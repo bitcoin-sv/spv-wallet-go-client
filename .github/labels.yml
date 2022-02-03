@@ -20,7 +20,7 @@
   description: "Any idea, suggestion"
   name: "idea"
 - color: d4c5f9
-  description: "Experimental - can break!"
+  description: "Experimental - breaking changes"
   name: "prototype"
 - color: cc317c
   description: "Any question or concern"
