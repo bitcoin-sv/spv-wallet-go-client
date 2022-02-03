@@ -23,6 +23,17 @@
           "maintenance",
           "security"
         ]
+      },
+      {
+        "login": "icellan",
+        "name": "Siggi",
+        "avatar_url": "https://avatars.githubusercontent.com/u/4411176?v=4",
+        "profile": "https://github.com/icellan",
+        "contributions": [
+            "infra",
+            "code",
+            "security"
+        ]
       }
     ]
 }
