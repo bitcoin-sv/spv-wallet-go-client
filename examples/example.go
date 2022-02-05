@@ -1,7 +1,9 @@
 package main
 
-import "github.com/BuxOrg/go-buxclient"
+import (
+	"fmt"
+)
 
 func main() {
-	buxclient.Greet()
+	fmt.Println("Example")
 }
