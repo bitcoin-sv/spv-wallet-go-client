@@ -17,7 +17,6 @@ import (
 const (
 	xPrivString = "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ"
 	xPubString  = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
-	serverURL   = "https://example.com/"
 )
 
 // TransportGraphQLMock ...
@@ -56,7 +55,7 @@ func TestRegisterXpub(t *testing.T) {
 		client := TransportGraphQLMock{
 			TransportGraphQL: TransportGraphQL{},
 		}
-		err := client.RegisterXpub(context.Background(), xPubString)
+		err := client.RegisterXpub(context.Background(), xPubString, nil)
 		assert.ErrorIs(t, err, ErrAdminKey)
 	})
 
@@ -70,7 +69,7 @@ func TestRegisterXpub(t *testing.T) {
 				},
 			},
 		}
-		err := client.RegisterXpub(context.Background(), xPubString)
+		err := client.RegisterXpub(context.Background(), xPubString, nil)
 		assert.ErrorIs(t, err, errTestTerror)
 	})
 
@@ -89,7 +88,7 @@ func TestRegisterXpub(t *testing.T) {
 				client:     &graphqlClient,
 			},
 		}
-		err := client.RegisterXpub(context.Background(), xPubString)
+		err := client.RegisterXpub(context.Background(), xPubString, nil)
 		assert.NoError(t, err)
 	})
 }
@@ -106,7 +105,7 @@ func TestGetDestination(t *testing.T) {
 				client:      &GraphQLMockClient{},
 			},
 		}
-		destination, err := client.GetDestination(context.Background())
+		destination, err := client.GetDestination(context.Background(), nil)
 		assert.ErrorIs(t, err, authentication.ErrMissingXPriv)
 		assert.Nil(t, destination)
 	})
@@ -127,16 +126,11 @@ func TestGetDestination(t *testing.T) {
 				client:      &graphqlClient,
 			},
 		}
-		destination, err := client.GetDestination(context.Background())
+		destination, err := client.GetDestination(context.Background(), nil)
 		assert.NoError(t, err)
 		assert.IsType(t, &bux.Destination{}, destination)
 		assert.Equal(t, "test-address", destination.Address)
-		assert.Len(t, graphqlClient.Request.Header, 5)
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_hash")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_nonce")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_signature")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_time")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_xpub")
+		checkAuthHeaders(t, graphqlClient)
 	})
 
 	t.Run("no signRequest success", func(t *testing.T) {
@@ -154,7 +148,7 @@ func TestGetDestination(t *testing.T) {
 				client: &graphqlClient,
 			},
 		}
-		destination, err := client.GetDestination(context.Background())
+		destination, err := client.GetDestination(context.Background(), nil)
 		assert.NoError(t, err)
 		assert.IsType(t, &bux.Destination{}, destination)
 		assert.Equal(t, "test-address", destination.Address)
@@ -178,7 +172,7 @@ func TestDraftTransaction(t *testing.T) {
 				client:      &GraphQLMockClient{},
 			},
 		}
-		destination, err := client.DraftTransaction(context.Background(), config)
+		destination, err := client.DraftTransaction(context.Background(), config, nil)
 		assert.ErrorIs(t, err, authentication.ErrMissingXPriv)
 		assert.Nil(t, destination)
 	})
@@ -199,15 +193,10 @@ func TestDraftTransaction(t *testing.T) {
 				signRequest: true,
 			},
 		}
-		draftTransaction, err := client.DraftTransaction(context.Background(), config)
+		draftTransaction, err := client.DraftTransaction(context.Background(), config, nil)
 		assert.NoError(t, err)
 		assert.IsType(t, &bux.DraftTransaction{}, draftTransaction)
-		assert.Len(t, graphqlClient.Request.Header, 5)
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_hash")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_nonce")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_signature")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_time")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_xpub")
+		checkAuthHeaders(t, graphqlClient)
 	})
 }
 
@@ -227,7 +216,7 @@ func TestDraftToRecipients(t *testing.T) {
 				client:      &GraphQLMockClient{},
 			},
 		}
-		destination, err := client.DraftToRecipients(context.Background(), recipients)
+		destination, err := client.DraftToRecipients(context.Background(), recipients, nil)
 		assert.ErrorIs(t, err, authentication.ErrMissingXPriv)
 		assert.Nil(t, destination)
 	})
@@ -248,14 +237,18 @@ func TestDraftToRecipients(t *testing.T) {
 				signRequest: true,
 			},
 		}
-		draftTransaction, err := client.DraftToRecipients(context.Background(), recipients)
+		draftTransaction, err := client.DraftToRecipients(context.Background(), recipients, nil)
 		assert.NoError(t, err)
 		assert.IsType(t, &bux.DraftTransaction{}, draftTransaction)
-		assert.Len(t, graphqlClient.Request.Header, 5)
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_hash")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_nonce")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_signature")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_time")
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_xpub")
+		checkAuthHeaders(t, graphqlClient)
 	})
+}
+
+func checkAuthHeaders(t *testing.T, graphqlClient GraphQLMockClient) {
+	assert.Len(t, graphqlClient.Request.Header, 5)
+	assert.Contains(t, graphqlClient.Request.Header, "Auth_hash")
+	assert.Contains(t, graphqlClient.Request.Header, "Auth_nonce")
+	assert.Contains(t, graphqlClient.Request.Header, "Auth_signature")
+	assert.Contains(t, graphqlClient.Request.Header, "Auth_time")
+	assert.Contains(t, graphqlClient.Request.Header, "Auth_xpub")
 }

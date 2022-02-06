@@ -54,11 +54,11 @@ type TransportService interface {
 	IsDebug() bool
 	SetSignRequest(debug bool)
 	IsSignRequest() bool
-	RegisterXpub(ctx context.Context, rawXPub string) error
-	GetDestination(ctx context.Context) (*bux.Destination, error)
-	DraftToRecipients(ctx context.Context, recipients []*Recipients) (*bux.DraftTransaction, error)
-	DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig) (*bux.DraftTransaction, error)
-	RecordTransaction(ctx context.Context, hex, referenceID string) (string, error)
+	RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error
+	GetDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error)
+	DraftToRecipients(ctx context.Context, recipients []*Recipients, metadata *bux.Metadata) (*bux.DraftTransaction, error)
+	DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig, metadata *bux.Metadata) (*bux.DraftTransaction, error)
+	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *bux.Metadata) (string, error)
 }
 
 // NewTransport create a new transport service object
@@ -91,6 +91,17 @@ func NewTransport(opts ...ClientOps) (TransportService, error) {
 
 func newTransportService(transportService TransportService) TransportService {
 	return transportService
+}
+
+func processMetadata(metadata *bux.Metadata) *bux.Metadata {
+	if metadata == nil {
+		m := make(bux.Metadata)
+		metadata = &m
+	}
+
+	(*metadata)["user_agent"] = BuxUserAgent
+
+	return metadata
 }
 
 // WithXPriv will set the xPriv

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/BitcoinSchema/xapi/bux"
 	"github.com/bitcoinschema/go-bitcoin/v2"
@@ -57,7 +58,7 @@ func (h *TransportHTTP) SetAdminKey(adminKey *bip32.ExtendedKey) {
 }
 
 // RegisterXpub will register an xPub
-func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string) error {
+func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
 
 	// adding an xpub needs to be signed by an admin key
 	if h.adminXPriv == nil {
@@ -65,10 +66,8 @@ func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string) error 
 	}
 
 	jsonData := map[string]interface{}{
-		"metadata": map[string]interface{}{
-			"user_agent": BuxUserAgent,
-		},
-		"key": rawXPub,
+		"metadata": processMetadata(metadata),
+		"key":      rawXPub,
 	}
 
 	jsonStr, err := json.Marshal(jsonData)
@@ -86,11 +85,9 @@ func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string) error 
 }
 
 // GetDestination will get a destination
-func (h *TransportHTTP) GetDestination(ctx context.Context) (*bux.Destination, error) {
+func (h *TransportHTTP) GetDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
 	jsonData := map[string]interface{}{
-		"metadata": map[string]interface{}{
-			"user_agent": BuxUserAgent,
-		},
+		"metadata": processMetadata(metadata),
 	}
 
 	jsonStr, err := json.Marshal(jsonData)
@@ -111,12 +108,21 @@ func (h *TransportHTTP) GetDestination(ctx context.Context) (*bux.Destination, e
 }
 
 // DraftTransaction is a draft transaction
-func (h *TransportHTTP) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig) (*bux.DraftTransaction, error) {
-	return nil, nil
+func (h *TransportHTTP) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig,
+	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+
+	jsonData := map[string]interface{}{
+		"config":   transactionConfig,
+		"metadata": processMetadata(metadata),
+	}
+
+	return h.createDraftTransaction(ctx, jsonData)
 }
 
 // DraftToRecipients is a draft transaction to a slice of recipients
-func (h *TransportHTTP) DraftToRecipients(ctx context.Context, recipients []*Recipients) (*bux.DraftTransaction, error) {
+func (h *TransportHTTP) DraftToRecipients(ctx context.Context, recipients []*Recipients,
+	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+
 	outputs := make([]map[string]interface{}, 0)
 	for _, recipient := range recipients {
 		outputs = append(outputs, map[string]interface{}{
@@ -129,11 +135,13 @@ func (h *TransportHTTP) DraftToRecipients(ctx context.Context, recipients []*Rec
 		"config": map[string]interface{}{
 			"outputs": outputs,
 		},
-		"metadata": map[string]interface{}{
-			"user_agent": BuxUserAgent,
-		},
+		"metadata": processMetadata(metadata),
 	}
 
+	return h.createDraftTransaction(ctx, jsonData)
+}
+
+func (h *TransportHTTP) createDraftTransaction(ctx context.Context, jsonData map[string]interface{}) (*bux.DraftTransaction, error) {
 	jsonStr, err := json.Marshal(jsonData)
 	if err != nil {
 		return nil, err
@@ -152,13 +160,13 @@ func (h *TransportHTTP) DraftToRecipients(ctx context.Context, recipients []*Rec
 }
 
 // RecordTransaction will record a transaction
-func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID string) (string, error) {
+func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID string,
+	metadata *bux.Metadata) (string, error) {
+
 	jsonData := map[string]interface{}{
 		"hex":          hex,
 		"reference_id": referenceID,
-		"metadata": map[string]interface{}{
-			"user_agent": BuxUserAgent,
-		},
+		"metadata":     processMetadata(metadata),
 	}
 
 	jsonStr, err := json.Marshal(jsonData)
@@ -207,7 +215,7 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, path string, jsonStr 
 		return err
 	}
 	if resp.StatusCode >= 400 {
-		return errors.New("server error: " + string(resp.StatusCode) + " - " + resp.Status)
+		return errors.New("server error: " + strconv.Itoa(resp.StatusCode) + " - " + resp.Status)
 	}
 
 	defer func(Body io.ReadCloser) {

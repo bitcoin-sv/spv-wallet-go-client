@@ -121,23 +121,23 @@ func (b *BuxClient) GetTransport() *transports.TransportService {
 }
 
 // RegisterXpub registers a new xpub - admin key needed
-func (b *BuxClient) RegisterXpub(ctx context.Context, rawXPub string) error {
-	return b.transport.RegisterXpub(ctx, rawXPub)
+func (b *BuxClient) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
+	return b.transport.RegisterXpub(ctx, rawXPub, metadata)
 }
 
 // DraftTransaction initialize a new draft transaction
-func (b *BuxClient) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig) (*bux.DraftTransaction, error) {
-	return b.transport.DraftTransaction(ctx, transactionConfig)
+func (b *BuxClient) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig, metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+	return b.transport.DraftTransaction(ctx, transactionConfig, metadata)
 }
 
 // DraftToRecipients initialize a new P2PKH draft transaction to a list of recipients
-func (b *BuxClient) DraftToRecipients(ctx context.Context, recipients []*transports.Recipients) (*bux.DraftTransaction, error) {
-	return b.transport.DraftToRecipients(ctx, recipients)
+func (b *BuxClient) DraftToRecipients(ctx context.Context, recipients []*transports.Recipients, metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+	return b.transport.DraftToRecipients(ctx, recipients, metadata)
 }
 
 // GetDestination get new fresh destination
-func (b *BuxClient) GetDestination(ctx context.Context) (*bux.Destination, error) {
-	return b.transport.GetDestination(ctx)
+func (b *BuxClient) GetDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
+	return b.transport.GetDestination(ctx, metadata)
 }
 
 // FinalizeTransaction will finalize the transaction
@@ -190,13 +190,13 @@ func (b *BuxClient) FinalizeTransaction(draft *bux.DraftTransaction) (string, er
 }
 
 // RecordTransaction record a new transaction
-func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string) (string, error) {
-	return b.transport.RecordTransaction(ctx, hex, draftID)
+func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string, metadata *bux.Metadata) (string, error) {
+	return b.transport.RecordTransaction(ctx, hex, draftID, metadata)
 }
 
 // SendToRecipients send to recipients
-func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transports.Recipients) (string, error) {
-	draft, err := b.DraftToRecipients(ctx, recipients)
+func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transports.Recipients, metadata *bux.Metadata) (string, error) {
+	draft, err := b.DraftToRecipients(ctx, recipients, metadata)
 	if err != nil {
 		return "", err
 	}
@@ -206,7 +206,7 @@ func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transpor
 		return "", err
 	}
 
-	return b.RecordTransaction(ctx, hex, draft.ID)
+	return b.RecordTransaction(ctx, hex, draft.ID, metadata)
 }
 
 // WithXPriv will set xPrivString on the client

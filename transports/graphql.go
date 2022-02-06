@@ -69,7 +69,7 @@ func (g *TransportGraphQL) IsSignRequest() bool {
 }
 
 // RegisterXpub will register an xPub
-func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string) error {
+func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
 
 	// adding an xpub needs to be signed by an admin key
 	if g.adminXPriv == nil {
@@ -77,19 +77,21 @@ func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string) err
 	}
 
 	reqBody := `
-   	mutation {
+   	mutation ($metadata: Map) {
 	  xpub(
 		xpub: "` + rawXPub + `"
-		metadata:{
-		  user_agent:"` + BuxUserAgent + `"
-        }
+		metadata: $metadata
 	  ) {
 	    ID
 	  }
 	}`
 	req := graphql.NewRequest(reqBody)
+	req.Var("metadata", processMetadata(metadata))
+	variables := map[string]interface{}{
+		"metadata": processMetadata(metadata),
+	}
 
-	bodyString, err := getBodyString(reqBody, nil)
+	bodyString, err := getBodyString(reqBody, variables)
 	if err != nil {
 		return err
 	}
@@ -108,13 +110,11 @@ func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string) err
 }
 
 // GetDestination will get a destination
-func (g *TransportGraphQL) GetDestination(ctx context.Context) (*bux.Destination, error) {
+func (g *TransportGraphQL) GetDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
 	reqBody := `
-   	mutation {
+   	mutation ($metadata: Map) {
 	  destination(
-		metadata:{
-		  user_agent:"` + BuxUserAgent + `"
-		}
+		metadata: $metadata
 	  ) {
 		ID
 		XpubID
@@ -127,8 +127,12 @@ func (g *TransportGraphQL) GetDestination(ctx context.Context) (*bux.Destination
 	  }
 	}`
 	req := graphql.NewRequest(reqBody)
+	req.Var("metadata", processMetadata(metadata))
 	if g.signRequest {
-		bodyString, err := getBodyString(reqBody, nil)
+		variables := map[string]interface{}{
+			"metadata": processMetadata(metadata),
+		}
+		bodyString, err := getBodyString(reqBody, variables)
 		if err != nil {
 			return nil, err
 		}
@@ -154,38 +158,40 @@ func (g *TransportGraphQL) GetDestination(ctx context.Context) (*bux.Destination
 }
 
 // DraftTransaction is a draft transaction
-func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig) (*bux.DraftTransaction, error) {
+func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig,
+	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+
 	reqBody := `
-   	mutation ($transactionConfig: TransactionConfigInput!) {
+   	mutation ($transactionConfig: TransactionConfigInput!, $metadata: Map) {
 	  newTransaction(
 		transactionConfig: $transactionConfig
-		metadata:{
-		  user_agent:"` + BuxUserAgent + `"
-		}
+		metadata: $metadata
 	  ) ` + graphqlDraftTransactionFields + `
 	}`
 	req := graphql.NewRequest(reqBody)
 	req.Var("transactionConfig", transactionConfig)
+	req.Var("metadata", processMetadata(metadata))
 	variables := map[string]interface{}{
 		"transactionConfig": transactionConfig,
+		"metadata":          processMetadata(metadata),
 	}
 
 	return g.draftTransactionCommon(ctx, reqBody, variables, req)
 }
 
 // DraftToRecipients is a draft transaction to a slice of recipients
-func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*Recipients) (*bux.DraftTransaction, error) {
+func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*Recipients,
+	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+
 	reqBody := `
-   	mutation ($outputs: [TransactionOutputInput]!) {
+   	mutation ($outputs: [TransactionOutputInput]!, $metadata: Map) {
 	  newTransaction(
 		transactionConfig:{
 		  Outputs: $outputs
           ChangeNumberOfDestinations:3
           ChangeDestinationsStrategy:"random"
 		}
-		metadata:{
-		  user_agent:"` + BuxUserAgent + `"
-		}
+		metadata:$metadata
 	  ) ` + graphqlDraftTransactionFields + `
 	}`
 	req := graphql.NewRequest(reqBody)
@@ -198,14 +204,18 @@ func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*
 		})
 	}
 	req.Var("outputs", outputs)
+	req.Var("metadata", processMetadata(metadata))
 	variables := map[string]interface{}{
-		"outputs": outputs,
+		"outputs":  outputs,
+		"metadata": processMetadata(metadata),
 	}
 
 	return g.draftTransactionCommon(ctx, reqBody, variables, req)
 }
 
-func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody string, variables map[string]interface{}, req *graphql.Request) (*bux.DraftTransaction, error) {
+func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody string,
+	variables map[string]interface{}, req *graphql.Request) (*bux.DraftTransaction, error) {
+
 	if g.signRequest {
 		bodyString, err := getBodyString(reqBody, variables)
 		if err != nil {
@@ -233,23 +243,27 @@ func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody s
 }
 
 // RecordTransaction will record a transaction
-func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, referenceID string) (string, error) {
+func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, referenceID string,
+	metadata *bux.Metadata) (string, error) {
+
 	reqBody := `
-   	mutation {
+   	mutation($metadata: Map) {
 	  transaction(
 		hex:"` + hex + `",
         draftID:"` + referenceID + `"
-		metadata:{
-		  user_agent:"` + BuxUserAgent + `"
-		}
+		metadata: $metadata
 	  ) {
 		ID
 	  }
 	}`
 	req := graphql.NewRequest(reqBody)
+	req.Var("metadata", processMetadata(metadata))
 
 	if g.signRequest {
-		bodyString, err := getBodyString(reqBody, nil)
+		variables := map[string]interface{}{
+			"metadata": processMetadata(metadata),
+		}
+		bodyString, err := getBodyString(reqBody, variables)
 		if err != nil {
 			return "", err
 		}
