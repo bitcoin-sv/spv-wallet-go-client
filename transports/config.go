@@ -1,6 +1,6 @@
 package transports
 
-import "github.com/BitcoinSchema/xapi/bux"
+import "github.com/BuxOrg/bux"
 
 // Recipients is a struct for recipients
 type Recipients struct {

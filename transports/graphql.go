@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/BitcoinSchema/xapi/bux"
+	"github.com/BuxOrg/bux"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/machinebox/graphql"

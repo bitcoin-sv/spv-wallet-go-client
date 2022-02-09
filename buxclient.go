@@ -11,7 +11,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/BitcoinSchema/xapi/bux"
+	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/go-buxclient/transports"
 	"github.com/BuxOrg/go-buxclient/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/BitcoinSchema/xapi/bux/utils"
+	"github.com/BuxOrg/bux/utils"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/libsv/go-bt/v2"

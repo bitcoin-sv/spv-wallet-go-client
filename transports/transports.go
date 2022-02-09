@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/BitcoinSchema/xapi/bux"
+	"github.com/BuxOrg/bux"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 )

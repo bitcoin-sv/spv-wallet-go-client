@@ -6,8 +6,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/BitcoinSchema/xapi/bux"
-	"github.com/BitcoinSchema/xapi/bux/utils"
+	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux/utils"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/machinebox/graphql"
 	"github.com/stretchr/testify/assert"
@@ -39,8 +39,13 @@ type GraphQLMockClient struct {
 
 // Run ...
 func (g *GraphQLMockClient) Run(_ context.Context, req *graphql.Request, resp interface{}) error {
-	j, _ := json.Marshal(g.Response)
-	_ = json.Unmarshal(j, &resp)
+	j, err := json.Marshal(g.Response)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(j, &resp); err != nil {
+		return err
+	}
 	g.Request = req
 	return g.Error
 }
