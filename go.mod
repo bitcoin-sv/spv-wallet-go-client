@@ -2,7 +2,7 @@ module github.com/BuxOrg/go-buxclient
 
 go 1.16
 
-replace github.com/BitcoinSchema/xapi => ../../BitcoinSchema/xapi
+replace github.com/BitcoinSchema/xapi => ../xapi
 
 require (
 	github.com/BitcoinSchema/xapi v0.0.0-00010101000000-000000000000
@@ -12,5 +12,5 @@ require (
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/stretchr/testify v1.7.0
-	google.golang.org/genproto v0.0.0-20220204002441-d6cc3cc0770e // indirect
+	golang.org/x/crypto v0.0.0-20220209154931-65fa2f7aa847 // indirect
 )

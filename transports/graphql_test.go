@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/BitcoinSchema/xapi/bux"
-	"github.com/BitcoinSchema/xapi/bux/authentication"
 	"github.com/BitcoinSchema/xapi/bux/utils"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/machinebox/graphql"
@@ -49,7 +48,7 @@ func (g *GraphQLMockClient) Run(_ context.Context, req *graphql.Request, resp in
 // TestRegisterXpub will test the RegisterXpub method
 func TestRegisterXpub(t *testing.T) {
 	xPriv, _ := bip32.NewKeyFromString(xPrivString)
-	//xPub, _ := xPriv.Neuter()
+	// xPub, _ := xPriv.Neuter()
 
 	t.Run("no admin key", func(t *testing.T) {
 		client := TransportGraphQLMock{
@@ -106,7 +105,7 @@ func TestGetDestination(t *testing.T) {
 			},
 		}
 		destination, err := client.GetDestination(context.Background(), nil)
-		assert.ErrorIs(t, err, authentication.ErrMissingXPriv)
+		assert.ErrorIs(t, err, bux.ErrMissingXPriv)
 		assert.Nil(t, destination)
 	})
 
@@ -173,7 +172,7 @@ func TestDraftTransaction(t *testing.T) {
 			},
 		}
 		destination, err := client.DraftTransaction(context.Background(), config, nil)
-		assert.ErrorIs(t, err, authentication.ErrMissingXPriv)
+		assert.ErrorIs(t, err, bux.ErrMissingXPriv)
 		assert.Nil(t, destination)
 	})
 
@@ -217,7 +216,7 @@ func TestDraftToRecipients(t *testing.T) {
 			},
 		}
 		destination, err := client.DraftToRecipients(context.Background(), recipients, nil)
-		assert.ErrorIs(t, err, authentication.ErrMissingXPriv)
+		assert.ErrorIs(t, err, bux.ErrMissingXPriv)
 		assert.Nil(t, destination)
 	})
 

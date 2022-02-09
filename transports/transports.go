@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/BitcoinSchema/xapi/bux"
-	"github.com/BitcoinSchema/xapi/bux/authentication"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 )
@@ -43,7 +42,7 @@ type ClientOps func(c *Client)
 
 // addSignature will add the signature to the request
 func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
-	return authentication.SetSignature(header, xPriv, bodyString)
+	return bux.SetSignature(header, xPriv, bodyString)
 }
 
 // TransportService the transport service interface
