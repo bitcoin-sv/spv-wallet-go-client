@@ -201,20 +201,27 @@ func (b *BuxClient) GetTransactions(ctx context.Context, conditions map[string]i
 }
 
 // RecordTransaction record a new transaction
-func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string, metadata *bux.Metadata) (string, error) {
+func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string,
+	metadata *bux.Metadata) (*bux.Transaction, error) {
+
 	return b.transport.RecordTransaction(ctx, hex, draftID, metadata)
 }
 
 // SendToRecipients send to recipients
-func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transports.Recipients, metadata *bux.Metadata) (string, error) {
+func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transports.Recipients,
+	metadata *bux.Metadata) (*bux.Transaction, error) {
+
 	draft, err := b.DraftToRecipients(ctx, recipients, metadata)
 	if err != nil {
-		return "", err
+		return nil, err
+	}
+	if draft == nil {
+		return nil, bux.ErrDraftNotFound
 	}
 
 	var hex string
 	if hex, err = b.FinalizeTransaction(draft); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	return b.RecordTransaction(ctx, hex, draft.ID, metadata)

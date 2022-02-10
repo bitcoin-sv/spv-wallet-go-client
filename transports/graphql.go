@@ -49,6 +49,11 @@ type TransactionsData struct {
 	Transactions []*bux.Transaction `json:"transactions"`
 }
 
+// NewTransactionData is a transaction
+type NewTransactionData struct {
+	Transaction *bux.Transaction `json:"transaction"`
+}
+
 // Init will initialize
 func (g *TransportGraphQL) Init() error {
 	g.client = graphql.NewClient(g.server, graphql.WithHTTPClient(g.httpClient))
@@ -331,7 +336,7 @@ func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[s
 
 // RecordTransaction will record a transaction
 func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, referenceID string,
-	metadata *bux.Metadata) (string, error) {
+	metadata *bux.Metadata) (*bux.Transaction, error) {
 
 	reqBody := `
    	mutation($metadata: Map) {
@@ -351,19 +356,20 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 	}
 	err := g.signGraphQLRequest(req, reqBody, variables)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// run it and capture the response
-	var transaction bux.Transaction
-	if err := g.client.Run(ctx, req, &transaction); err != nil {
-		return "", err
+	var respData NewTransactionData
+	if err = g.client.Run(ctx, req, &respData); err != nil {
+		return nil, err
 	}
+	transaction := respData.Transaction
 	if g.debug {
 		fmt.Printf("Transaction: %s\n", transaction.ID)
 	}
 
-	return transaction.ID, nil
+	return transaction, nil
 }
 
 func getBodyString(reqBody string, variables map[string]interface{}) (string, error) {

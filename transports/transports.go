@@ -59,7 +59,7 @@ type TransportService interface {
 	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) ([]*bux.Transaction, error)
 	DraftToRecipients(ctx context.Context, recipients []*Recipients, metadata *bux.Metadata) (*bux.DraftTransaction, error)
 	DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig, metadata *bux.Metadata) (*bux.DraftTransaction, error)
-	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *bux.Metadata) (string, error)
+	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *bux.Metadata) (*bux.Transaction, error)
 }
 
 // NewTransport create a new transport service object

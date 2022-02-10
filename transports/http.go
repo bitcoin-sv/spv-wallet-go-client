@@ -193,7 +193,7 @@ func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[stri
 
 // RecordTransaction will record a transaction
 func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID string,
-	metadata *bux.Metadata) (string, error) {
+	metadata *bux.Metadata) (*bux.Transaction, error) {
 
 	jsonData := map[string]interface{}{
 		"hex":          hex,
@@ -203,19 +203,19 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 
 	jsonStr, err := json.Marshal(jsonData)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	var transaction *bux.Transaction
 	err = h.doHTTPRequest(ctx, "POST", "/transactions/record", jsonStr, h.xPriv, h.signRequest, &transaction)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if h.debug {
 		fmt.Printf("Transaction: %s\n", transaction.ID)
 	}
 
-	return transaction.ID, nil
+	return transaction, nil
 }
 
 func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path string, jsonStr []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) error {
