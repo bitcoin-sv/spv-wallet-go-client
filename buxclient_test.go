@@ -56,6 +56,20 @@ func mustWrite(w io.Writer, s string) {
 	}
 }
 
+type testTransportHandler struct {
+	ClientURL string
+	Client    func(serverURL string, httpClient *http.Client) ClientOps
+	Path      string
+	Queries   []*testTransportHandlerRequest
+	Result    string
+	Type      string
+}
+
+type testTransportHandlerRequest struct {
+	Path   string
+	Result func(w http.ResponseWriter, req *http.Request)
+}
+
 // TestNewBuxClient will test the TestNewBuxClient method
 func TestNewBuxClient(t *testing.T) {
 	t.Run("no keys", func(t *testing.T) {
@@ -151,24 +165,23 @@ func TestSetDebug(t *testing.T) {
 
 // TestDraftTransaction will test the DraftTransaction method
 func TestDraftTransaction(t *testing.T) {
-	transportHandlers := []map[string]interface{}{{
-		"type":       "http",
-		"path":       "/transactions/new",
-		"result":     draftTxJSON,
-		"client_url": serverURL,
-		"client":     WithHTTPClient,
+	transportHandlers := []testTransportHandler{{
+		Type:      "http",
+		Path:      "/transactions/new",
+		Result:    draftTxJSON,
+		ClientURL: serverURL,
+		Client:    WithHTTPClient,
 	}, {
-		"type":       "graphql",
-		"path":       "/graphql",
-		"result":     `{"data":{"new_transaction":` + draftTxJSON + `}}`,
-		"client_url": serverURL + `graphql`,
-		"client":     WithGraphQLClient,
+		Type:      "graphql",
+		Path:      "/graphql",
+		Result:    `{"data":{"new_transaction":` + draftTxJSON + `}}`,
+		ClientURL: serverURL + `graphql`,
+		Client:    WithGraphQLClient,
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("draft transaction "+transportHandler["type"].(string), func(t *testing.T) {
-			client := getTestBuxClient(transportHandler, false)
-
+		t.Run("draft transaction "+transportHandler.Type, func(t *testing.T) {
+			var client = getTestBuxClient(transportHandler, false)
 			config := &bux.TransactionConfig{
 				Outputs: []*bux.TransactionOutput{{
 					Satoshis: 1000,
@@ -188,22 +201,22 @@ func TestDraftTransaction(t *testing.T) {
 
 // TestRegisterXpub will test the RegisterXpub method
 func TestRegisterXpub(t *testing.T) {
-	transportHandlers := []map[string]interface{}{{
-		"type":       "http",
-		"path":       "/xpubs",
-		"result":     xpubJSON,
-		"client_url": serverURL,
-		"client":     WithHTTPClient,
+	transportHandlers := []testTransportHandler{{
+		Type:      "http",
+		Path:      "/xpubs",
+		Result:    xpubJSON,
+		ClientURL: serverURL,
+		Client:    WithHTTPClient,
 	}, {
-		"type":       "graphql",
-		"path":       "/graphql",
-		"result":     `{"data":{"xpub":` + xpubJSON + `}}`,
-		"client_url": serverURL + `graphql`,
-		"client":     WithGraphQLClient,
+		Type:      "graphql",
+		Path:      "/graphql",
+		Result:    `{"data":{"xpub":` + xpubJSON + `}}`,
+		ClientURL: serverURL + `graphql`,
+		Client:    WithGraphQLClient,
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("draft transaction "+transportHandler["type"].(string), func(t *testing.T) {
+		t.Run("draft transaction "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, true)
 			metadata := &bux.Metadata{
 				"test-key": "test-value",
@@ -216,22 +229,22 @@ func TestRegisterXpub(t *testing.T) {
 
 // TestDraftToRecipients will test the DraftToRecipients method
 func TestDraftToRecipients(t *testing.T) {
-	transportHandlers := []map[string]interface{}{{
-		"type":       "http",
-		"path":       "/transactions/new",
-		"result":     draftTxJSON,
-		"client_url": serverURL,
-		"client":     WithHTTPClient,
+	transportHandlers := []testTransportHandler{{
+		Type:      "http",
+		Path:      "/transactions/new",
+		Result:    draftTxJSON,
+		ClientURL: serverURL,
+		Client:    WithHTTPClient,
 	}, {
-		"type":       "graphql",
-		"path":       "/graphql",
-		"result":     `{"data":{"new_transaction":` + draftTxJSON + `}}`,
-		"client_url": serverURL + `graphql`,
-		"client":     WithGraphQLClient,
+		Type:      "graphql",
+		Path:      "/graphql",
+		Result:    `{"data":{"new_transaction":` + draftTxJSON + `}}`,
+		ClientURL: serverURL + `graphql`,
+		Client:    WithGraphQLClient,
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("draft transaction "+transportHandler["type"].(string), func(t *testing.T) {
+		t.Run("draft transaction "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			recipients := []*transports.Recipients{{
@@ -261,22 +274,22 @@ func checkDraftTransactionOutput(t *testing.T, draft *bux.DraftTransaction) {
 
 // TestGetDestination will test the GetDestination method
 func TestGetDestination(t *testing.T) {
-	transportHandlers := []map[string]interface{}{{
-		"type":       "http",
-		"path":       "/destinations",
-		"result":     destinationJSON,
-		"client_url": serverURL,
-		"client":     WithHTTPClient,
+	transportHandlers := []testTransportHandler{{
+		Type:      "http",
+		Path:      "/destinations",
+		Result:    destinationJSON,
+		ClientURL: serverURL,
+		Client:    WithHTTPClient,
 	}, {
-		"type":       "graphql",
-		"path":       "/graphql",
-		"result":     `{"data":{"destination":` + destinationJSON + `}}`,
-		"client_url": serverURL + `graphql`,
-		"client":     WithGraphQLClient,
+		Type:      "graphql",
+		Path:      "/graphql",
+		Result:    `{"data":{"destination":` + destinationJSON + `}}`,
+		ClientURL: serverURL + `graphql`,
+		Client:    WithGraphQLClient,
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("new destination "+transportHandler["type"].(string), func(t *testing.T) {
+		t.Run("new destination "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			destination, err := client.GetDestination(context.Background(), nil)
@@ -295,22 +308,22 @@ func TestGetDestination(t *testing.T) {
 
 // TestGetTransaction will test the GetTransaction method
 func TestGetTransaction(t *testing.T) {
-	transportHandlers := []map[string]interface{}{{
-		"type":       "http",
-		"path":       "/transaction",
-		"result":     transactionJSON,
-		"client_url": serverURL,
-		"client":     WithHTTPClient,
+	transportHandlers := []testTransportHandler{{
+		Type:      "http",
+		Path:      "/transaction",
+		Result:    transactionJSON,
+		ClientURL: serverURL,
+		Client:    WithHTTPClient,
 	}, {
-		"type":       "graphql",
-		"path":       "/graphql",
-		"result":     `{"data":{"transaction":` + transactionJSON + `}}`,
-		"client_url": serverURL + `graphql`,
-		"client":     WithGraphQLClient,
+		Type:      "graphql",
+		Path:      "/graphql",
+		Result:    `{"data":{"transaction":` + transactionJSON + `}}`,
+		ClientURL: serverURL + `graphql`,
+		Client:    WithGraphQLClient,
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("get transaction "+transportHandler["type"].(string), func(t *testing.T) {
+		t.Run("get transaction "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			transaction, err := client.GetTransaction(context.Background(), txID)
@@ -327,22 +340,22 @@ func TestGetTransaction(t *testing.T) {
 
 // TestGetTransactions will test the GetTransactions method
 func TestGetTransactions(t *testing.T) {
-	transportHandlers := []map[string]interface{}{{
-		"type":       "http",
-		"path":       "/transactions",
-		"result":     transactionsJSON,
-		"client_url": serverURL,
-		"client":     WithHTTPClient,
+	transportHandlers := []testTransportHandler{{
+		Type:      "http",
+		Path:      "/transactions",
+		Result:    transactionsJSON,
+		ClientURL: serverURL,
+		Client:    WithHTTPClient,
 	}, {
-		"type":       "graphql",
-		"path":       "/graphql",
-		"result":     `{"data":{"transactions":` + transactionsJSON + `}}`,
-		"client_url": serverURL + `graphql`,
-		"client":     WithGraphQLClient,
+		Type:      "graphql",
+		Path:      "/graphql",
+		Result:    `{"data":{"transactions":` + transactionsJSON + `}}`,
+		ClientURL: serverURL + `graphql`,
+		Client:    WithGraphQLClient,
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("get transactions "+transportHandler["type"].(string), func(t *testing.T) {
+		t.Run("get transactions "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			conditions := map[string]interface{}{
@@ -374,22 +387,22 @@ func TestGetTransactions(t *testing.T) {
 
 // TestRecordTransaction will test the RecordTransaction method
 func TestRecordTransaction(t *testing.T) {
-	transportHandlers := []map[string]interface{}{{
-		"type":       "http",
-		"path":       "/transactions/record",
-		"result":     transactionJSON,
-		"client_url": serverURL,
-		"client":     WithHTTPClient,
+	transportHandlers := []testTransportHandler{{
+		Type:      "http",
+		Path:      "/transactions/record",
+		Result:    transactionJSON,
+		ClientURL: serverURL,
+		Client:    WithHTTPClient,
 	}, {
-		"type":       "graphql",
-		"path":       "/graphql",
-		"result":     `{"data":{"transaction":` + transactionJSON + `}}`,
-		"client_url": serverURL + `graphql`,
-		"client":     WithGraphQLClient,
+		Type:      "graphql",
+		Path:      "/graphql",
+		Result:    `{"data":{"transaction":` + transactionJSON + `}}`,
+		ClientURL: serverURL + `graphql`,
+		Client:    WithGraphQLClient,
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("get transactions "+transportHandler["type"].(string), func(t *testing.T) {
+		t.Run("get transactions "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			hex := ""
@@ -406,28 +419,28 @@ func TestRecordTransaction(t *testing.T) {
 
 // TestSendToRecipients will test the SendToRecipients method
 func TestSendToRecipients(t *testing.T) {
-	transportHandlers := []map[string]interface{}{{
-		"type": "http",
-		"queries": []map[string]interface{}{{
-			"path": "/transactions/new",
-			"result": func(w http.ResponseWriter, req *http.Request) {
+	transportHandlers := []testTransportHandler{{
+		Type: "http",
+		Queries: []*testTransportHandlerRequest{{
+			Path: "/transactions/new",
+			Result: func(w http.ResponseWriter, req *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				mustWrite(w, draftTxJSON)
 			},
 		}, {
-			"path": "/transactions/record",
-			"result": func(w http.ResponseWriter, req *http.Request) {
+			Path: "/transactions/record",
+			Result: func(w http.ResponseWriter, req *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				mustWrite(w, transactionJSON)
 			},
 		}},
-		"client_url": serverURL,
-		"client":     WithHTTPClient,
+		ClientURL: serverURL,
+		Client:    WithHTTPClient,
 	}, {
-		"type": "graphql",
-		"queries": []map[string]interface{}{{
-			"path": "/graphql",
-			"result": func(w http.ResponseWriter, req *http.Request) {
+		Type: "graphql",
+		Queries: []*testTransportHandlerRequest{{
+			Path: "/graphql",
+			Result: func(w http.ResponseWriter, req *http.Request) {
 				result := `{"data":{"transaction":` + transactionJSON + `}}`
 				if req.ContentLength > 1000 {
 					result = `{"data":{"new_transaction":` + draftTxJSON + `}}`
@@ -436,12 +449,12 @@ func TestSendToRecipients(t *testing.T) {
 				mustWrite(w, result)
 			},
 		}},
-		"client_url": serverURL + `graphql`,
-		"client":     WithGraphQLClient,
+		ClientURL: serverURL + `graphql`,
+		Client:    WithGraphQLClient,
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("get transactions "+transportHandler["type"].(string), func(t *testing.T) {
+		t.Run("get transactions "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			recipients := []*transports.Recipients{{
@@ -515,24 +528,23 @@ func TestGetTransport(t *testing.T) {
 	})
 }
 
-func getTestBuxClient(transportHandler map[string]interface{}, adminKey bool) *BuxClient {
+func getTestBuxClient(transportHandler testTransportHandler, adminKey bool) *BuxClient {
 	mux := http.NewServeMux()
-	if _, ok := transportHandler["queries"]; ok {
-		for _, query := range transportHandler["queries"].([]map[string]interface{}) {
-			mux.HandleFunc(query["path"].(string), query["result"].(func(w http.ResponseWriter, req *http.Request)))
+	if transportHandler.Queries != nil {
+		for _, query := range transportHandler.Queries {
+			mux.HandleFunc(query.Path, query.Result)
 		}
 	} else {
-		mux.HandleFunc(transportHandler["path"].(string), func(w http.ResponseWriter, req *http.Request) {
+		mux.HandleFunc(transportHandler.Path, func(w http.ResponseWriter, req *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
-			mustWrite(w, transportHandler["result"].(string))
+			mustWrite(w, transportHandler.Result)
 		})
 	}
 	httpclient := &http.Client{Transport: localRoundTripper{handler: mux}}
 
-	clientHandler := transportHandler["client"].(func(serverURL string, httpClient *http.Client) ClientOps)
 	opts := []ClientOps{
 		WithXPriv(xPrivString),
-		clientHandler(transportHandler["client_url"].(string), httpclient),
+		transportHandler.Client(transportHandler.ClientURL, httpclient),
 	}
 	if adminKey {
 		opts = append(opts, WithAdminKey(adminKeyXpub))
