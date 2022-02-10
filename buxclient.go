@@ -3,8 +3,7 @@
 // If you have any suggestions or comments, please feel free to open an issue on
 // this GitHub repository!
 //
-// By MrZ (https://github.com/mrz1836)
-// By icellan (https://github.com/icellan)
+// By BuxOrg (https://github.com/BuxOrg)
 package buxclient
 
 import (
@@ -22,21 +21,20 @@ import (
 	"github.com/libsv/go-bt/v2/bscript"
 )
 
-// ClientOps ...
+// ClientOps are used for client options
 type ClientOps func(c *BuxClient)
 
-// BuxClient the bux client
+// BuxClient is the bux client
 type BuxClient struct {
-	// private fields
+	accessKey        *bec.PrivateKey
+	accessKeyString  string
 	debug            bool
 	transport        transports.TransportService
-	xPrivString      string
-	xPubString       string
-	accessKeyString  string
-	xPriv            *bip32.ExtendedKey
-	xPub             *bip32.ExtendedKey
-	accessKey        *bec.PrivateKey
 	transportOptions []transports.ClientOps
+	xPriv            *bip32.ExtendedKey
+	xPrivString      string
+	xPub             *bip32.ExtendedKey
+	xPubString       string
 }
 
 // New create a new bux client
