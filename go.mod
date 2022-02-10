@@ -13,3 +13,6 @@ require (
 	golang.org/x/crypto v0.0.0-20220209195652-db638375bc3a // indirect
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 )
+
+// replace github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go v4.0.0-preview1
+replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.2.0
