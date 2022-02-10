@@ -9,6 +9,7 @@ package buxclient
 import (
 	"context"
 	"errors"
+	"net/http"
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/go-buxclient/transports"
@@ -187,6 +188,18 @@ func (b *BuxClient) FinalizeTransaction(draft *bux.DraftTransaction) (string, er
 	return txDraft.String(), nil
 }
 
+// GetTransaction get a transaction by id
+func (b *BuxClient) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
+	return b.transport.GetTransaction(ctx, txID)
+}
+
+// GetTransactions get all transactions matching search criteria
+func (b *BuxClient) GetTransactions(ctx context.Context, conditions map[string]interface{},
+	metadata *bux.Metadata) ([]*bux.Transaction, error) {
+
+	return b.transport.GetTransactions(ctx, conditions, metadata)
+}
+
 // RecordTransaction record a new transaction
 func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string, metadata *bux.Metadata) (string, error) {
 	return b.transport.RecordTransaction(ctx, hex, draftID, metadata)
@@ -234,29 +247,38 @@ func WithAccessKey(accessKeyString string) ClientOps {
 	}
 }
 
-// WithHTTPClient will overwrite the default client with a custom client
-func WithHTTPClient(serverURL string) ClientOps {
+// WithHTTP will overwrite the default client with a custom client
+func WithHTTP(serverURL string) ClientOps {
 	return func(c *BuxClient) {
 		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithHTTPClient(serverURL))
+			c.transportOptions = append(c.transportOptions, transports.WithHTTP(serverURL))
+		}
+	}
+}
+
+// WithGraphQL will overwrite the default client with a custom client
+func WithGraphQL(serverURL string) ClientOps {
+	return func(c *BuxClient) {
+		if c != nil {
+			c.transportOptions = append(c.transportOptions, transports.WithGraphQL(serverURL))
+		}
+	}
+}
+
+// WithHTTPClient will overwrite the default client with a custom client
+func WithHTTPClient(serverURL string, httpClient *http.Client) ClientOps {
+	return func(c *BuxClient) {
+		if c != nil {
+			c.transportOptions = append(c.transportOptions, transports.WithHTTPClient(serverURL, httpClient))
 		}
 	}
 }
 
 // WithGraphQLClient will overwrite the default client with a custom client
-func WithGraphQLClient(serverURL string) ClientOps {
+func WithGraphQLClient(serverURL string, httpClient *http.Client) ClientOps {
 	return func(c *BuxClient) {
 		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithGraphQLClient(serverURL))
-		}
-	}
-}
-
-// WithClient will overwrite the default client with a custom client
-func WithClient(transportClient transports.TransportService) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithClient(transportClient))
+			c.transportOptions = append(c.transportOptions, transports.WithGraphQLClient(serverURL, httpClient))
 		}
 	}
 }

@@ -18,7 +18,7 @@ func TestWithDebugging(t *testing.T) {
 	t.Run("debug false", func(t *testing.T) {
 		opts := []ClientOps{
 			WithDebugging(false),
-			WithHTTPClient(""),
+			WithHTTP(""),
 		}
 		c, err := NewTransport(opts...)
 		require.NoError(t, err)
@@ -30,7 +30,7 @@ func TestWithDebugging(t *testing.T) {
 	t.Run("debug true", func(t *testing.T) {
 		opts := []ClientOps{
 			WithDebugging(true),
-			WithHTTPClient(""),
+			WithHTTP(""),
 		}
 		c, err := NewTransport(opts...)
 		require.NoError(t, err)
@@ -51,7 +51,7 @@ func TestWithSignRequest(t *testing.T) {
 	t.Run("debug false", func(t *testing.T) {
 		opts := []ClientOps{
 			WithSignRequest(false),
-			WithHTTPClient(""),
+			WithHTTP(""),
 		}
 		c, err := NewTransport(opts...)
 		require.NoError(t, err)
@@ -63,7 +63,7 @@ func TestWithSignRequest(t *testing.T) {
 	t.Run("debug true", func(t *testing.T) {
 		opts := []ClientOps{
 			WithSignRequest(true),
-			WithHTTPClient(""),
+			WithHTTP(""),
 		}
 		c, err := NewTransport(opts...)
 		require.NoError(t, err)

@@ -21,6 +21,7 @@ type TransportHTTP struct {
 	accessKey   *bec.PrivateKey
 	adminXPriv  *bip32.ExtendedKey
 	debug       bool
+	httpClient  *http.Client
 	server      string
 	signRequest bool
 	xPriv       *bip32.ExtendedKey
@@ -76,7 +77,7 @@ func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metada
 	}
 
 	var xPubData bux.Xpub
-	err = h.doHTTPRequest(ctx, "/xpubs", jsonStr, h.adminXPriv, true, &xPubData)
+	err = h.doHTTPRequest(ctx, "POST", "/xpubs", jsonStr, h.adminXPriv, true, &xPubData)
 	if err != nil {
 		return err
 	}
@@ -96,7 +97,7 @@ func (h *TransportHTTP) GetDestination(ctx context.Context, metadata *bux.Metada
 	}
 
 	var destination bux.Destination
-	err = h.doHTTPRequest(ctx, "/destinations", jsonStr, h.xPriv, true, &destination)
+	err = h.doHTTPRequest(ctx, "POST", "/destinations", jsonStr, h.xPriv, true, &destination)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +149,7 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context, jsonData map
 	}
 
 	var draftTransaction *bux.DraftTransaction
-	err = h.doHTTPRequest(ctx, "/transactions/new", jsonStr, h.xPriv, true, &draftTransaction)
+	err = h.doHTTPRequest(ctx, "POST", "/transactions/new", jsonStr, h.xPriv, true, &draftTransaction)
 	if err != nil {
 		return nil, err
 	}
@@ -157,6 +158,37 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context, jsonData map
 	}
 
 	return draftTransaction, nil
+}
+
+// GetTransaction will get a transaction by ID
+func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
+
+	var transaction *bux.Transaction
+	err := h.doHTTPRequest(ctx, "GET", "/transaction?id="+txID, nil, h.xPriv, h.signRequest, &transaction)
+	if err != nil {
+		return nil, err
+	}
+	if h.debug {
+		fmt.Printf("Transaction: %s\n", transaction.ID)
+	}
+
+	return transaction, nil
+}
+
+// GetTransactions will get a transactions by
+func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[string]interface{},
+	metadata *bux.Metadata) ([]*bux.Transaction, error) {
+
+	var transactions []*bux.Transaction
+	err := h.doHTTPRequest(ctx, "POST", "/transactions", nil, h.xPriv, h.signRequest, &transactions)
+	if err != nil {
+		return nil, err
+	}
+	if h.debug {
+		fmt.Printf("Transactions: %d\n", len(transactions))
+	}
+
+	return transactions, nil
 }
 
 // RecordTransaction will record a transaction
@@ -175,7 +207,7 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 	}
 
 	var transaction *bux.Transaction
-	err = h.doHTTPRequest(ctx, "/transactions/record", jsonStr, h.xPriv, h.signRequest, &transaction)
+	err = h.doHTTPRequest(ctx, "POST", "/transactions/record", jsonStr, h.xPriv, h.signRequest, &transaction)
 	if err != nil {
 		return "", err
 	}
@@ -186,10 +218,10 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 	return transaction.ID, nil
 }
 
-func (h *TransportHTTP) doHTTPRequest(ctx context.Context, path string, jsonStr []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) error {
+func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path string, jsonStr []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) error {
 
 	url := h.server + path
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return err
 	}
@@ -209,8 +241,7 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, path string, jsonStr 
 		req.Header.Set("auth_xpub", xPub)
 	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req) //nolint:bodyclose // done in defer function
+	resp, err := h.httpClient.Do(req) //nolint:bodyclose // done in defer function
 	if err != nil {
 		return err
 	}

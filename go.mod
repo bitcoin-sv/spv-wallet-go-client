@@ -6,6 +6,7 @@ require (
 	github.com/BuxOrg/bux v0.1.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.2
 	github.com/libsv/go-bk v0.1.6
+	github.com/libsv/go-bt v1.0.4
 	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0
 	github.com/machinebox/graphql v0.2.2
 	github.com/stretchr/testify v1.7.0
@@ -54,7 +55,6 @@ require (
 	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/klauspost/compress v1.14.2 // indirect
-	github.com/libsv/go-bt v1.0.4 // indirect
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.11 // indirect
@@ -73,6 +73,7 @@ require (
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/quasilyte/go-ruleguard/dsl v0.3.16 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/tonicpow/go-minercraft v0.7.0 // indirect

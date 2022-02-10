@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/BuxOrg/bux"
 	"github.com/libsv/go-bk/bec"
@@ -20,6 +21,7 @@ type TransportGraphQL struct {
 	accessKey   *bec.PrivateKey
 	adminXPriv  *bip32.ExtendedKey
 	debug       bool
+	httpClient  *http.Client
 	server      string
 	signRequest bool
 	xPriv       *bip32.ExtendedKey
@@ -34,12 +36,22 @@ type DestinationData struct {
 
 // DraftTransactionData is a draft transaction
 type DraftTransactionData struct {
-	NewTransaction *bux.DraftTransaction `json:"newTransaction"`
+	NewTransaction *bux.DraftTransaction `json:"new_transaction"`
+}
+
+// TransactionData is a transaction
+type TransactionData struct {
+	Transaction *bux.Transaction `json:"transaction"`
+}
+
+// TransactionsData is a slice of transactions
+type TransactionsData struct {
+	Transactions []*bux.Transaction `json:"transactions"`
 }
 
 // Init will initialize
 func (g *TransportGraphQL) Init() error {
-	g.client = graphql.NewClient(g.server)
+	g.client = graphql.NewClient(g.server, graphql.WithHTTPClient(g.httpClient))
 	return nil
 }
 
@@ -128,20 +140,13 @@ func (g *TransportGraphQL) GetDestination(ctx context.Context, metadata *bux.Met
 	}`
 	req := graphql.NewRequest(reqBody)
 	req.Var("metadata", processMetadata(metadata))
-	if g.signRequest {
-		variables := map[string]interface{}{
-			"metadata": processMetadata(metadata),
-		}
-		bodyString, err := getBodyString(reqBody, variables)
-		if err != nil {
-			return nil, err
-		}
-		err = addSignature(&req.Header, g.xPriv, bodyString)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		req.Header.Set("auth_xpub", g.xPub.String())
+
+	variables := map[string]interface{}{
+		"metadata": processMetadata(metadata),
+	}
+	err := g.signGraphQLRequest(req, reqBody, variables)
+	if err != nil {
+		return nil, err
 	}
 
 	// run it and capture the response
@@ -216,17 +221,9 @@ func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*
 func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody string,
 	variables map[string]interface{}, req *graphql.Request) (*bux.DraftTransaction, error) {
 
-	if g.signRequest {
-		bodyString, err := getBodyString(reqBody, variables)
-		if err != nil {
-			return nil, err
-		}
-		err = addSignature(&req.Header, g.xPriv, bodyString)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		req.Header.Set("auth_xpub", g.xPub.String())
+	err := g.signGraphQLRequest(req, reqBody, variables)
+	if err != nil {
+		return nil, err
 	}
 
 	// run it and capture the response
@@ -240,6 +237,96 @@ func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody s
 	}
 
 	return draftTransaction, nil
+}
+
+// GetTransaction get a transaction by ID
+func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
+
+	reqBody := `
+   	query {
+	  transaction(
+		txId:"` + txID + `",
+	  ) {
+		ID
+	  }
+	}`
+	req := graphql.NewRequest(reqBody)
+
+	err := g.signGraphQLRequest(req, reqBody, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// run it and capture the response
+	var respData TransactionData
+	if err = g.client.Run(ctx, req, &respData); err != nil {
+		return nil, err
+	}
+	transaction := respData.Transaction
+	if g.debug {
+		fmt.Printf("Transaction: %s\n", transaction.ID)
+	}
+
+	return transaction, nil
+}
+
+// GetTransactions get a transactions, filtered by the given metadata
+func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[string]interface{},
+	metadata *bux.Metadata) ([]*bux.Transaction, error) {
+
+	querySignature := ""
+	queryArguments := ""
+
+	// is there a better way to do this ?
+	if conditions != nil {
+		querySignature += "( $conditions Map "
+		queryArguments += " conditions: $conditions\n"
+	}
+	if metadata != nil {
+		if conditions == nil {
+			querySignature += "( "
+		} else {
+			querySignature += ", "
+		}
+		querySignature += "$metadata Map"
+		queryArguments += " metadata: $metadata\n"
+	} else {
+		querySignature += " )"
+	}
+
+	reqBody := `
+   	query ` + querySignature + `{
+	  transactions ` + queryArguments + ` {
+		ID
+	  }
+	}`
+	req := graphql.NewRequest(reqBody)
+	variables := make(map[string]interface{})
+	if conditions != nil {
+		req.Var("conditions", conditions)
+		variables["conditions"] = conditions
+	}
+	if metadata != nil {
+		req.Var("metadata", metadata)
+		variables["metadata"] = metadata
+	}
+
+	err := g.signGraphQLRequest(req, reqBody, variables)
+	if err != nil {
+		return nil, err
+	}
+
+	// run it and capture the response
+	var respData TransactionsData
+	if err = g.client.Run(ctx, req, &respData); err != nil {
+		return nil, err
+	}
+	transactions := respData.Transactions
+	if g.debug {
+		fmt.Printf("Transactions: %d\n", len(transactions))
+	}
+
+	return transactions, nil
 }
 
 // RecordTransaction will record a transaction
@@ -259,20 +346,12 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 	req := graphql.NewRequest(reqBody)
 	req.Var("metadata", processMetadata(metadata))
 
-	if g.signRequest {
-		variables := map[string]interface{}{
-			"metadata": processMetadata(metadata),
-		}
-		bodyString, err := getBodyString(reqBody, variables)
-		if err != nil {
-			return "", err
-		}
-		err = addSignature(&req.Header, g.xPriv, bodyString)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		req.Header.Set("auth_xpub", g.xPub.String())
+	variables := map[string]interface{}{
+		"metadata": processMetadata(metadata),
+	}
+	err := g.signGraphQLRequest(req, reqBody, variables)
+	if err != nil {
+		return "", err
 	}
 
 	// run it and capture the response
@@ -302,6 +381,22 @@ func getBodyString(reqBody string, variables map[string]interface{}) (string, er
 	}
 
 	return string(body), nil
+}
+
+func (g *TransportGraphQL) signGraphQLRequest(req *graphql.Request, reqBody string, variables map[string]interface{}) error {
+	if g.signRequest {
+		bodyString, err := getBodyString(reqBody, variables)
+		if err != nil {
+			return err
+		}
+		err = addSignature(&req.Header, g.xPriv, bodyString)
+		if err != nil {
+			return err
+		}
+	} else {
+		req.Header.Set("auth_xpub", g.xPub.String())
+	}
+	return nil
 }
 
 const graphqlDraftTransactionFields = `{

@@ -55,6 +55,8 @@ type TransportService interface {
 	IsSignRequest() bool
 	RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error
 	GetDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error)
+	GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error)
+	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) ([]*bux.Transaction, error)
 	DraftToRecipients(ctx context.Context, recipients []*Recipients, metadata *bux.Metadata) (*bux.DraftTransaction, error)
 	DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig, metadata *bux.Metadata) (*bux.DraftTransaction, error)
 	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *bux.Metadata) (string, error)
@@ -88,7 +90,8 @@ func NewTransport(opts ...ClientOps) (TransportService, error) {
 	return client.transport, nil
 }
 
-func newTransportService(transportService TransportService) TransportService {
+// NewTransportService create a new transport service interface
+func NewTransportService(transportService TransportService) TransportService {
 	return transportService
 }
 
@@ -130,15 +133,52 @@ func WithAccessKey(accessKey *bec.PrivateKey) ClientOps {
 	}
 }
 
-// WithGraphQLClient will overwrite the default client with a custom client
-func WithGraphQLClient(serverURL string) ClientOps {
+// WithGraphQL will overwrite the default client with a custom client
+func WithGraphQL(serverURL string) ClientOps {
 	return func(c *Client) {
 		if c != nil {
-			c.transport = newTransportService(&TransportGraphQL{
+			c.transport = NewTransportService(&TransportGraphQL{
 				debug:       c.debug,
 				server:      serverURL,
 				signRequest: c.signRequest,
 				adminXPriv:  c.adminXPriv,
+				httpClient:  &http.Client{},
+				xPriv:       c.xPriv,
+				xPub:        c.xPub,
+				accessKey:   c.accessKey,
+			})
+		}
+	}
+}
+
+// WithHTTP will overwrite the default client with a custom client
+func WithHTTP(serverURL string) ClientOps {
+	return func(c *Client) {
+		if c != nil {
+			c.transport = NewTransportService(&TransportHTTP{
+				debug:       c.debug,
+				server:      serverURL,
+				signRequest: c.signRequest,
+				adminXPriv:  c.adminXPriv,
+				httpClient:  &http.Client{},
+				xPriv:       c.xPriv,
+				xPub:        c.xPub,
+				accessKey:   c.accessKey,
+			})
+		}
+	}
+}
+
+// WithGraphQLClient will overwrite the default client with a custom client
+func WithGraphQLClient(serverURL string, httpClient *http.Client) ClientOps {
+	return func(c *Client) {
+		if c != nil {
+			c.transport = NewTransportService(&TransportGraphQL{
+				debug:       c.debug,
+				server:      serverURL,
+				signRequest: c.signRequest,
+				adminXPriv:  c.adminXPriv,
+				httpClient:  httpClient,
 				xPriv:       c.xPriv,
 				xPub:        c.xPub,
 				accessKey:   c.accessKey,
@@ -148,27 +188,19 @@ func WithGraphQLClient(serverURL string) ClientOps {
 }
 
 // WithHTTPClient will overwrite the default client with a custom client
-func WithHTTPClient(serverURL string) ClientOps {
+func WithHTTPClient(serverURL string, httpClient *http.Client) ClientOps {
 	return func(c *Client) {
 		if c != nil {
-			c.transport = newTransportService(&TransportHTTP{
+			c.transport = NewTransportService(&TransportHTTP{
 				debug:       c.debug,
 				server:      serverURL,
 				signRequest: c.signRequest,
 				adminXPriv:  c.adminXPriv,
+				httpClient:  httpClient,
 				xPriv:       c.xPriv,
 				xPub:        c.xPub,
 				accessKey:   c.accessKey,
 			})
-		}
-	}
-}
-
-// WithClient will overwrite the default client with a custom client
-func WithClient(transport TransportService) ClientOps {
-	return func(c *Client) {
-		if c != nil {
-			c.transport = transport
 		}
 	}
 }
