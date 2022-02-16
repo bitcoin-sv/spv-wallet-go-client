@@ -39,7 +39,7 @@ type GraphQLMockClient struct {
 
 // Run ...
 func (g *GraphQLMockClient) Run(_ context.Context, req *graphql.Request, resp interface{}) error {
-	j, _ := json.Marshal(g.Response)
+	j, _ := json.Marshal(g.Response) // nolint: errchkjson // used for testing only
 	_ = json.Unmarshal(j, &resp)
 	g.Request = req
 	return g.Error
@@ -48,7 +48,7 @@ func (g *GraphQLMockClient) Run(_ context.Context, req *graphql.Request, resp in
 // TestRegisterXpub will test the RegisterXpub method
 func TestRegisterXpub(t *testing.T) {
 	xPriv, _ := bip32.NewKeyFromString(xPrivString)
-	//xPub, _ := xPriv.Neuter()
+	// xPub, _ := xPriv.Neuter()
 
 	t.Run("no admin key", func(t *testing.T) {
 		client := TransportGraphQLMock{
