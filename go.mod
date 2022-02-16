@@ -59,8 +59,8 @@ require (
 	github.com/matryer/respond v1.0.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.11 // indirect
 	github.com/miekg/dns v1.1.46 // indirect
-	github.com/mrz1836/go-api-router v0.4.10 // indirect
-	github.com/mrz1836/go-cache v0.6.4 // indirect
+	github.com/mrz1836/go-api-router v0.4.11 // indirect
+	github.com/mrz1836/go-cache v0.6.5 // indirect
 	github.com/mrz1836/go-logger v0.2.5 // indirect
 	github.com/mrz1836/go-mattercloud v0.5.3 // indirect
 	github.com/mrz1836/go-nownodes v0.0.5 // indirect
@@ -95,7 +95,7 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/genproto v0.0.0-20220211171837-173942840c17 // indirect
+	google.golang.org/genproto v0.0.0-20220216160803-4663080d8bc8 // indirect
 	google.golang.org/grpc v1.44.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
