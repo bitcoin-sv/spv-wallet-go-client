@@ -179,8 +179,18 @@ func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*bux.T
 func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[string]interface{},
 	metadata *bux.Metadata) ([]*bux.Transaction, error) {
 
+	jsonData := map[string]interface{}{
+		"conditions": conditions,
+		"metadata":   processMetadata(metadata),
+	}
+
+	jsonStr, err := json.Marshal(jsonData)
+	if err != nil {
+		return nil, err
+	}
+
 	var transactions []*bux.Transaction
-	err := h.doHTTPRequest(ctx, "POST", "/transactions", nil, h.xPriv, h.signRequest, &transactions)
+	err = h.doHTTPRequest(ctx, "POST", "/transactions", jsonStr, h.xPriv, h.signRequest, &transactions)
 	if err != nil {
 		return nil, err
 	}

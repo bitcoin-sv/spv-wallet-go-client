@@ -174,7 +174,7 @@ func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConf
 	reqBody := `
    	mutation ($transactionConfig: TransactionConfigInput!, $metadata: Map) {
 	  newTransaction(
-		transactionConfig: $transactionConfig
+		transaction_config: $transactionConfig
 		metadata: $metadata
 	  ) ` + graphqlDraftTransactionFields + `
 	}`
@@ -252,7 +252,7 @@ func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*bu
 	  transaction(
 		txId:"` + txID + `",
 	  ) {
-		ID
+		id
 	  }
 	}`
 	req := graphql.NewRequest(reqBody)
@@ -302,7 +302,17 @@ func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[s
 	reqBody := `
    	query ` + querySignature + `{
 	  transactions ` + queryArguments + ` {
-		ID
+	    id,
+	    hex,
+	    xpub_in_ids,
+	    xpub_out_ids,
+	    block_hash,
+	    block_height,
+	    fee,
+	    number_of_inputs,
+	    number_of_outputs,
+	    draft_id,
+	    total_value,
 	  }
 	}`
 	req := graphql.NewRequest(reqBody)
@@ -342,10 +352,10 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
    	mutation($metadata: Map) {
 	  transaction(
 		hex:"` + hex + `",
-        draftID:"` + referenceID + `"
+        draft_id:"` + referenceID + `"
 		metadata: $metadata
 	  ) {
-		ID
+		id
 	  }
 	}`
 	req := graphql.NewRequest(reqBody)
