@@ -8,7 +8,6 @@ package buxclient
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/BuxOrg/bux"
@@ -20,6 +19,7 @@ import (
 	"github.com/libsv/go-bk/wif"
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-bt/v2/bscript"
+	"github.com/pkg/errors"
 )
 
 // ClientOps are used for client options
@@ -65,12 +65,21 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 	} else if client.accessKeyString != "" {
 		client.xPriv = nil
 		client.xPub = nil
+
+		var privateKey *bec.PrivateKey
 		var decodedWIF *wif.WIF
 		decodedWIF, err = wif.DecodeWIF(client.accessKeyString)
 		if err != nil {
-			return nil, err
+			// try as a hex string
+			var errHex error
+			privateKey, errHex = bitcoin.PrivateKeyFromString(client.accessKeyString)
+			if errHex != nil {
+				return nil, errors.Wrap(err, errHex.Error())
+			}
+		} else {
+			privateKey = decodedWIF.PrivKey
 		}
-		client.accessKey = decodedWIF.PrivKey
+		client.accessKey = privateKey
 	} else {
 		return nil, errors.New("no keys available")
 	}
@@ -114,6 +123,21 @@ func (b *BuxClient) SetDebug(debug bool) {
 	b.transport.SetDebug(debug)
 }
 
+// IsDebug return the debugging status
+func (b *BuxClient) IsDebug() bool {
+	return b.transport.IsDebug()
+}
+
+// SetSignRequest turn the signing of the http request on or off
+func (b *BuxClient) SetSignRequest(signRequest bool) {
+	b.transport.SetSignRequest(signRequest)
+}
+
+// IsSignRequest return whether to sign all requests
+func (b *BuxClient) IsSignRequest() bool {
+	return b.transport.IsSignRequest()
+}
+
 // GetTransport returns the current transport service
 func (b *BuxClient) GetTransport() *transports.TransportService {
 	return &b.transport
@@ -125,12 +149,16 @@ func (b *BuxClient) RegisterXpub(ctx context.Context, rawXPub string, metadata *
 }
 
 // DraftTransaction initialize a new draft transaction
-func (b *BuxClient) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig, metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+func (b *BuxClient) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig,
+	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+
 	return b.transport.DraftTransaction(ctx, transactionConfig, metadata)
 }
 
 // DraftToRecipients initialize a new P2PKH draft transaction to a list of recipients
-func (b *BuxClient) DraftToRecipients(ctx context.Context, recipients []*transports.Recipients, metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+func (b *BuxClient) DraftToRecipients(ctx context.Context, recipients []*transports.Recipients,
+	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+
 	return b.transport.DraftToRecipients(ctx, recipients, metadata)
 }
 

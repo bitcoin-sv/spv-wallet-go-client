@@ -3,12 +3,13 @@ module github.com/BuxOrg/go-buxclient
 go 1.17
 
 require (
-	github.com/BuxOrg/bux v0.1.3
+	github.com/BuxOrg/bux v0.1.4
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.2
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt v1.0.4
 	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0
 	github.com/machinebox/graphql v0.2.2
+	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
 )
 
@@ -71,8 +72,8 @@ require (
 	github.com/newrelic/go-agent/v3 v3.15.2 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/quasilyte/go-ruleguard/dsl v0.3.17 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/tidwall/gjson v1.14.0 // indirect

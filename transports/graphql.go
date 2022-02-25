@@ -99,7 +99,7 @@ func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string, met
 		xpub: "` + rawXPub + `"
 		metadata: $metadata
 	  ) {
-	    ID
+	    id
 	  }
 	}`
 	req := graphql.NewRequest(reqBody)
@@ -133,14 +133,14 @@ func (g *TransportGraphQL) GetDestination(ctx context.Context, metadata *bux.Met
 	  destination(
 		metadata: $metadata
 	  ) {
-		ID
-		XpubID
-		LockingScript
-		Type
-		Chain
-		Num
-		Address
-		Metadata
+		id
+		xpub_id
+		locking_script
+		type
+		chain
+		num
+		address
+		metadata
 	  }
 	}`
 	req := graphql.NewRequest(reqBody)
@@ -173,7 +173,7 @@ func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConf
 
 	reqBody := `
    	mutation ($transactionConfig: TransactionConfigInput!, $metadata: Map) {
-	  newTransaction(
+	  new_transaction(
 		transaction_config: $transactionConfig
 		metadata: $metadata
 	  ) ` + graphqlDraftTransactionFields + `
@@ -182,8 +182,8 @@ func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConf
 	req.Var("transactionConfig", transactionConfig)
 	req.Var("metadata", processMetadata(metadata))
 	variables := map[string]interface{}{
-		"transactionConfig": transactionConfig,
-		"metadata":          processMetadata(metadata),
+		"transaction_config": transactionConfig,
+		"metadata":           processMetadata(metadata),
 	}
 
 	return g.draftTransactionCommon(ctx, reqBody, variables, req)
@@ -195,11 +195,11 @@ func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*
 
 	reqBody := `
    	mutation ($outputs: [TransactionOutputInput]!, $metadata: Map) {
-	  newTransaction(
-		transactionConfig:{
-		  Outputs: $outputs
-          ChangeNumberOfDestinations:3
-          ChangeDestinationsStrategy:"random"
+	  new_transaction(
+		transaction_config:{
+		  outputs: $outputs
+          change_number_of_destinations:3
+          change_destinations_strategy:"random"
 		}
 		metadata:$metadata
 	  ) ` + graphqlDraftTransactionFields + `
@@ -208,9 +208,9 @@ func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*
 	outputs := make([]map[string]interface{}, 0)
 	for _, recipient := range recipients {
 		outputs = append(outputs, map[string]interface{}{
-			"To":       recipient.To,
-			"Satoshis": recipient.Satoshis,
-			"OpReturn": recipient.OpReturn,
+			"to":        recipient.To,
+			"satoshis":  recipient.Satoshis,
+			"op_return": recipient.OpReturn,
 		})
 	}
 	req.Var("outputs", outputs)
@@ -416,54 +416,54 @@ func (g *TransportGraphQL) signGraphQLRequest(req *graphql.Request, reqBody stri
 }
 
 const graphqlDraftTransactionFields = `{
-ID
-XpubID
-Configuration {
-  Inputs {
-	ID
-	Satoshis
-	TransactionID
-	OutputIndex
-	ScriptPubKey
-	Destination {
-	  ID
-	  Address
-	  Type
-	  Num
-	  Chain
-	  LockingScript
+id
+xpub_id
+configuration {
+  inputs {
+	id
+	satoshis
+	transaction_id
+	output_index
+	script_pub_key
+	destination {
+	  id
+	  address
+	  type
+	  num
+	  chain
+	  locking_script
 	}
   }
-  Outputs {
-	To
-	Satoshis
-	Scripts {
-	  Address
-	  Satoshis
-	  Script
+  outputs {
+	to
+	satoshis
+	scripts {
+	  address
+	  satoshis
+	  script
 	}
-	PaymailP4 {
-	  Alias
-	  Domain
-	  FromPaymail
-	  Note
-	  PubKey
-	  ReceiveEndpoint
-	  ReferenceID
-	  ResolutionType
+	paymail_p4 {
+	  alias
+	  domain
+	  from_paymail
+	  note
+	  pub_key
+	  receive_endpoint
+      reference_id
+	  resolution_type
 	}
   }
-  ChangeDestinations {
-	Address
-	Chain
-	Num
-	LockingScript
-	DraftID
+  change_destinations {
+	address
+	chain
+	num
+	locking_script
+	draft_id
   }
-  ChangeSatoshis
-  Fee
+  change_satoshis
+  fee
 }
-Status
-ExpiresAt
-Hex
+status
+expires_at
+hex
 }`
