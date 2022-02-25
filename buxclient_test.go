@@ -11,6 +11,7 @@ import (
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux/utils"
 	"github.com/BuxOrg/go-buxclient/transports"
+	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -30,11 +31,7 @@ const (
 	destinationJSON  = `{"id":"90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce","xpub_id":"9fe44728bf16a2dde3748f72cc65ea661f3bf18653b320d31eafcab37cf7fb36","locking_script":"76a9140e0eb4911d79e9b7683f268964f595b66fa3604588ac","type":"pubkeyhash","chain":0,"num":245,"address":"12HL5RyEy3Rt6SCwxgpiFSTigem1Pzbq22","metadata":{"test":"test value"}}}`
 	transactionJSON  = `{"id":"041479f86c475603fd510431cf702bc8c9849a9c350390eb86b467d82a13cc24","created_at":"2022-01-28T13:45:01.711Z","updated_at":null,"deleted_at":null,"hex":"0100000004afcafa163824904aa3bbc403b30db56a08f29ffa53b16b1b4b4914b9bd7d7610010000006a4730440220710c2b2fe5a0ece2cbc962635d0fb6dabf95c94db0b125c3e2613cede9738666022067e9cc0f4f706c3a2781990981a50313fb0aad18c1e19a757125eec2408ecadb412103dcd8d28545c9f80af54648fcca87972d89e3e7ed7b482465dd78b62c784ad533ffffffff783452c4038c46a4d68145d829f09c70755edd8d4b3512d7d6a27db08a92a76b000000006b483045022100ee7e24859274013e748090a022bf51200ab216771b5d0d57c0d074843dfa62bd02203933c2bd2880c2f8257befff44dc19cb1f3760c6eea44fc0f8094ff94bce652a41210375680e36c45658bd9b0694a48f5756298cf95b77f50bada14ef1cba6d7ea1d3affffffff25e893beb8240ede7661c02cb959799d364711ba638eccdf12e3ce60faa2fd0f010000006b483045022100fc380099ac7f41329aaeed364b95baa390be616243b80a8ef444ae0ddc76fa3a0220644a9677d40281827fa4602269720a5a453fbe77409be40293c3f8248534e5f8412102398146eff37de36ed608b2ee917a3d4b4a424722f9a00f1b48c183322a8ef2a1ffffffff00e6f915a5a3678f01229e5c320c64755f242be6cebfac54e2f77ec5e0eec581000000006b483045022100951511f81291ac234926c866f777fe8e77bc00661031675978ddecf159cc265902207a5957dac7c89493e2b7df28741ce3291e19dc8bba4b13082c69d0f2b79c70ab4121031d674b3ad42b28f3a445e9970bd9ae8fe5d3fb89ee32452d9f6dc7916ea184bfffffffff04c7110000000000001976a91483615db3fb9b9cbbf4cd407100833511a1cb278588ac30060000000000001976a914296a5295e70697e844fb4c2113b41a501d41452e88ac96040000000000001976a914e73e21935fc48df0d1cf8b73f2e8bbd23b78244a88ac27020000000000001976a9140b2b03751813e3467a28ce916cbb102d84c6eec588ac00000000","block_hash":"","block_height":0,"fee":354,"number_of_inputs":4,"number_of_outputs":4,"total_value":6955,"metadata":{"client_id":"8","run":76,"run_id":"3108aa426fc7102488bb0ffd","xbench":"is awesome"},"output_value":1725,"direction":"incoming"}`
 	transactionsJSON = `[{"id":"caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda","created_at":"2022-01-28T13:44:59.376Z","updated_at":null,"deleted_at":null,"hex":"0100000001cf4faa628ce1abdd2cfc641c948898bb7a3dbe043999236c3ea4436a0c79f5dc000000006a47304402206aeca14175e4477031970c1cda0af4d9d1206289212019b54f8e1c9272b5bac2022067c4d32086146ca77640f02a989f51b3c6738ebfa24683c4a923f647cf7f1c624121036295a81525ba33e22c6497c0b758e6a84b60d97c2d8905aa603dd364915c3a0effffffff023e030000000000001976a914f7fc6e0b05e91c3610efd0ce3f04f6502e2ed93d88ac99030000000000001976a914550e06a3aa71ba7414b53922c13f96a882bf027988ac00000000","block_hash":"","block_height":0,"fee":97,"number_of_inputs":1,"number_of_outputs":2,"total_value":733,"metadata":{"client_id":"8","run":14,"run_id":"3108aa426fc7102488bb0ffd","xbench":"is awesome"},"output_value":921,"direction":"incoming"},{"id":"5f4fd2be162769852e8bd1362bb8d815a89e137707b4985249876a7f0ebbb071","created_at":"2022-01-28T13:44:59.996Z","updated_at":null,"deleted_at":null,"hex":"01000000016c0c005d516ccd1f1029fa5b61be51a0feaee6e2b07804ceba71047e06edb2df000000006b483045022100ab020464941452dff13bf4ff40a6218825b8dc3502d7860857ee0dd9407e490402206325d24bd46c09b246ebe8493257f2b91d4157de58adfdedf42ba72d6de9aaf5412103a06808b0c597ee6c572baf4f167166e9fed4b8ca66d651d2345b12e0ae5344b3ffffffff0208020000000000001976a914c3367acfc659588393c68dae3eb435c5d0a088b988ac46120000000000001976a91492fc673e0630962068c8b7d909fbfeeb77e3ea3288ac00000000","block_hash":"","block_height":0,"fee":97,"number_of_inputs":1,"number_of_outputs":2,"total_value":423,"metadata":{"client_id":"8","run":32,"run_id":"3108aa426fc7102488bb0ffd","xbench":"is awesome"},"output_value":4678,"direction":"incoming"}]`
-)
-
-var (
-//testTxHex = "020000000165bb8d2733298b2d3b441a871868d6323c5392facf0d3eced3a6c6a17dc84c10000000006a473044022057b101e9a017cdcc333ef66a4a1e78720ae15adf7d1be9c33abec0fe56bc849d022013daa203095522039fadaba99e567ec3cf8615861d3b7258d5399c9f1f4ace8f412103b9c72aebee5636664b519e5f7264c78614f1e57fa4097ae83a3012a967b1c4b9ffffffff03e0930400000000001976a91413473d21dc9e1fb392f05a028b447b165a052d4d88acf9020000000000001976a91455decebedd9a6c2c2d32cf0ee77e2640c3955d3488ac00000000000000000c006a09446f7457616c6c657400000000"
-//testTxID  = "1b52eac9d1eb0adf3ce6a56dee1c4768780b8126e288aca65dd1db32f173b853"
+	accessKeyString  = `7779d24ca6f8821f225042bf55e8f80aa41b08b879b72827f51e41e6523b9cd0`
 )
 
 // localRoundTripper is an http.RoundTripper that executes HTTP transactions
@@ -94,6 +91,34 @@ func TestNewBuxClient(t *testing.T) {
 		require.NoError(t, err)
 		assert.IsType(t, BuxClient{}, *client)
 	})
+
+	t.Run("valid xPub client", func(t *testing.T) {
+		client, err := New(
+			WithXPub(xPubString),
+			WithHTTP(serverURL),
+		)
+		require.NoError(t, err)
+		assert.IsType(t, BuxClient{}, *client)
+	})
+
+	t.Run("valid access keys", func(t *testing.T) {
+		client, err := New(
+			WithAccessKey(accessKeyString),
+			WithHTTP(serverURL),
+		)
+		require.NoError(t, err)
+		assert.IsType(t, BuxClient{}, *client)
+	})
+
+	t.Run("valid access key WIF", func(t *testing.T) {
+		wifKey, _ := bitcoin.PrivateKeyToWif(accessKeyString)
+		client, err := New(
+			WithAccessKey(wifKey.String()),
+			WithHTTP(serverURL),
+		)
+		require.NoError(t, err)
+		assert.IsType(t, BuxClient{}, *client)
+	})
 }
 
 // TestSetAdminKey will test the admin key setter
@@ -143,6 +168,7 @@ func TestSetDebug(t *testing.T) {
 			WithHTTP(serverURL),
 		)
 		client.SetDebug(true)
+		assert.True(t, client.IsDebug())
 	})
 
 	t.Run("false", func(t *testing.T) {
@@ -151,6 +177,7 @@ func TestSetDebug(t *testing.T) {
 			WithHTTP(serverURL),
 		)
 		client.SetDebug(false)
+		assert.False(t, client.IsDebug())
 	})
 
 	t.Run("false", func(t *testing.T) {
@@ -159,7 +186,37 @@ func TestSetDebug(t *testing.T) {
 			WithDebugging(false),
 			WithHTTP(serverURL),
 		)
-		assert.NoError(t, err)
+		require.NoError(t, err)
+	})
+}
+
+// TestSetSignRequest will test the sign request setter
+func TestSetSignRequest(t *testing.T) {
+	t.Run("true", func(t *testing.T) {
+		client, _ := New(
+			WithXPriv(xPrivString),
+			WithHTTP(serverURL),
+		)
+		client.SetSignRequest(true)
+		assert.True(t, client.IsSignRequest())
+	})
+
+	t.Run("false", func(t *testing.T) {
+		client, _ := New(
+			WithXPriv(xPrivString),
+			WithHTTP(serverURL),
+		)
+		client.SetSignRequest(false)
+		assert.False(t, client.IsSignRequest())
+	})
+
+	t.Run("false", func(t *testing.T) {
+		_, err := New(
+			WithXPriv(xPrivString),
+			WithDebugging(false),
+			WithHTTP(serverURL),
+		)
+		require.NoError(t, err)
 	})
 }
 
