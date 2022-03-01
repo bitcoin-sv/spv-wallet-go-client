@@ -1,18 +1,18 @@
 # go-buxclient
 > Go client for interacting with Bux Servers
 
-[![Release](https://img.shields.io/github/release-pre/BuxOrg/go-buxclient.svg?logo=github&style=flat&v=1)](https://github.com/BuxOrg/go-buxclient/releases)
-[![Build Status](https://img.shields.io/github/workflow/status/BuxOrg/go-buxclient/run-go-tests?logo=github&v=1)](https://github.com/BuxOrg/go-buxclient/actions)
-[![Report](https://goreportcard.com/badge/github.com/BuxOrg/go-buxclient?style=flat&v=1)](https://goreportcard.com/report/github.com/BuxOrg/go-buxclient)
-[![codecov](https://codecov.io/gh/BuxOrg/go-buxclient/branch/master/graph/badge.svg?v=1)](https://codecov.io/gh/BuxOrg/go-buxclient)
-[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://gh.mergify.io/badges/BuxOrg/go-buxclient&style=flat&v=1)](https://mergify.io)
-[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/go-buxclient?v=1)](https://golang.org/)
+[![Release](https://img.shields.io/github/release-pre/BuxOrg/go-buxclient.svg?logo=github&style=flat&v=2)](https://github.com/BuxOrg/go-buxclient/releases)
+[![Build Status](https://img.shields.io/github/workflow/status/BuxOrg/go-buxclient/run-go-tests?logo=github&v=2)](https://github.com/BuxOrg/go-buxclient/actions)
+[![Report](https://goreportcard.com/badge/github.com/BuxOrg/go-buxclient?style=flat&v=2)](https://goreportcard.com/report/github.com/BuxOrg/go-buxclient)
+[![codecov](https://codecov.io/gh/BuxOrg/go-buxclient/branch/master/graph/badge.svg?v=2)](https://codecov.io/gh/BuxOrg/go-buxclient)
+[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://gh.mergify.io/badges/BuxOrg/go-buxclient&style=flat&v=2)](https://mergify.io)
+[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/go-buxclient?v=2)](https://golang.org/)
 <br>
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/BuxOrg/go-buxclient)
-[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat)](https://github.com/RichardLitt/standard-readme)
-[![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot)](Makefile)
-[![Sponsor](https://img.shields.io/badge/sponsor-mrz1836-181717.svg?logo=github&style=flat&v=1)](https://github.com/sponsors/BuxOrg)
-[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat&v=1)](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=go-buxclient&utm_term=go-buxclient&utm_content=go-buxclient)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=2)](https://gitpod.io/#https://github.com/BuxOrg/go-buxclient)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=2)](https://github.com/RichardLitt/standard-readme)
+[![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=2)](Makefile)
+[![Sponsor](https://img.shields.io/badge/sponsor-mrz1836-181717.svg?logo=github&style=flat&v=2)](https://github.com/sponsors/BuxOrg)
+[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat&v=2)](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=go-buxclient&utm_term=go-buxclient&utm_content=go-buxclient)
 
 <br/>
 
@@ -40,7 +40,7 @@ go get -u github.com/BuxOrg/go-buxclient
 ## Documentation
 View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/go-buxclient)
 
-[![GoDoc](https://godoc.org/github.com/BuxOrg/go-buxclient?status.svg&style=flat&v=1)](https://pkg.go.dev/github.com/BuxOrg/go-buxclient)
+[![GoDoc](https://godoc.org/github.com/BuxOrg/go-buxclient?status.svg&style=flat&v=2)](https://pkg.go.dev/github.com/BuxOrg/go-buxclient)
 
 <br/>
 
@@ -237,4 +237,4 @@ Thank you to these wonderful people ([emoji key](https://allcontributors.org/doc
 
 ## License
 
-[![License](https://img.shields.io/github/license/BuxOrg/go-buxclient.svg?style=flat&v=1)](LICENSE)
+[![License](https://img.shields.io/github/license/BuxOrg/go-buxclient.svg?style=flat&v=2)](LICENSE)
