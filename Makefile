@@ -17,7 +17,7 @@ endif
 .PHONY: clean install-all-contributors update-contributors
 
 all: ## Runs multiple commands
-	@$(MAKE) test
+	@$(MAKE) test-coverage-custom
 
 clean: ## Remove previous builds and any cached data
 	@echo "cleaning local cache..."
@@ -32,6 +32,10 @@ install-all-contributors: ## Installs all contributors locally
 
 release:: ## Runs common.release then runs godocs
 	@$(MAKE) godocs
+
+test-coverage-custom: ## Custom package test coverage
+	@echo "running coverage..."
+	@go test -coverpkg=./... -covermode=atomic -coverprofile=coverage.out ./...
 
 update-contributors: ## Regenerates the contributors html/list
 	@echo "generating contributor html..."
