@@ -8,7 +8,6 @@ package buxclient
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/go-buxclient/transports"
@@ -48,18 +47,15 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 
 	var err error
 	if client.xPrivString != "" {
-		client.xPriv, err = bip32.NewKeyFromString(client.xPrivString)
-		if err != nil {
+		if client.xPriv, err = bip32.NewKeyFromString(client.xPrivString); err != nil {
 			return nil, err
 		}
-		client.xPub, err = client.xPriv.Neuter()
-		if err != nil {
+		if client.xPub, err = client.xPriv.Neuter(); err != nil {
 			return nil, err
 		}
 	} else if client.xPubString != "" {
 		client.xPriv = nil
-		client.xPub, err = bip32.NewKeyFromString(client.xPubString)
-		if err != nil {
+		if client.xPub, err = bip32.NewKeyFromString(client.xPubString); err != nil {
 			return nil, err
 		}
 	} else if client.accessKeyString != "" {
@@ -68,12 +64,10 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 
 		var privateKey *bec.PrivateKey
 		var decodedWIF *wif.WIF
-		decodedWIF, err = wif.DecodeWIF(client.accessKeyString)
-		if err != nil {
+		if decodedWIF, err = wif.DecodeWIF(client.accessKeyString); err != nil {
 			// try as a hex string
 			var errHex error
-			privateKey, errHex = bitcoin.PrivateKeyFromString(client.accessKeyString)
-			if errHex != nil {
+			if privateKey, errHex = bitcoin.PrivateKeyFromString(client.accessKeyString); errHex != nil {
 				return nil, errors.Wrap(err, errHex.Error())
 			}
 		} else {
@@ -97,8 +91,7 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 		transportOptions = append(transportOptions, client.transportOptions...)
 	}
 
-	client.transport, err = transports.NewTransport(transportOptions...)
-	if err != nil {
+	if client.transport, err = transports.NewTransport(transportOptions...); err != nil {
 		return nil, err
 	}
 
@@ -253,94 +246,4 @@ func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transpor
 	}
 
 	return b.RecordTransaction(ctx, hex, draft.ID, metadata)
-}
-
-// WithXPriv will set xPrivString on the client
-func WithXPriv(xPrivString string) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.xPrivString = xPrivString
-		}
-	}
-}
-
-// WithXPub will set xPubString on the client
-func WithXPub(xPubString string) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.xPubString = xPubString
-		}
-	}
-}
-
-// WithAccessKey will set accessKey on the client
-func WithAccessKey(accessKeyString string) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.accessKeyString = accessKeyString
-		}
-	}
-}
-
-// WithHTTP will overwrite the default client with a custom client
-func WithHTTP(serverURL string) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithHTTP(serverURL))
-		}
-	}
-}
-
-// WithGraphQL will overwrite the default client with a custom client
-func WithGraphQL(serverURL string) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithGraphQL(serverURL))
-		}
-	}
-}
-
-// WithHTTPClient will overwrite the default client with a custom client
-func WithHTTPClient(serverURL string, httpClient *http.Client) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithHTTPClient(serverURL, httpClient))
-		}
-	}
-}
-
-// WithGraphQLClient will overwrite the default client with a custom client
-func WithGraphQLClient(serverURL string, httpClient *http.Client) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithGraphQLClient(serverURL, httpClient))
-		}
-	}
-}
-
-// WithAdminKey will set the admin key for admin requests
-func WithAdminKey(adminKey string) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithAdminKey(adminKey))
-		}
-	}
-}
-
-// WithSignRequest will set whether to sign all requests
-func WithSignRequest(signRequest bool) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithSignRequest(signRequest))
-		}
-	}
-}
-
-// WithDebugging will set whether to turn debugging on
-func WithDebugging(debug bool) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithDebugging(debug))
-		}
-	}
 }
