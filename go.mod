@@ -58,7 +58,7 @@ require (
 	github.com/klauspost/compress v1.14.4 // indirect
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
-	github.com/mattn/go-sqlite3 v1.14.11 // indirect
+	github.com/mattn/go-sqlite3 v1.14.12 // indirect
 	github.com/miekg/dns v1.1.46 // indirect
 	github.com/mrz1836/go-api-router v0.4.11 // indirect
 	github.com/mrz1836/go-cache v0.6.5 // indirect
@@ -80,8 +80,8 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tonicpow/go-minercraft v0.7.1 // indirect
 	github.com/tonicpow/go-paymail v0.7.2 // indirect
-	github.com/ugorji/go/codec v1.2.6 // indirect
-	github.com/vektah/gqlparser/v2 v2.3.1 // indirect
+	github.com/ugorji/go/codec v1.2.7 // indirect
+	github.com/vektah/gqlparser/v2 v2.4.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/vmihailenco/taskq/v3 v3.2.9-0.20211122085105-720ffc56ac4d // indirect
@@ -94,18 +94,18 @@ require (
 	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220224120231-95c6836cb0e7 // indirect
+	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/genproto v0.0.0-20220222213610-43724f9ea8cf // indirect
+	google.golang.org/genproto v0.0.0-20220228195345-15d65a4533f7 // indirect
 	google.golang.org/grpc v1.44.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	gorm.io/driver/mysql v1.3.2 // indirect
 	gorm.io/driver/postgres v1.3.1 // indirect
 	gorm.io/driver/sqlite v1.3.1 // indirect
-	gorm.io/gorm v1.23.1 // indirect
+	gorm.io/gorm v1.23.2 // indirect
 	gorm.io/plugin/dbresolver v1.1.0 // indirect
 )
 
