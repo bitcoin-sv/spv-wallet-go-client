@@ -16,6 +16,8 @@ import (
 	"github.com/libsv/go-bk/bip32"
 )
 
+const BuxVersion = "v1"
+
 // TransportHTTP is the struct for HTTP
 type TransportHTTP struct {
 	accessKey   *bec.PrivateKey
@@ -77,7 +79,7 @@ func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metada
 	}
 
 	var xPubData bux.Xpub
-	err = h.doHTTPRequest(ctx, "POST", "/xpubs", jsonStr, h.adminXPriv, true, &xPubData)
+	err = h.doHTTPRequest(ctx, "POST", fmt.Sprintf("/%s/xpubs", BuxVersion), jsonStr, h.adminXPriv, true, &xPubData)
 	if err != nil {
 		return err
 	}
@@ -97,7 +99,7 @@ func (h *TransportHTTP) GetDestination(ctx context.Context, metadata *bux.Metada
 	}
 
 	var destination bux.Destination
-	err = h.doHTTPRequest(ctx, "POST", "/destinations", jsonStr, h.xPriv, true, &destination)
+	err = h.doHTTPRequest(ctx, "POST", fmt.Sprintf("/%s/destinations", BuxVersion), jsonStr, h.xPriv, true, &destination)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +151,7 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context, jsonData map
 	}
 
 	var draftTransaction *bux.DraftTransaction
-	err = h.doHTTPRequest(ctx, "POST", "/transactions/new", jsonStr, h.xPriv, true, &draftTransaction)
+	err = h.doHTTPRequest(ctx, "POST", fmt.Sprintf("/%s/transactions/new", BuxVersion), jsonStr, h.xPriv, true, &draftTransaction)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +166,7 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context, jsonData map
 func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
 
 	var transaction *bux.Transaction
-	err := h.doHTTPRequest(ctx, "GET", "/transaction?id="+txID, nil, h.xPriv, h.signRequest, &transaction)
+	err := h.doHTTPRequest(ctx, "GET", fmt.Sprintf("/%s/transaction?id="+txID, BuxVersion), nil, h.xPriv, h.signRequest, &transaction)
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +192,7 @@ func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[stri
 	}
 
 	var transactions []*bux.Transaction
-	err = h.doHTTPRequest(ctx, "POST", "/transactions", jsonStr, h.xPriv, h.signRequest, &transactions)
+	err = h.doHTTPRequest(ctx, "POST", fmt.Sprintf("/%s/transactions", BuxVersion), jsonStr, h.xPriv, h.signRequest, &transactions)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +219,7 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 	}
 
 	var transaction *bux.Transaction
-	err = h.doHTTPRequest(ctx, "POST", "/transactions/record", jsonStr, h.xPriv, h.signRequest, &transaction)
+	err = h.doHTTPRequest(ctx, "POST", fmt.Sprintf("/%s/transactions/record", BuxVersion), jsonStr, h.xPriv, h.signRequest, &transaction)
 	if err != nil {
 		return nil, err
 	}
