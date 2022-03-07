@@ -85,6 +85,17 @@ func (g *TransportGraphQL) IsSignRequest() bool {
 	return g.signRequest
 }
 
+// RegisterPaymail will register a new paymail
+func (g *TransportGraphQL) RegisterPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error {
+	return nil
+}
+
+// GetXpub will get an xPub
+func (g *TransportGraphQL) GetXpub(ctx context.Context, rawXpub string) (*bux.Xpub, error) {
+	// TODO: Implement this
+	return nil, nil
+}
+
 // RegisterXpub will register an xPub
 func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
 

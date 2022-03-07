@@ -136,9 +136,19 @@ func (b *BuxClient) GetTransport() *transports.TransportService {
 	return &b.transport
 }
 
+// RegisterPaymail registers a new paymail
+func (b *BuxClient) RegisterPaymail(ctx context.Context, rawXPub, paymailAddress string, metadata *bux.Metadata) error {
+	return b.transport.RegisterPaymail(ctx, rawXPub, paymailAddress, metadata)
+}
+
 // RegisterXpub registers a new xpub - admin key needed
 func (b *BuxClient) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
 	return b.transport.RegisterXpub(ctx, rawXPub, metadata)
+}
+
+// GetXpub gets an xpub
+func (b *BuxClient) GetXpub(ctx context.Context, rawXpub string) (*bux.Xpub, error) {
+	return b.transport.GetXpub(ctx, rawXpub)
 }
 
 // DraftTransaction initialize a new draft transaction
