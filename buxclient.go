@@ -162,7 +162,7 @@ func (b *BuxClient) GetAccessKeys(ctx context.Context, metadataConditions *bux.M
 	return b.transport.GetAccessKeys(ctx, metadataConditions)
 }
 
-// CreateAccessKey creates a new access key
+// CreateAccessKey creates new access key
 func (b *BuxClient) CreateAccessKey(ctx context.Context, metadata *bux.Metadata) (*bux.AccessKey, error) {
 	return b.transport.CreateAccessKey(ctx, metadata)
 }
