@@ -224,7 +224,7 @@ func TestSetSignRequest(t *testing.T) {
 func TestDraftTransaction(t *testing.T) {
 	transportHandlers := []testTransportHandler{{
 		Type:      "http",
-		Path:      "/transactions/new",
+		Path:      "/transaction",
 		Result:    draftTxJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
@@ -260,7 +260,7 @@ func TestDraftTransaction(t *testing.T) {
 func TestRegisterXpub(t *testing.T) {
 	transportHandlers := []testTransportHandler{{
 		Type:      "http",
-		Path:      "/xpubs",
+		Path:      "/xpub",
 		Result:    xpubJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
@@ -288,7 +288,7 @@ func TestRegisterXpub(t *testing.T) {
 func TestDraftToRecipients(t *testing.T) {
 	transportHandlers := []testTransportHandler{{
 		Type:      "http",
-		Path:      "/transactions/new",
+		Path:      "/transaction",
 		Result:    draftTxJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
@@ -329,11 +329,11 @@ func checkDraftTransactionOutput(t *testing.T, draft *bux.DraftTransaction) {
 	assert.Equal(t, "test-value", draft.Metadata["testkey"])
 }
 
-// TestGetDestination will test the GetDestination method
-func TestGetDestination(t *testing.T) {
+// TestNewDestination will test the NewDestination method
+func TestNewDestination(t *testing.T) {
 	transportHandlers := []testTransportHandler{{
 		Type:      "http",
-		Path:      "/destinations",
+		Path:      "/destination",
 		Result:    destinationJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
@@ -349,7 +349,7 @@ func TestGetDestination(t *testing.T) {
 		t.Run("new destination "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
-			destination, err := client.GetDestination(context.Background(), nil)
+			destination, err := client.NewDestination(context.Background(), nil)
 			assert.NoError(t, err)
 			assert.IsType(t, bux.Destination{}, *destination)
 			assert.Equal(t, "90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce", destination.ID)
@@ -399,7 +399,7 @@ func TestGetTransaction(t *testing.T) {
 func TestGetTransactions(t *testing.T) {
 	transportHandlers := []testTransportHandler{{
 		Type:      "http",
-		Path:      "/transactions",
+		Path:      "/transaction/search",
 		Result:    transactionsJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
@@ -446,7 +446,7 @@ func TestGetTransactions(t *testing.T) {
 func TestRecordTransaction(t *testing.T) {
 	transportHandlers := []testTransportHandler{{
 		Type:      "http",
-		Path:      "/transactions/record",
+		Path:      "/transaction/record",
 		Result:    transactionJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
@@ -479,13 +479,13 @@ func TestSendToRecipients(t *testing.T) {
 	transportHandlers := []testTransportHandler{{
 		Type: "http",
 		Queries: []*testTransportHandlerRequest{{
-			Path: "/transactions/new",
+			Path: "/transaction",
 			Result: func(w http.ResponseWriter, req *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				mustWrite(w, draftTxJSON)
 			},
 		}, {
-			Path: "/transactions/record",
+			Path: "/transaction/record",
 			Result: func(w http.ResponseWriter, req *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				mustWrite(w, transactionJSON)
@@ -511,7 +511,7 @@ func TestSendToRecipients(t *testing.T) {
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("get transactions "+transportHandler.Type, func(t *testing.T) {
+		t.Run("send to recipients "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			recipients := []*transports.Recipients{{

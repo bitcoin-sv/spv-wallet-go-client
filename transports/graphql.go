@@ -29,9 +29,29 @@ type TransportGraphQL struct {
 	client      graphQlService
 }
 
+// XPubData is the xpub data
+type XPubData struct {
+	XPub *bux.Xpub `json:"xpub"`
+}
+
+// AccessKeyData is the access key data
+type AccessKeyData struct {
+	AccessKey *bux.AccessKey `json:"access_key"`
+}
+
+// AccessKeysData is a slice of access key data
+type AccessKeysData struct {
+	AccessKeys []*bux.AccessKey `json:"access_keys"`
+}
+
 // DestinationData is the destination data
 type DestinationData struct {
 	Destination *bux.Destination `json:"destination"`
+}
+
+// DestinationsData is a slice of destination data
+type DestinationsData struct {
+	Destinations []*bux.Destination `json:"destinations"`
 }
 
 // DraftTransactionData is a draft transaction
@@ -137,8 +157,295 @@ func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string, met
 	return nil
 }
 
-// GetDestination will get a destination
-func (g *TransportGraphQL) GetDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
+// GetXPub will get information about the current xPub
+func (g *TransportGraphQL) GetXPub(ctx context.Context) (*bux.Xpub, error) {
+
+	reqBody := `
+	query {
+	  xpub {
+		id
+		current_balance
+		next_internal_num
+		next_external_num
+		metadata
+		created_at
+		updated_at
+		deleted_at
+	  }
+	}`
+
+	var respData XPubData
+	err := g.doGraphQLQuery(ctx, reqBody, nil, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.XPub, nil
+}
+
+// GetAccessKey will get an access key by id
+func (g *TransportGraphQL) GetAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
+
+	reqBody := `
+	query ($id: String) {
+      access_key (
+        id: $id
+      ) {
+        id
+        xpub_id
+        key
+        metadata
+        created_at
+        updated_at
+        deleted_at
+        revoked_at
+      }
+    }`
+	variables := map[string]interface{}{
+		"id": id,
+	}
+
+	var respData AccessKeyData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.AccessKey, nil
+}
+
+// GetAccessKeys will get all access keys filtered by the metadata
+func (g *TransportGraphQL) GetAccessKeys(ctx context.Context, metadata *bux.Metadata) ([]*bux.AccessKey, error) {
+
+	reqBody := `
+	query ($metadata: Metadata) {
+      access_keys (
+        metadata: $metadata
+      ) {
+        id
+        xpub_id
+        key
+        metadata
+        created_at
+        updated_at
+        deleted_at
+        revoked_at
+      }
+    }`
+	variables := map[string]interface{}{
+		"metadata": processMetadata(metadata),
+	}
+
+	var respData AccessKeysData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.AccessKeys, nil
+}
+
+// CreateAccessKey will create a new access key
+func (g *TransportGraphQL) CreateAccessKey(ctx context.Context, metadata *bux.Metadata) (*bux.AccessKey, error) {
+
+	reqBody := `
+	  mutation ($metadata: Metadata) {
+        access_key (
+          metadata: $metadata
+        ) {
+          id
+          xpub_id
+          key
+          metadata
+          created_at
+          updated_at
+          deleted_at
+          revoked_at
+        }
+      }`
+	variables := map[string]interface{}{
+		"metadata": processMetadata(metadata),
+	}
+
+	var respData AccessKeyData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.AccessKey, nil
+}
+
+// RevokeAccessKey will revoke the given access key
+func (g *TransportGraphQL) RevokeAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
+
+	reqBody := `
+	  mutation ($id: String) {
+        access_key_revoke (
+          id: $id
+        ) {
+          id
+          xpub_id
+          key
+          metadata
+          created_at
+          updated_at
+          deleted_at
+          revoked_at
+        }
+      }`
+	variables := map[string]interface{}{
+		"id": id,
+	}
+
+	var respData AccessKeyData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.AccessKey, nil
+}
+
+// GetDestinationByID will get a destination by the given id
+func (g *TransportGraphQL) GetDestinationByID(ctx context.Context, id string) (*bux.Destination, error) {
+
+	reqBody := `{
+	query ($id: String) {
+        destination (
+          id: $id
+        ) {
+          id
+          xpub_id
+          locking_script
+          type
+          chain
+          num
+          address
+          metadata
+          created_at
+          updated_at
+          deleted_at
+        }
+      }`
+	variables := map[string]interface{}{
+		"id": id,
+	}
+
+	var respData DestinationData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.Destination, nil
+}
+
+// GetDestinationByLockingScript will get a destination by the given locking script
+func (g *TransportGraphQL) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*bux.Destination, error) {
+
+	reqBody := `{
+	query ($lockingScript: String) {
+        destination (
+          locking_script: $lockingScript
+        ) {
+          id
+          xpub_id
+          locking_script
+          type
+          chain
+          num
+          address
+          metadata
+          created_at
+          updated_at
+          deleted_at
+        }
+      }`
+	variables := map[string]interface{}{
+		"lockingScript": lockingScript,
+	}
+
+	var respData DestinationData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.Destination, nil
+}
+
+// GetDestinationByAddress will get a destination by the given address
+func (g *TransportGraphQL) GetDestinationByAddress(ctx context.Context, address string) (*bux.Destination, error) {
+
+	reqBody := `{
+	query ($address: String) {
+        destination (
+          address: $address
+        ) {
+          id
+          xpub_id
+          locking_script
+          type
+          chain
+          num
+          address
+          metadata
+          created_at
+          updated_at
+          deleted_at
+        }
+      }`
+	variables := map[string]interface{}{
+		"address": address,
+	}
+
+	var respData DestinationData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.Destination, nil
+}
+
+// GetDestinations will get all destinations filtered by the medata conditions
+func (g *TransportGraphQL) GetDestinations(ctx context.Context, metadataConditions *bux.Metadata) ([]*bux.Destination, error) {
+
+	reqBody := `{
+	  query ($metadata: Metadata) {
+        destinations (
+          metadata: $metadata
+        ) {
+          id
+          xpub_id
+          locking_script
+          type
+          chain
+          num
+          address
+          metadata
+          created_at
+          updated_at
+          deleted_at
+        }
+      }`
+	variables := map[string]interface{}{
+		"metadata": processMetadata(metadataConditions),
+	}
+
+	var respData DestinationsData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.Destinations, nil
+}
+
+// NewDestination will get a new destination
+func (g *TransportGraphQL) NewDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
+
 	reqBody := `
    	mutation ($metadata: Map) {
 	  destination(
@@ -154,50 +461,110 @@ func (g *TransportGraphQL) GetDestination(ctx context.Context, metadata *bux.Met
 		metadata
 	  }
 	}`
-	req := graphql.NewRequest(reqBody)
-	req.Var("metadata", processMetadata(metadata))
-
 	variables := map[string]interface{}{
 		"metadata": processMetadata(metadata),
 	}
-	err := g.signGraphQLRequest(req, reqBody, variables)
+
+	var respData DestinationData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
 	if err != nil {
 		return nil, err
 	}
 
-	// run it and capture the response
-	var respData DestinationData
-	if err := g.client.Run(ctx, req, &respData); err != nil {
-		return nil, err
-	}
-	destination := respData.Destination
-	if g.debug {
-		fmt.Printf("Address for new destination: %s\n", destination.Address)
-	}
-
-	return destination, nil
+	return respData.Destination, nil
 }
 
-// DraftTransaction is a draft transaction
-func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig,
-	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+// GetTransaction get a transaction by ID
+func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
 
 	reqBody := `
-   	mutation ($transactionConfig: TransactionConfigInput!, $metadata: Map) {
-	  new_transaction(
-		transaction_config: $transactionConfig
-		metadata: $metadata
-	  ) ` + graphqlDraftTransactionFields + `
+   	query {
+	  transaction(
+		txId:"` + txID + `",
+	  ) {
+        id
+        hex
+        block_hash
+        block_height
+        fee
+        number_of_inputs
+        number_of_outputs
+        output_value
+        total_value
+        direction
+        metadata
+        created_at
+        updated_at
+        deleted_at
+	  }
 	}`
-	req := graphql.NewRequest(reqBody)
-	req.Var("transactionConfig", transactionConfig)
-	req.Var("metadata", processMetadata(metadata))
-	variables := map[string]interface{}{
-		"transaction_config": transactionConfig,
-		"metadata":           processMetadata(metadata),
+	var respData TransactionData
+	err := g.doGraphQLQuery(ctx, reqBody, nil, &respData)
+	if err != nil {
+		return nil, err
 	}
 
-	return g.draftTransactionCommon(ctx, reqBody, variables, req)
+	return respData.Transaction, nil
+}
+
+// GetTransactions get a transactions, filtered by the given metadata
+func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[string]interface{},
+	metadataConditions *bux.Metadata) ([]*bux.Transaction, error) {
+
+	querySignature := ""
+	queryArguments := ""
+
+	// is there a better way to do this ?
+	if conditions != nil {
+		querySignature += "( $conditions Map "
+		queryArguments += " conditions: $conditions\n"
+	}
+	if metadataConditions != nil {
+		if conditions == nil {
+			querySignature += "( "
+		} else {
+			querySignature += ", "
+		}
+		querySignature += "$metadata Map"
+		queryArguments += " metadata: $metadata\n"
+	} else {
+		querySignature += " )"
+	}
+
+	reqBody := `
+   	query ` + querySignature + `{
+	  transactions ` + queryArguments + ` {
+        id
+        hex
+        block_hash
+        block_height
+        fee
+        number_of_inputs
+        number_of_outputs
+        output_value
+        total_value
+        direction
+        metadata
+        created_at
+        updated_at
+        deleted_at
+	  }
+	}`
+	variables := make(map[string]interface{})
+	if conditions != nil {
+		variables["conditions"] = conditions
+	}
+	if metadataConditions != nil {
+		variables["metadata"] = metadataConditions
+	}
+
+	var respData TransactionsData
+	err := g.doGraphQLQuery(ctx, reqBody, variables, &respData)
+	if err != nil {
+		return nil, err
+	}
+
+	return respData.Transactions, nil
 }
 
 // DraftToRecipients is a draft transaction to a slice of recipients
@@ -234,6 +601,28 @@ func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*
 	return g.draftTransactionCommon(ctx, reqBody, variables, req)
 }
 
+// DraftTransaction is a draft transaction
+func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig,
+	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+
+	reqBody := `
+   	mutation ($transactionConfig: TransactionConfigInput!, $metadata: Map) {
+	  new_transaction(
+		transaction_config: $transactionConfig
+		metadata: $metadata
+	  ) ` + graphqlDraftTransactionFields + `
+	}`
+	req := graphql.NewRequest(reqBody)
+	req.Var("transactionConfig", transactionConfig)
+	req.Var("metadata", processMetadata(metadata))
+	variables := map[string]interface{}{
+		"transaction_config": transactionConfig,
+		"metadata":           processMetadata(metadata),
+	}
+
+	return g.draftTransactionCommon(ctx, reqBody, variables, req)
+}
+
 func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody string,
 	variables map[string]interface{}, req *graphql.Request) (*bux.DraftTransaction, error) {
 
@@ -253,106 +642,6 @@ func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody s
 	}
 
 	return draftTransaction, nil
-}
-
-// GetTransaction get a transaction by ID
-func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
-
-	reqBody := `
-   	query {
-	  transaction(
-		txId:"` + txID + `",
-	  ) {
-		id
-	  }
-	}`
-	req := graphql.NewRequest(reqBody)
-
-	err := g.signGraphQLRequest(req, reqBody, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	// run it and capture the response
-	var respData TransactionData
-	if err = g.client.Run(ctx, req, &respData); err != nil {
-		return nil, err
-	}
-	transaction := respData.Transaction
-	if g.debug {
-		fmt.Printf("Transaction: %s\n", transaction.ID)
-	}
-
-	return transaction, nil
-}
-
-// GetTransactions get a transactions, filtered by the given metadata
-func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata) ([]*bux.Transaction, error) {
-
-	querySignature := ""
-	queryArguments := ""
-
-	// is there a better way to do this ?
-	if conditions != nil {
-		querySignature += "( $conditions Map "
-		queryArguments += " conditions: $conditions\n"
-	}
-	if metadata != nil {
-		if conditions == nil {
-			querySignature += "( "
-		} else {
-			querySignature += ", "
-		}
-		querySignature += "$metadata Map"
-		queryArguments += " metadata: $metadata\n"
-	} else {
-		querySignature += " )"
-	}
-
-	reqBody := `
-   	query ` + querySignature + `{
-	  transactions ` + queryArguments + ` {
-	    id,
-	    hex,
-	    xpub_in_ids,
-	    xpub_out_ids,
-	    block_hash,
-	    block_height,
-	    fee,
-	    number_of_inputs,
-	    number_of_outputs,
-	    draft_id,
-	    total_value,
-	  }
-	}`
-	req := graphql.NewRequest(reqBody)
-	variables := make(map[string]interface{})
-	if conditions != nil {
-		req.Var("conditions", conditions)
-		variables["conditions"] = conditions
-	}
-	if metadata != nil {
-		req.Var("metadata", metadata)
-		variables["metadata"] = metadata
-	}
-
-	err := g.signGraphQLRequest(req, reqBody, variables)
-	if err != nil {
-		return nil, err
-	}
-
-	// run it and capture the response
-	var respData TransactionsData
-	if err = g.client.Run(ctx, req, &respData); err != nil {
-		return nil, err
-	}
-	transactions := respData.Transactions
-	if g.debug {
-		fmt.Printf("Transactions: %d\n", len(transactions))
-	}
-
-	return transactions, nil
 }
 
 // RecordTransaction will record a transaction
@@ -391,6 +680,30 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 	}
 
 	return transaction, nil
+}
+
+func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, variables map[string]interface{},
+	respData interface{}) error {
+
+	req := graphql.NewRequest(reqBody)
+	for key, value := range variables {
+		req.Var(key, value)
+	}
+
+	err := g.signGraphQLRequest(req, reqBody, variables)
+	if err != nil {
+		return err
+	}
+
+	// run it and capture the response
+	if err = g.client.Run(ctx, req, &respData); err != nil {
+		return err
+	}
+	if g.debug {
+		fmt.Printf("Model: %v\n", respData)
+	}
+
+	return nil
 }
 
 func getBodyString(reqBody string, variables map[string]interface{}) (string, error) {
