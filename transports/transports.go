@@ -54,11 +54,19 @@ type TransportService interface {
 	SetSignRequest(debug bool)
 	IsSignRequest() bool
 	RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error
-	GetXpub(ctx context.Context, rawXPub string) (*bux.Xpub, error)
 	RegisterPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error
-	GetDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error)
+	GetXPub(ctx context.Context) (*bux.Xpub, error)
+	GetAccessKey(ctx context.Context, id string) (*bux.AccessKey, error)
+	GetAccessKeys(ctx context.Context, metadataConditions *bux.Metadata) ([]*bux.AccessKey, error)
+	CreateAccessKey(ctx context.Context, metadata *bux.Metadata) (*bux.AccessKey, error)
+	RevokeAccessKey(ctx context.Context, id string) (*bux.AccessKey, error)
+	GetDestinationByID(ctx context.Context, id string) (*bux.Destination, error)
+	GetDestinationByAddress(ctx context.Context, address string) (*bux.Destination, error)
+	GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*bux.Destination, error)
+	GetDestinations(ctx context.Context, metadataConditions *bux.Metadata) ([]*bux.Destination, error)
+	NewDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error)
 	GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error)
-	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) ([]*bux.Transaction, error)
+	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadataConditions *bux.Metadata) ([]*bux.Transaction, error)
 	DraftToRecipients(ctx context.Context, recipients []*Recipients, metadata *bux.Metadata) (*bux.DraftTransaction, error)
 	DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig, metadata *bux.Metadata) (*bux.DraftTransaction, error)
 	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *bux.Metadata) (*bux.Transaction, error)

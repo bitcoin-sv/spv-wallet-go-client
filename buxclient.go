@@ -26,6 +26,7 @@ type ClientOps func(c *BuxClient)
 
 // BuxClient is the bux client
 type BuxClient struct {
+	transports.TransportService
 	accessKey        *bec.PrivateKey
 	accessKeyString  string
 	debug            bool
@@ -146,16 +147,66 @@ func (b *BuxClient) RegisterXpub(ctx context.Context, rawXPub string, metadata *
 	return b.transport.RegisterXpub(ctx, rawXPub, metadata)
 }
 
-// GetXpub gets an xpub
-func (b *BuxClient) GetXpub(ctx context.Context, rawXpub string) (*bux.Xpub, error) {
-	return b.transport.GetXpub(ctx, rawXpub)
+// GetXPub gets the current xpub
+func (b *BuxClient) GetXPub(ctx context.Context) (*bux.Xpub, error) {
+	return b.transport.GetXPub(ctx)
 }
 
-// DraftTransaction initialize a new draft transaction
-func (b *BuxClient) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig,
-	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+// GetAccessKey gets the access key given by id
+func (b *BuxClient) GetAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
+	return b.transport.GetAccessKey(ctx, id)
+}
 
-	return b.transport.DraftTransaction(ctx, transactionConfig, metadata)
+// GetAccessKeys gets all the access keys filtered by the metadata
+func (b *BuxClient) GetAccessKeys(ctx context.Context, metadataConditions *bux.Metadata) ([]*bux.AccessKey, error) {
+	return b.transport.GetAccessKeys(ctx, metadataConditions)
+}
+
+// CreateAccessKey creates a new access key
+func (b *BuxClient) CreateAccessKey(ctx context.Context, metadata *bux.Metadata) (*bux.AccessKey, error) {
+	return b.transport.CreateAccessKey(ctx, metadata)
+}
+
+// RevokeAccessKey revoked the access key given by id
+func (b *BuxClient) RevokeAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
+	return b.transport.RevokeAccessKey(ctx, id)
+}
+
+// GetDestinationByID gets the destination by id
+func (b *BuxClient) GetDestinationByID(ctx context.Context, id string) (*bux.Destination, error) {
+	return b.transport.GetDestinationByID(ctx, id)
+}
+
+// GetDestinationByAddress gets the destination by address
+func (b *BuxClient) GetDestinationByAddress(ctx context.Context, address string) (*bux.Destination, error) {
+	return b.transport.GetDestinationByAddress(ctx, address)
+}
+
+// GetDestinationByLockingScript gets the destination by locking script
+func (b *BuxClient) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*bux.Destination, error) {
+	return b.transport.GetDestinationByLockingScript(ctx, lockingScript)
+}
+
+// GetDestinations gets all destinations that match the metadata filter
+func (b *BuxClient) GetDestinations(ctx context.Context, metadataConditions *bux.Metadata) ([]*bux.Destination, error) {
+	return b.transport.GetDestinations(ctx, metadataConditions)
+}
+
+// NewDestination create a new destination and return it
+func (b *BuxClient) NewDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
+	return b.transport.NewDestination(ctx, metadata)
+}
+
+// GetTransaction get a transaction by id
+func (b *BuxClient) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
+	return b.transport.GetTransaction(ctx, txID)
+}
+
+// GetTransactions get all transactions matching search criteria
+func (b *BuxClient) GetTransactions(ctx context.Context, conditions map[string]interface{},
+	metadata *bux.Metadata) ([]*bux.Transaction, error) {
+
+	return b.transport.GetTransactions(ctx, conditions, metadata)
 }
 
 // DraftToRecipients initialize a new P2PKH draft transaction to a list of recipients
@@ -165,9 +216,18 @@ func (b *BuxClient) DraftToRecipients(ctx context.Context, recipients []*transpo
 	return b.transport.DraftToRecipients(ctx, recipients, metadata)
 }
 
-// GetDestination get new fresh destination
-func (b *BuxClient) GetDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
-	return b.transport.GetDestination(ctx, metadata)
+// DraftTransaction initialize a new draft transaction
+func (b *BuxClient) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig,
+	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
+
+	return b.transport.DraftTransaction(ctx, transactionConfig, metadata)
+}
+
+// RecordTransaction record a new transaction
+func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string,
+	metadata *bux.Metadata) (*bux.Transaction, error) {
+
+	return b.transport.RecordTransaction(ctx, hex, draftID, metadata)
 }
 
 // FinalizeTransaction will finalize the transaction
@@ -217,25 +277,6 @@ func (b *BuxClient) FinalizeTransaction(draft *bux.DraftTransaction) (string, er
 	}
 
 	return txDraft.String(), nil
-}
-
-// GetTransaction get a transaction by id
-func (b *BuxClient) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
-	return b.transport.GetTransaction(ctx, txID)
-}
-
-// GetTransactions get all transactions matching search criteria
-func (b *BuxClient) GetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata) ([]*bux.Transaction, error) {
-
-	return b.transport.GetTransactions(ctx, conditions, metadata)
-}
-
-// RecordTransaction record a new transaction
-func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string,
-	metadata *bux.Metadata) (*bux.Transaction, error) {
-
-	return b.transport.RecordTransaction(ctx, hex, draftID, metadata)
 }
 
 // SendToRecipients send to recipients
