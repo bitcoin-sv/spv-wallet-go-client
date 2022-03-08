@@ -686,10 +686,8 @@ func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, v
 	respData interface{}) error {
 
 	req := graphql.NewRequest(reqBody)
-	if variables != nil {
-		for key, value := range variables {
-			req.Var(key, value)
-		}
+	for key, value := range variables {
+		req.Var(key, value)
 	}
 
 	err := g.signGraphQLRequest(req, reqBody, variables)

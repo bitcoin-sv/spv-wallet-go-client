@@ -104,7 +104,7 @@ func TestGetDestination(t *testing.T) {
 				client:      &GraphQLMockClient{},
 			},
 		}
-		destination, err := client.GetDestination(context.Background(), nil)
+		destination, err := client.NewDestination(context.Background(), nil)
 		assert.ErrorIs(t, err, bux.ErrMissingXPriv)
 		assert.Nil(t, destination)
 	})
@@ -125,7 +125,7 @@ func TestGetDestination(t *testing.T) {
 				client:      &graphqlClient,
 			},
 		}
-		destination, err := client.GetDestination(context.Background(), nil)
+		destination, err := client.NewDestination(context.Background(), nil)
 		assert.NoError(t, err)
 		assert.IsType(t, &bux.Destination{}, destination)
 		assert.Equal(t, "test-address", destination.Address)
@@ -147,7 +147,7 @@ func TestGetDestination(t *testing.T) {
 				client: &graphqlClient,
 			},
 		}
-		destination, err := client.GetDestination(context.Background(), nil)
+		destination, err := client.NewDestination(context.Background(), nil)
 		assert.NoError(t, err)
 		assert.IsType(t, &bux.Destination{}, destination)
 		assert.Equal(t, "test-address", destination.Address)
