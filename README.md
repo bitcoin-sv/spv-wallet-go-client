@@ -1,5 +1,5 @@
 # BUX: Go Client
-> Go client for interacting with Bux Servers
+> Get started using [BUX](https://getbux.io) in five minutes
 
 [![Release](https://img.shields.io/github/release-pre/BuxOrg/go-buxclient.svg?logo=github&style=flat&v=2)](https://github.com/BuxOrg/go-buxclient/releases)
 [![Build Status](https://img.shields.io/github/workflow/status/BuxOrg/go-buxclient/run-go-tests?logo=github&v=2)](https://github.com/BuxOrg/go-buxclient/actions)
@@ -17,6 +17,7 @@
 <br/>
 
 ## Table of Contents
+- [What is BUX?](#what-is-bux)
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Examples & Tests](#examples--tests)
@@ -25,6 +26,11 @@
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
+
+<br/>
+
+## What is BUX?
+[Read more about BUX](https://getbux.io)
 
 <br/>
 
