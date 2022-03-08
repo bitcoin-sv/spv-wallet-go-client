@@ -58,6 +58,28 @@ func (h *TransportHTTP) SetAdminKey(adminKey *bip32.ExtendedKey) {
 	h.adminXPriv = adminKey
 }
 
+// RegisterPaymail will register a new paymail
+func (h *TransportHTTP) RegisterPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error {
+	jsonData := map[string]interface{}{
+		"metadata": processMetadata(metadata),
+		"key":      rawXpub,
+		"address":  paymailAddress,
+	}
+
+	jsonStr, err := json.Marshal(jsonData)
+	if err != nil {
+		return err
+	}
+
+	var paymailData interface{}
+	err = h.doHTTPRequest(ctx, "POST", "/paymail", jsonStr, h.xPriv, true, &paymailData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // RegisterXpub will register an xPub
 func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
 
@@ -83,6 +105,24 @@ func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metada
 	}
 
 	return nil
+}
+
+// GetXpub will get an xpub
+func (h *TransportHTTP) GetXpub(ctx context.Context, rawXpub string) (*bux.Xpub, error) {
+	// adding an xpub needs to be signed by an admin key
+	if h.adminXPriv == nil {
+		return nil, ErrAdminKey
+	}
+	var xpub *bux.Xpub
+	err := h.doHTTPRequest(ctx, "GET", "/xpub?key="+rawXpub, nil, h.xPriv, h.signRequest, &xpub)
+	if err != nil {
+		return nil, err
+	}
+	if h.debug {
+		fmt.Printf("Xpub: %s\n", xpub.ID)
+	}
+
+	return xpub, nil
 }
 
 // GetDestination will get a destination

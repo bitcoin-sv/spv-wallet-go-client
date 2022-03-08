@@ -54,6 +54,8 @@ type TransportService interface {
 	SetSignRequest(debug bool)
 	IsSignRequest() bool
 	RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error
+	GetXpub(ctx context.Context, rawXPub string) (*bux.Xpub, error)
+	RegisterPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error
 	GetDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error)
 	GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error)
 	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) ([]*bux.Transaction, error)
