@@ -1,4 +1,4 @@
-# go-buxclient
+# BUX: Go Client
 > Go client for interacting with Bux Servers
 
 [![Release](https://img.shields.io/github/release-pre/BuxOrg/go-buxclient.svg?logo=github&style=flat&v=2)](https://github.com/BuxOrg/go-buxclient/releases)
