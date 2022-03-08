@@ -5,8 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -60,20 +59,19 @@ func (h *TransportHTTP) SetAdminKey(adminKey *bip32.ExtendedKey) {
 
 // RegisterPaymail will register a new paymail
 func (h *TransportHTTP) RegisterPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error {
-	jsonData := map[string]interface{}{
-		"metadata": processMetadata(metadata),
-		"key":      rawXpub,
-		"address":  paymailAddress,
-	}
-
-	jsonStr, err := json.Marshal(jsonData)
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldAddress:  paymailAddress,
+		FieldMetadata: processMetadata(metadata),
+		FieldXpubKey:  rawXpub,
+	})
 	if err != nil {
 		return err
 	}
 
 	var paymailData interface{}
-	err = h.doHTTPRequest(ctx, "POST", "/paymail", jsonStr, h.xPriv, true, &paymailData)
-	if err != nil {
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/paymail", jsonStr, h.xPriv, true, &paymailData,
+	); err != nil {
 		return err
 	}
 
@@ -83,24 +81,23 @@ func (h *TransportHTTP) RegisterPaymail(ctx context.Context, rawXpub, paymailAdd
 // RegisterXpub will register an xPub
 func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
 
-	// adding an xpub needs to be signed by an admin key
+	// Adding a xpub needs to be signed by an admin key
 	if h.adminXPriv == nil {
 		return ErrAdminKey
 	}
 
-	jsonData := map[string]interface{}{
-		"metadata": processMetadata(metadata),
-		"key":      rawXPub,
-	}
-
-	jsonStr, err := json.Marshal(jsonData)
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldMetadata: processMetadata(metadata),
+		FieldXpubKey:  rawXPub,
+	})
 	if err != nil {
 		return err
 	}
 
 	var xPubData bux.Xpub
-	err = h.doHTTPRequest(ctx, "POST", "/xpub", jsonStr, h.adminXPriv, true, &xPubData)
-	if err != nil {
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/xpub", jsonStr, h.adminXPriv, true, &xPubData,
+	); err != nil {
 		return err
 	}
 
@@ -110,12 +107,13 @@ func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metada
 // GetXPub will get the xpub of the current xpub
 func (h *TransportHTTP) GetXPub(ctx context.Context) (*bux.Xpub, error) {
 	var xPub bux.Xpub
-	err := h.doHTTPRequest(ctx, "GET", "/xpub", nil, h.xPriv, true, &xPub)
-	if err != nil {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodGet, "/xpub", nil, h.xPriv, true, &xPub,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("XPub: %v\n", xPub)
+		log.Printf("xpub: %v\n", xPub)
 	}
 
 	return &xPub, nil
@@ -124,12 +122,13 @@ func (h *TransportHTTP) GetXPub(ctx context.Context) (*bux.Xpub, error) {
 // GetAccessKey will get an access key by id
 func (h *TransportHTTP) GetAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
 	var accessKey bux.AccessKey
-	err := h.doHTTPRequest(ctx, "GET", "/access-key?id="+id, nil, h.xPriv, true, &accessKey)
-	if err != nil {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodGet, "/access-key?id="+id, nil, h.xPriv, true, &accessKey,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("Access key: %v\n", accessKey)
+		log.Printf("access key: %v\n", accessKey)
 	}
 
 	return &accessKey, nil
@@ -137,17 +136,16 @@ func (h *TransportHTTP) GetAccessKey(ctx context.Context, id string) (*bux.Acces
 
 // GetAccessKeys will get all access keys matching the metadata filter
 func (h *TransportHTTP) GetAccessKeys(ctx context.Context, metadataConditions *bux.Metadata) ([]*bux.AccessKey, error) {
-	jsonData := map[string]interface{}{
-		"metadata": processMetadata(metadataConditions),
-	}
-
-	jsonStr, err := json.Marshal(jsonData)
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldMetadata: processMetadata(metadataConditions),
+	})
 	if err != nil {
 		return nil, err
 	}
 	var accessKey []*bux.AccessKey
-	err = h.doHTTPRequest(ctx, "POST", "/access-key/search", jsonStr, h.xPriv, true, &accessKey)
-	if err != nil {
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/access-key/search", jsonStr, h.xPriv, true, &accessKey,
+	); err != nil {
 		return nil, err
 	}
 
@@ -157,30 +155,30 @@ func (h *TransportHTTP) GetAccessKeys(ctx context.Context, metadataConditions *b
 // RevokeAccessKey will revoke an access key by id
 func (h *TransportHTTP) RevokeAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
 	var accessKey bux.AccessKey
-	err := h.doHTTPRequest(ctx, "DELETE", "/access-key?id="+id, nil, h.xPriv, true, &accessKey)
-	if err != nil {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodDelete, "/access-key?id="+id, nil, h.xPriv, true, &accessKey,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("Access key: %v\n", accessKey)
+		log.Printf("access key: %v\n", accessKey)
 	}
 
 	return &accessKey, nil
 }
 
-// CreateAccessKey will create a new access key
+// CreateAccessKey will create new access key
 func (h *TransportHTTP) CreateAccessKey(ctx context.Context, metadata *bux.Metadata) (*bux.AccessKey, error) {
-	jsonData := map[string]interface{}{
-		"metadata": processMetadata(metadata),
-	}
-
-	jsonStr, err := json.Marshal(jsonData)
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldMetadata: processMetadata(metadata),
+	})
 	if err != nil {
 		return nil, err
 	}
 	var accessKey bux.AccessKey
-	err = h.doHTTPRequest(ctx, "POST", "/access-key", jsonStr, h.xPriv, true, &accessKey)
-	if err != nil {
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/access-key", jsonStr, h.xPriv, true, &accessKey,
+	); err != nil {
 		return nil, err
 	}
 
@@ -190,12 +188,13 @@ func (h *TransportHTTP) CreateAccessKey(ctx context.Context, metadata *bux.Metad
 // GetDestinationByID will get a destination by id
 func (h *TransportHTTP) GetDestinationByID(ctx context.Context, id string) (*bux.Destination, error) {
 	var destination bux.Destination
-	err := h.doHTTPRequest(ctx, "GET", "/destination?id="+id, nil, h.xPriv, true, &destination)
-	if err != nil {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodGet, "/destination?id="+id, nil, h.xPriv, true, &destination,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("Destination: %v\n", destination)
+		log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -204,12 +203,13 @@ func (h *TransportHTTP) GetDestinationByID(ctx context.Context, id string) (*bux
 // GetDestinationByAddress will get a destination by address
 func (h *TransportHTTP) GetDestinationByAddress(ctx context.Context, address string) (*bux.Destination, error) {
 	var destination bux.Destination
-	err := h.doHTTPRequest(ctx, "GET", "/destination?address="+address, nil, h.xPriv, true, &destination)
-	if err != nil {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodGet, "/destination?address="+address, nil, h.xPriv, true, &destination,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("Destination: %v\n", destination)
+		log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -218,12 +218,13 @@ func (h *TransportHTTP) GetDestinationByAddress(ctx context.Context, address str
 // GetDestinationByLockingScript will get a destination by locking script
 func (h *TransportHTTP) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*bux.Destination, error) {
 	var destination bux.Destination
-	err := h.doHTTPRequest(ctx, "GET", "/destination?locking_script="+lockingScript, nil, h.xPriv, true, &destination)
-	if err != nil {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodGet, "/destination?locking_script="+lockingScript, nil, h.xPriv, true, &destination,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("Destination: %v\n", destination)
+		log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -231,17 +232,16 @@ func (h *TransportHTTP) GetDestinationByLockingScript(ctx context.Context, locki
 
 // GetDestinations will get all destinations matching the metadata filter
 func (h *TransportHTTP) GetDestinations(ctx context.Context, metadataConditions *bux.Metadata) ([]*bux.Destination, error) {
-	jsonData := map[string]interface{}{
-		"metadata": processMetadata(metadataConditions),
-	}
-
-	jsonStr, err := json.Marshal(jsonData)
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldMetadata: processMetadata(metadataConditions),
+	})
 	if err != nil {
 		return nil, err
 	}
 	var destinations []*bux.Destination
-	err = h.doHTTPRequest(ctx, "POST", "/destination/search", jsonStr, h.xPriv, true, &destinations)
-	if err != nil {
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/destination/search", jsonStr, h.xPriv, true, &destinations,
+	); err != nil {
 		return nil, err
 	}
 
@@ -250,21 +250,20 @@ func (h *TransportHTTP) GetDestinations(ctx context.Context, metadataConditions 
 
 // NewDestination will create a new destination and return it
 func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
-	jsonData := map[string]interface{}{
-		"metadata": processMetadata(metadata),
-	}
-
-	jsonStr, err := json.Marshal(jsonData)
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldMetadata: processMetadata(metadata),
+	})
 	if err != nil {
 		return nil, err
 	}
 	var destination bux.Destination
-	err = h.doHTTPRequest(ctx, "POST", "/destination", jsonStr, h.xPriv, true, &destination)
-	if err != nil {
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/destination", jsonStr, h.xPriv, true, &destination,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("New destination: %v\n", destination)
+		log.Printf("new destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -272,40 +271,39 @@ func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *bux.Metada
 
 // GetTransaction will get a transaction by ID
 func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
-
 	var transaction bux.Transaction
-	err := h.doHTTPRequest(ctx, "GET", "/transaction?id="+txID, nil, h.xPriv, h.signRequest, &transaction)
-	if err != nil {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodGet, "/transaction?id="+txID, nil, h.xPriv, h.signRequest, &transaction,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("Transaction: %v\n", transaction)
+		log.Printf("Transaction: %v\n", transaction)
 	}
 
 	return &transaction, nil
 }
 
-// GetTransactions will get a transactions by
+// GetTransactions will get a transactions by conditions
 func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[string]interface{},
 	metadataConditions *bux.Metadata) ([]*bux.Transaction, error) {
 
-	jsonData := map[string]interface{}{
-		"conditions": conditions,
-		"metadata":   processMetadata(metadataConditions),
-	}
-
-	jsonStr, err := json.Marshal(jsonData)
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldConditions: conditions,
+		FieldMetadata:   processMetadata(metadataConditions),
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	var transactions []*bux.Transaction
-	err = h.doHTTPRequest(ctx, "POST", "/transaction/search", jsonStr, h.xPriv, h.signRequest, &transactions)
-	if err != nil {
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/transaction/search", jsonStr, h.xPriv, h.signRequest, &transactions,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("Transactions: %d\n", len(transactions))
+		log.Printf("transactions: %d\n", len(transactions))
 	}
 
 	return transactions, nil
@@ -318,46 +316,47 @@ func (h *TransportHTTP) DraftToRecipients(ctx context.Context, recipients []*Rec
 	outputs := make([]map[string]interface{}, 0)
 	for _, recipient := range recipients {
 		outputs = append(outputs, map[string]interface{}{
-			"to":        recipient.To,
-			"satoshis":  recipient.Satoshis,
-			"op_return": recipient.OpReturn,
+			FieldTo:       recipient.To,
+			FieldSatoshis: recipient.Satoshis,
+			FieldOpReturn: recipient.OpReturn,
 		})
 	}
-	jsonData := map[string]interface{}{
-		"config": map[string]interface{}{
-			"outputs": outputs,
-		},
-		"metadata": processMetadata(metadata),
-	}
 
-	return h.createDraftTransaction(ctx, jsonData)
+	return h.createDraftTransaction(ctx, map[string]interface{}{
+		FieldConfig: map[string]interface{}{
+			FieldOutputs: outputs,
+		},
+		FieldMetadata: processMetadata(metadata),
+	})
 }
 
 // DraftTransaction is a draft transaction
 func (h *TransportHTTP) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig,
 	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
 
-	jsonData := map[string]interface{}{
-		"config":   transactionConfig,
-		"metadata": processMetadata(metadata),
-	}
-
-	return h.createDraftTransaction(ctx, jsonData)
+	return h.createDraftTransaction(ctx, map[string]interface{}{
+		FieldConfig:   transactionConfig,
+		FieldMetadata: processMetadata(metadata),
+	})
 }
 
-func (h *TransportHTTP) createDraftTransaction(ctx context.Context, jsonData map[string]interface{}) (*bux.DraftTransaction, error) {
+// createDraftTransaction will create a draft transaction
+func (h *TransportHTTP) createDraftTransaction(ctx context.Context,
+	jsonData map[string]interface{}) (*bux.DraftTransaction, error) {
+
 	jsonStr, err := json.Marshal(jsonData)
 	if err != nil {
 		return nil, err
 	}
 
 	var draftTransaction bux.DraftTransaction
-	err = h.doHTTPRequest(ctx, "POST", "/transaction", jsonStr, h.xPriv, true, &draftTransaction)
-	if err != nil {
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/transaction", jsonStr, h.xPriv, true, &draftTransaction,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("Draft transaction: %v\n", draftTransaction)
+		log.Printf("draft transaction: %v\n", draftTransaction)
 	}
 
 	return &draftTransaction, nil
@@ -367,71 +366,60 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context, jsonData map
 func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID string,
 	metadata *bux.Metadata) (*bux.Transaction, error) {
 
-	jsonData := map[string]interface{}{
-		"hex":          hex,
-		"reference_id": referenceID,
-		"metadata":     processMetadata(metadata),
-	}
-
-	jsonStr, err := json.Marshal(jsonData)
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldHex:         hex,
+		FieldReferenceID: referenceID,
+		FieldMetadata:    processMetadata(metadata),
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	var transaction bux.Transaction
-	err = h.doHTTPRequest(ctx, "POST", "/transaction/record", jsonStr, h.xPriv, h.signRequest, &transaction)
-	if err != nil {
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/transaction/record", jsonStr, h.xPriv, h.signRequest, &transaction,
+	); err != nil {
 		return nil, err
 	}
 	if h.debug {
-		fmt.Printf("Transaction: %s\n", transaction.ID)
+		log.Printf("transaction: %s\n", transaction.ID)
 	}
 
 	return &transaction, nil
 }
 
-func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path string, jsonStr []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) error {
+// doHTTPRequest will create and submit the HTTP request
+func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path string,
+	rawJSON []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) error {
 
-	url := h.server + path
-	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequestWithContext(ctx, method, h.server+path, bytes.NewBuffer(rawJSON))
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	if sign {
-		err = addSignature(&req.Header, xPriv, string(jsonStr))
-		if err != nil {
+		if err = addSignature(&req.Header, xPriv, string(rawJSON)); err != nil {
 			return err
 		}
 	} else {
 		var xPub string
-		xPub, err = bitcoin.GetExtendedPublicKey(xPriv)
-		if err != nil {
+		if xPub, err = bitcoin.GetExtendedPublicKey(xPriv); err != nil {
 			return err
 		}
-		req.Header.Set("auth_xpub", xPub)
+		req.Header.Set(bux.AuthHeader, xPub)
 	}
 
-	resp, err := h.httpClient.Do(req) //nolint:bodyclose // done in defer function
-	if err != nil {
+	var resp *http.Response
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	if resp, err = h.httpClient.Do(req); err != nil {
 		return err
 	}
-	if resp.StatusCode >= 400 {
+	if resp.StatusCode >= http.StatusBadRequest {
 		return errors.New("server error: " + strconv.Itoa(resp.StatusCode) + " - " + resp.Status)
 	}
 
-	defer func(Body io.ReadCloser) {
-		err = Body.Close()
-		if err != nil {
-			return
-		}
-	}(resp.Body)
-
-	err = json.NewDecoder(resp.Body).Decode(&responseJSON)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return json.NewDecoder(resp.Body).Decode(&responseJSON)
 }
