@@ -14,18 +14,23 @@ import (
 type TransportType string
 
 // BuxUserAgent the bux user agent sent to the bux server
-const BuxUserAgent = "BuxClient v1.0.0"
+const BuxUserAgent = "BUX: go-client " + BuxClientVersion
+
+// BuxClientVersion is the version of the client
+const BuxClientVersion = "v0.1.3"
 
 const (
 	// BuxTransportHTTP uses the http transport for all bux server actions
 	BuxTransportHTTP TransportType = "http"
+
 	// BuxTransportGraphQL uses the graphql transport for all bux server actions
 	BuxTransportGraphQL TransportType = "graphql"
+
 	// BuxTransportMock uses the mock transport for all bux server actions
 	BuxTransportMock TransportType = "mock"
 )
 
-// Client ...
+// Client is the transport client
 type Client struct {
 	accessKey   *bec.PrivateKey
 	adminKey    string
@@ -37,7 +42,7 @@ type Client struct {
 	xPub        *bip32.ExtendedKey
 }
 
-// ClientOps ...
+// ClientOps are the client options functions
 type ClientOps func(c *Client)
 
 // addSignature will add the signature to the request
