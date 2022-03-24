@@ -12,7 +12,7 @@ import (
 	"github.com/BuxOrg/bux/utils"
 	"github.com/BuxOrg/go-buxclient/transports"
 	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bt"
+	"github.com/libsv/go-bt/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -557,8 +557,8 @@ func TestFinalizeTransaction(t *testing.T) {
 		txDraft, err = bt.NewTxFromString(draftHex)
 		require.NoError(t, err)
 		assert.Len(t, txDraft.Inputs, 1)
-		assert.Len(t, txDraft.GetInputs(), 1)
-		assert.Len(t, txDraft.GetOutputs(), 2)
+		// assert.Len(t, txDraft.GetInputs(), 1)
+		assert.Len(t, txDraft.Outputs, 2)
 		// todo check the signature
 	})
 }
