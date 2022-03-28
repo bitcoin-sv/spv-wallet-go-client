@@ -18,26 +18,22 @@ const (
 	xPubString  = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
 )
 
-// TransportGraphQLMock ...
 type TransportGraphQLMock struct {
 	TransportGraphQL
 	client *GraphQLMockClient
 }
 
-// Init() ...
 func (t *TransportGraphQLMock) Init() error {
 	t.client = &GraphQLMockClient{}
 	return nil
 }
 
-// GraphQLMockClient ...
 type GraphQLMockClient struct {
 	Response interface{}
 	Request  *graphql.Request
 	Error    error
 }
 
-// Run ...
 func (g *GraphQLMockClient) Run(_ context.Context, req *graphql.Request, resp interface{}) error {
 	j, _ := json.Marshal(g.Response) // nolint: errchkjson // used for testing only
 	_ = json.Unmarshal(j, &resp)
@@ -45,8 +41,8 @@ func (g *GraphQLMockClient) Run(_ context.Context, req *graphql.Request, resp in
 	return g.Error
 }
 
-// TestRegisterXpub will test the RegisterXpub method
-func TestRegisterXpub(t *testing.T) {
+// TestNewXpub will test the NewXpub method
+func TestNewXpub(t *testing.T) {
 	xPriv, _ := bip32.NewKeyFromString(xPrivString)
 	// xPub, _ := xPriv.Neuter()
 
@@ -54,7 +50,7 @@ func TestRegisterXpub(t *testing.T) {
 		client := TransportGraphQLMock{
 			TransportGraphQL: TransportGraphQL{},
 		}
-		err := client.RegisterXpub(context.Background(), xPubString, nil)
+		err := client.NewXpub(context.Background(), xPubString, nil)
 		assert.ErrorIs(t, err, ErrAdminKey)
 	})
 
@@ -68,7 +64,7 @@ func TestRegisterXpub(t *testing.T) {
 				},
 			},
 		}
-		err := client.RegisterXpub(context.Background(), xPubString, nil)
+		err := client.NewXpub(context.Background(), xPubString, nil)
 		assert.ErrorIs(t, err, errTestTerror)
 	})
 
@@ -87,7 +83,7 @@ func TestRegisterXpub(t *testing.T) {
 				client:     &graphqlClient,
 			},
 		}
-		err := client.RegisterXpub(context.Background(), xPubString, nil)
+		err := client.NewXpub(context.Background(), xPubString, nil)
 		assert.NoError(t, err)
 	})
 }

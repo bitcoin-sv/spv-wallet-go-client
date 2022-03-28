@@ -6,9 +6,9 @@ import (
 	"github.com/BuxOrg/bux"
 )
 
-// RegisterXpub registers a new xpub - admin key needed
-func (b *BuxClient) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
-	return b.transport.RegisterXpub(ctx, rawXPub, metadata)
+// NewXpub registers a new xpub - admin key needed
+func (b *BuxClient) NewXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
+	return b.transport.NewXpub(ctx, rawXPub, metadata)
 }
 
 // GetXPub gets the current xpub

@@ -258,8 +258,8 @@ func TestDraftTransaction(t *testing.T) {
 	}
 }
 
-// TestRegisterXpub will test the RegisterXpub method
-func TestRegisterXpub(t *testing.T) {
+// TestNewXpub will test the NewXpub method
+func TestNewXpub(t *testing.T) {
 	transportHandlers := []testTransportHandler{{
 		Type:      requestTypeHTTP,
 		Path:      "/xpub",
@@ -275,12 +275,12 @@ func TestRegisterXpub(t *testing.T) {
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("draft transaction "+transportHandler.Type, func(t *testing.T) {
+		t.Run("NewXpub "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, true)
 			metadata := &bux.Metadata{
 				"test-key": "test-value",
 			}
-			err := client.RegisterXpub(context.Background(), xPubString, metadata)
+			err := client.NewXpub(context.Background(), xPubString, metadata)
 			assert.NoError(t, err)
 		})
 	}
@@ -303,7 +303,7 @@ func TestDraftToRecipients(t *testing.T) {
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("draft transaction "+transportHandler.Type, func(t *testing.T) {
+		t.Run("DraftToRecipients "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			recipients := []*transports.Recipients{{
@@ -461,7 +461,7 @@ func TestRecordTransaction(t *testing.T) {
 	}}
 
 	for _, transportHandler := range transportHandlers {
-		t.Run("get transactions "+transportHandler.Type, func(t *testing.T) {
+		t.Run("record transaction "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			hex := ""
@@ -537,7 +537,7 @@ func TestSendToRecipients(t *testing.T) {
 // TestFinalizeTransaction will test the FinalizeTransaction method
 func TestFinalizeTransaction(t *testing.T) {
 
-	t.Run("mock", func(t *testing.T) {
+	t.Run("finalize transaction", func(t *testing.T) {
 		httpclient := &http.Client{Transport: localRoundTripper{handler: http.NewServeMux()}}
 		client, err := New(
 			WithXPriv(xPrivString),
@@ -574,7 +574,7 @@ func TestGetTransport(t *testing.T) {
 		assert.IsType(t, &transports.TransportHTTP{}, *transport)
 	})
 
-	t.Run("client", func(t *testing.T) {
+	t.Run("client GetTransport", func(t *testing.T) {
 		client, _ := New(
 			WithXPriv(xPrivString),
 			WithGraphQL(serverURL),

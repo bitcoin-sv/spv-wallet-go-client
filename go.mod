@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.17
 
 require (
-	github.com/BuxOrg/bux v0.1.11
+	github.com/BuxOrg/bux v0.1.12
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0
@@ -107,7 +107,7 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/genproto v0.0.0-20220324131243-acbaeb5b85eb // indirect
+	google.golang.org/genproto v0.0.0-20220328180837-c47567c462d1 // indirect
 	google.golang.org/grpc v1.45.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect

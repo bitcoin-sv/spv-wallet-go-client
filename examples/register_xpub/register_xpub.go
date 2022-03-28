@@ -26,7 +26,7 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	if err = buxClient.RegisterXpub(
+	if err = buxClient.NewXpub(
 		context.Background(), rawXPub, &bux.Metadata{"example_field": "example_data"},
 	); err != nil {
 		log.Fatalln(err.Error())

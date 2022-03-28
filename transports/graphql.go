@@ -106,8 +106,8 @@ func (g *TransportGraphQL) IsSignRequest() bool {
 	return g.signRequest
 }
 
-// RegisterPaymail will register a new paymail
-func (g *TransportGraphQL) RegisterPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error {
+// NewPaymail will register a new paymail
+func (g *TransportGraphQL) NewPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error {
 	// TODO: Implement this
 	return nil
 }
@@ -118,8 +118,8 @@ func (g *TransportGraphQL) GetXpub(ctx context.Context, rawXpub string) (*bux.Xp
 	return nil, nil
 }
 
-// RegisterXpub will register an xPub
-func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
+// NewXpub will register an xPub
+func (g *TransportGraphQL) NewXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
 
 	// adding a xpub needs to be signed by an admin key
 	if g.adminXPriv == nil {

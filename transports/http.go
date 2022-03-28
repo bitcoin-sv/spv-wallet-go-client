@@ -57,8 +57,8 @@ func (h *TransportHTTP) SetAdminKey(adminKey *bip32.ExtendedKey) {
 	h.adminXPriv = adminKey
 }
 
-// RegisterPaymail will register a new paymail
-func (h *TransportHTTP) RegisterPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error {
+// NewPaymail will register a new paymail
+func (h *TransportHTTP) NewPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldAddress:  paymailAddress,
 		FieldMetadata: processMetadata(metadata),
@@ -78,8 +78,8 @@ func (h *TransportHTTP) RegisterPaymail(ctx context.Context, rawXpub, paymailAdd
 	return nil
 }
 
-// RegisterXpub will register an xPub
-func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
+// NewXpub will register an xPub
+func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
 
 	// Adding a xpub needs to be signed by an admin key
 	if h.adminXPriv == nil {
@@ -129,7 +129,7 @@ func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *bux.Me
 	}
 
 	var xPub bux.Xpub
-	if err := h.doHTTPRequest(
+	if err = h.doHTTPRequest(
 		ctx, http.MethodPatch, "/xpub", jsonStr, h.xPriv, true, &xPub,
 	); err != nil {
 		return nil, err
@@ -145,7 +145,7 @@ func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *bux.Me
 func (h *TransportHTTP) GetAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
 	var accessKey bux.AccessKey
 	if err := h.doHTTPRequest(
-		ctx, http.MethodGet, "/access-key?id="+id, nil, h.xPriv, true, &accessKey,
+		ctx, http.MethodGet, "/access-key?"+FieldID+"="+id, nil, h.xPriv, true, &accessKey,
 	); err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func (h *TransportHTTP) GetAccessKeys(ctx context.Context, metadataConditions *b
 func (h *TransportHTTP) RevokeAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
 	var accessKey bux.AccessKey
 	if err := h.doHTTPRequest(
-		ctx, http.MethodDelete, "/access-key?id="+id, nil, h.xPriv, true, &accessKey,
+		ctx, http.MethodDelete, "/access-key?"+FieldID+"="+id, nil, h.xPriv, true, &accessKey,
 	); err != nil {
 		return nil, err
 	}
@@ -211,7 +211,7 @@ func (h *TransportHTTP) CreateAccessKey(ctx context.Context, metadata *bux.Metad
 func (h *TransportHTTP) GetDestinationByID(ctx context.Context, id string) (*bux.Destination, error) {
 	var destination bux.Destination
 	if err := h.doHTTPRequest(
-		ctx, http.MethodGet, "/destination?id="+id, nil, h.xPriv, true, &destination,
+		ctx, http.MethodGet, "/destination?"+FieldID+"="+id, nil, h.xPriv, true, &destination,
 	); err != nil {
 		return nil, err
 	}
@@ -226,7 +226,7 @@ func (h *TransportHTTP) GetDestinationByID(ctx context.Context, id string) (*bux
 func (h *TransportHTTP) GetDestinationByAddress(ctx context.Context, address string) (*bux.Destination, error) {
 	var destination bux.Destination
 	if err := h.doHTTPRequest(
-		ctx, http.MethodGet, "/destination?address="+address, nil, h.xPriv, true, &destination,
+		ctx, http.MethodGet, "/destination?"+FieldAddress+"="+address, nil, h.xPriv, true, &destination,
 	); err != nil {
 		return nil, err
 	}
@@ -241,7 +241,7 @@ func (h *TransportHTTP) GetDestinationByAddress(ctx context.Context, address str
 func (h *TransportHTTP) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*bux.Destination, error) {
 	var destination bux.Destination
 	if err := h.doHTTPRequest(
-		ctx, http.MethodGet, "/destination?locking_script="+lockingScript, nil, h.xPriv, true, &destination,
+		ctx, http.MethodGet, "/destination?"+FieldLockingScript+"="+lockingScript, nil, h.xPriv, true, &destination,
 	); err != nil {
 		return nil, err
 	}
@@ -292,9 +292,10 @@ func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *bux.Metada
 }
 
 // UpdateDestinationMetadataByID updates the destination metadata by id
-func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id string, metadata *bux.Metadata) (*bux.Destination, error) {
+func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id string,
+	metadata *bux.Metadata) (*bux.Destination, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
-		"id":          id,
+		FieldID:       id,
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
@@ -302,7 +303,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id st
 	}
 
 	var destination bux.Destination
-	if err := h.doHTTPRequest(
+	if err = h.doHTTPRequest(
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
 		return nil, err
@@ -315,9 +316,10 @@ func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id st
 }
 
 // UpdateDestinationMetadataByAddress updates the destination metadata by address
-func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, address string, metadata *bux.Metadata) (*bux.Destination, error) {
+func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, address string,
+	metadata *bux.Metadata) (*bux.Destination, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
-		"address":     address,
+		FieldAddress:  address,
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
@@ -325,7 +327,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, 
 	}
 
 	var destination bux.Destination
-	if err := h.doHTTPRequest(
+	if err = h.doHTTPRequest(
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
 		return nil, err
@@ -338,17 +340,18 @@ func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, 
 }
 
 // UpdateDestinationMetadataByLockingScript updates the destination metadata by locking script
-func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string, metadata *bux.Metadata) (*bux.Destination, error) {
+func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string,
+	metadata *bux.Metadata) (*bux.Destination, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
-		"lockingScript": lockingScript,
-		FieldMetadata:   processMetadata(metadata),
+		FieldLockingScript: lockingScript,
+		FieldMetadata:      processMetadata(metadata),
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	var destination bux.Destination
-	if err := h.doHTTPRequest(
+	if err = h.doHTTPRequest(
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
 		return nil, err
@@ -364,7 +367,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Con
 func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
 	var transaction bux.Transaction
 	if err := h.doHTTPRequest(
-		ctx, http.MethodGet, "/transaction?id="+txID, nil, h.xPriv, h.signRequest, &transaction,
+		ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
 		return nil, err
 	}
@@ -480,9 +483,10 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 }
 
 // UpdateTransactionMetadata update the metadata of a transaction
-func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID string, metadata *bux.Metadata) (*bux.Transaction, error) {
+func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID string,
+	metadata *bux.Metadata) (*bux.Transaction, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
-		"tx_id":       txID,
+		FieldID:       txID,
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
@@ -490,7 +494,7 @@ func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID stri
 	}
 
 	var transaction bux.Transaction
-	if err := h.doHTTPRequest(
+	if err = h.doHTTPRequest(
 		ctx, http.MethodPatch, "/transaction", jsonStr, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
 		return nil, err
