@@ -15,3 +15,8 @@ func (b *BuxClient) RegisterXpub(ctx context.Context, rawXPub string, metadata *
 func (b *BuxClient) GetXPub(ctx context.Context) (*bux.Xpub, error) {
 	return b.transport.GetXPub(ctx)
 }
+
+// UpdateXPubMetadata update the metadata of the logged in xpub
+func (b *BuxClient) UpdateXPubMetadata(ctx context.Context, metadata *bux.Metadata) (*bux.Xpub, error) {
+	return b.transport.UpdateXPubMetadata(ctx, metadata)
+}
