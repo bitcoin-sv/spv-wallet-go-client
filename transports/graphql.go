@@ -183,6 +183,36 @@ func (g *TransportGraphQL) GetXPub(ctx context.Context) (*bux.Xpub, error) {
 	return respData.XPub, nil
 }
 
+// UpdateXPubMetadata update the metadata of the logged in xpub
+func (g *TransportGraphQL) UpdateXPubMetadata(ctx context.Context, metadata *bux.Metadata) (*bux.Xpub, error) {
+
+	reqBody := `
+    mutation ($metadata: Metadata!) {
+  	  xpub_metadata (
+  	    metadata: $metadata
+  	  ) {
+		id
+		current_balance
+		next_internal_num
+		next_external_num
+		metadata
+		created_at
+		updated_at
+		deleted_at
+	  }
+	}`
+	variables := map[string]interface{}{
+		FieldMetadata: processMetadata(metadata),
+	}
+
+	var respData XPubData
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		return nil, err
+	}
+
+	return respData.XPub, nil
+}
+
 // GetAccessKey will get an access key by id
 func (g *TransportGraphQL) GetAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
 
@@ -391,6 +421,111 @@ func (g *TransportGraphQL) GetDestinationByAddress(ctx context.Context, address 
       }`
 	variables := map[string]interface{}{
 		FieldAddress: address,
+	}
+
+	var respData DestinationData
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		return nil, err
+	}
+
+	return respData.Destination, nil
+}
+
+// UpdateDestinationMetadataByID updates the destination metadata by id
+func (g *TransportGraphQL) UpdateDestinationMetadataByID(ctx context.Context, id string, metadata *bux.Metadata) (*bux.Destination, error) {
+
+	reqBody := `{
+      mutation ($id: String, $metadata: Metadata!) {
+  	    destination_metadata (
+		  id: $id
+  	      metadata: $metadata
+  	    ) {
+          id
+          xpub_id
+          locking_script
+          type
+          chain
+          num
+          address
+          metadata
+          created_at
+          updated_at
+          deleted_at
+        }
+      }`
+	variables := map[string]interface{}{
+		"id":          id,
+		FieldMetadata: processMetadata(metadata),
+	}
+
+	var respData DestinationData
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		return nil, err
+	}
+
+	return respData.Destination, nil
+}
+
+// UpdateDestinationMetadataByAddress updates the destination metadata by address
+func (g *TransportGraphQL) UpdateDestinationMetadataByAddress(ctx context.Context, address string, metadata *bux.Metadata) (*bux.Destination, error) {
+
+	reqBody := `{
+      mutation ($address: String, $metadata: Metadata!) {
+  	    destination_metadata (
+		  address: $address
+  	      metadata: $metadata
+  	    ) {
+          id
+          xpub_id
+          locking_script
+          type
+          chain
+          num
+          address
+          metadata
+          created_at
+          updated_at
+          deleted_at
+        }
+      }`
+	variables := map[string]interface{}{
+		"address":     address,
+		FieldMetadata: processMetadata(metadata),
+	}
+
+	var respData DestinationData
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		return nil, err
+	}
+
+	return respData.Destination, nil
+}
+
+// UpdateDestinationMetadataByLockingScript updates the destination metadata by lockingScript
+func (g *TransportGraphQL) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string, metadata *bux.Metadata) (*bux.Destination, error) {
+
+	reqBody := `{
+      mutation ($locking_script: String, $metadata: Metadata!) {
+  	    destination_metadata (
+		  locking_script: $locking_script
+  	      metadata: $metadata
+  	    ) {
+          id
+          xpub_id
+          locking_script
+          type
+          chain
+          num
+          address
+          metadata
+          created_at
+          updated_at
+          deleted_at
+        }
+      }`
+	variables := map[string]interface{}{
+		"locking_script": lockingScript,
+		FieldMetadata:    processMetadata(metadata),
 	}
 
 	var respData DestinationData
@@ -668,6 +803,44 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 	}
 
 	return transaction, nil
+}
+
+// UpdateTransactionMetadata update the metadata of a transaction
+func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID string, metadata *bux.Metadata) (*bux.Transaction, error) {
+
+	reqBody := `
+    mutation ($tx_id: String!, $metadata: Metadata!) {
+  	  destination_metadata (
+	    tx_id: $tx_id
+  	    metadata: $metadata
+ 	  ) {
+        id
+        hex
+        block_hash
+        block_height
+        fee
+        number_of_inputs
+        number_of_outputs
+        output_value
+        total_value
+        direction
+        metadata
+        created_at
+        updated_at
+        deleted_at
+	  }
+	}`
+	variables := map[string]interface{}{
+		"tx_id":       txID,
+		FieldMetadata: processMetadata(metadata),
+	}
+
+	var respData TransactionData
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		return nil, err
+	}
+
+	return respData.Transaction, nil
 }
 
 func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, variables map[string]interface{},

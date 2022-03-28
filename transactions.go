@@ -46,6 +46,11 @@ func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string,
 	return b.transport.RecordTransaction(ctx, hex, draftID, metadata)
 }
 
+// UpdateTransactionMetadata update the metadata of a transaction
+func (b *BuxClient) UpdateTransactionMetadata(ctx context.Context, txID string, metadata *bux.Metadata) (*bux.Transaction, error) {
+	return b.transport.UpdateTransactionMetadata(ctx, txID, metadata)
+}
+
 // FinalizeTransaction will finalize the transaction
 func (b *BuxClient) FinalizeTransaction(draft *bux.DraftTransaction) (string, error) {
 	txDraft, err := bt.NewTxFromString(draft.Hex)

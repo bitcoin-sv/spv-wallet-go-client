@@ -30,3 +30,18 @@ func (b *BuxClient) GetDestinations(ctx context.Context, metadataConditions *bux
 func (b *BuxClient) NewDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
 	return b.transport.NewDestination(ctx, metadata)
 }
+
+// UpdateDestinationMetadataByID updates the destination metadata by id
+func (b *BuxClient) UpdateDestinationMetadataByID(ctx context.Context, id string, metadata *bux.Metadata) (*bux.Destination, error) {
+	return b.transport.UpdateDestinationMetadataByID(ctx, id, metadata)
+}
+
+// UpdateDestinationMetadataByAddress updates the destination metadata by address
+func (b *BuxClient) UpdateDestinationMetadataByAddress(ctx context.Context, address string, metadata *bux.Metadata) (*bux.Destination, error) {
+	return b.transport.UpdateDestinationMetadataByAddress(ctx, address, metadata)
+}
+
+// UpdateDestinationMetadataByLockingScript updates the destination metadata by locking script
+func (b *BuxClient) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string, metadata *bux.Metadata) (*bux.Destination, error) {
+	return b.transport.UpdateDestinationMetadataByLockingScript(ctx, lockingScript, metadata)
+}

@@ -119,6 +119,28 @@ func (h *TransportHTTP) GetXPub(ctx context.Context) (*bux.Xpub, error) {
 	return &xPub, nil
 }
 
+// UpdateXPubMetadata update the metadata of the logged in xpub
+func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *bux.Metadata) (*bux.Xpub, error) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldMetadata: processMetadata(metadata),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var xPub bux.Xpub
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPatch, "/xpub", jsonStr, h.xPriv, true, &xPub,
+	); err != nil {
+		return nil, err
+	}
+	if h.debug {
+		log.Printf("xpub: %v\n", xPub)
+	}
+
+	return &xPub, nil
+}
+
 // GetAccessKey will get an access key by id
 func (h *TransportHTTP) GetAccessKey(ctx context.Context, id string) (*bux.AccessKey, error) {
 	var accessKey bux.AccessKey
@@ -269,6 +291,75 @@ func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *bux.Metada
 	return &destination, nil
 }
 
+// UpdateDestinationMetadataByID updates the destination metadata by id
+func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id string, metadata *bux.Metadata) (*bux.Destination, error) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		"id":          id,
+		FieldMetadata: processMetadata(metadata),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var destination bux.Destination
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
+	); err != nil {
+		return nil, err
+	}
+	if h.debug {
+		log.Printf("destination: %v\n", destination)
+	}
+
+	return &destination, nil
+}
+
+// UpdateDestinationMetadataByAddress updates the destination metadata by address
+func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, address string, metadata *bux.Metadata) (*bux.Destination, error) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		"address":     address,
+		FieldMetadata: processMetadata(metadata),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var destination bux.Destination
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
+	); err != nil {
+		return nil, err
+	}
+	if h.debug {
+		log.Printf("destination: %v\n", destination)
+	}
+
+	return &destination, nil
+}
+
+// UpdateDestinationMetadataByLockingScript updates the destination metadata by locking script
+func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string, metadata *bux.Metadata) (*bux.Destination, error) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		"lockingScript": lockingScript,
+		FieldMetadata:   processMetadata(metadata),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var destination bux.Destination
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
+	); err != nil {
+		return nil, err
+	}
+	if h.debug {
+		log.Printf("destination: %v\n", destination)
+	}
+
+	return &destination, nil
+}
+
 // GetTransaction will get a transaction by ID
 func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error) {
 	var transaction bux.Transaction
@@ -383,6 +474,29 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 	}
 	if h.debug {
 		log.Printf("transaction: %s\n", transaction.ID)
+	}
+
+	return &transaction, nil
+}
+
+// UpdateTransactionMetadata update the metadata of a transaction
+func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID string, metadata *bux.Metadata) (*bux.Transaction, error) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		"tx_id":       txID,
+		FieldMetadata: processMetadata(metadata),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var transaction bux.Transaction
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPatch, "/transaction", jsonStr, h.xPriv, h.signRequest, &transaction,
+	); err != nil {
+		return nil, err
+	}
+	if h.debug {
+		log.Printf("Transaction: %v\n", transaction)
 	}
 
 	return &transaction, nil
