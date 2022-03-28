@@ -17,7 +17,7 @@ type TransportType string
 const BuxUserAgent = "BUX: go-client " + BuxClientVersion
 
 // BuxClientVersion is the version of the client
-const BuxClientVersion = "v0.1.5"
+const BuxClientVersion = "v0.1.6"
 
 const (
 	// BuxTransportHTTP uses the http transport for all bux server actions
