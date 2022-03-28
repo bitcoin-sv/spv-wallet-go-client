@@ -35,6 +35,11 @@ type XPubData struct {
 	XPub *bux.Xpub `json:"xpub"`
 }
 
+// XPubMetadataData is the xpub data for the metadata mutation
+type XPubMetadataData struct {
+	XPub *bux.Xpub `json:"xpub_metadata"`
+}
+
 // AccessKeyData is the access key data
 type AccessKeyData struct {
 	AccessKey *bux.AccessKey `json:"access_key"`
@@ -50,6 +55,11 @@ type DestinationData struct {
 	Destination *bux.Destination `json:"destination"`
 }
 
+// DestinationMetadataData is the destination data for the metadata mutation
+type DestinationMetadataData struct {
+	Destination *bux.Destination `json:"destination_metadata"`
+}
+
 // DestinationsData is a slice of destination data
 type DestinationsData struct {
 	Destinations []*bux.Destination `json:"destinations"`
@@ -63,6 +73,11 @@ type DraftTransactionData struct {
 // TransactionData is a transaction
 type TransactionData struct {
 	Transaction *bux.Transaction `json:"transaction"`
+}
+
+// TransactionMetadataData is a transaction for the metadata mutation
+type TransactionMetadataData struct {
+	Transaction *bux.Transaction `json:"transaction_metadata"`
 }
 
 // TransactionsData is a slice of transactions
@@ -205,7 +220,7 @@ func (g *TransportGraphQL) UpdateXPubMetadata(ctx context.Context, metadata *bux
 		FieldMetadata: processMetadata(metadata),
 	}
 
-	var respData XPubData
+	var respData XPubMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
 		return nil, err
 	}
@@ -458,7 +473,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByID(ctx context.Context, id
 		FieldMetadata: processMetadata(metadata),
 	}
 
-	var respData DestinationData
+	var respData DestinationMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
 		return nil, err
 	}
@@ -493,7 +508,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByAddress(ctx context.Contex
 		FieldMetadata: processMetadata(metadata),
 	}
 
-	var respData DestinationData
+	var respData DestinationMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
 		return nil, err
 	}
@@ -528,7 +543,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByLockingScript(ctx context.
 		FieldMetadata:    processMetadata(metadata),
 	}
 
-	var respData DestinationData
+	var respData DestinationMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
 		return nil, err
 	}
@@ -835,7 +850,7 @@ func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID s
 		FieldMetadata: processMetadata(metadata),
 	}
 
-	var respData TransactionData
+	var respData TransactionMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
 		return nil, err
 	}
