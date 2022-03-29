@@ -249,7 +249,7 @@ func (g *TransportGraphQL) GetAccessKey(ctx context.Context, id string) (*bux.Ac
 
 	var respData AccessKeyData
 	if err := g.doGraphQLQuery(ctx, reqBody, map[string]interface{}{
-		"id": id,
+		FieldID: id,
 	}, &respData); err != nil {
 		return nil, err
 	}
@@ -336,7 +336,7 @@ func (g *TransportGraphQL) RevokeAccessKey(ctx context.Context, id string) (*bux
         }
       }`
 	variables := map[string]interface{}{
-		"id": id,
+		FieldID: id,
 	}
 
 	var respData AccessKeyData
@@ -369,7 +369,7 @@ func (g *TransportGraphQL) GetDestinationByID(ctx context.Context, id string) (*
         }
       }`
 	variables := map[string]interface{}{
-		"id": id,
+		FieldID: id,
 	}
 
 	var respData DestinationData
@@ -402,7 +402,7 @@ func (g *TransportGraphQL) GetDestinationByLockingScript(ctx context.Context, lo
         }
       }`
 	variables := map[string]interface{}{
-		"lockingScript": lockingScript,
+		FieldLockingScript: lockingScript,
 	}
 
 	var respData DestinationData
@@ -469,7 +469,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByID(ctx context.Context, id
         }
       }`
 	variables := map[string]interface{}{
-		"id":          id,
+		FieldID:       id,
 		FieldMetadata: processMetadata(metadata),
 	}
 
@@ -504,7 +504,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByAddress(ctx context.Contex
         }
       }`
 	variables := map[string]interface{}{
-		"address":     address,
+		FieldAddress:  address,
 		FieldMetadata: processMetadata(metadata),
 	}
 
@@ -539,8 +539,8 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByLockingScript(ctx context.
         }
       }`
 	variables := map[string]interface{}{
-		"locking_script": lockingScript,
-		FieldMetadata:    processMetadata(metadata),
+		FieldLockingScript: lockingScript,
+		FieldMetadata:      processMetadata(metadata),
 	}
 
 	var respData DestinationMetadataData
@@ -620,7 +620,7 @@ func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*bu
 	reqBody := `
    	query {
 	  transaction(
-		txId:"` + txID + `",
+		id:"` + txID + `",
 	  ) {
         id
         hex
@@ -754,8 +754,8 @@ func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConf
 	req.Var("transactionConfig", transactionConfig)
 	req.Var(FieldMetadata, processMetadata(metadata))
 	variables := map[string]interface{}{
-		"transaction_config": transactionConfig,
-		FieldMetadata:        processMetadata(metadata),
+		FieldTransactionConfig: transactionConfig,
+		FieldMetadata:          processMetadata(metadata),
 	}
 
 	return g.draftTransactionCommon(ctx, reqBody, variables, req)
@@ -824,9 +824,9 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID string, metadata *bux.Metadata) (*bux.Transaction, error) {
 
 	reqBody := `
-    mutation ($tx_id: String!, $metadata: Metadata!) {
+    mutation ($id: String!, $metadata: Metadata!) {
   	  destination_metadata (
-	    tx_id: $tx_id
+        id: $id
   	    metadata: $metadata
  	  ) {
         id
@@ -846,7 +846,7 @@ func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID s
 	  }
 	}`
 	variables := map[string]interface{}{
-		"tx_id":       txID,
+		FieldID:       txID,
 		FieldMetadata: processMetadata(metadata),
 	}
 
