@@ -71,4 +71,7 @@ const (
 
 	// FieldUserAgent is the field for storing the user agent
 	FieldUserAgent = "user_agent"
+
+	// FieldTransactionConfig is the field for the config of a new transaction
+	FieldTransactionConfig = "transaction_config"
 )
