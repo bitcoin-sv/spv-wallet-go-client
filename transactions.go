@@ -5,12 +5,6 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/go-buxclient/transports"
-	"github.com/BuxOrg/go-buxclient/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bt/v2"
-	"github.com/libsv/go-bt/v2/bscript"
 )
 
 // GetTransaction get a transaction by id
@@ -47,57 +41,14 @@ func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string,
 }
 
 // UpdateTransactionMetadata update the metadata of a transaction
-func (b *BuxClient) UpdateTransactionMetadata(ctx context.Context, txID string, metadata *bux.Metadata) (*bux.Transaction, error) {
+func (b *BuxClient) UpdateTransactionMetadata(ctx context.Context, txID string,
+	metadata *bux.Metadata) (*bux.Transaction, error) {
 	return b.transport.UpdateTransactionMetadata(ctx, txID, metadata)
 }
 
 // FinalizeTransaction will finalize the transaction
 func (b *BuxClient) FinalizeTransaction(draft *bux.DraftTransaction) (string, error) {
-	txDraft, err := bt.NewTxFromString(draft.Hex)
-	if err != nil {
-		return "", err
-	}
-
-	// sign the inputs
-	for index, input := range draft.Configuration.Inputs {
-		var ls *bscript.Script
-		ls, err = bscript.NewFromHexString(input.Destination.LockingScript)
-		if err != nil {
-			return "", err
-		}
-		txDraft.Inputs[index].PreviousTxScript = ls
-
-		var chainKey *bip32.ExtendedKey
-		chainKey, err = b.xPriv.Child(input.Destination.Chain)
-		if err != nil {
-			return "", err
-		}
-
-		var numKey *bip32.ExtendedKey
-		numKey, err = chainKey.Child(input.Destination.Num)
-		if err != nil {
-			return "", err
-		}
-
-		var privateKey *bec.PrivateKey
-		privateKey, err = bitcoin.GetPrivateKeyFromHDKey(numKey)
-		if err != nil {
-			return "", err
-		}
-
-		var s *bscript.Script
-		s, err = utils.GetUnlockingScript(txDraft, uint32(index), privateKey)
-		if err != nil {
-			return "", err
-		}
-
-		err = txDraft.InsertInputUnlockingScript(uint32(index), s)
-		if err != nil {
-			return "", err
-		}
-	}
-
-	return txDraft.String(), nil
+	return draft.SignInputs(b.xPriv)
 }
 
 // SendToRecipients send to recipients
