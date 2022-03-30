@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.17
 
 require (
-	github.com/BuxOrg/bux v0.1.13-0.20220330160134-722764c98275
+	github.com/BuxOrg/bux v0.1.13
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0
