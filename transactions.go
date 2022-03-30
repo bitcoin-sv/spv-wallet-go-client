@@ -15,28 +15,24 @@ func (b *BuxClient) GetTransaction(ctx context.Context, txID string) (*bux.Trans
 // GetTransactions get all transactions matching search criteria
 func (b *BuxClient) GetTransactions(ctx context.Context, conditions map[string]interface{},
 	metadata *bux.Metadata) ([]*bux.Transaction, error) {
-
 	return b.transport.GetTransactions(ctx, conditions, metadata)
 }
 
 // DraftToRecipients initialize a new P2PKH draft transaction to a list of recipients
 func (b *BuxClient) DraftToRecipients(ctx context.Context, recipients []*transports.Recipients,
 	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
-
 	return b.transport.DraftToRecipients(ctx, recipients, metadata)
 }
 
 // DraftTransaction initialize a new draft transaction
 func (b *BuxClient) DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig,
 	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
-
 	return b.transport.DraftTransaction(ctx, transactionConfig, metadata)
 }
 
 // RecordTransaction record a new transaction
 func (b *BuxClient) RecordTransaction(ctx context.Context, hex, draftID string,
 	metadata *bux.Metadata) (*bux.Transaction, error) {
-
 	return b.transport.RecordTransaction(ctx, hex, draftID, metadata)
 }
 
@@ -54,12 +50,10 @@ func (b *BuxClient) FinalizeTransaction(draft *bux.DraftTransaction) (string, er
 // SendToRecipients send to recipients
 func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transports.Recipients,
 	metadata *bux.Metadata) (*bux.Transaction, error) {
-
 	draft, err := b.DraftToRecipients(ctx, recipients, metadata)
 	if err != nil {
 		return nil, err
-	}
-	if draft == nil {
+	} else if draft == nil {
 		return nil, bux.ErrDraftNotFound
 	}
 

@@ -18,7 +18,7 @@ import (
 // ClientOps are used for client options
 type ClientOps func(c *BuxClient)
 
-// BuxClient is the bux client
+// BuxClient is the go-buxclient
 type BuxClient struct {
 	transports.TransportService
 	accessKey        *bec.PrivateKey

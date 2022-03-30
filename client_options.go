@@ -24,7 +24,7 @@ func WithXPub(xPubString string) ClientOps {
 	}
 }
 
-// WithAccessKey will set accessKey on the client
+// WithAccessKey will set the access key on the client
 func WithAccessKey(accessKeyString string) ClientOps {
 	return func(c *BuxClient) {
 		if c != nil {
