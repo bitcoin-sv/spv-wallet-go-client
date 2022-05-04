@@ -157,7 +157,9 @@ func TestDraftTransaction(t *testing.T) {
 	xPriv, _ := bip32.NewKeyFromString(xPrivString)
 	xPub, _ := xPriv.Neuter()
 	config := &bux.TransactionConfig{
-		SendAllTo: "bux@bux.org",
+		SendAllTo: &bux.TransactionOutput{
+			To: "bux@bux.org",
+		},
 	}
 
 	t.Run("missing xpriv", func(t *testing.T) {
