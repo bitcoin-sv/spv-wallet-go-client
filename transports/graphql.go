@@ -142,7 +142,7 @@ func (g *TransportGraphQL) NewXpub(ctx context.Context, rawXPub string, metadata
 	}
 
 	reqBody := `
-   	mutation ($metadata: Map) {
+   	mutation ($metadata: Metadata) {
 	  xpub(
 		xpub: "` + rawXPub + `"
 		metadata: $metadata
@@ -588,7 +588,7 @@ func (g *TransportGraphQL) GetDestinations(ctx context.Context, metadataConditio
 func (g *TransportGraphQL) NewDestination(ctx context.Context, metadata *bux.Metadata) (*bux.Destination, error) {
 
 	reqBody := `
-   	mutation ($metadata: Map) {
+   	mutation ($metadata: Metadata) {
 	  destination(
 		metadata: $metadata
 	  ) {
@@ -710,7 +710,7 @@ func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*
 	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
 
 	reqBody := `
-   	mutation ($outputs: [TransactionOutputInput]!, $metadata: Map) {
+   	mutation ($outputs: [TransactionOutputInput]!, $metadata: Metadata) {
 	  new_transaction(
 		transaction_config:{
 		  outputs: $outputs
@@ -744,7 +744,7 @@ func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConf
 	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
 
 	reqBody := `
-   	mutation ($transactionConfig: TransactionConfigInput!, $metadata: Map) {
+   	mutation ($transactionConfig: TransactionConfigInput!, $metadata: Metadata) {
 	  new_transaction(
 		transaction_config: $transactionConfig
 		metadata: $metadata
@@ -787,7 +787,7 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 	metadata *bux.Metadata) (*bux.Transaction, error) {
 
 	reqBody := `
-   	mutation($metadata: Map) {
+   	mutation($metadata: Metadata) {
 	  transaction(
 		hex:"` + hex + `",
         draft_id:"` + referenceID + `"
