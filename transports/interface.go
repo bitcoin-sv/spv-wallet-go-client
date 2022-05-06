@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux/datastore"
 	"github.com/libsv/go-bk/bip32"
 )
 
@@ -11,6 +12,7 @@ import (
 type XpubService interface {
 	GetXPub(ctx context.Context) (*bux.Xpub, error)
 	NewXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error
+	RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error
 	UpdateXPubMetadata(ctx context.Context, metadata *bux.Metadata) (*bux.Xpub, error)
 }
 
@@ -49,9 +51,33 @@ type PaymailService interface {
 	NewPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error
 }
 
+// AdminService is the admin related requests
+type AdminService interface {
+	AdminGetStatus(ctx context.Context) (bool, error)
+	AdminGetStats(ctx context.Context) (*bux.AdminStats, error)
+	AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.AccessKey, error)
+	AdminGetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
+	AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.BlockHeader, error)
+	AdminGetBlockHeadersCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
+	AdminGetDestinations(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Destination, error)
+	AdminGetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
+	AdminGetPaymail(ctx context.Context, address string) (*bux.PaymailAddress, error)
+	AdminGetPaymails(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.PaymailAddress, error)
+	AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
+	AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*bux.PaymailAddress, error)
+	AdminDeletePaymail(ctx context.Context, address string) (*bux.PaymailAddress, error)
+	AdminGetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Transaction, error)
+	AdminGetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
+	AdminGetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Utxo, error)
+	AdminGetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
+	AdminGetXPubs(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Xpub, error)
+	AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
+}
+
 // TransportService the transport service interface
 type TransportService interface {
 	AccessKeyService
+	AdminService
 	DestinationService
 	PaymailService
 	TransactionService

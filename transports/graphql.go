@@ -133,46 +133,6 @@ func (g *TransportGraphQL) GetXpub(ctx context.Context, rawXpub string) (*bux.Xp
 	return nil, nil
 }
 
-// NewXpub will register an xPub
-func (g *TransportGraphQL) NewXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
-
-	// adding a xpub needs to be signed by an admin key
-	if g.adminXPriv == nil {
-		return ErrAdminKey
-	}
-
-	reqBody := `
-   	mutation ($metadata: Metadata) {
-	  xpub(
-		xpub: "` + rawXPub + `"
-		metadata: $metadata
-	  ) {
-	    id
-	  }
-	}`
-	req := graphql.NewRequest(reqBody)
-	req.Var(FieldMetadata, processMetadata(metadata))
-	variables := map[string]interface{}{
-		FieldMetadata: processMetadata(metadata),
-	}
-
-	bodyString, err := getBodyString(reqBody, variables)
-	if err != nil {
-		return err
-	}
-	if err = addSignature(&req.Header, g.adminXPriv, bodyString); err != nil {
-		return err
-	}
-
-	// run it and capture the response
-	var xPubData interface{}
-	if err = g.client.Run(ctx, req, &xPubData); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // GetXPub will get information about the current xPub
 func (g *TransportGraphQL) GetXPub(ctx context.Context) (*bux.Xpub, error) {
 
@@ -764,7 +724,7 @@ func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConf
 func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody string,
 	variables map[string]interface{}, req *graphql.Request) (*bux.DraftTransaction, error) {
 
-	err := g.signGraphQLRequest(req, reqBody, variables)
+	err := g.signGraphQLRequest(req, reqBody, variables, g.xPriv, g.xPub)
 	if err != nil {
 		return nil, err
 	}
@@ -802,7 +762,7 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 	variables := map[string]interface{}{
 		FieldMetadata: processMetadata(metadata),
 	}
-	err := g.signGraphQLRequest(req, reqBody, variables)
+	err := g.signGraphQLRequest(req, reqBody, variables, g.xPriv, g.xPub)
 	if err != nil {
 		return nil, err
 	}
@@ -866,7 +826,7 @@ func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, v
 		req.Var(key, value)
 	}
 
-	err := g.signGraphQLRequest(req, reqBody, variables)
+	err := g.signGraphQLRequest(req, reqBody, variables, g.xPriv, g.xPub)
 	if err != nil {
 		return err
 	}
@@ -899,18 +859,20 @@ func getBodyString(reqBody string, variables map[string]interface{}) (string, er
 	return string(body), nil
 }
 
-func (g *TransportGraphQL) signGraphQLRequest(req *graphql.Request, reqBody string, variables map[string]interface{}) error {
+func (g *TransportGraphQL) signGraphQLRequest(req *graphql.Request, reqBody string, variables map[string]interface{},
+	xPriv *bip32.ExtendedKey, xPub *bip32.ExtendedKey) error {
+
 	if g.signRequest {
 		bodyString, err := getBodyString(reqBody, variables)
 		if err != nil {
 			return err
 		}
-		err = addSignature(&req.Header, g.xPriv, bodyString)
+		err = addSignature(&req.Header, xPriv, bodyString)
 		if err != nil {
 			return err
 		}
 	} else {
-		req.Header.Set(bux.AuthHeader, g.xPub.String())
+		req.Header.Set(bux.AuthHeader, xPub.String())
 	}
 	return nil
 }

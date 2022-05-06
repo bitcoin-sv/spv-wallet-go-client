@@ -78,32 +78,6 @@ func (h *TransportHTTP) NewPaymail(ctx context.Context, rawXpub, paymailAddress 
 	return nil
 }
 
-// NewXpub will register an xPub
-func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
-
-	// Adding a xpub needs to be signed by an admin key
-	if h.adminXPriv == nil {
-		return ErrAdminKey
-	}
-
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldMetadata: processMetadata(metadata),
-		FieldXpubKey:  rawXPub,
-	})
-	if err != nil {
-		return err
-	}
-
-	var xPubData bux.Xpub
-	if err = h.doHTTPRequest(
-		ctx, http.MethodPost, "/xpub", jsonStr, h.adminXPriv, true, &xPubData,
-	); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // GetXPub will get the xpub of the current xpub
 func (h *TransportHTTP) GetXPub(ctx context.Context) (*bux.Xpub, error) {
 	var xPub bux.Xpub
