@@ -33,11 +33,23 @@ const (
 	// FieldMetadata is the field name for metadata
 	FieldMetadata = "metadata"
 
+	// FieldQueryParams is the field name for the query params
+	FieldQueryParams = "params"
+
 	// FieldXpubKey is the field name for xpub key
 	FieldXpubKey = "key"
 
+	// FieldXpubID is the field name for xpub id
+	FieldXpubID = "xpub_id"
+
 	// FieldAddress is the field name for paymail address
 	FieldAddress = "address"
+
+	// FieldPublicName is the field name for (paymail) public name
+	FieldPublicName = "public_name"
+
+	// FieldAvatar is the field name for (paymail) avatar
+	FieldAvatar = "avatar"
 
 	// FieldConditions is the field name for conditions
 	FieldConditions = "conditions"
