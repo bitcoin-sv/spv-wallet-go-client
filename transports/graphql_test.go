@@ -148,7 +148,7 @@ func TestGetDestination(t *testing.T) {
 		assert.IsType(t, &bux.Destination{}, destination)
 		assert.Equal(t, "test-address", destination.Address)
 		assert.Len(t, graphqlClient.Request.Header, 1)
-		assert.Contains(t, graphqlClient.Request.Header, "Auth_xpub")
+		assert.Contains(t, graphqlClient.Request.Header, "Bux-Auth-Xpub")
 	})
 }
 
@@ -243,9 +243,9 @@ func TestDraftToRecipients(t *testing.T) {
 
 func checkAuthHeaders(t *testing.T, graphqlClient GraphQLMockClient) {
 	assert.Len(t, graphqlClient.Request.Header, 5)
-	assert.Contains(t, graphqlClient.Request.Header, "Auth_hash")
-	assert.Contains(t, graphqlClient.Request.Header, "Auth_nonce")
-	assert.Contains(t, graphqlClient.Request.Header, "Auth_signature")
-	assert.Contains(t, graphqlClient.Request.Header, "Auth_time")
-	assert.Contains(t, graphqlClient.Request.Header, "Auth_xpub")
+	assert.Contains(t, graphqlClient.Request.Header, "Bux-Auth-Hash")
+	assert.Contains(t, graphqlClient.Request.Header, "Bux-Auth-Nonce")
+	assert.Contains(t, graphqlClient.Request.Header, "Bux-Auth-Signature")
+	assert.Contains(t, graphqlClient.Request.Header, "Bux-Auth-Time")
+	assert.Contains(t, graphqlClient.Request.Header, "Bux-Auth-Xpub")
 }
