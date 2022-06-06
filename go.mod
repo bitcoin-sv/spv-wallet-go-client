@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.17
 
 require (
-	github.com/BuxOrg/bux v0.2.28
+	github.com/BuxOrg/bux v0.2.29
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0-beta.3
@@ -14,7 +14,7 @@ require (
 
 require (
 	github.com/99designs/gqlgen v0.17.9 // indirect
-	github.com/bitcoinschema/go-bob v0.1.9 // indirect
+	github.com/bitcoinschema/go-bob v0.1.10 // indirect
 	github.com/bitcoinschema/go-map v0.0.14 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
@@ -69,7 +69,7 @@ require (
 	github.com/mrz1836/go-cache v0.6.5 // indirect
 	github.com/mrz1836/go-logger v0.2.5 // indirect
 	github.com/mrz1836/go-mattercloud v0.5.3 // indirect
-	github.com/mrz1836/go-nownodes v0.0.5 // indirect
+	github.com/mrz1836/go-nownodes v0.0.6 // indirect
 	github.com/mrz1836/go-parameters v0.2.8 // indirect
 	github.com/mrz1836/go-sanitize v1.1.5 // indirect
 	github.com/mrz1836/go-validate v0.2.0 // indirect

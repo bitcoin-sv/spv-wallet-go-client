@@ -43,6 +43,8 @@ github.com/BurntSushi/toml v1.1.0/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbi
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/BuxOrg/bux v0.2.28 h1:KLpuV2Tuw7emt3y261qNxLs+R5KU7+fwSN2qrvlCGvc=
 github.com/BuxOrg/bux v0.2.28/go.mod h1:zdbnoct6F8yaPrzc2ha+WnIy4L+H0Shx25lMFDSihao=
+github.com/BuxOrg/bux v0.2.29 h1:OSYRnb+a9ysd3wWK+tTIe3iwtlNnDprxrDxyGAsg6v4=
+github.com/BuxOrg/bux v0.2.29/go.mod h1:tson35COmJFTeDIDqfeCbdVwmppQMGtsi5MdjDwj7Tg=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
@@ -105,6 +107,8 @@ github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3 h1:sIg1FAKz7RSWDM5bu4L5OPI
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3/go.mod h1:VN6ACz7ptkAvJ6PcPEb2pt5lAlKlJtGE1smtjKn3i8I=
 github.com/bitcoinschema/go-bob v0.1.9 h1:CqmtSFeO6vIth9jIK2S1KTOIZA1/V4KT5+FRl4Aq02k=
 github.com/bitcoinschema/go-bob v0.1.9/go.mod h1:mbsbQJyIN/OH0d/YqctTZNQU2+7qSl3DyiMEOW8DNb0=
+github.com/bitcoinschema/go-bob v0.1.10 h1:Is10oLLYAWv0z8/FUB75M9yLXQpG9m8ZTwQ63N4FG+Y=
+github.com/bitcoinschema/go-bob v0.1.10/go.mod h1:5UFLEMIfCsdEXwZRXBoILipsu7dUOWBcp52A3IPYQMo=
 github.com/bitcoinschema/go-map v0.0.14 h1:j2DTrmCduTofeUl8UuB+DxSuhAPrNg+P+jl4Bi7iYZs=
 github.com/bitcoinschema/go-map v0.0.14/go.mod h1:UlOEpL00BBDxQPvh2jEsdkuvO81FKJCva1KDNsbgzBc=
 github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 h1:2yTIV9u7H0BhRDGXH5xrAwAz7XibWJtX2dNezMeNsUo=
@@ -649,6 +653,8 @@ github.com/mrz1836/go-mattercloud v0.5.3 h1:neBpVRS/leavDgBZ0K7R8p4kIWzxGy5lA6pf
 github.com/mrz1836/go-mattercloud v0.5.3/go.mod h1:f4AE0HJ3J0mDPfMuZLXJY7fFUBsLqjHrdhGxIJbXXKw=
 github.com/mrz1836/go-nownodes v0.0.5 h1:tId4WvR8hSilsrluVzIeYcigEV/Nn6vVqcPYIYhE7cE=
 github.com/mrz1836/go-nownodes v0.0.5/go.mod h1:W3z5V6No3bO6cYqFLl3Wq79D91JjXY0oEJVL7SVG7t8=
+github.com/mrz1836/go-nownodes v0.0.6 h1:RxXOUEYromY8uJeOiphFZ/60zfYoaHj86Bgy7faYir0=
+github.com/mrz1836/go-nownodes v0.0.6/go.mod h1:QMrAPr+OMqUnzcqKmlXWGSI7Xh2TKcwp9tsnTKC4XaA=
 github.com/mrz1836/go-parameters v0.2.8 h1:TfirO5GgS0RxYc3X36zbGds00c3U+BUgkfqyDFNcVBM=
 github.com/mrz1836/go-parameters v0.2.8/go.mod h1:5Ig2rnk6DH2BNf+Hknisoo7v6X5GE7wQCt1xvQSLgGQ=
 github.com/mrz1836/go-sanitize v1.1.5 h1:LOywG3ijK/B/D9ik3hsniyIzA1JVZlM2wmp3Q/CBk88=
