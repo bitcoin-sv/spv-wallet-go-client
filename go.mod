@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.17
 
 require (
-	github.com/BuxOrg/bux v0.2.29
+	github.com/BuxOrg/bux v0.2.30
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0-beta.3
@@ -66,14 +66,13 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.13 // indirect
 	github.com/miekg/dns v1.1.49 // indirect
 	github.com/mrz1836/go-api-router v0.4.13 // indirect
-	github.com/mrz1836/go-cache v0.6.5 // indirect
+	github.com/mrz1836/go-cache v0.6.6 // indirect
 	github.com/mrz1836/go-logger v0.2.5 // indirect
-	github.com/mrz1836/go-mattercloud v0.5.3 // indirect
 	github.com/mrz1836/go-nownodes v0.0.6 // indirect
 	github.com/mrz1836/go-parameters v0.2.8 // indirect
 	github.com/mrz1836/go-sanitize v1.1.5 // indirect
 	github.com/mrz1836/go-validate v0.2.0 // indirect
-	github.com/mrz1836/go-whatsonchain v0.10.4 // indirect
+	github.com/mrz1836/go-whatsonchain v0.11.0 // indirect
 	github.com/newrelic/go-agent/v3 v3.16.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
@@ -85,8 +84,8 @@ require (
 	github.com/tidwall/gjson v1.14.1 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/tonicpow/go-minercraft v0.7.3 // indirect
-	github.com/tonicpow/go-paymail v0.7.7 // indirect
+	github.com/tonicpow/go-minercraft v0.8.0 // indirect
+	github.com/tonicpow/go-paymail v0.7.8 // indirect
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -101,21 +100,21 @@ require (
 	go.mongodb.org/mongo-driver v1.9.1 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/net v0.0.0-20220531201128-c960675eff93 // indirect
+	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+	golang.org/x/sys v0.0.0-20220608164250-635b8c9b7f68 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220517211312-f3a8303e98df // indirect
-	google.golang.org/genproto v0.0.0-20220602131408-e326c6e8e9c8 // indirect
+	google.golang.org/genproto v0.0.0-20220608133413-ed9918b62aac // indirect
 	google.golang.org/grpc v1.47.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.3.4 // indirect
 	gorm.io/driver/postgres v1.3.7 // indirect
-	gorm.io/driver/sqlite v1.3.2 // indirect
+	gorm.io/driver/sqlite v1.3.4 // indirect
 	gorm.io/gorm v1.23.5 // indirect
-	gorm.io/plugin/dbresolver v1.2.0 // indirect
+	gorm.io/plugin/dbresolver v1.2.1 // indirect
 )
 
 // NOTE: needed for ask-nancy, jwt package is outdated
