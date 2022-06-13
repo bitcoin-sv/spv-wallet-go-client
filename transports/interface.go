@@ -72,6 +72,7 @@ type AdminService interface {
 	AdminGetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
 	AdminGetXPubs(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Xpub, error)
 	AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
+	AdminRecordTransaction(ctx context.Context, hex string) (*bux.Transaction, error)
 }
 
 // TransportService the transport service interface

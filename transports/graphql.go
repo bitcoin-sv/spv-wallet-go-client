@@ -754,6 +754,19 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 		metadata: $metadata
 	  ) {
 		id
+		hex
+		block_hash
+		block_height
+		fee
+		number_of_inputs
+		number_of_outputs
+		output_value
+		total_value
+		direction
+		metadata
+		created_at
+		updated_at
+		deleted_at
 	  }
 	}`
 	req := graphql.NewRequest(reqBody)

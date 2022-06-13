@@ -323,3 +323,26 @@ func (h *TransportHTTP) adminCount(ctx context.Context, conditions map[string]in
 
 	return count, nil
 }
+
+// AdminRecordTransaction will record a transaction as an admin
+func (h *TransportHTTP) AdminRecordTransaction(ctx context.Context, hex string) (*bux.Transaction, error) {
+
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldHex: hex,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var transaction bux.Transaction
+	if err = h.doHTTPRequest(
+		ctx, http.MethodPost, "/admin/transactions/record", jsonStr, h.xPriv, h.signRequest, &transaction,
+	); err != nil {
+		return nil, err
+	}
+	if h.debug {
+		log.Printf("transaction: %s\n", transaction.ID)
+	}
+
+	return &transaction, nil
+}

@@ -417,7 +417,7 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context,
 		return nil, err
 	}
 
-	var draftTransaction bux.DraftTransaction
+	var draftTransaction *bux.DraftTransaction
 	if err = h.doHTTPRequest(
 		ctx, http.MethodPost, "/transaction", jsonStr, h.xPriv, true, &draftTransaction,
 	); err != nil {
@@ -426,8 +426,11 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context,
 	if h.debug {
 		log.Printf("draft transaction: %v\n", draftTransaction)
 	}
+	if draftTransaction == nil {
+		return nil, bux.ErrDraftNotFound
+	}
 
-	return &draftTransaction, nil
+	return draftTransaction, nil
 }
 
 // RecordTransaction will record a transaction
@@ -504,7 +507,9 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 
 	var resp *http.Response
 	defer func() {
-		_ = resp.Body.Close()
+		if resp.Body != nil {
+			_ = resp.Body.Close()
+		}
 	}()
 	if resp, err = h.httpClient.Do(req); err != nil {
 		return err
