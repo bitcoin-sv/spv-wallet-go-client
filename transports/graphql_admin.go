@@ -527,3 +527,47 @@ func (g *TransportGraphQL) doGraphQLAdminQuery(ctx context.Context, reqBody stri
 
 	return nil
 }
+
+// AdminRecordTransaction will record a transaction as an admin
+func (g *TransportGraphQL) AdminRecordTransaction(ctx context.Context, hex string) (*bux.Transaction, error) {
+
+	reqBody := `
+   	mutation() {
+	  admin_transaction (
+		hex:"` + hex + `",
+	  ) {
+		id
+		hex
+		block_hash
+		block_height
+		fee
+		number_of_inputs
+		number_of_outputs
+		output_value
+		total_value
+		direction
+		metadata
+		created_at
+		updated_at
+		deleted_at
+	  }
+	}`
+	req := graphql.NewRequest(reqBody)
+
+	err := g.signGraphQLRequest(req, reqBody, nil, g.xPriv, g.xPub)
+	if err != nil {
+		return nil, err
+	}
+
+	// run it and capture the response
+	var respData NewTransactionData
+	if err = g.client.Run(ctx, req, &respData); err != nil {
+		return nil, err
+	}
+	transaction := respData.Transaction
+	if g.debug {
+		log.Printf("transaction: %s\n", transaction.ID)
+	}
+
+	return transaction, nil
+}
