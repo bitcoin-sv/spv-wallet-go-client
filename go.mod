@@ -9,7 +9,7 @@ require (
 	github.com/libsv/go-bt/v2 v2.1.0-beta.4
 	github.com/machinebox/graphql v0.2.2
 	github.com/pkg/errors v0.9.1
-	github.com/stretchr/testify v1.7.4
+	github.com/stretchr/testify v1.7.5
 )
 
 require (
