@@ -1,9 +1,9 @@
 module github.com/BuxOrg/go-buxclient
 
-go 1.17
+go 1.18
 
 require (
-	github.com/BuxOrg/bux v0.2.33
+	github.com/BuxOrg/bux v0.2.34
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0-beta.4
@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	github.com/99designs/gqlgen v0.17.10 // indirect
+	github.com/99designs/gqlgen v0.17.12 // indirect
 	github.com/bitcoinschema/go-bob v0.1.11 // indirect
 	github.com/bitcoinschema/go-map v0.0.14 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
@@ -21,7 +21,7 @@ require (
 	github.com/bsm/redislock v0.7.2 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
 	github.com/centrifugal/centrifuge-go v0.8.3 // indirect
-	github.com/centrifugal/protocol v0.8.8 // indirect
+	github.com/centrifugal/protocol v0.8.9 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/coocood/freecache v1.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -37,7 +37,7 @@ require (
 	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/gomodule/redigo v1.8.8 // indirect
+	github.com/gomodule/redigo v1.8.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
@@ -59,17 +59,17 @@ require (
 	github.com/klauspost/compress v1.15.7 // indirect
 	github.com/korovkin/limiter v0.0.0-20220422174850-01f593e64cf7 // indirect
 	github.com/libsv/go-bc v0.1.11 // indirect
-	github.com/libsv/go-bt v1.0.6 // indirect
+	github.com/libsv/go-bt v1.0.8 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.14 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
-	github.com/mrz1836/go-api-router v0.4.13 // indirect
+	github.com/mrz1836/go-api-router v0.4.14 // indirect
 	github.com/mrz1836/go-cache v0.6.6 // indirect
-	github.com/mrz1836/go-logger v0.2.5 // indirect
+	github.com/mrz1836/go-logger v0.2.6 // indirect
 	github.com/mrz1836/go-nownodes v0.0.6 // indirect
-	github.com/mrz1836/go-parameters v0.2.8 // indirect
+	github.com/mrz1836/go-parameters v0.2.9 // indirect
 	github.com/mrz1836/go-sanitize v1.1.5 // indirect
 	github.com/mrz1836/go-validate v0.2.0 // indirect
 	github.com/mrz1836/go-whatsonchain v0.11.0 // indirect
@@ -89,7 +89,7 @@ require (
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/vektah/gqlparser/v2 v2.4.5 // indirect
+	github.com/vektah/gqlparser/v2 v2.4.6 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/vmihailenco/taskq/v3 v3.2.9-0.20211122085105-720ffc56ac4d // indirect
@@ -102,19 +102,19 @@ require (
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b // indirect
+	golang.org/x/sys v0.0.0-20220704084225-05e143d24a9e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.11 // indirect
-	google.golang.org/genproto v0.0.0-20220630174209-ad1d48641aa7 // indirect
+	google.golang.org/genproto v0.0.0-20220706132729-d86698d07c53 // indirect
 	google.golang.org/grpc v1.47.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.3.4 // indirect
-	gorm.io/driver/postgres v1.3.7 // indirect
-	gorm.io/driver/sqlite v1.3.5 // indirect
+	gorm.io/driver/postgres v1.3.8 // indirect
+	gorm.io/driver/sqlite v1.3.6 // indirect
 	gorm.io/gorm v1.23.7 // indirect
 	gorm.io/plugin/dbresolver v1.2.1 // indirect
 )
 
 // NOTE: needed for ask-nancy, jwt package is outdated
-replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.2.0
+replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
