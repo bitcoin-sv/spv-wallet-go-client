@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.18
 
 require (
-	github.com/BuxOrg/bux v0.2.34
+	github.com/BuxOrg/bux v0.3.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0-beta.4
@@ -66,8 +66,8 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.14 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/mrz1836/go-api-router v0.4.14 // indirect
-	github.com/mrz1836/go-cache v0.6.6 // indirect
-	github.com/mrz1836/go-logger v0.2.6 // indirect
+	github.com/mrz1836/go-cache v0.7.0 // indirect
+	github.com/mrz1836/go-logger v0.3.1 // indirect
 	github.com/mrz1836/go-nownodes v0.0.6 // indirect
 	github.com/mrz1836/go-parameters v0.2.9 // indirect
 	github.com/mrz1836/go-sanitize v1.1.5 // indirect
@@ -100,19 +100,19 @@ require (
 	go.mongodb.org/mongo-driver v1.9.1 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
+	golang.org/x/net v0.0.0-20220706163947-c90051bbdb60 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/sys v0.0.0-20220704084225-05e143d24a9e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.11 // indirect
-	google.golang.org/genproto v0.0.0-20220706132729-d86698d07c53 // indirect
+	google.golang.org/genproto v0.0.0-20220707150051-590a5ac7bee1 // indirect
 	google.golang.org/grpc v1.47.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.3.4 // indirect
 	gorm.io/driver/postgres v1.3.8 // indirect
 	gorm.io/driver/sqlite v1.3.6 // indirect
-	gorm.io/gorm v1.23.7 // indirect
+	gorm.io/gorm v1.23.8 // indirect
 	gorm.io/plugin/dbresolver v1.2.1 // indirect
 )
 
