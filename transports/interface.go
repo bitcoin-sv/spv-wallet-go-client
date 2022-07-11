@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux/datastore"
 	"github.com/libsv/go-bk/bip32"
+	"github.com/mrz1836/go-datastore"
 )
 
 // XpubService is the xPub related requests

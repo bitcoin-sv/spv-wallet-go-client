@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux/datastore"
 	"github.com/machinebox/graphql"
+	"github.com/mrz1836/go-datastore"
 )
 
 // NewXpub will register an xPub
