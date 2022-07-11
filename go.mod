@@ -3,11 +3,12 @@ module github.com/BuxOrg/go-buxclient
 go 1.18
 
 require (
-	github.com/BuxOrg/bux v0.3.1
+	github.com/BuxOrg/bux v0.4.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0-beta.4
 	github.com/machinebox/graphql v0.2.2
+	github.com/mrz1836/go-datastore v0.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.0
 )
@@ -111,7 +112,7 @@ require (
 	google.golang.org/grpc v1.47.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/mysql v1.3.4 // indirect
+	gorm.io/driver/mysql v1.3.5 // indirect
 	gorm.io/driver/postgres v1.3.8 // indirect
 	gorm.io/driver/sqlite v1.3.6 // indirect
 	gorm.io/gorm v1.23.8 // indirect
