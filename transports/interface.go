@@ -48,7 +48,7 @@ type TransactionService interface {
 
 // PaymailService is the paymail related requests
 type PaymailService interface {
-	NewPaymail(ctx context.Context, rawXpub, paymailAddress string, metadata *bux.Metadata) error
+	NewPaymail(ctx context.Context, rawXpub, paymailAddress, avatar, publicName string, metadata *bux.Metadata) error
 }
 
 // AdminService is the admin related requests
