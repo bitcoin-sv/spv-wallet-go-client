@@ -8,7 +8,7 @@ require (
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0-beta.4
 	github.com/machinebox/graphql v0.2.2
-	github.com/mrz1836/go-datastore v0.1.8
+	github.com/mrz1836/go-datastore v0.1.9
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
 )
@@ -56,14 +56,14 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
-	github.com/klauspost/compress v1.15.11 // indirect
+	github.com/klauspost/compress v1.15.12 // indirect
 	github.com/korovkin/limiter v0.0.0-20221015170604-22eb1ceceddc // indirect
 	github.com/libsv/go-bc v0.1.11 // indirect
 	github.com/libsv/go-bt v1.0.8 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
-	github.com/mattn/go-sqlite3 v1.14.15 // indirect
+	github.com/mattn/go-sqlite3 v1.14.16 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/montanaflynn/stats v0.6.6 // indirect
 	github.com/mrz1836/go-api-router v0.4.16 // indirect
@@ -75,7 +75,7 @@ require (
 	github.com/mrz1836/go-sanitize v1.1.5 // indirect
 	github.com/mrz1836/go-validate v0.2.0 // indirect
 	github.com/mrz1836/go-whatsonchain v0.11.0 // indirect
-	github.com/newrelic/go-agent/v3 v3.19.2 // indirect
+	github.com/newrelic/go-agent/v3 v3.20.0 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -100,7 +100,7 @@ require (
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
-	go.mongodb.org/mongo-driver v1.10.3 // indirect
+	go.mongodb.org/mongo-driver v1.11.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/net v0.1.0 // indirect
@@ -108,14 +108,14 @@ require (
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
-	google.golang.org/genproto v0.0.0-20221018160656-63c7b68cfc55 // indirect
+	google.golang.org/genproto v0.0.0-20221027153422-115e99e71e1c // indirect
 	google.golang.org/grpc v1.50.1 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.4.3 // indirect
 	gorm.io/driver/postgres v1.4.5 // indirect
 	gorm.io/driver/sqlite v1.4.3 // indirect
-	gorm.io/gorm v1.24.1-0.20221019064659-5dd2bb482755 // indirect
+	gorm.io/gorm v1.24.1 // indirect
 	gorm.io/plugin/dbresolver v1.3.0 // indirect
 )
 
