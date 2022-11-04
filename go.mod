@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.18
 
 require (
-	github.com/BuxOrg/bux v0.4.11
+	github.com/BuxOrg/bux v0.4.12
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0-beta.4
@@ -24,7 +24,7 @@ require (
 	github.com/centrifugal/centrifuge-go v0.9.0 // indirect
 	github.com/centrifugal/protocol v0.8.11 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/coocood/freecache v1.2.2 // indirect
+	github.com/coocood/freecache v1.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -32,7 +32,7 @@ require (
 	github.com/go-redis/redis_rate/v9 v9.1.2 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
-	github.com/gofrs/uuid v4.3.0+incompatible // indirect
+	github.com/gofrs/uuid v4.3.1+incompatible // indirect
 	github.com/gojektech/heimdall/v6 v6.1.0 // indirect
 	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -70,7 +70,7 @@ require (
 	github.com/mrz1836/go-cache v0.7.3 // indirect
 	github.com/mrz1836/go-cachestore v0.1.4 // indirect
 	github.com/mrz1836/go-logger v0.3.1 // indirect
-	github.com/mrz1836/go-nownodes v0.0.7 // indirect
+	github.com/mrz1836/go-nownodes v0.0.8 // indirect
 	github.com/mrz1836/go-parameters v0.2.9 // indirect
 	github.com/mrz1836/go-sanitize v1.1.5 // indirect
 	github.com/mrz1836/go-validate v0.2.0 // indirect
@@ -107,7 +107,7 @@ require (
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	golang.org/x/tools v0.1.12 // indirect
+	golang.org/x/tools v0.2.0 // indirect
 	google.golang.org/genproto v0.0.0-20221027153422-115e99e71e1c // indirect
 	google.golang.org/grpc v1.50.1 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
