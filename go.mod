@@ -127,4 +127,4 @@ replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
 replace github.com/centrifugal/centrifuge-go => github.com/centrifugal/centrifuge-go v0.8.3
 
 // Incompatible version
-replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
+// replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
