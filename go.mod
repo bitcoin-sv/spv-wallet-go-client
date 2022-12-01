@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.18
 
 require (
-	github.com/BuxOrg/bux v0.4.12
+	github.com/BuxOrg/bux v0.4.13
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.0
@@ -21,7 +21,7 @@ require (
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
 	github.com/bsm/redislock v0.8.2 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
-	github.com/centrifugal/centrifuge-go v0.9.0 // indirect
+	github.com/centrifugal/centrifuge-go v0.9.3 // indirect
 	github.com/centrifugal/protocol v0.8.11 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/coocood/freecache v1.2.3 // indirect
@@ -35,10 +35,10 @@ require (
 	github.com/gofrs/uuid v4.3.1+incompatible // indirect
 	github.com/gojektech/heimdall/v6 v6.1.0 // indirect
 	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
-	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
@@ -67,15 +67,15 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.16 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/montanaflynn/stats v0.6.6 // indirect
-	github.com/mrz1836/go-api-router v0.4.16 // indirect
-	github.com/mrz1836/go-cache v0.7.3 // indirect
-	github.com/mrz1836/go-cachestore v0.1.4 // indirect
+	github.com/mrz1836/go-api-router v0.5.0 // indirect
+	github.com/mrz1836/go-cache v0.8.0 // indirect
+	github.com/mrz1836/go-cachestore v0.1.5 // indirect
 	github.com/mrz1836/go-logger v0.3.1 // indirect
 	github.com/mrz1836/go-nownodes v0.0.8 // indirect
 	github.com/mrz1836/go-parameters v0.2.9 // indirect
 	github.com/mrz1836/go-sanitize v1.1.5 // indirect
 	github.com/mrz1836/go-validate v0.2.0 // indirect
-	github.com/mrz1836/go-whatsonchain v0.11.0 // indirect
+	github.com/mrz1836/go-whatsonchain v0.12.0 // indirect
 	github.com/newrelic/go-agent/v3 v3.20.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
@@ -86,7 +86,7 @@ require (
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/segmentio/encoding v0.3.6 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/tidwall/gjson v1.14.3 // indirect
+	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tonicpow/go-minercraft v0.8.2 // indirect
@@ -104,13 +104,13 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.mongodb.org/mongo-driver v1.11.0 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
-	golang.org/x/mod v0.6.0 // indirect
+	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	golang.org/x/tools v0.2.0 // indirect
-	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
+	golang.org/x/tools v0.3.0 // indirect
+	google.golang.org/genproto v0.0.0-20221130183247-a2ec334bae6f // indirect
 	google.golang.org/grpc v1.51.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
