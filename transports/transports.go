@@ -1,3 +1,4 @@
+// Package transports encapsulates the different ways to communicate with BUX
 package transports
 
 import (

@@ -35,7 +35,7 @@ type GraphQLMockClient struct {
 }
 
 func (g *GraphQLMockClient) Run(_ context.Context, req *graphql.Request, resp interface{}) error {
-	j, _ := json.Marshal(g.Response) // nolint: errchkjson // used for testing only
+	j, _ := json.Marshal(g.Response) //nolint:errchkjson // used for testing only
 	_ = json.Unmarshal(j, &resp)
 	g.Request = req
 	return g.Error
