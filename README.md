@@ -2,7 +2,7 @@
 > Get started using [BUX](https://getbux.io) in five minutes
 
 [![Release](https://img.shields.io/github/release-pre/BuxOrg/go-buxclient.svg?logo=github&style=flat&v=2)](https://github.com/BuxOrg/go-buxclient/releases)
-[![Build Status](https://img.shields.io/github/workflow/status/BuxOrg/go-buxclient/run-go-tests?logo=github&v=2)](https://github.com/BuxOrg/go-buxclient/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/BuxOrg/go-buxclient/run-tests.yml?branch=master&v=2)](https://github.com/BuxOrg/go-buxclient/actions)
 [![Report](https://goreportcard.com/badge/github.com/BuxOrg/go-buxclient?style=flat&v=2)](https://goreportcard.com/report/github.com/BuxOrg/go-buxclient)
 [![codecov](https://codecov.io/gh/BuxOrg/go-buxclient/branch/master/graph/badge.svg?v=2)](https://codecov.io/gh/BuxOrg/go-buxclient)
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/BuxOrg/go-buxclient&style=flat&v=2)](https://mergify.io)
