@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.18
 
 require (
-	github.com/BuxOrg/bux v0.4.13
+	github.com/BuxOrg/bux v0.4.14
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.1
@@ -23,7 +23,7 @@ require (
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
 	github.com/centrifugal/centrifuge-go v0.9.3 // indirect
 	github.com/centrifugal/protocol v0.8.11 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coocood/freecache v1.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
@@ -69,14 +69,14 @@ require (
 	github.com/montanaflynn/stats v0.6.6 // indirect
 	github.com/mrz1836/go-api-router v0.5.0 // indirect
 	github.com/mrz1836/go-cache v0.8.0 // indirect
-	github.com/mrz1836/go-cachestore v0.1.5 // indirect
+	github.com/mrz1836/go-cachestore v0.1.6 // indirect
 	github.com/mrz1836/go-logger v0.3.1 // indirect
 	github.com/mrz1836/go-nownodes v0.0.8 // indirect
 	github.com/mrz1836/go-parameters v0.2.9 // indirect
 	github.com/mrz1836/go-sanitize v1.1.5 // indirect
 	github.com/mrz1836/go-validate v0.2.0 // indirect
 	github.com/mrz1836/go-whatsonchain v0.12.0 // indirect
-	github.com/newrelic/go-agent/v3 v3.20.1 // indirect
+	github.com/newrelic/go-agent/v3 v3.20.2 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
 	github.com/onsi/gomega v1.21.1 // indirect
@@ -89,8 +89,8 @@ require (
 	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	github.com/tonicpow/go-minercraft v0.8.2 // indirect
-	github.com/tonicpow/go-paymail v0.8.0 // indirect
+	github.com/tonicpow/go-minercraft v0.9.0 // indirect
+	github.com/tonicpow/go-paymail v0.8.1 // indirect
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -103,13 +103,13 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.mongodb.org/mongo-driver v1.11.1 // indirect
-	golang.org/x/crypto v0.4.0 // indirect
+	golang.org/x/crypto v0.5.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
-	golang.org/x/net v0.4.0 // indirect
+	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
-	golang.org/x/tools v0.3.0 // indirect
+	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/tools v0.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37 // indirect
 	google.golang.org/grpc v1.51.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
@@ -117,7 +117,7 @@ require (
 	gorm.io/driver/mysql v1.4.4 // indirect
 	gorm.io/driver/postgres v1.4.5 // indirect
 	gorm.io/driver/sqlite v1.4.3 // indirect
-	gorm.io/gorm v1.24.2 // indirect
+	gorm.io/gorm v1.24.3 // indirect
 	gorm.io/plugin/dbresolver v1.4.0 // indirect
 )
 
