@@ -8,7 +8,7 @@ require (
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.1
 	github.com/machinebox/graphql v0.2.2
-	github.com/mrz1836/go-datastore v0.2.0
+	github.com/mrz1836/go-datastore v0.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
 )
@@ -105,15 +105,15 @@ require (
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/tools v0.5.0 // indirect
-	google.golang.org/genproto v0.0.0-20230127162408-596548ed4efa // indirect
+	google.golang.org/genproto v0.0.0-20230131230820-1c016267d619 // indirect
 	google.golang.org/grpc v1.52.3 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.4.5 // indirect
 	gorm.io/driver/postgres v1.4.6 // indirect
 	gorm.io/driver/sqlite v1.4.4 // indirect
-	gorm.io/gorm v1.24.3 // indirect
-	gorm.io/plugin/dbresolver v1.4.0 // indirect
+	gorm.io/gorm v1.24.4 // indirect
+	gorm.io/plugin/dbresolver v1.4.1 // indirect
 )
 
 // Issue with Ask Nancy on related packages
