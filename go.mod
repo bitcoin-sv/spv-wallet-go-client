@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/BuxOrg/bux v0.4.17
-	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
+	github.com/bitcoinschema/go-bitcoin/v2 v2.0.2
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.1.1
 	github.com/machinebox/graphql v0.2.2
