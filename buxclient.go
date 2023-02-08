@@ -42,7 +42,7 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 
 	var err error
 	if client.xPrivString != "" {
-		if client.xPriv, err = bip32.NewKeyFromString(client.xPrivString); err != nil {
+		if client.xPriv, err = bitcoin.GenerateHDKeyFromString(client.xPrivString); err != nil {
 			return nil, err
 		}
 		if client.xPub, err = client.xPriv.Neuter(); err != nil {
@@ -50,7 +50,7 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 		}
 	} else if client.xPubString != "" {
 		client.xPriv = nil
-		if client.xPub, err = bip32.NewKeyFromString(client.xPubString); err != nil {
+		if client.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(client.xPubString); err != nil {
 			return nil, err
 		}
 	} else if client.accessKeyString != "" {
