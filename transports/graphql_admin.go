@@ -42,11 +42,8 @@ func (g *TransportGraphQL) NewXpub(ctx context.Context, rawXPub string, metadata
 
 	// run it and capture the response
 	var xPubData interface{}
-	if err = g.client.Run(ctx, req, &xPubData); err != nil {
-		return err
-	}
 
-	return nil
+	return g.client.Run(ctx, req, &xPubData)
 }
 
 // RegisterXpub alias for NewXpub
@@ -456,11 +453,7 @@ func (g *TransportGraphQL) adminGetModels(ctx context.Context, conditions map[st
 		FieldQueryParams: queryParams,
 	}
 
-	if err := g.doGraphQLAdminQuery(ctx, reqBody, variables, &models); err != nil {
-		return err
-	}
-
-	return nil
+	return g.doGraphQLAdminQuery(ctx, reqBody, variables, &models)
 }
 
 func (g *TransportGraphQL) adminCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata,

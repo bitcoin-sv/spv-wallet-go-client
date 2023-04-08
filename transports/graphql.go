@@ -122,13 +122,13 @@ func (g *TransportGraphQL) IsSignRequest() bool {
 }
 
 // NewPaymail will register a new paymail
-func (g *TransportGraphQL) NewPaymail(ctx context.Context, rawXpub, paymailAddress, avatar, publicName string, metadata *bux.Metadata) error {
+func (g *TransportGraphQL) NewPaymail(_ context.Context, _, _, _, _ string, _ *bux.Metadata) error {
 	// TODO: Implement this
 	return nil
 }
 
 // GetXpub will get an xPub
-func (g *TransportGraphQL) GetXpub(ctx context.Context, rawXpub string) (*bux.Xpub, error) {
+func (g *TransportGraphQL) GetXpub(_ context.Context, _ string) (*bux.Xpub, error) {
 	// TODO: Implement this
 	return nil, nil
 }

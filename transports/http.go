@@ -71,13 +71,10 @@ func (h *TransportHTTP) NewPaymail(ctx context.Context, rawXpub, paymailAddress,
 	}
 
 	var paymailData interface{}
-	if err = h.doHTTPRequest(
-		ctx, http.MethodPost, "/paymail", jsonStr, h.xPriv, true, &paymailData,
-	); err != nil {
-		return err
-	}
 
-	return nil
+	return h.doHTTPRequest(
+		ctx, http.MethodPost, "/paymail", jsonStr, h.xPriv, true, &paymailData,
+	)
 }
 
 // GetXPub will get the xpub of the current xpub

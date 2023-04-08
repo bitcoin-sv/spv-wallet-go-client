@@ -27,13 +27,10 @@ func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *b
 	}
 
 	var xPubData bux.Xpub
-	if err = h.doHTTPRequest(
-		ctx, http.MethodPost, "/xpub", jsonStr, h.adminXPriv, true, &xPubData,
-	); err != nil {
-		return err
-	}
 
-	return nil
+	return h.doHTTPRequest(
+		ctx, http.MethodPost, "/xpub", jsonStr, h.adminXPriv, true, &xPubData,
+	)
 }
 
 // RegisterXpub alias for NewXpub
