@@ -6,7 +6,7 @@ require (
 	github.com/BuxOrg/bux v0.4.23
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.3
 	github.com/libsv/go-bk v0.1.6
-	github.com/libsv/go-bt/v2 v2.2.0
+	github.com/libsv/go-bt/v2 v2.2.1
 	github.com/machinebox/graphql v0.2.2
 	github.com/mrz1836/go-datastore v0.3.0
 	github.com/pkg/errors v0.9.1
