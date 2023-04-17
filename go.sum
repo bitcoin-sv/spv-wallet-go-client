@@ -1,7 +1,7 @@
-github.com/99designs/gqlgen v0.17.28 h1:kbc1RhvwMltFVCb6drIrfQcxS9iKybyNwaJkgJZd5ao=
-github.com/99designs/gqlgen v0.17.28/go.mod h1:i4rEatMrzzu6RXaHydq1nmEPZkb3bKQsnxNRHS4DQB4=
-github.com/BuxOrg/bux v0.4.23 h1:0hcNXuoRGLmBqf9/+WlLMZCBLpfocnD5oudHYdsiSa0=
-github.com/BuxOrg/bux v0.4.23/go.mod h1:6kBEtztrsLyOSaKub/8uArOIaoko5Ybe3R9Kg7oFajk=
+github.com/99designs/gqlgen v0.17.29 h1:z2MrNOFATCVgQLRCF6Uufz4uz2IQLB5BBMwPUMafJOA=
+github.com/99designs/gqlgen v0.17.29/go.mod h1:i4rEatMrzzu6RXaHydq1nmEPZkb3bKQsnxNRHS4DQB4=
+github.com/BuxOrg/bux v0.4.24 h1:VBkBuxheUBqMh+aYH9X+ThizeGBEVNl+SXC5yfnV9Mw=
+github.com/BuxOrg/bux v0.4.24/go.mod h1:BEv03Rj1azpKxImSiKdnLj/nbTszYVFOqbnK/Y3y9cY=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DataDog/datadog-go v3.7.1+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/acobaugh/osrelease v0.1.0 h1:Yb59HQDGGNhCj4suHaFQQfBps5wyoKLSSX/J/+UifRE=
@@ -435,7 +435,8 @@ gorm.io/driver/sqlite v1.4.4/go.mod h1:0Aq3iPO+v9ZKbcdiz8gLWRw5VOPcBOPUQJFLq5e2e
 gorm.io/gorm v1.23.8/go.mod h1:l2lP/RyAtc1ynaTjFksBde/O8v9oOGIApu2/xRitmZk=
 gorm.io/gorm v1.24.0/go.mod h1:DVrVomtaYTbqs7gB/x2uVvqnXzv0nqjB396B8cG4dBA=
 gorm.io/gorm v1.24.3/go.mod h1:DVrVomtaYTbqs7gB/x2uVvqnXzv0nqjB396B8cG4dBA=
-gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11 h1:9qNbmu21nNThCNnF5i2R3kw2aL27U8ZwbzccNjOmW0g=
 gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
+gorm.io/gorm v1.25.0 h1:+KtYtb2roDz14EQe4bla8CbQlmb9dN3VejSai3lprfU=
+gorm.io/gorm v1.25.0/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
 gorm.io/plugin/dbresolver v1.4.1 h1:Ug4LcoPhrvqq71UhxtF346f+skTYoCa/nEsdjvHwEzk=
 gorm.io/plugin/dbresolver v1.4.1/go.mod h1:CTbCtMWhsjXSiJqiW2R8POvJ2cq18RVOl4WGyT5nhNc=

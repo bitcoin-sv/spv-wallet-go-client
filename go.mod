@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.18
 
 require (
-	github.com/BuxOrg/bux v0.4.23
+	github.com/BuxOrg/bux v0.4.24
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.1
@@ -14,7 +14,7 @@ require (
 )
 
 require (
-	github.com/99designs/gqlgen v0.17.28 // indirect
+	github.com/99designs/gqlgen v0.17.29 // indirect
 	github.com/bitcoinschema/go-bpu v0.0.8 // indirect
 	github.com/bitcoinschema/go-map v0.0.17 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
@@ -112,7 +112,7 @@ require (
 	gorm.io/driver/mysql v1.4.7 // indirect
 	gorm.io/driver/postgres v1.5.0 // indirect
 	gorm.io/driver/sqlite v1.4.4 // indirect
-	gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11 // indirect
+	gorm.io/gorm v1.25.0 // indirect
 	gorm.io/plugin/dbresolver v1.4.1 // indirect
 )
 
