@@ -1,9 +1,9 @@
 module github.com/BuxOrg/go-buxclient
 
-go 1.18
+go 1.19
 
 require (
-	github.com/BuxOrg/bux v0.4.24
+	github.com/BuxOrg/bux v0.5.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.3
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.1
@@ -14,14 +14,14 @@ require (
 )
 
 require (
-	github.com/99designs/gqlgen v0.17.30 // indirect
+	github.com/99designs/gqlgen v0.17.31 // indirect
 	github.com/bitcoinschema/go-bpu v0.0.8 // indirect
 	github.com/bitcoinschema/go-map v0.0.17 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
-	github.com/bsm/redislock v0.9.2 // indirect
+	github.com/bsm/redislock v0.9.3 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
-	github.com/centrifugal/centrifuge-go v0.9.4 // indirect
+	github.com/centrifugal/centrifuge-go v0.9.6 // indirect
 	github.com/centrifugal/protocol v0.10.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coocood/freecache v1.2.3 // indirect
@@ -60,13 +60,13 @@ require (
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.16 // indirect
-	github.com/miekg/dns v1.1.53 // indirect
+	github.com/miekg/dns v1.1.54 // indirect
 	github.com/montanaflynn/stats v0.7.0 // indirect
 	github.com/mrz1836/go-api-router v0.5.1 // indirect
 	github.com/mrz1836/go-cache v0.8.0 // indirect
 	github.com/mrz1836/go-cachestore v0.2.0 // indirect
 	github.com/mrz1836/go-logger v0.3.2 // indirect
-	github.com/mrz1836/go-nownodes v0.0.8 // indirect
+	github.com/mrz1836/go-nownodes v0.1.0 // indirect
 	github.com/mrz1836/go-parameters v0.3.1 // indirect
 	github.com/mrz1836/go-sanitize v1.2.1 // indirect
 	github.com/mrz1836/go-validate v0.2.0 // indirect
@@ -101,12 +101,12 @@ require (
 	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sync v0.2.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/tools v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
-	google.golang.org/grpc v1.54.0 // indirect
+	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.5.0 // indirect
