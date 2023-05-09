@@ -8,7 +8,7 @@ require (
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.1
 	github.com/machinebox/graphql v0.2.2
-	github.com/mrz1836/go-datastore v0.3.1
+	github.com/mrz1836/go-datastore v0.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.2
 )
@@ -100,7 +100,7 @@ require (
 	go.mongodb.org/mongo-driver v1.11.6 // indirect
 	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect
-	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
@@ -112,7 +112,7 @@ require (
 	gorm.io/driver/mysql v1.5.0 // indirect
 	gorm.io/driver/postgres v1.5.0 // indirect
 	gorm.io/driver/sqlite v1.5.0 // indirect
-	gorm.io/gorm v1.25.0 // indirect
+	gorm.io/gorm v1.25.1 // indirect
 	gorm.io/plugin/dbresolver v1.4.1 // indirect
 )
 
