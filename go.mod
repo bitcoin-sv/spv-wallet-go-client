@@ -10,7 +10,7 @@ require (
 	github.com/machinebox/graphql v0.2.2
 	github.com/mrz1836/go-datastore v0.4.1
 	github.com/pkg/errors v0.9.1
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 )
 
 require (
