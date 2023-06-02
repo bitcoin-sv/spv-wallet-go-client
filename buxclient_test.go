@@ -587,7 +587,140 @@ func TestGetTransport(t *testing.T) {
 	})
 }
 
+func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
+	anyConditions := make(map[string]interface{}, 0)
+	var anyMetadataConditions *bux.Metadata
+	anyParam := "sth"
+
+	testCases := []struct {
+		caseTitle    string
+		path         string
+		clientMethod func(*BuxClient) (any, error)
+	}{
+		{
+			caseTitle:    "GetXPub",
+			path:         "/xpub",
+			clientMethod: func(c *BuxClient) (any, error) { return c.GetXPub(context.Background()) },
+		},
+		{
+			caseTitle:    "GetAccessKey",
+			path:         "/access-key",
+			clientMethod: func(c *BuxClient) (any, error) { return c.GetAccessKey(context.Background(), anyParam) },
+		},
+		{
+			caseTitle:    "GetAccessKeys",
+			path:         "/access-key",
+			clientMethod: func(c *BuxClient) (any, error) { return c.GetAccessKeys(context.Background(), anyMetadataConditions) },
+		},
+		{
+			caseTitle:    "GetDestinationByID",
+			path:         "/destination",
+			clientMethod: func(c *BuxClient) (any, error) { return c.GetDestinationByID(context.Background(), anyParam) },
+		},
+		{
+			caseTitle:    "GetDestinationByAddress",
+			path:         "/destination",
+			clientMethod: func(c *BuxClient) (any, error) { return c.GetDestinationByAddress(context.Background(), anyParam) },
+		},
+		{
+			caseTitle: "GetDestinationByLockingScript",
+			path:      "/destination",
+			clientMethod: func(c *BuxClient) (any, error) {
+				return c.GetDestinationByLockingScript(context.Background(), anyParam)
+			},
+		},
+		{
+			caseTitle: "GetDestinations",
+			path:      "/destination/search",
+			clientMethod: func(c *BuxClient) (any, error) {
+				return c.GetDestinations(context.Background(), nil)
+			},
+		},
+		{
+			caseTitle:    "GetTransaction",
+			path:         "/transaction",
+			clientMethod: func(c *BuxClient) (any, error) { return c.GetTransaction(context.Background(), txID) },
+		},
+		{
+			caseTitle: "GetTransactions",
+			path:      "/transaction/search",
+			clientMethod: func(c *BuxClient) (any, error) {
+				return c.GetTransactions(context.Background(), anyConditions, anyMetadataConditions)
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run("httpClient."+test.caseTitle, func(t *testing.T) {
+			transportHandler := testTransportHandler{
+				Type: requestTypeHTTP,
+				Queries: []*testTransportHandlerRequest{{
+					Path: "/transaction",
+					Result: func(w http.ResponseWriter, req *http.Request) {
+						assertAuthHeaders(t, req)
+						w.Header().Set("Content-Type", "application/json")
+						mustWrite(w, "{}")
+					},
+				}},
+				ClientURL: serverURL,
+				Client:    WithHTTPClient,
+			}
+
+			client := getTestBuxClientWithOpts(transportHandler, WithAccessKey(accessKeyString))
+
+			_, err := test.clientMethod(client)
+			if err != nil {
+				t.Log(err)
+			}
+		})
+
+		t.Run("graphqlClient."+test.caseTitle, func(t *testing.T) {
+			transportHandler := testTransportHandler{
+				Type: requestTypeGraphQL,
+				Queries: []*testTransportHandlerRequest{{
+					Path: "/graphql",
+					Result: func(w http.ResponseWriter, req *http.Request) {
+						assertAuthHeaders(t, req)
+						w.Header().Set("Content-Type", "application/json")
+						mustWrite(w, `{"data":{}}`)
+					},
+				}},
+				ClientURL: serverURL + `graphql`,
+				Client:    WithGraphQLClient,
+			}
+
+			client := getTestBuxClientWithOpts(transportHandler, WithAccessKey(accessKeyString))
+
+			_, err := test.clientMethod(client)
+			if err != nil {
+				t.Log(err)
+			}
+		})
+	}
+
+}
+
+func assertAuthHeaders(t *testing.T, req *http.Request) {
+	assert.Empty(t, req.Header.Get("bux-auth-xpub"), "Header value bux-auth-xpub should be empty")
+	assert.NotEmpty(t, req.Header.Get("bux-auth-key"), "Header value bux-auth-key should not be empty")
+	assert.NotEmpty(t, req.Header.Get("bux-auth-time"), "Header value bux-auth-time should not be empty")
+	assert.NotEmpty(t, req.Header.Get("bux-auth-hash"), "Header value bux-auth-hash should not be empty")
+	assert.NotEmpty(t, req.Header.Get("bux-auth-nonce"), "Header value bux-auth-nonce should not be empty")
+	assert.NotEmpty(t, req.Header.Get("bux-auth-signature"), "Header value bux-auth-signature should not be empty")
+}
+
 func getTestBuxClient(transportHandler testTransportHandler, adminKey bool) *BuxClient {
+	opts := []ClientOps{
+		WithXPriv(xPrivString),
+	}
+	if adminKey {
+		opts = append(opts, WithAdminKey(adminKeyXpub))
+	}
+
+	return getTestBuxClientWithOpts(transportHandler, opts...)
+}
+
+func getTestBuxClientWithOpts(transportHandler testTransportHandler, options ...ClientOps) *BuxClient {
 	mux := http.NewServeMux()
 	if transportHandler.Queries != nil {
 		for _, query := range transportHandler.Queries {
@@ -602,12 +735,10 @@ func getTestBuxClient(transportHandler testTransportHandler, adminKey bool) *Bux
 	httpclient := &http.Client{Transport: localRoundTripper{handler: mux}}
 
 	opts := []ClientOps{
-		WithXPriv(xPrivString),
 		transportHandler.Client(transportHandler.ClientURL, httpclient),
 	}
-	if adminKey {
-		opts = append(opts, WithAdminKey(adminKeyXpub))
-	}
+
+	opts = append(opts, options...)
 
 	client, _ := New(opts...)
 
