@@ -170,6 +170,7 @@ pull_request_rules:
           - author!=allcontributors[bot]
           - author!=mrz1836
           - author!=icellan
+          - author!=dorzepowski
     actions:
       comment:
         message: |
