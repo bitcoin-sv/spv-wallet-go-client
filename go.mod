@@ -59,7 +59,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
-	github.com/mattn/go-sqlite3 v1.14.16 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/miekg/dns v1.1.54 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/mrz1836/go-api-router v0.5.1 // indirect
@@ -68,10 +68,10 @@ require (
 	github.com/mrz1836/go-logger v0.3.2 // indirect
 	github.com/mrz1836/go-nownodes v0.1.0 // indirect
 	github.com/mrz1836/go-parameters v0.3.1 // indirect
-	github.com/mrz1836/go-sanitize v1.2.1 // indirect
+	github.com/mrz1836/go-sanitize v1.3.0 // indirect
 	github.com/mrz1836/go-validate v0.2.0 // indirect
 	github.com/mrz1836/go-whatsonchain v0.12.2 // indirect
-	github.com/newrelic/go-agent/v3 v3.21.1 // indirect
+	github.com/newrelic/go-agent/v3 v3.22.0 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
 	github.com/onsi/gomega v1.21.1 // indirect
@@ -104,8 +104,8 @@ require (
 	golang.org/x/sync v0.2.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
-	golang.org/x/tools v0.9.1 // indirect
-	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
+	golang.org/x/tools v0.9.3 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
