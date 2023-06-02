@@ -2,6 +2,7 @@ package transports
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -875,6 +876,16 @@ func getBodyString(reqBody string, variables map[string]interface{}) (string, er
 func (g *TransportGraphQL) signGraphQLRequest(req *graphql.Request, reqBody string, variables map[string]interface{},
 	xPriv *bip32.ExtendedKey, xPub *bip32.ExtendedKey) error {
 
+	if xPriv != nil || xPub != nil {
+		return g.authenticateWithXpriv(req, reqBody, variables, xPriv, xPub)
+	} else if g.accessKey != nil {
+		return g.authenticateWithAccessKey(req, reqBody, variables)
+	} else {
+		return bux.ErrMissingXPriv
+	}
+}
+
+func (g *TransportGraphQL) authenticateWithXpriv(req *graphql.Request, reqBody string, variables map[string]interface{}, xPriv *bip32.ExtendedKey, xPub *bip32.ExtendedKey) error {
 	if g.signRequest {
 		bodyString, err := getBodyString(reqBody, variables)
 		if err != nil {
@@ -888,6 +899,14 @@ func (g *TransportGraphQL) signGraphQLRequest(req *graphql.Request, reqBody stri
 		req.Header.Set(bux.AuthHeader, xPub.String())
 	}
 	return nil
+}
+
+func (g *TransportGraphQL) authenticateWithAccessKey(req *graphql.Request, reqBody string, variables map[string]interface{}) error {
+	bodyString, err := getBodyString(reqBody, variables)
+	if err != nil {
+		return err
+	}
+	return bux.SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(g.accessKey.Serialise()), bodyString)
 }
 
 const graphqlDraftTransactionFields = `{

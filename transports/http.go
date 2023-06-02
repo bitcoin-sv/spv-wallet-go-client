@@ -3,6 +3,7 @@ package transports
 import (
 	"bytes"
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"log"
@@ -492,21 +493,21 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	if sign {
-		if err = addSignature(&req.Header, xPriv, string(rawJSON)); err != nil {
+	if xPriv != nil {
+		err = h.authenticateWithXpriv(sign, req, xPriv, rawJSON)
+		if err != nil {
 			return err
 		}
 	} else {
-		var xPub string
-		if xPub, err = bitcoin.GetExtendedPublicKey(xPriv); err != nil {
+		err = h.authenticateWithAccessKey(req, rawJSON)
+		if err != nil {
 			return err
 		}
-		req.Header.Set(bux.AuthHeader, xPub)
 	}
 
 	var resp *http.Response
 	defer func() {
-		if resp.Body != nil {
+		if resp != nil && resp.Body != nil {
 			_ = resp.Body.Close()
 		}
 	}()
@@ -518,4 +519,23 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 	}
 
 	return json.NewDecoder(resp.Body).Decode(&responseJSON)
+}
+
+func (h *TransportHTTP) authenticateWithXpriv(sign bool, req *http.Request, xPriv *bip32.ExtendedKey, rawJSON []byte) (err error) {
+	if sign {
+		if err = addSignature(&req.Header, xPriv, string(rawJSON)); err != nil {
+			return err
+		}
+	} else {
+		var xPub string
+		if xPub, err = bitcoin.GetExtendedPublicKey(xPriv); err != nil {
+			return err
+		}
+		req.Header.Set(bux.AuthHeader, xPub)
+	}
+	return nil
+}
+
+func (h *TransportHTTP) authenticateWithAccessKey(req *http.Request, rawJSON []byte) error {
+	return bux.SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(h.accessKey.Serialise()), string(rawJSON))
 }
