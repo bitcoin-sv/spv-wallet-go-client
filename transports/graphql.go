@@ -11,6 +11,7 @@ import (
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/machinebox/graphql"
+	"github.com/mrz1836/go-datastore"
 )
 
 // graphQlService is the interface for GraphQL
@@ -609,8 +610,8 @@ func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*bu
 
 // GetTransactions get a transactions, filtered by the given metadata
 func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadataConditions *bux.Metadata) ([]*bux.Transaction, error) {
-
+	metadataConditions *bux.Metadata, queryParams *datastore.QueryParams,
+) ([]*bux.Transaction, error) {
 	querySignature := ""
 	queryArguments := ""
 

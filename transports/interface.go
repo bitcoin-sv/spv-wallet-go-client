@@ -41,7 +41,7 @@ type TransactionService interface {
 	DraftToRecipients(ctx context.Context, recipients []*Recipients, metadata *bux.Metadata) (*bux.DraftTransaction, error)
 	DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig, metadata *bux.Metadata) (*bux.DraftTransaction, error)
 	GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error)
-	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadataConditions *bux.Metadata) ([]*bux.Transaction, error)
+	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadataConditions *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Transaction, error)
 	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *bux.Metadata) (*bux.Transaction, error)
 	UpdateTransactionMetadata(ctx context.Context, txID string, metadata *bux.Metadata) (*bux.Transaction, error)
 }

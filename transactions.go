@@ -5,6 +5,7 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/go-buxclient/transports"
+	"github.com/mrz1836/go-datastore"
 )
 
 // GetTransaction get a transaction by id
@@ -14,8 +15,9 @@ func (b *BuxClient) GetTransaction(ctx context.Context, txID string) (*bux.Trans
 
 // GetTransactions get all transactions matching search criteria
 func (b *BuxClient) GetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata) ([]*bux.Transaction, error) {
-	return b.transport.GetTransactions(ctx, conditions, metadata)
+	metadata *bux.Metadata, queryParams *datastore.QueryParams,
+) ([]*bux.Transaction, error) {
+	return b.transport.GetTransactions(ctx, conditions, metadata, queryParams)
 }
 
 // DraftToRecipients initialize a new P2PKH draft transaction to a list of recipients
