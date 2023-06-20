@@ -610,7 +610,7 @@ func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*bu
 
 // GetTransactions get a transactions, filtered by the given metadata
 func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadataConditions *bux.Metadata, queryParams *datastore.QueryParams,
+	metadataConditions *bux.Metadata, queryParams *datastore.QueryParams, //nolint:revive // TODO: implement this field
 ) ([]*bux.Transaction, error) {
 	querySignature := ""
 	queryArguments := ""
