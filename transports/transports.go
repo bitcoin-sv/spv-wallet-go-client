@@ -69,7 +69,5 @@ func processMetadata(metadata *bux.Metadata) *bux.Metadata {
 		metadata = &m
 	}
 
-	(*metadata)[FieldUserAgent] = BuxUserAgent
-
 	return metadata
 }

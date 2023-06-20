@@ -13,6 +13,7 @@ import (
 	"github.com/BuxOrg/go-buxclient/transports"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bt/v2"
+	"github.com/mrz1836/go-datastore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -240,7 +241,7 @@ func TestDraftTransaction(t *testing.T) {
 
 	for _, transportHandler := range transportHandlers {
 		t.Run("draft transaction "+transportHandler.Type, func(t *testing.T) {
-			var client = getTestBuxClient(transportHandler, false)
+			client := getTestBuxClient(transportHandler, false)
 			config := &bux.TransactionConfig{
 				Outputs: []*bux.TransactionOutput{{
 					Satoshis: 1000,
@@ -428,7 +429,7 @@ func TestGetTransactions(t *testing.T) {
 			metadata := &bux.Metadata{
 				"run_id": "3108aa426fc7102488bb0ffd",
 			}
-			transactions, err := client.GetTransactions(context.Background(), conditions, metadata)
+			transactions, err := client.GetTransactions(context.Background(), conditions, metadata, &datastore.QueryParams{})
 			assert.NoError(t, err)
 			assert.IsType(t, []*bux.Transaction{}, transactions)
 			assert.Len(t, transactions, 2)
@@ -536,7 +537,6 @@ func TestSendToRecipients(t *testing.T) {
 
 // TestFinalizeTransaction will test the FinalizeTransaction method
 func TestFinalizeTransaction(t *testing.T) {
-
 	t.Run("finalize transaction", func(t *testing.T) {
 		httpclient := &http.Client{Transport: localRoundTripper{handler: http.NewServeMux()}}
 		client, err := New(
@@ -645,7 +645,7 @@ func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 			caseTitle: "GetTransactions",
 			path:      "/transaction/search",
 			clientMethod: func(c *BuxClient) (any, error) {
-				return c.GetTransactions(context.Background(), anyConditions, anyMetadataConditions)
+				return c.GetTransactions(context.Background(), anyConditions, anyMetadataConditions, &datastore.QueryParams{})
 			},
 		},
 	}
@@ -697,7 +697,6 @@ func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func assertAuthHeaders(t *testing.T, req *http.Request) {
