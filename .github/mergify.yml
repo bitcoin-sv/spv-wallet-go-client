@@ -171,10 +171,10 @@ pull_request_rules:
           - author!=mrz1836
           - author!=icellan
           - author!=dorzepowski
+          - author!=pawellewandowski98
     actions:
       comment:
-        message: |
-          Welcome to our open-source project! 💘
+        message: "Welcome to our open-source project @{{author}}! 💘"
 
   # ===============================================================================
   # STALE BRANCHES
