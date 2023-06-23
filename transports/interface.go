@@ -42,6 +42,7 @@ type TransactionService interface {
 	DraftTransaction(ctx context.Context, transactionConfig *bux.TransactionConfig, metadata *bux.Metadata) (*bux.DraftTransaction, error)
 	GetTransaction(ctx context.Context, txID string) (*bux.Transaction, error)
 	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadataConditions *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Transaction, error)
+	GetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error)
 	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *bux.Metadata) (*bux.Transaction, error)
 	UpdateTransactionMetadata(ctx context.Context, txID string, metadata *bux.Metadata) (*bux.Transaction, error)
 }
