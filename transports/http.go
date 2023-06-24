@@ -379,6 +379,31 @@ func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[stri
 	return transactions, nil
 }
 
+// GetTransactionsCount get number of user transactions
+func (h *TransportHTTP) GetTransactionsCount(ctx context.Context, conditions map[string]interface{},
+	metadata *bux.Metadata,
+) (int64, error) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldConditions: conditions,
+		FieldMetadata:   processMetadata(metadata),
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	var count int64
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPost, "/transaction/count", jsonStr, h.xPriv, h.signRequest, &count,
+	); err != nil {
+		return 0, err
+	}
+	if h.debug {
+		log.Printf("Transactions count: %v\n", count)
+	}
+
+	return count, nil
+}
+
 // DraftToRecipients is a draft transaction to a slice of recipients
 func (h *TransportHTTP) DraftToRecipients(ctx context.Context, recipients []*Recipients,
 	metadata *bux.Metadata) (*bux.DraftTransaction, error) {

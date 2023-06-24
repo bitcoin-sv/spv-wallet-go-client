@@ -667,6 +667,27 @@ func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[s
 	return respData.Transactions, nil
 }
 
+// GetTransactionsCount get number of user transactions
+func (g *TransportGraphQL) GetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error) {
+	reqBody := `
+	query ($conditions: Map, $metadata: Metadata) {
+      transactions_count (
+        conditions: $conditions
+        metadata: $metadata
+	  )
+    }`
+	variables := map[string]interface{}{
+		"conditions": conditions,
+		"metadata":   metadata,
+	}
+	var respData int64
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		return 0, err
+	}
+
+	return respData, nil
+}
+
 // DraftToRecipients is a draft transaction to a slice of recipients
 func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*Recipients,
 	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
