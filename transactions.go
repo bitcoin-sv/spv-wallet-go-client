@@ -26,7 +26,6 @@ func (b *BuxClient) GetTransactionsCount(ctx context.Context, conditions map[str
 	return b.transport.GetTransactionsCount(ctx, conditions, metadata)
 }
 
-
 // DraftToRecipients initialize a new P2PKH draft transaction to a list of recipients
 func (b *BuxClient) DraftToRecipients(ctx context.Context, recipients []*transports.Recipients,
 	metadata *bux.Metadata) (*bux.DraftTransaction, error) {
