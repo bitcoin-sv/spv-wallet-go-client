@@ -13,8 +13,8 @@ github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNg
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdKJDJF9BV14lnkjHmOQgcvEKgtqs5a1N3LNdJhGE=
 github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1caE=
-github.com/bitcoinschema/go-bitcoin/v2 v2.0.3 h1:3pxGpFk7L2GcAx6VYW6kgcOmI0jhnZ/2zKSsfxqhvfM=
-github.com/bitcoinschema/go-bitcoin/v2 v2.0.3/go.mod h1:MnikSx/hRXOS7dG3RlJOP2cV2lG6IOmoGd6HhvCB7Gc=
+github.com/bitcoinschema/go-bitcoin/v2 v2.0.4 h1:GHiEgqynN2Nx78RH+W/qrntDQ/PIagZWB+wm/3OnI1Y=
+github.com/bitcoinschema/go-bitcoin/v2 v2.0.4/go.mod h1:mvHyiVy4AkgDyiDJNfpip8dBALUvYmgak5O876Q0Hbk=
 github.com/bitcoinschema/go-bob v0.2.1 h1:acdSqbwOX40q6ajfgcZWVprGqUMoFeOGvD0eLpw4eSk=
 github.com/bitcoinschema/go-bpu v0.0.8 h1:oDbd3IUP3XxoEZSTfL4GXS8jF5qR6EwX6buLYb8vi50=
 github.com/bitcoinschema/go-bpu v0.0.8/go.mod h1:9drcVXECm6hDho97YnygXZtGkmJbv2+lZCo6IoZcF3g=
