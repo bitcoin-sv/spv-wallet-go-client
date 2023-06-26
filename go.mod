@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.19
 
 require (
-	github.com/BuxOrg/bux v0.5.2
+	github.com/BuxOrg/bux v0.5.3
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.4
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.1
@@ -15,8 +15,8 @@ require (
 
 require (
 	github.com/99designs/gqlgen v0.17.34 // indirect
-	github.com/bitcoinschema/go-bpu v0.0.8 // indirect
-	github.com/bitcoinschema/go-map v0.0.17 // indirect
+	github.com/bitcoinschema/go-bpu v0.1.0 // indirect
+	github.com/bitcoinschema/go-map v0.1.0 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
 	github.com/bsm/redislock v0.9.3 // indirect
