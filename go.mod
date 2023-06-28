@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.19
 
 require (
-	github.com/BuxOrg/bux v0.5.3
+	github.com/BuxOrg/bux v0.5.4
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.4
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.1
@@ -89,7 +89,7 @@ require (
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/vektah/gqlparser/v2 v2.5.5 // indirect
+	github.com/vektah/gqlparser/v2 v2.5.6 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/vmihailenco/taskq/v3 v3.2.9 // indirect
@@ -117,7 +117,7 @@ require (
 )
 
 // Issue with Ask Nancy on related packages
-replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.5.0
+// replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.5.0
 
 // Issue with using wrong version of Redigo
 replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
@@ -132,7 +132,7 @@ replace github.com/centrifugal/protocol => github.com/centrifugal/protocol v0.9.
 replace github.com/bsm/redislock => github.com/bsm/redislock v0.7.2
 
 // Bad version of go-bob, failing tests etc
-replace github.com/bitcoinschema/go-bob => github.com/bitcoinschema/go-bob v0.2.1
+// replace github.com/bitcoinschema/go-bob => github.com/bitcoinschema/go-bob v0.2.1
 
 // Issue: go.mongodb.org/mongo-driver/x/bsonx: cannot find module providing package go.mongodb.org/mongo-driver/x/bsonx
 replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.7

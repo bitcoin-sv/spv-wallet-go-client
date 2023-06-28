@@ -1,7 +1,7 @@
 github.com/99designs/gqlgen v0.17.34 h1:5cS5/OKFguQt+Ws56uj9FlG2xm1IlcJWNF2jrMIKYFQ=
 github.com/99designs/gqlgen v0.17.34/go.mod h1:Axcd3jIFHBVcqzixujJQr1wGqE+lGTpz6u4iZBZg1G8=
-github.com/BuxOrg/bux v0.5.3 h1:uy+t3LJSVgV6GEa/UoJ2gSiOGG9P2erSFkqE7YuvuFY=
-github.com/BuxOrg/bux v0.5.3/go.mod h1:efMc+hPBRexLPgRT7wIHiZ6A3MT9PKPX5UJWtkZ6LfQ=
+github.com/BuxOrg/bux v0.5.4 h1:pvBAySPYlbnni6j/iueHN22VH3qH4BKaFu6YSebtTds=
+github.com/BuxOrg/bux v0.5.4/go.mod h1:HI+eZkF0Yyh74btCXTqWmQXEivlp9bfSMWsU0Etcifc=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DataDog/datadog-go v3.7.1+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/acobaugh/osrelease v0.1.0 h1:Yb59HQDGGNhCj4suHaFQQfBps5wyoKLSSX/J/+UifRE=
@@ -15,7 +15,7 @@ github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdK
 github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1caE=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.4 h1:GHiEgqynN2Nx78RH+W/qrntDQ/PIagZWB+wm/3OnI1Y=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.4/go.mod h1:mvHyiVy4AkgDyiDJNfpip8dBALUvYmgak5O876Q0Hbk=
-github.com/bitcoinschema/go-bob v0.2.1 h1:acdSqbwOX40q6ajfgcZWVprGqUMoFeOGvD0eLpw4eSk=
+github.com/bitcoinschema/go-bob v0.4.0 h1:adsAEboLQCg0D6e9vwcJUJEJScszsouAYCYu35UAiGo=
 github.com/bitcoinschema/go-bpu v0.1.0 h1:z9wF3xWR3es43eBEMh/0hhJwjhyUQ41tkJ4x2uMEXKo=
 github.com/bitcoinschema/go-bpu v0.1.0/go.mod h1:lEDLfwUZwJtMRRDdV1qLO5zYmrEhyW20NBGjNBIk3hU=
 github.com/bitcoinschema/go-map v0.1.0 h1:dM8OJ/E5MnEm9m1xNI/B3msCgSI9s7Ps3Vk0BFP53eI=
@@ -273,8 +273,8 @@ github.com/ugorji/go/codec v1.2.11 h1:BMaWp1Bb6fHwEtbplGBGJ498wD+LKlNSl25MjdZY4d
 github.com/ugorji/go/codec v1.2.11/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
-github.com/vektah/gqlparser/v2 v2.5.5 h1:zZj0N2PtRGLBo+zw/IHOcUfK+8po1k5rb3O3Twe7tLM=
-github.com/vektah/gqlparser/v2 v2.5.5/go.mod h1:z8xXUff237NntSuH8mLFijZ+1tjV1swDbpDqjJmk6ME=
+github.com/vektah/gqlparser/v2 v2.5.6 h1:Ou14T0N1s191eRMZ1gARVqohcbe1e8FrcONScsq8cRU=
+github.com/vektah/gqlparser/v2 v2.5.6/go.mod h1:z8xXUff237NntSuH8mLFijZ+1tjV1swDbpDqjJmk6ME=
 github.com/vmihailenco/msgpack/v5 v5.3.5 h1:5gO0H1iULLWGhs2H5tbAHIZTV8/cYafcFOr9znI5mJU=
 github.com/vmihailenco/msgpack/v5 v5.3.5/go.mod h1:7xyJ9e+0+9SaZT0Wt1RGleJXzli6Q/V5KbhBonMG9jc=
 github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAhO7/IwNM9g=
