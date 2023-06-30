@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -542,7 +544,16 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 		return err
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
-		return errors.New("server error: " + strconv.Itoa(resp.StatusCode) + " - " + resp.Status)
+		var errorMsg string
+		err = json.NewDecoder(resp.Body).Decode(&errorMsg)
+		if err != nil {
+			// if EOF, then body is empty and we return response status as error message
+			if !errors.Is(err, io.EOF) {
+				errorMsg = fmt.Sprintf("bux-server error message can't be decoded. Reason: %s", err.Error())
+			}
+			errorMsg = resp.Status
+		}
+		return errors.New("server error: " + strconv.Itoa(resp.StatusCode) + " - " + errorMsg)
 	}
 
 	return json.NewDecoder(resp.Body).Decode(&responseJSON)
