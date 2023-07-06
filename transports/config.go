@@ -1,6 +1,6 @@
 package transports
 
-import "github.com/BuxOrg/bux"
+import buxmodels "github.com/BuxOrg/bux-models"
 
 // TransportType the type of transport being used (http or graphql)
 type TransportType string
@@ -24,9 +24,9 @@ const (
 
 // Recipients is a struct for recipients
 type Recipients struct {
-	OpReturn *bux.OpReturn `json:"op_return"`
-	Satoshis uint64        `json:"satoshis"`
-	To       string        `json:"to"`
+	OpReturn *buxmodels.OpReturn `json:"op_return"`
+	Satoshis uint64              `json:"satoshis"`
+	To       string              `json:"to"`
 }
 
 const (

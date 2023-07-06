@@ -4,14 +4,13 @@ import (
 	"context"
 	"log"
 
-	"github.com/BuxOrg/bux"
+	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/machinebox/graphql"
 	"github.com/mrz1836/go-datastore"
 )
 
 // NewXpub will register an xPub
-func (g *TransportGraphQL) NewXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
-
+func (g *TransportGraphQL) NewXpub(ctx context.Context, rawXPub string, metadata *buxmodels.Metadata) error {
 	// adding a xpub needs to be signed by an admin key
 	if g.adminXPriv == nil {
 		return ErrAdminKey
@@ -47,13 +46,12 @@ func (g *TransportGraphQL) NewXpub(ctx context.Context, rawXPub string, metadata
 }
 
 // RegisterXpub alias for NewXpub
-func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string, metadata *bux.Metadata) error {
+func (g *TransportGraphQL) RegisterXpub(ctx context.Context, rawXPub string, metadata *buxmodels.Metadata) error {
 	return g.NewXpub(ctx, rawXPub, metadata)
 }
 
 // AdminGetStatus get whether admin key is valid
 func (g *TransportGraphQL) AdminGetStatus(ctx context.Context) (bool, error) {
-
 	reqBody := `
 	query {
 	  admin_get_status
@@ -68,35 +66,35 @@ func (g *TransportGraphQL) AdminGetStatus(ctx context.Context) (bool, error) {
 }
 
 // AdminGetStats get admin stats
-func (g *TransportGraphQL) AdminGetStats(ctx context.Context) (*bux.AdminStats, error) {
+// TODO: Add AdminStats to buxmodels
+// func (g *TransportGraphQL) AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, error) {
+// 	reqBody := `
+// 	  query {
+//         admin_get_stats {
+//           balance
+//           destinations
+//           transactions
+//           paymails
+//           utxos
+//           xpubs
+//           transactions_per_day
+//           utxos_per_type
+//         }
+//       }`
 
-	reqBody := `
-	  query {
-        admin_get_stats {
-          balance
-          destinations
-          transactions
-          paymails
-          utxos
-          xpubs
-          transactions_per_day
-          utxos_per_type
-        }
-      }`
+// 	var stats *buxmodels.AdminStats
+// 	if err := g.doGraphQLAdminQuery(ctx, reqBody, nil, &stats); err != nil {
+// 		return nil, err
+// 	}
 
-	var stats *bux.AdminStats
-	if err := g.doGraphQLAdminQuery(ctx, reqBody, nil, &stats); err != nil {
-		return nil, err
-	}
-
-	return stats, nil
-}
+// 	return stats, nil
+// }
 
 // AdminGetAccessKeys get all access keys filtered by conditions
 func (g *TransportGraphQL) AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.AccessKey, error) {
-
-	var models []*bux.AccessKey
+	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+) ([]*buxmodels.AccessKey, error) {
+	var models []*buxmodels.AccessKey
 	method := `admin_access_keys_list`
 	fields := `
       id
@@ -118,16 +116,16 @@ func (g *TransportGraphQL) AdminGetAccessKeys(ctx context.Context, conditions ma
 
 // AdminGetAccessKeysCount get a count of all the access keys filtered by conditions
 func (g *TransportGraphQL) AdminGetAccessKeysCount(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata) (int64, error) {
-
+	metadata *buxmodels.Metadata,
+) (int64, error) {
 	return g.adminCount(ctx, conditions, metadata, "admin_access_keys_count")
 }
 
 // AdminGetBlockHeaders get all block headers filtered by conditions
 func (g *TransportGraphQL) AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.BlockHeader, error) {
-
-	var models []*bux.BlockHeader
+	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+) ([]*buxmodels.BlockHeader, error) {
+	var models []*buxmodels.BlockHeader
 	method := `admin_block_headers_list`
 	fields := `
 	  id
@@ -153,16 +151,16 @@ func (g *TransportGraphQL) AdminGetBlockHeaders(ctx context.Context, conditions 
 
 // AdminGetBlockHeadersCount get a count of all the block headers filtered by conditions
 func (g *TransportGraphQL) AdminGetBlockHeadersCount(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata) (int64, error) {
-
+	metadata *buxmodels.Metadata,
+) (int64, error) {
 	return g.adminCount(ctx, conditions, metadata, "admin_block_headers_count")
 }
 
 // AdminGetDestinations get all block destinations filtered by conditions
 func (g *TransportGraphQL) AdminGetDestinations(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Destination, error) {
-
-	var models []*bux.Destination
+	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+) ([]*buxmodels.Destination, error) {
+	var models []*buxmodels.Destination
 	method := `admin_destinations_list`
 	fields := `
 	  id
@@ -188,14 +186,13 @@ func (g *TransportGraphQL) AdminGetDestinations(ctx context.Context, conditions 
 
 // AdminGetDestinationsCount get a count of all the destinations filtered by conditions
 func (g *TransportGraphQL) AdminGetDestinationsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata) (int64, error) {
-
+	metadata *buxmodels.Metadata,
+) (int64, error) {
 	return g.adminCount(ctx, conditions, metadata, "admin_destinations_count")
 }
 
 // AdminGetPaymail get a paymail by address
-func (g *TransportGraphQL) AdminGetPaymail(ctx context.Context, address string) (*bux.PaymailAddress, error) {
-
+func (g *TransportGraphQL) AdminGetPaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, error) {
 	reqBody := `
 	  query ($address: String!) {
         admin_paymail_get (
@@ -217,7 +214,7 @@ func (g *TransportGraphQL) AdminGetPaymail(ctx context.Context, address string) 
 		FieldAddress: address,
 	}
 
-	var paymail *bux.PaymailAddress
+	var paymail *buxmodels.PaymailAddress
 	if err := g.doGraphQLAdminQuery(ctx, reqBody, variables, &paymail); err != nil {
 		return nil, err
 	}
@@ -227,9 +224,9 @@ func (g *TransportGraphQL) AdminGetPaymail(ctx context.Context, address string) 
 
 // AdminGetPaymails get all block paymails filtered by conditions
 func (g *TransportGraphQL) AdminGetPaymails(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.PaymailAddress, error) {
-
-	var models []*bux.PaymailAddress
+	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+) ([]*buxmodels.PaymailAddress, error) {
+	var models []*buxmodels.PaymailAddress
 	method := `admin_paymails_list`
 	fields := `
 	  id
@@ -252,15 +249,15 @@ func (g *TransportGraphQL) AdminGetPaymails(ctx context.Context, conditions map[
 
 // AdminGetPaymailsCount get a count of all the paymails filtered by conditions
 func (g *TransportGraphQL) AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata) (int64, error) {
-
+	metadata *buxmodels.Metadata,
+) (int64, error) {
 	return g.adminCount(ctx, conditions, metadata, "admin_paymails_count")
 }
 
 // AdminCreatePaymail create a new paymail for a xpub
 func (g *TransportGraphQL) AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string,
-	avatar string) (*bux.PaymailAddress, error) {
-
+	avatar string,
+) (*buxmodels.PaymailAddress, error) {
 	reqBody := `
       mutation (
         $xpub_id: String!
@@ -293,7 +290,7 @@ func (g *TransportGraphQL) AdminCreatePaymail(ctx context.Context, xPubID string
 		FieldAvatar:     avatar,
 	}
 
-	var paymail *bux.PaymailAddress
+	var paymail *buxmodels.PaymailAddress
 	if err := g.doGraphQLAdminQuery(ctx, reqBody, variables, &paymail); err != nil {
 		return nil, err
 	}
@@ -302,8 +299,7 @@ func (g *TransportGraphQL) AdminCreatePaymail(ctx context.Context, xPubID string
 }
 
 // AdminDeletePaymail delete a paymail address from the database
-func (g *TransportGraphQL) AdminDeletePaymail(ctx context.Context, address string) (*bux.PaymailAddress, error) {
-
+func (g *TransportGraphQL) AdminDeletePaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, error) {
 	reqBody := `
       mutation (
         $address: String!
@@ -327,7 +323,7 @@ func (g *TransportGraphQL) AdminDeletePaymail(ctx context.Context, address strin
 		FieldAddress: address,
 	}
 
-	var paymail *bux.PaymailAddress
+	var paymail *buxmodels.PaymailAddress
 	if err := g.doGraphQLAdminQuery(ctx, reqBody, variables, &paymail); err != nil {
 		return nil, err
 	}
@@ -337,9 +333,9 @@ func (g *TransportGraphQL) AdminDeletePaymail(ctx context.Context, address strin
 
 // AdminGetTransactions get all block transactions filtered by conditions
 func (g *TransportGraphQL) AdminGetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Transaction, error) {
-
-	var models []*bux.Transaction
+	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+) ([]*buxmodels.Transaction, error) {
+	var models []*buxmodels.Transaction
 	method := `admin_transactions_list`
 	fields := `
 	  id
@@ -366,16 +362,16 @@ func (g *TransportGraphQL) AdminGetTransactions(ctx context.Context, conditions 
 
 // AdminGetTransactionsCount get a count of all the transactions filtered by conditions
 func (g *TransportGraphQL) AdminGetTransactionsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata) (int64, error) {
-
+	metadata *buxmodels.Metadata,
+) (int64, error) {
 	return g.adminCount(ctx, conditions, metadata, "admin_transactions_count")
 }
 
 // AdminGetUtxos get all block utxos filtered by conditions
 func (g *TransportGraphQL) AdminGetUtxos(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Utxo, error) {
-
-	var models []*bux.Utxo
+	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+) ([]*buxmodels.Utxo, error) {
+	var models []*buxmodels.Utxo
 	method := `admin_utxos_list`
 	fields := `
 	  id
@@ -399,15 +395,15 @@ func (g *TransportGraphQL) AdminGetUtxos(ctx context.Context, conditions map[str
 }
 
 // AdminGetUtxosCount get a count of all the utxos filtered by conditions
-func (g *TransportGraphQL) AdminGetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error) {
+func (g *TransportGraphQL) AdminGetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, error) {
 	return g.adminCount(ctx, conditions, metadata, "admin_utxos_count")
 }
 
 // AdminGetXPubs get all block xpubs filtered by conditions
 func (g *TransportGraphQL) AdminGetXPubs(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata, queryParams *datastore.QueryParams) ([]*bux.Xpub, error) {
-
-	var models []*bux.Xpub
+	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+) ([]*buxmodels.Xpub, error) {
+	var models []*buxmodels.Xpub
 	method := `admin_xpubs_list`
 	fields := `
 	  id
@@ -428,14 +424,14 @@ func (g *TransportGraphQL) AdminGetXPubs(ctx context.Context, conditions map[str
 }
 
 // AdminGetXPubsCount get a count of all the xpubs filtered by conditions
-func (g *TransportGraphQL) AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata) (int64, error) {
+func (g *TransportGraphQL) AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, error) {
 	return g.adminCount(ctx, conditions, metadata, "admin_xpubs_count")
 }
 
 func (g *TransportGraphQL) adminGetModels(ctx context.Context, conditions map[string]interface{},
-	metadata *bux.Metadata, queryParams *datastore.QueryParams, method string, fields string,
-	models interface{}) error {
-
+	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams, method string, fields string,
+	models interface{},
+) error {
 	reqBody := `
 	  query ($conditions: Map, $metadata: Metadata, $params: QueryParams) {
         ` + method + ` (
@@ -456,9 +452,9 @@ func (g *TransportGraphQL) adminGetModels(ctx context.Context, conditions map[st
 	return g.doGraphQLAdminQuery(ctx, reqBody, variables, &models)
 }
 
-func (g *TransportGraphQL) adminCount(ctx context.Context, conditions map[string]interface{}, metadata *bux.Metadata,
-	method string) (int64, error) {
-
+func (g *TransportGraphQL) adminCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata,
+	method string,
+) (int64, error) {
 	// adding a xpub needs to be signed by an admin key
 	if g.adminXPriv == nil {
 		return 0, ErrAdminKey
@@ -498,8 +494,8 @@ func (g *TransportGraphQL) adminCount(ctx context.Context, conditions map[string
 }
 
 func (g *TransportGraphQL) doGraphQLAdminQuery(ctx context.Context, reqBody string, variables map[string]interface{},
-	respData interface{}) error {
-
+	respData interface{},
+) error {
 	req := graphql.NewRequest(reqBody)
 	for key, value := range variables {
 		req.Var(key, value)
@@ -522,8 +518,7 @@ func (g *TransportGraphQL) doGraphQLAdminQuery(ctx context.Context, reqBody stri
 }
 
 // AdminRecordTransaction will record a transaction as an admin
-func (g *TransportGraphQL) AdminRecordTransaction(ctx context.Context, hex string) (*bux.Transaction, error) {
-
+func (g *TransportGraphQL) AdminRecordTransaction(ctx context.Context, hex string) (*buxmodels.Transaction, error) {
 	reqBody := `
    	mutation() {
 	  admin_transaction (

@@ -4,7 +4,7 @@ package transports
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
+	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 )
@@ -26,7 +26,9 @@ type ClientOps func(c *Client)
 
 // addSignature will add the signature to the request
 func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
-	return bux.SetSignature(header, xPriv, bodyString)
+	// return bux.SetSignature(header, xPriv, bodyString)
+	// TODO: Add SetSignature to bux
+	return nil
 }
 
 // NewTransport create a new transport service object
@@ -63,9 +65,9 @@ func NewTransportService(transportService TransportService) TransportService {
 }
 
 // processMetadata will process the metadata
-func processMetadata(metadata *bux.Metadata) *bux.Metadata {
+func processMetadata(metadata *buxmodels.Metadata) *buxmodels.Metadata {
 	if metadata == nil {
-		m := make(bux.Metadata)
+		m := make(buxmodels.Metadata)
 		metadata = &m
 	}
 
