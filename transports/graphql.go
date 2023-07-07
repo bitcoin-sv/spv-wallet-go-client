@@ -2,11 +2,13 @@ package transports
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	buxmodels "github.com/BuxOrg/bux-models"
+	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/machinebox/graphql"
@@ -886,9 +888,7 @@ func (g *TransportGraphQL) signGraphQLRequest(req *graphql.Request, reqBody stri
 	} else if g.accessKey != nil {
 		return g.authenticateWithAccessKey(req, reqBody, variables)
 	} else {
-		// TODO: Add ErrMissingXPriv to buxmodels
-		// return bux.ErrMissingXPriv
-		return nil
+		return buxerrors.ErrMissingXPriv
 	}
 }
 
@@ -903,20 +903,21 @@ func (g *TransportGraphQL) authenticateWithXpriv(req *graphql.Request, reqBody s
 			return err
 		}
 	} else {
-		// TODO: Add AuthHeader to buxmodels
-		// req.Header.Set(bux.AuthHeader, xPub.String())
+		req.Header.Set(buxmodels.AuthHeader, xPub.String())
 	}
 	return nil
 }
 
+func (g *TransportGraphQL) SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, err error) {
+	return "", nil
+}
+
 func (g *TransportGraphQL) authenticateWithAccessKey(req *graphql.Request, reqBody string, variables map[string]interface{}) error {
-	// bodyString, err := getBodyString(reqBody, variables)
-	// if err != nil {
-	// 	return err
-	// }
-	// TODO: Add SetSignatureFromAccessKey to buxmodels
-	// return bux.SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(g.accessKey.Serialise()), bodyString)
-	return nil
+	bodyString, err := getBodyString(reqBody, variables)
+	if err != nil {
+		return err
+	}
+	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(g.accessKey.Serialise()), bodyString)
 }
 
 const graphqlDraftTransactionFields = `{

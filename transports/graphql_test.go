@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	buxmodels "github.com/BuxOrg/bux-models"
+	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
+	"github.com/BuxOrg/go-buxclient/utils"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/machinebox/graphql"
 	"github.com/stretchr/testify/assert"
@@ -70,8 +72,7 @@ func TestNewXpub(t *testing.T) {
 	t.Run("return success", func(t *testing.T) {
 		graphqlClient := GraphQLMockClient{
 			Response: buxmodels.Xpub{
-				// TODO: Add utils.Hash to buxmodels
-				// ID:              utils.Hash(xPubString),
+				ID:              utils.Hash(xPubString),
 				CurrentBalance:  0,
 				NextInternalNum: 0,
 				NextExternalNum: 0,
@@ -101,8 +102,7 @@ func TestGetDestination(t *testing.T) {
 			},
 		}
 		destination, err := client.NewDestination(context.Background(), nil)
-		// TODO: Add ErrMissingXPriv to buxmodels
-		// assert.ErrorIs(t, err, bux.ErrMissingXPriv)
+		assert.ErrorIs(t, err, buxerrors.ErrMissingXPriv)
 		assert.ErrorIs(t, err, nil)
 		assert.Nil(t, destination)
 	})
@@ -172,8 +172,7 @@ func TestDraftTransaction(t *testing.T) {
 			},
 		}
 		destination, err := client.DraftTransaction(context.Background(), config, nil)
-		// TODO: Add ErrMissingXPriv to buxmodels
-		// assert.ErrorIs(t, err, bux.ErrMissingXPriv)
+		assert.ErrorIs(t, err, buxerrors.ErrMissingXPriv)
 		assert.ErrorIs(t, err, nil)
 		assert.Nil(t, destination)
 	})
@@ -182,8 +181,7 @@ func TestDraftTransaction(t *testing.T) {
 		graphqlClient := GraphQLMockClient{
 			Response: DraftTransactionData{
 				NewTransaction: &buxmodels.DraftTransaction{
-					// TODO: Add DraftStatusDraft to buxmodels
-					// Status: buxmodels.DraftStatusDraft,
+					Status: buxmodels.DraftStatusDraft,
 				},
 			},
 		}
@@ -219,8 +217,7 @@ func TestDraftToRecipients(t *testing.T) {
 			},
 		}
 		destination, err := client.DraftToRecipients(context.Background(), recipients, nil)
-		// TODO: Add ErrMissingXPriv to buxmodels
-		// assert.ErrorIs(t, err, buxmodels.ErrMissingXPriv)
+		assert.ErrorIs(t, err, buxerrors.ErrMissingXPriv)
 		assert.ErrorIs(t, err, nil)
 		assert.Nil(t, destination)
 	})
@@ -229,8 +226,7 @@ func TestDraftToRecipients(t *testing.T) {
 		graphqlClient := GraphQLMockClient{
 			Response: DraftTransactionData{
 				NewTransaction: &buxmodels.DraftTransaction{
-					// TODO: Add DraftStatusDraft to buxmodels
-					// Status: buxmodels.DraftStatusDraft,
+					Status: buxmodels.DraftStatusDraft,
 				},
 			},
 		}

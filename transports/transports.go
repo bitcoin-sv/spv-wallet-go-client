@@ -26,9 +26,7 @@ type ClientOps func(c *Client)
 
 // addSignature will add the signature to the request
 func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
-	// return bux.SetSignature(header, xPriv, bodyString)
-	// TODO: Add SetSignature to bux
-	return nil
+	return SetSignature(header, xPriv, bodyString)
 }
 
 // NewTransport create a new transport service object

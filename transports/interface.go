@@ -55,8 +55,7 @@ type PaymailService interface {
 // AdminService is the admin related requests
 type AdminService interface {
 	AdminGetStatus(ctx context.Context) (bool, error)
-	// TODO: Add AdminGetStats to buxmodels
-	// AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, error)
+	AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, error)
 	AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *datastore.QueryParams) ([]*buxmodels.AccessKey, error)
 	AdminGetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, error)
 	AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *datastore.QueryParams) ([]*buxmodels.BlockHeader, error)

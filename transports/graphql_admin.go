@@ -66,29 +66,28 @@ func (g *TransportGraphQL) AdminGetStatus(ctx context.Context) (bool, error) {
 }
 
 // AdminGetStats get admin stats
-// TODO: Add AdminStats to buxmodels
-// func (g *TransportGraphQL) AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, error) {
-// 	reqBody := `
-// 	  query {
-//         admin_get_stats {
-//           balance
-//           destinations
-//           transactions
-//           paymails
-//           utxos
-//           xpubs
-//           transactions_per_day
-//           utxos_per_type
-//         }
-//       }`
+func (g *TransportGraphQL) AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, error) {
+	reqBody := `
+	  query {
+        admin_get_stats {
+          balance
+          destinations
+          transactions
+          paymails
+          utxos
+          xpubs
+          transactions_per_day
+          utxos_per_type
+        }
+      }`
 
-// 	var stats *buxmodels.AdminStats
-// 	if err := g.doGraphQLAdminQuery(ctx, reqBody, nil, &stats); err != nil {
-// 		return nil, err
-// 	}
+	var stats *buxmodels.AdminStats
+	if err := g.doGraphQLAdminQuery(ctx, reqBody, nil, &stats); err != nil {
+		return nil, err
+	}
 
-// 	return stats, nil
-// }
+	return stats, nil
+}
 
 // AdminGetAccessKeys get all access keys filtered by conditions
 func (g *TransportGraphQL) AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{},

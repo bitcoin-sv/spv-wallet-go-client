@@ -8,9 +8,7 @@ import (
 
 // GetAccessKey gets the access key given by id
 func (b *BuxClient) GetAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, error) {
-	// TODO: Add GetAccessKey to buxmodels
-	// return b.transport.GetAccessKey(ctx, id)
-	return nil, nil
+	return b.transport.GetAccessKey(ctx, id)
 }
 
 // GetAccessKeys gets all the access keys filtered by the metadata

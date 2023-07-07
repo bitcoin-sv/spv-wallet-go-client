@@ -53,21 +53,19 @@ func (h *TransportHTTP) AdminGetStatus(ctx context.Context) (bool, error) {
 }
 
 // AdminGetStats get admin stats
-// TODO: Add AdminStats to buxmodels
-// func (h *TransportHTTP) AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, error) {
+func (h *TransportHTTP) AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, error) {
+	var stats *buxmodels.AdminStats
+	if err := h.doHTTPRequest(
+		ctx, http.MethodGet, "/admin/stats", nil, h.xPriv, true, &stats,
+	); err != nil {
+		return nil, err
+	}
+	if h.debug {
+		log.Printf("admin stats: %v\n", stats)
+	}
 
-// 	var stats *buxmodels.AdminStats
-// 	if err := h.doHTTPRequest(
-// 		ctx, http.MethodGet, "/admin/stats", nil, h.xPriv, true, &stats,
-// 	); err != nil {
-// 		return nil, err
-// 	}
-// 	if h.debug {
-// 		log.Printf("admin stats: %v\n", stats)
-// 	}
-
-// 	return stats, nil
-// }
+	return stats, nil
+}
 
 // AdminGetAccessKeys get all access keys filtered by conditions
 func (h *TransportHTTP) AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{},

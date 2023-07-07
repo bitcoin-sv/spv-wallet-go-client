@@ -3,6 +3,7 @@ package transports
 import (
 	"bytes"
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,6 +13,8 @@ import (
 	"strconv"
 
 	buxmodels "github.com/BuxOrg/bux-models"
+	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
+	"github.com/BuxOrg/go-buxclient/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
@@ -458,9 +461,7 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context,
 		log.Printf("draft transaction: %v\n", draftTransaction)
 	}
 	if draftTransaction == nil {
-		// TODO: Add ErrDraftNotFound to buxmodels
-		// return nil, bux.ErrDraftNotFound
-		return nil, nil
+		return nil, buxerrors.ErrDraftNotFound
 	}
 
 	return draftTransaction, nil
@@ -515,6 +516,50 @@ func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID stri
 	}
 
 	return &transaction, nil
+}
+
+// SetSignatureFromAccessKey will set the signature on the header for the request from an access key
+func SetSignatureFromAccessKey(header *http.Header, privateKeyHex, bodyString string) error {
+	// Create the signature
+	authData, err := createSignatureAccessKey(privateKeyHex, bodyString)
+	if err != nil {
+		return err
+	}
+
+	// Set the auth header
+	header.Set(buxmodels.AuthAccessKey, authData.AccessKey)
+
+	return setSignatureHeaders(header, authData)
+}
+
+// createSignatureAccessKey will create a signature for the given access key & body contents
+func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *buxmodels.AuthPayload, err error) {
+	// No key?
+	if privateKeyHex == "" {
+		err = buxerrors.ErrMissingAccessKey
+		return
+	}
+
+	var privateKey *bec.PrivateKey
+	if privateKey, err = bitcoin.PrivateKeyFromString(
+		privateKeyHex,
+	); err != nil {
+		return
+	}
+	publicKey := privateKey.PubKey()
+
+	// Get the xPub
+	payload = new(buxmodels.AuthPayload)
+	payload.AccessKey = hex.EncodeToString(publicKey.SerialiseCompressed())
+
+	// auth_nonce is a random unique string to seed the signing message
+	// this can be checked server side to make sure the request is not being replayed
+	payload.AuthNonce, err = utils.RandomHex(32)
+	if err != nil {
+		return nil, err
+	}
+
+	return createSignatureCommon(payload, bodyString, privateKey)
 }
 
 // doHTTPRequest will create and submit the HTTP request
@@ -574,15 +619,12 @@ func (h *TransportHTTP) authenticateWithXpriv(sign bool, req *http.Request, xPri
 		if xPub, err = bitcoin.GetExtendedPublicKey(xPriv); err != nil {
 			return err
 		}
-		// TODO: Add AuthHeader to buxmodels
-		// req.Header.Set(buxmodels.AuthHeader, xPub)
+		req.Header.Set(buxmodels.AuthHeader, xPub)
 		req.Header.Set("", xPub)
 	}
 	return nil
 }
 
 func (h *TransportHTTP) authenticateWithAccessKey(req *http.Request, rawJSON []byte) error {
-	// TODO: Add SetSignatureFromAccessKey to buxmodels
-	// return bux.SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(h.accessKey.Serialise()), string(rawJSON))
-	return nil
+	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(h.accessKey.Serialise()), string(rawJSON))
 }

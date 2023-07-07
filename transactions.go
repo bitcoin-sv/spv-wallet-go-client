@@ -4,6 +4,7 @@ import (
 	"context"
 
 	buxmodels "github.com/BuxOrg/bux-models"
+	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"github.com/BuxOrg/go-buxclient/transports"
 	"github.com/mrz1836/go-datastore"
 )
@@ -57,9 +58,7 @@ func (b *BuxClient) UpdateTransactionMetadata(ctx context.Context, txID string,
 
 // FinalizeTransaction will finalize the transaction
 func (b *BuxClient) FinalizeTransaction(draft *buxmodels.DraftTransaction) (string, error) {
-	// TODO: Add SignInputs to buxmodels
-	// return draft.SignInputs(b.xPriv)
-	return "", nil
+	return transports.SignInputs(draft, b.xPriv)
 }
 
 // SendToRecipients send to recipients
@@ -70,9 +69,7 @@ func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transpor
 	if err != nil {
 		return nil, err
 	} else if draft == nil {
-		// TODO: Add ErrDraftNotFound to buxmodels
-		// return nil, buxmodels.ErrDraftNotFound
-		return nil, nil
+		return nil, buxerrors.ErrDraftNotFound
 	}
 
 	var hex string

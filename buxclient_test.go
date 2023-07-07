@@ -324,8 +324,7 @@ func TestDraftToRecipients(t *testing.T) {
 func checkDraftTransactionOutput(t *testing.T, draft *buxmodels.DraftTransaction) {
 	assert.IsType(t, buxmodels.DraftTransaction{}, *draft)
 	assert.Equal(t, xPubID, draft.XpubID)
-	// TODO: Add DraftStatusDraft to buxmodels
-	// assert.Equal(t, bux.DraftStatusDraft, draft.Status)
+	assert.Equal(t, buxmodels.DraftStatusDraft, draft.Status)
 	assert.Len(t, draft.Configuration.Inputs, 1)
 	assert.Len(t, draft.Configuration.Outputs, 2)
 	assert.Equal(t, uint64(1000), draft.Configuration.Outputs[0].Satoshis)
