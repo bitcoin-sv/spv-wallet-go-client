@@ -3,7 +3,7 @@ module github.com/BuxOrg/go-buxclient
 go 1.19
 
 require (
-	github.com/BuxOrg/bux-models v0.0.0-20230706160048-c5696eedc3ea
+	github.com/BuxOrg/bux-models v0.1.1
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.4
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.1
