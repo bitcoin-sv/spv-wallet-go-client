@@ -1,3 +1,4 @@
+// Package utils contains utility functions for the wallet like hashes and crypto functions
 package utils
 
 import (
@@ -24,6 +25,7 @@ const (
 	MaxInt32 = int64(1<<(32-1) - 1)
 )
 
+// Hash returns the sha256 hash of the data string
 func Hash(data string) string {
 	hash := sha256.Sum256([]byte(data))
 	return hex.EncodeToString(hash[:])

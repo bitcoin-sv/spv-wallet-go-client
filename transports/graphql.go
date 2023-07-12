@@ -908,10 +908,6 @@ func (g *TransportGraphQL) authenticateWithXpriv(req *graphql.Request, reqBody s
 	return nil
 }
 
-func (g *TransportGraphQL) SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, err error) {
-	return "", nil
-}
-
 func (g *TransportGraphQL) authenticateWithAccessKey(req *graphql.Request, reqBody string, variables map[string]interface{}) error {
 	bodyString, err := getBodyString(reqBody, variables)
 	if err != nil {
