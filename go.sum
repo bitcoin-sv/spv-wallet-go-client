@@ -1,7 +1,5 @@
 github.com/99designs/gqlgen v0.17.34 h1:5cS5/OKFguQt+Ws56uj9FlG2xm1IlcJWNF2jrMIKYFQ=
 github.com/99designs/gqlgen v0.17.34/go.mod h1:Axcd3jIFHBVcqzixujJQr1wGqE+lGTpz6u4iZBZg1G8=
-github.com/BuxOrg/bux-models v0.0.0-20230706160048-c5696eedc3ea h1:jTEHe3olaDkICwD2TGZdHQ8tiKAZTCzHA2iR9eFhYXo=
-github.com/BuxOrg/bux-models v0.0.0-20230706160048-c5696eedc3ea/go.mod h1:nH3MOdsIPPerBPOiEvwA01yTeArYtBk+PtDo7E+vPCk=
 github.com/BuxOrg/bux-models v0.1.1 h1:BqKPbBnk5G943SR7Bh7UvyNqG42970ELGyvTciDX2/E=
 github.com/BuxOrg/bux-models v0.1.1/go.mod h1:nH3MOdsIPPerBPOiEvwA01yTeArYtBk+PtDo7E+vPCk=
 github.com/agnivade/levenshtein v1.1.1/go.mod h1:veldBMzWxcCG2ZvUTKD2kJNRdCk5hVbJomOvKkmgYbo=
