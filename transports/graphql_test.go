@@ -103,7 +103,6 @@ func TestGetDestination(t *testing.T) {
 		}
 		destination, err := client.NewDestination(context.Background(), nil)
 		assert.ErrorIs(t, err, buxerrors.ErrMissingXPriv)
-		assert.ErrorIs(t, err, nil)
 		assert.Nil(t, destination)
 	})
 
@@ -173,7 +172,6 @@ func TestDraftTransaction(t *testing.T) {
 		}
 		destination, err := client.DraftTransaction(context.Background(), config, nil)
 		assert.ErrorIs(t, err, buxerrors.ErrMissingXPriv)
-		assert.ErrorIs(t, err, nil)
 		assert.Nil(t, destination)
 	})
 
@@ -218,7 +216,6 @@ func TestDraftToRecipients(t *testing.T) {
 		}
 		destination, err := client.DraftToRecipients(context.Background(), recipients, nil)
 		assert.ErrorIs(t, err, buxerrors.ErrMissingXPriv)
-		assert.ErrorIs(t, err, nil)
 		assert.Nil(t, destination)
 	})
 
