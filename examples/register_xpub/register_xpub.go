@@ -4,13 +4,12 @@ import (
 	"context"
 	"log"
 
-	"github.com/BuxOrg/bux"
+	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/go-buxclient"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 )
 
 func main() {
-
 	// Example xPub
 	masterKey, _ := bitcoin.GenerateHDKey(bitcoin.SecureSeedLength)
 	rawXPub, _ := bitcoin.GetExtendedPublicKey(masterKey)
@@ -27,7 +26,7 @@ func main() {
 	}
 
 	if err = buxClient.NewXpub(
-		context.Background(), rawXPub, &bux.Metadata{"example_field": "example_data"},
+		context.Background(), rawXPub, &buxmodels.Metadata{"example_field": "example_data"},
 	); err != nil {
 		log.Fatalln(err.Error())
 	}

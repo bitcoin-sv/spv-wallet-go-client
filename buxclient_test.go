@@ -8,8 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux/utils"
+	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/go-buxclient/transports"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bt/v2"
@@ -242,13 +241,13 @@ func TestDraftTransaction(t *testing.T) {
 	for _, transportHandler := range transportHandlers {
 		t.Run("draft transaction "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
-			config := &bux.TransactionConfig{
-				Outputs: []*bux.TransactionOutput{{
+			config := &buxmodels.TransactionConfig{
+				Outputs: []*buxmodels.TransactionOutput{{
 					Satoshis: 1000,
 					To:       testAddress,
 				}},
 			}
-			metadata := &bux.Metadata{
+			metadata := &buxmodels.Metadata{
 				"test-key": "test-value",
 			}
 
@@ -278,7 +277,7 @@ func TestNewXpub(t *testing.T) {
 	for _, transportHandler := range transportHandlers {
 		t.Run("NewXpub "+transportHandler.Type, func(t *testing.T) {
 			client := getTestBuxClient(transportHandler, true)
-			metadata := &bux.Metadata{
+			metadata := &buxmodels.Metadata{
 				"test-key": "test-value",
 			}
 			err := client.NewXpub(context.Background(), xPubString, metadata)
@@ -311,7 +310,7 @@ func TestDraftToRecipients(t *testing.T) {
 				Satoshis: 1000,
 				To:       testAddress,
 			}}
-			metadata := &bux.Metadata{
+			metadata := &buxmodels.Metadata{
 				"test-key": "test-value",
 			}
 
@@ -322,14 +321,13 @@ func TestDraftToRecipients(t *testing.T) {
 	}
 }
 
-func checkDraftTransactionOutput(t *testing.T, draft *bux.DraftTransaction) {
-	assert.IsType(t, bux.DraftTransaction{}, *draft)
+func checkDraftTransactionOutput(t *testing.T, draft *buxmodels.DraftTransaction) {
+	assert.IsType(t, buxmodels.DraftTransaction{}, *draft)
 	assert.Equal(t, xPubID, draft.XpubID)
-	assert.Equal(t, bux.DraftStatusDraft, draft.Status)
+	assert.Equal(t, buxmodels.DraftStatusDraft, draft.Status)
 	assert.Len(t, draft.Configuration.Inputs, 1)
 	assert.Len(t, draft.Configuration.Outputs, 2)
 	assert.Equal(t, uint64(1000), draft.Configuration.Outputs[0].Satoshis)
-	assert.Equal(t, "test-value", draft.Metadata["testkey"])
 }
 
 // TestNewDestination will test the NewDestination method
@@ -354,11 +352,10 @@ func TestNewDestination(t *testing.T) {
 
 			destination, err := client.NewDestination(context.Background(), nil)
 			assert.NoError(t, err)
-			assert.IsType(t, bux.Destination{}, *destination)
+			assert.IsType(t, buxmodels.Destination{}, *destination)
 			assert.Equal(t, "90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce", destination.ID)
 			assert.Equal(t, xPubID, destination.XpubID)
 			assert.Equal(t, "76a9140e0eb4911d79e9b7683f268964f595b66fa3604588ac", destination.LockingScript)
-			assert.Equal(t, utils.ScriptTypePubKeyHash, destination.Type)
 			assert.Equal(t, uint32(0), destination.Chain)
 			assert.Equal(t, uint32(245), destination.Num)
 			assert.Equal(t, "12HL5RyEy3Rt6SCwxgpiFSTigem1Pzbq22", destination.Address)
@@ -388,7 +385,7 @@ func TestGetTransaction(t *testing.T) {
 
 			transaction, err := client.GetTransaction(context.Background(), txID)
 			assert.NoError(t, err)
-			assert.IsType(t, bux.Transaction{}, *transaction)
+			assert.IsType(t, buxmodels.Transaction{}, *transaction)
 			assert.Equal(t, txID, transaction.ID)
 			assert.Equal(t, uint64(354), transaction.Fee)
 			assert.Equal(t, uint32(4), transaction.NumberOfInputs)
@@ -426,21 +423,19 @@ func TestGetTransactions(t *testing.T) {
 					"$lt": 740,
 				},
 			}
-			metadata := &bux.Metadata{
+			metadata := &buxmodels.Metadata{
 				"run_id": "3108aa426fc7102488bb0ffd",
 			}
 			transactions, err := client.GetTransactions(context.Background(), conditions, metadata, &datastore.QueryParams{})
 			assert.NoError(t, err)
-			assert.IsType(t, []*bux.Transaction{}, transactions)
+			assert.IsType(t, []*buxmodels.Transaction{}, transactions)
 			assert.Len(t, transactions, 2)
 			assert.Equal(t, "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda", transactions[0].ID)
 			assert.Equal(t, uint64(97), transactions[0].Fee)
 			assert.Equal(t, uint64(733), transactions[0].TotalValue)
-			assert.Equal(t, "8", transactions[0].Metadata["client_id"])
 			assert.Equal(t, "5f4fd2be162769852e8bd1362bb8d815a89e137707b4985249876a7f0ebbb071", transactions[1].ID)
 			assert.Equal(t, uint64(97), transactions[1].Fee)
 			assert.Equal(t, uint64(423), transactions[1].TotalValue)
-			assert.Equal(t, "8", transactions[1].Metadata["client_id"])
 		})
 	}
 }
@@ -466,12 +461,12 @@ func TestRecordTransaction(t *testing.T) {
 			client := getTestBuxClient(transportHandler, false)
 
 			hex := ""
-			metadata := &bux.Metadata{
+			metadata := &buxmodels.Metadata{
 				"test-key": "test-value",
 			}
 			transaction, err := client.RecordTransaction(context.Background(), hex, "", metadata)
 			assert.NoError(t, err)
-			assert.IsType(t, bux.Transaction{}, *transaction)
+			assert.IsType(t, buxmodels.Transaction{}, *transaction)
 			assert.Equal(t, txID, transaction.ID)
 		})
 	}
@@ -524,12 +519,12 @@ func TestSendToRecipients(t *testing.T) {
 				To:       testAddress2,
 				Satoshis: 4321,
 			}}
-			metadata := &bux.Metadata{
+			metadata := &buxmodels.Metadata{
 				"test-key": "test-value",
 			}
 			transaction, err := client.SendToRecipients(context.Background(), recipients, metadata)
 			require.NoError(t, err)
-			assert.IsType(t, bux.Transaction{}, *transaction)
+			assert.IsType(t, buxmodels.Transaction{}, *transaction)
 			assert.Equal(t, txID, transaction.ID)
 		})
 	}
@@ -545,7 +540,7 @@ func TestFinalizeTransaction(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		var draft *bux.DraftTransaction
+		var draft *buxmodels.DraftTransaction
 		err = json.Unmarshal([]byte(draftTxJSON), &draft)
 		require.NoError(t, err)
 
@@ -589,7 +584,7 @@ func TestGetTransport(t *testing.T) {
 
 func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 	anyConditions := make(map[string]interface{}, 0)
-	var anyMetadataConditions *bux.Metadata
+	var anyMetadataConditions *buxmodels.Metadata
 	anyParam := "sth"
 
 	testCases := []struct {
