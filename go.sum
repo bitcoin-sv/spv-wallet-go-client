@@ -27,8 +27,8 @@ github.com/golang/snappy v0.0.4/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEW
 github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
-github.com/iancoleman/strcase v0.2.0 h1:05I4QRnGpI0m37iZQRuskXh+w77mr6Z41lwQzuHLwW0=
-github.com/iancoleman/strcase v0.2.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=
+github.com/iancoleman/strcase v0.3.0 h1:nTXanmYxhfFAMjZL34Ov6gkzEsSJZ5DbhxWjvSASxEI=
+github.com/iancoleman/strcase v0.3.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a h1:bbPeKD0xmW/Y25WS6cokEszi5g+S0QxI/d45PkRi7Nk=
@@ -61,8 +61,8 @@ github.com/mattn/go-sqlite3 v1.14.17/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/montanaflynn/stats v0.7.1 h1:etflOAAHORrCC44V+aR6Ftzort912ZU+YLiSTuV8eaE=
 github.com/montanaflynn/stats v0.7.1/go.mod h1:etXPPgVO6n31NxCd9KQUMvCM+ve0ruNzt6R8Bnaayow=
-github.com/mrz1836/go-datastore v0.4.4 h1:YRA1DK2sxN+PkhZ6g6sl66U1o9fEt9NVUF1VVYkAeps=
-github.com/mrz1836/go-datastore v0.4.4/go.mod h1:oWUJYyPvDS3LFb2Qrw1Ou5FxhsDJARH5IIB5p7fCW3A=
+github.com/mrz1836/go-datastore v0.4.5 h1:2KUyECUH4z/FH57JAzrHlN/hLh+870v0dv59tcG4/ko=
+github.com/mrz1836/go-datastore v0.4.5/go.mod h1:Fj4tDn6uf5Dde9eaK9SEmFZ8SXY4gr6ljl521m4GQ/E=
 github.com/mrz1836/go-logger v0.3.2 h1:bjd23NwVaLWncXgXAyxAwWLQ02of0Ci3iJIZZEakkFU=
 github.com/mrz1836/go-logger v0.3.2/go.mod h1:8gWPdqxOAFNJOHDXS2ducgsokUOf0wWtAAM3LXPrhYo=
 github.com/newrelic/go-agent/v3 v3.23.1 h1:n4CK4EEod2A47T74wQFztavh9g3wHxxmlndj53ksbVg=

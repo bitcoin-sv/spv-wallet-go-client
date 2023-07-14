@@ -8,7 +8,7 @@ require (
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.1
 	github.com/machinebox/graphql v0.2.2
-	github.com/mrz1836/go-datastore v0.4.4
+	github.com/mrz1836/go-datastore v0.4.5
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
 )
@@ -20,7 +20,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/iancoleman/strcase v0.2.0 // indirect
+	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.4.2 // indirect
