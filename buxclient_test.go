@@ -12,7 +12,6 @@ import (
 	"github.com/BuxOrg/go-buxclient/transports"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bt/v2"
-	"github.com/mrz1836/go-datastore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -426,7 +425,7 @@ func TestGetTransactions(t *testing.T) {
 			metadata := &buxmodels.Metadata{
 				"run_id": "3108aa426fc7102488bb0ffd",
 			}
-			transactions, err := client.GetTransactions(context.Background(), conditions, metadata, &datastore.QueryParams{})
+			transactions, err := client.GetTransactions(context.Background(), conditions, metadata, &transports.QueryParams{})
 			assert.NoError(t, err)
 			assert.IsType(t, []*buxmodels.Transaction{}, transactions)
 			assert.Len(t, transactions, 2)
@@ -640,7 +639,7 @@ func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 			caseTitle: "GetTransactions",
 			path:      "/transaction/search",
 			clientMethod: func(c *BuxClient) (any, error) {
-				return c.GetTransactions(context.Background(), anyConditions, anyMetadataConditions, &datastore.QueryParams{})
+				return c.GetTransactions(context.Background(), anyConditions, anyMetadataConditions, &transports.QueryParams{})
 			},
 		},
 	}

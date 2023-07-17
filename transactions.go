@@ -6,7 +6,6 @@ import (
 	buxmodels "github.com/BuxOrg/bux-models"
 	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"github.com/BuxOrg/go-buxclient/transports"
-	"github.com/mrz1836/go-datastore"
 )
 
 // GetTransaction get a transaction by id
@@ -16,7 +15,7 @@ func (b *BuxClient) GetTransaction(ctx context.Context, txID string) (*buxmodels
 
 // GetTransactions get all transactions matching search criteria
 func (b *BuxClient) GetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+	metadata *buxmodels.Metadata, queryParams *transports.QueryParams,
 ) ([]*buxmodels.Transaction, error) {
 	return b.transport.GetTransactions(ctx, conditions, metadata, queryParams)
 }
