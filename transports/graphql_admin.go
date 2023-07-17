@@ -6,7 +6,6 @@ import (
 
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/machinebox/graphql"
-	"github.com/mrz1836/go-datastore"
 )
 
 // NewXpub will register an xPub
@@ -91,7 +90,7 @@ func (g *TransportGraphQL) AdminGetStats(ctx context.Context) (*buxmodels.AdminS
 
 // AdminGetAccessKeys get all access keys filtered by conditions
 func (g *TransportGraphQL) AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+	metadata *buxmodels.Metadata, queryParams *QueryParams,
 ) ([]*buxmodels.AccessKey, error) {
 	var models []*buxmodels.AccessKey
 	method := `admin_access_keys_list`
@@ -122,7 +121,7 @@ func (g *TransportGraphQL) AdminGetAccessKeysCount(ctx context.Context, conditio
 
 // AdminGetBlockHeaders get all block headers filtered by conditions
 func (g *TransportGraphQL) AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+	metadata *buxmodels.Metadata, queryParams *QueryParams,
 ) ([]*buxmodels.BlockHeader, error) {
 	var models []*buxmodels.BlockHeader
 	method := `admin_block_headers_list`
@@ -157,7 +156,7 @@ func (g *TransportGraphQL) AdminGetBlockHeadersCount(ctx context.Context, condit
 
 // AdminGetDestinations get all block destinations filtered by conditions
 func (g *TransportGraphQL) AdminGetDestinations(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+	metadata *buxmodels.Metadata, queryParams *QueryParams,
 ) ([]*buxmodels.Destination, error) {
 	var models []*buxmodels.Destination
 	method := `admin_destinations_list`
@@ -223,7 +222,7 @@ func (g *TransportGraphQL) AdminGetPaymail(ctx context.Context, address string) 
 
 // AdminGetPaymails get all block paymails filtered by conditions
 func (g *TransportGraphQL) AdminGetPaymails(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+	metadata *buxmodels.Metadata, queryParams *QueryParams,
 ) ([]*buxmodels.PaymailAddress, error) {
 	var models []*buxmodels.PaymailAddress
 	method := `admin_paymails_list`
@@ -332,7 +331,7 @@ func (g *TransportGraphQL) AdminDeletePaymail(ctx context.Context, address strin
 
 // AdminGetTransactions get all block transactions filtered by conditions
 func (g *TransportGraphQL) AdminGetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+	metadata *buxmodels.Metadata, queryParams *QueryParams,
 ) ([]*buxmodels.Transaction, error) {
 	var models []*buxmodels.Transaction
 	method := `admin_transactions_list`
@@ -368,7 +367,7 @@ func (g *TransportGraphQL) AdminGetTransactionsCount(ctx context.Context, condit
 
 // AdminGetUtxos get all block utxos filtered by conditions
 func (g *TransportGraphQL) AdminGetUtxos(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+	metadata *buxmodels.Metadata, queryParams *QueryParams,
 ) ([]*buxmodels.Utxo, error) {
 	var models []*buxmodels.Utxo
 	method := `admin_utxos_list`
@@ -400,7 +399,7 @@ func (g *TransportGraphQL) AdminGetUtxosCount(ctx context.Context, conditions ma
 
 // AdminGetXPubs get all block xpubs filtered by conditions
 func (g *TransportGraphQL) AdminGetXPubs(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams,
+	metadata *buxmodels.Metadata, queryParams *QueryParams,
 ) ([]*buxmodels.Xpub, error) {
 	var models []*buxmodels.Xpub
 	method := `admin_xpubs_list`
@@ -428,7 +427,7 @@ func (g *TransportGraphQL) AdminGetXPubsCount(ctx context.Context, conditions ma
 }
 
 func (g *TransportGraphQL) adminGetModels(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *datastore.QueryParams, method string, fields string,
+	metadata *buxmodels.Metadata, queryParams *QueryParams, method string, fields string,
 	models interface{},
 ) error {
 	reqBody := `

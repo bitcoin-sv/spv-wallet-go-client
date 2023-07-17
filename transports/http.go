@@ -18,7 +18,6 @@ import (
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
-	"github.com/mrz1836/go-datastore"
 )
 
 // TransportHTTP is the struct for HTTP
@@ -362,7 +361,7 @@ func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*buxmo
 
 // GetTransactions will get a transactions by conditions
 func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadataConditions *buxmodels.Metadata, queryParams *datastore.QueryParams,
+	metadataConditions *buxmodels.Metadata, queryParams *QueryParams,
 ) ([]*buxmodels.Transaction, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions:  conditions,
