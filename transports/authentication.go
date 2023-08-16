@@ -3,11 +3,11 @@ package transports
 import (
 	"encoding/hex"
 	"fmt"
+	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"net/http"
 	"time"
 
 	buxmodels "github.com/BuxOrg/bux-models"
-	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"github.com/BuxOrg/go-buxclient/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
@@ -18,11 +18,11 @@ import (
 )
 
 // SetSignature will set the signature on the header for the request
-func SetSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
+func SetSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
 	// Create the signature
 	authData, err := createSignature(xPriv, bodyString)
 	if err != nil {
-		return err
+		return WrapError(err)
 	}
 
 	// Set the auth header
@@ -32,10 +32,12 @@ func SetSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 }
 
 // SignInputs will sign all the inputs using the given xPriv key
-func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, err error) {
+func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, resError ResponseError) {
+	var err error
 	// Start a bt draft transaction
 	var txDraft *bt.Tx
 	if txDraft, err = bt.NewTxFromString(dt.Hex); err != nil {
+		resError = WrapError(err)
 		return
 	}
 
@@ -47,6 +49,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if ls, err = bscript.NewFromHexString(
 			input.Destination.LockingScript,
 		); err != nil {
+			resError = WrapError(err)
 			return
 		}
 		txDraft.Inputs[index].PreviousTxScript = ls
@@ -57,6 +60,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if chainKey, err = xPriv.Child(
 			input.Destination.Chain,
 		); err != nil {
+			resError = WrapError(err)
 			return
 		}
 
@@ -65,6 +69,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if numKey, err = chainKey.Child(
 			input.Destination.Num,
 		); err != nil {
+			resError = WrapError(err)
 			return
 		}
 
@@ -73,6 +78,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(
 			numKey,
 		); err != nil {
+			resError = WrapError(err)
 			return
 		}
 
@@ -81,6 +87,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if s, err = GetUnlockingScript(
 			txDraft, uint32(index), privateKey,
 		); err != nil {
+			resError = WrapError(err)
 			return
 		}
 
@@ -88,6 +95,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if err = txDraft.InsertInputUnlockingScript(
 			uint32(index), s,
 		); err != nil {
+			resError = WrapError(err)
 			return
 		}
 	}
@@ -191,7 +199,7 @@ func getSigningMessage(xPub string, auth *buxmodels.AuthPayload) string {
 	return fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
 }
 
-func setSignatureHeaders(header *http.Header, authData *buxmodels.AuthPayload) error {
+func setSignatureHeaders(header *http.Header, authData *buxmodels.AuthPayload) ResponseError {
 	// Create the auth header hash
 	header.Set(buxmodels.AuthHeaderHash, authData.AuthHash)
 

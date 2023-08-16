@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"log"
 	"net/http"
 
 	buxmodels "github.com/BuxOrg/bux-models"
-	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/machinebox/graphql"
@@ -124,19 +124,19 @@ func (g *TransportGraphQL) IsSignRequest() bool {
 }
 
 // NewPaymail will register a new paymail
-func (g *TransportGraphQL) NewPaymail(_ context.Context, _, _, _, _ string, _ *buxmodels.Metadata) error {
+func (g *TransportGraphQL) NewPaymail(_ context.Context, _, _, _, _ string, _ *buxmodels.Metadata) ResponseError {
 	// TODO: Implement this
 	return nil
 }
 
 // GetXpub will get an xPub
-func (g *TransportGraphQL) GetXpub(_ context.Context, _ string) (*buxmodels.Xpub, error) {
+func (g *TransportGraphQL) GetXpub(_ context.Context, _ string) (*buxmodels.Xpub, ResponseError) {
 	// TODO: Implement this
 	return nil, nil
 }
 
 // GetXPub will get information about the current xPub
-func (g *TransportGraphQL) GetXPub(ctx context.Context) (*buxmodels.Xpub, error) {
+func (g *TransportGraphQL) GetXPub(ctx context.Context) (*buxmodels.Xpub, ResponseError) {
 	reqBody := `
 	query {
 	  xpub {
@@ -160,7 +160,7 @@ func (g *TransportGraphQL) GetXPub(ctx context.Context) (*buxmodels.Xpub, error)
 }
 
 // UpdateXPubMetadata update the metadata of the logged in xpub
-func (g *TransportGraphQL) UpdateXPubMetadata(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Xpub, error) {
+func (g *TransportGraphQL) UpdateXPubMetadata(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Xpub, ResponseError) {
 	reqBody := `
     mutation ($metadata: Metadata!) {
   	  xpub_metadata (
@@ -189,7 +189,7 @@ func (g *TransportGraphQL) UpdateXPubMetadata(ctx context.Context, metadata *bux
 }
 
 // GetAccessKey will get an access key by id
-func (g *TransportGraphQL) GetAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, error) {
+func (g *TransportGraphQL) GetAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError) {
 	reqBody := `
 	query ($id: String) {
       access_key (
@@ -217,7 +217,7 @@ func (g *TransportGraphQL) GetAccessKey(ctx context.Context, id string) (*buxmod
 }
 
 // GetAccessKeys will get all access keys filtered by the metadata
-func (g *TransportGraphQL) GetAccessKeys(ctx context.Context, metadata *buxmodels.Metadata) ([]*buxmodels.AccessKey, error) {
+func (g *TransportGraphQL) GetAccessKeys(ctx context.Context, metadata *buxmodels.Metadata) ([]*buxmodels.AccessKey, ResponseError) {
 	reqBody := `
 	query ($metadata: Metadata) {
       access_keys (
@@ -246,7 +246,7 @@ func (g *TransportGraphQL) GetAccessKeys(ctx context.Context, metadata *buxmodel
 }
 
 // CreateAccessKey will create new access key
-func (g *TransportGraphQL) CreateAccessKey(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.AccessKey, error) {
+func (g *TransportGraphQL) CreateAccessKey(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.AccessKey, ResponseError) {
 	reqBody := `
 	  mutation ($metadata: Metadata) {
         access_key (
@@ -275,7 +275,7 @@ func (g *TransportGraphQL) CreateAccessKey(ctx context.Context, metadata *buxmod
 }
 
 // RevokeAccessKey will revoke the given access key
-func (g *TransportGraphQL) RevokeAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, error) {
+func (g *TransportGraphQL) RevokeAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError) {
 	reqBody := `
 	  mutation ($id: String) {
         access_key_revoke (
@@ -304,7 +304,7 @@ func (g *TransportGraphQL) RevokeAccessKey(ctx context.Context, id string) (*bux
 }
 
 // GetDestinationByID will get a destination by the given id
-func (g *TransportGraphQL) GetDestinationByID(ctx context.Context, id string) (*buxmodels.Destination, error) {
+func (g *TransportGraphQL) GetDestinationByID(ctx context.Context, id string) (*buxmodels.Destination, ResponseError) {
 	reqBody := `{
 	query ($id: String) {
         destination (
@@ -336,7 +336,7 @@ func (g *TransportGraphQL) GetDestinationByID(ctx context.Context, id string) (*
 }
 
 // GetDestinationByLockingScript will get a destination by the given locking script
-func (g *TransportGraphQL) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*buxmodels.Destination, error) {
+func (g *TransportGraphQL) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*buxmodels.Destination, ResponseError) {
 	reqBody := `{
 	query ($lockingScript: String) {
         destination (
@@ -368,7 +368,7 @@ func (g *TransportGraphQL) GetDestinationByLockingScript(ctx context.Context, lo
 }
 
 // GetDestinationByAddress will get a destination by the given address
-func (g *TransportGraphQL) GetDestinationByAddress(ctx context.Context, address string) (*buxmodels.Destination, error) {
+func (g *TransportGraphQL) GetDestinationByAddress(ctx context.Context, address string) (*buxmodels.Destination, ResponseError) {
 	reqBody := `{
 	query ($address: String) {
         destination (
@@ -400,7 +400,7 @@ func (g *TransportGraphQL) GetDestinationByAddress(ctx context.Context, address 
 }
 
 // UpdateDestinationMetadataByID updates the destination metadata by id
-func (g *TransportGraphQL) UpdateDestinationMetadataByID(ctx context.Context, id string, metadata *buxmodels.Metadata) (*buxmodels.Destination, error) {
+func (g *TransportGraphQL) UpdateDestinationMetadataByID(ctx context.Context, id string, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError) {
 	reqBody := `{
       mutation ($id: String, $metadata: Metadata!) {
   	    destination_metadata (
@@ -434,7 +434,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByID(ctx context.Context, id
 }
 
 // UpdateDestinationMetadataByAddress updates the destination metadata by address
-func (g *TransportGraphQL) UpdateDestinationMetadataByAddress(ctx context.Context, address string, metadata *buxmodels.Metadata) (*buxmodels.Destination, error) {
+func (g *TransportGraphQL) UpdateDestinationMetadataByAddress(ctx context.Context, address string, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError) {
 	reqBody := `{
       mutation ($address: String, $metadata: Metadata!) {
   	    destination_metadata (
@@ -468,7 +468,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByAddress(ctx context.Contex
 }
 
 // UpdateDestinationMetadataByLockingScript updates the destination metadata by lockingScript
-func (g *TransportGraphQL) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string, metadata *buxmodels.Metadata) (*buxmodels.Destination, error) {
+func (g *TransportGraphQL) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError) {
 	reqBody := `{
       mutation ($locking_script: String, $metadata: Metadata!) {
   	    destination_metadata (
@@ -502,7 +502,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByLockingScript(ctx context.
 }
 
 // GetDestinations will get all destinations filtered by the medata conditions
-func (g *TransportGraphQL) GetDestinations(ctx context.Context, metadataConditions *buxmodels.Metadata) ([]*buxmodels.Destination, error) {
+func (g *TransportGraphQL) GetDestinations(ctx context.Context, metadataConditions *buxmodels.Metadata) ([]*buxmodels.Destination, ResponseError) {
 	reqBody := `{
 	  query ($metadata: Metadata) {
         destinations (
@@ -534,7 +534,7 @@ func (g *TransportGraphQL) GetDestinations(ctx context.Context, metadataConditio
 }
 
 // NewDestination will get a new destination
-func (g *TransportGraphQL) NewDestination(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Destination, error) {
+func (g *TransportGraphQL) NewDestination(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError) {
 	reqBody := `
    	mutation ($metadata: Metadata) {
 	  destination(
@@ -563,7 +563,7 @@ func (g *TransportGraphQL) NewDestination(ctx context.Context, metadata *buxmode
 }
 
 // GetTransaction get a transaction by ID
-func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*buxmodels.Transaction, error) {
+func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*buxmodels.Transaction, ResponseError) {
 	reqBody := `
    	query {
 	  transaction(
@@ -596,8 +596,7 @@ func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*bu
 // GetTransactions get a transactions, filtered by the given metadata
 func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[string]interface{},
 	metadataConditions *buxmodels.Metadata, queryParams *QueryParams, //nolint:revive // TODO: implement this field
-) ([]*buxmodels.Transaction, error) {
-
+) ([]*buxmodels.Transaction, ResponseError) {
 	querySignature := ""
 	queryArguments := ""
 
@@ -654,7 +653,7 @@ func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[s
 }
 
 // GetTransactionsCount get number of user transactions
-func (g *TransportGraphQL) GetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, error) {
+func (g *TransportGraphQL) GetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError) {
 	reqBody := `
 	query ($conditions: Map, $metadata: Metadata) {
       transactions_count (
@@ -677,7 +676,7 @@ func (g *TransportGraphQL) GetTransactionsCount(ctx context.Context, conditions 
 // DraftToRecipients is a draft transaction to a slice of recipients
 func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*Recipients,
 	metadata *buxmodels.Metadata,
-) (*buxmodels.DraftTransaction, error) {
+) (*buxmodels.DraftTransaction, ResponseError) {
 	reqBody := `
    	mutation ($outputs: [TransactionOutputInput]!, $metadata: Metadata) {
 	  new_transaction(
@@ -711,7 +710,7 @@ func (g *TransportGraphQL) DraftToRecipients(ctx context.Context, recipients []*
 // DraftTransaction is a draft transaction
 func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConfig *buxmodels.TransactionConfig,
 	metadata *buxmodels.Metadata,
-) (*buxmodels.DraftTransaction, error) {
+) (*buxmodels.DraftTransaction, ResponseError) {
 	reqBody := `
    	mutation ($transactionConfig: TransactionConfigInput!, $metadata: Metadata) {
 	  new_transaction(
@@ -732,7 +731,7 @@ func (g *TransportGraphQL) DraftTransaction(ctx context.Context, transactionConf
 
 func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody string,
 	variables map[string]interface{}, req *graphql.Request,
-) (*buxmodels.DraftTransaction, error) {
+) (*buxmodels.DraftTransaction, ResponseError) {
 	err := g.signGraphQLRequest(req, reqBody, variables, g.xPriv, g.xPub)
 	if err != nil {
 		return nil, err
@@ -740,8 +739,8 @@ func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody s
 
 	// run it and capture the response
 	var respData DraftTransactionData
-	if err = g.client.Run(ctx, req, &respData); err != nil {
-		return nil, err
+	if err := g.client.Run(ctx, req, &respData); err != nil {
+		return nil, WrapError(err)
 	}
 	draftTransaction := respData.NewTransaction
 	if g.debug {
@@ -754,7 +753,7 @@ func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody s
 // RecordTransaction will record a transaction
 func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, referenceID string,
 	metadata *buxmodels.Metadata,
-) (*buxmodels.Transaction, error) {
+) (*buxmodels.Transaction, ResponseError) {
 	reqBody := `
    	mutation($metadata: Metadata) {
 	  transaction(
@@ -791,8 +790,8 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 
 	// run it and capture the response
 	var respData NewTransactionData
-	if err = g.client.Run(ctx, req, &respData); err != nil {
-		return nil, err
+	if err := g.client.Run(ctx, req, &respData); err != nil {
+		return nil, WrapError(err)
 	}
 	transaction := respData.Transaction
 	if g.debug {
@@ -803,7 +802,7 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 }
 
 // UpdateTransactionMetadata update the metadata of a transaction
-func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID string, metadata *buxmodels.Metadata) (*buxmodels.Transaction, error) {
+func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID string, metadata *buxmodels.Metadata) (*buxmodels.Transaction, ResponseError) {
 	reqBody := `
     mutation ($id: String!, $metadata: Metadata!) {
   	  destination_metadata (
@@ -841,7 +840,7 @@ func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID s
 
 func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, variables map[string]interface{},
 	respData interface{},
-) error {
+) ResponseError {
 	req := graphql.NewRequest(reqBody)
 	for key, value := range variables {
 		req.Var(key, value)
@@ -853,8 +852,8 @@ func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, v
 	}
 
 	// run it and capture the response
-	if err = g.client.Run(ctx, req, &respData); err != nil {
-		return err
+	if err := g.client.Run(ctx, req, &respData); err != nil {
+		return WrapError(err)
 	}
 	if g.debug {
 		log.Printf("model: %v\n", respData)
@@ -863,7 +862,7 @@ func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, v
 	return nil
 }
 
-func getBodyString(reqBody string, variables map[string]interface{}) (string, error) {
+func getBodyString(reqBody string, variables map[string]interface{}) (string, ResponseError) {
 	requestBodyObj := struct {
 		Query     string                 `json:"query"`
 		Variables map[string]interface{} `json:"variables"`
@@ -874,7 +873,7 @@ func getBodyString(reqBody string, variables map[string]interface{}) (string, er
 
 	body, err := json.Marshal(requestBodyObj)
 	if err != nil {
-		return "", err
+		return "", WrapError(err)
 	}
 
 	return string(body), nil
@@ -882,17 +881,17 @@ func getBodyString(reqBody string, variables map[string]interface{}) (string, er
 
 func (g *TransportGraphQL) signGraphQLRequest(req *graphql.Request, reqBody string, variables map[string]interface{},
 	xPriv *bip32.ExtendedKey, xPub *bip32.ExtendedKey,
-) error {
+) ResponseError {
 	if xPriv != nil || xPub != nil {
 		return g.authenticateWithXpriv(req, reqBody, variables, xPriv, xPub)
 	} else if g.accessKey != nil {
 		return g.authenticateWithAccessKey(req, reqBody, variables)
 	} else {
-		return buxerrors.ErrMissingXPriv
+		return WrapError(buxerrors.ErrMissingXPriv)
 	}
 }
 
-func (g *TransportGraphQL) authenticateWithXpriv(req *graphql.Request, reqBody string, variables map[string]interface{}, xPriv *bip32.ExtendedKey, xPub *bip32.ExtendedKey) error {
+func (g *TransportGraphQL) authenticateWithXpriv(req *graphql.Request, reqBody string, variables map[string]interface{}, xPriv *bip32.ExtendedKey, xPub *bip32.ExtendedKey) ResponseError {
 	if g.signRequest {
 		bodyString, err := getBodyString(reqBody, variables)
 		if err != nil {
@@ -908,7 +907,7 @@ func (g *TransportGraphQL) authenticateWithXpriv(req *graphql.Request, reqBody s
 	return nil
 }
 
-func (g *TransportGraphQL) authenticateWithAccessKey(req *graphql.Request, reqBody string, variables map[string]interface{}) error {
+func (g *TransportGraphQL) authenticateWithAccessKey(req *graphql.Request, reqBody string, variables map[string]interface{}) ResponseError {
 	bodyString, err := getBodyString(reqBody, variables)
 	if err != nil {
 		return err

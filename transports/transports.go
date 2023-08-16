@@ -25,7 +25,7 @@ type Client struct {
 type ClientOps func(c *Client)
 
 // addSignature will add the signature to the request
-func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
+func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
 	return SetSignature(header, xPriv, bodyString)
 }
 
