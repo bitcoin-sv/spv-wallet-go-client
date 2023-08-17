@@ -52,7 +52,7 @@ func TestNewXpub(t *testing.T) {
 			TransportGraphQL: TransportGraphQL{},
 		}
 		err := client.NewXpub(context.Background(), xPubString, nil)
-		assert.ErrorIs(t, err, ErrAdminKey)
+		assert.Equal(t, err.Error(), ErrAdminKey.Error())
 	})
 
 	t.Run("return error", func(t *testing.T) {
@@ -66,7 +66,7 @@ func TestNewXpub(t *testing.T) {
 			},
 		}
 		err := client.NewXpub(context.Background(), xPubString, nil)
-		assert.ErrorIs(t, err, errTestTerror)
+		assert.Equal(t, err.Error(), errTestTerror.Error())
 	})
 
 	t.Run("return success", func(t *testing.T) {
@@ -102,7 +102,7 @@ func TestGetDestination(t *testing.T) {
 			},
 		}
 		destination, err := client.NewDestination(context.Background(), nil)
-		assert.ErrorIs(t, err, buxerrors.ErrMissingXPriv)
+		assert.Equal(t, err.Error(), buxerrors.ErrMissingXPriv.Error())
 		assert.Nil(t, destination)
 	})
 
@@ -171,7 +171,7 @@ func TestDraftTransaction(t *testing.T) {
 			},
 		}
 		destination, err := client.DraftTransaction(context.Background(), config, nil)
-		assert.ErrorIs(t, err, buxerrors.ErrMissingXPriv)
+		assert.Equal(t, err.Error(), buxerrors.ErrMissingXPriv.Error())
 		assert.Nil(t, destination)
 	})
 
@@ -215,7 +215,7 @@ func TestDraftToRecipients(t *testing.T) {
 			},
 		}
 		destination, err := client.DraftToRecipients(context.Background(), recipients, nil)
-		assert.ErrorIs(t, err, buxerrors.ErrMissingXPriv)
+		assert.Equal(t, err.Error(), buxerrors.ErrMissingXPriv.Error())
 		assert.Nil(t, destination)
 	})
 
