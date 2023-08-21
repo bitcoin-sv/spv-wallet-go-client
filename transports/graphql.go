@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"log"
 	"net/http"
+
+	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/libsv/go-bk/bec"
@@ -836,6 +837,22 @@ func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID s
 	}
 
 	return respData.Transaction, nil
+}
+
+// UnreserveUtxos will unreserve utxos from draft transaction
+func (g *TransportGraphQL) UnreserveUtxos(ctx context.Context, referenceID string) ResponseError {
+	reqBody := `
+	  mutation ($draft_id: String!) {
+        utxos_unreserve (
+		  draft_id: $draft_id
+        ) 
+      }`
+	variables := map[string]interface{}{
+		"draft_id": referenceID,
+	}
+
+	var respData bool
+	return g.doGraphQLQuery(ctx, reqBody, variables, &respData)
 }
 
 func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, variables map[string]interface{},

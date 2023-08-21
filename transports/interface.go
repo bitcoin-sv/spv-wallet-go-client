@@ -2,6 +2,7 @@ package transports
 
 import (
 	"context"
+
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/libsv/go-bk/bip32"
 )
@@ -43,6 +44,7 @@ type TransactionService interface {
 	GetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
 	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *buxmodels.Metadata) (*buxmodels.Transaction, ResponseError)
 	UpdateTransactionMetadata(ctx context.Context, txID string, metadata *buxmodels.Metadata) (*buxmodels.Transaction, ResponseError)
+	UnreserveUtxos(ctx context.Context, referenceID string) ResponseError
 }
 
 // PaymailService is the paymail related requests
