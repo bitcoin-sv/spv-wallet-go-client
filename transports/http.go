@@ -5,14 +5,15 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"log"
+	"net/http"
+
 	buxmodels "github.com/BuxOrg/bux-models"
 	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"github.com/BuxOrg/go-buxclient/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
-	"log"
-	"net/http"
 )
 
 // TransportHTTP is the struct for HTTP
@@ -526,6 +527,18 @@ func SetSignatureFromAccessKey(header *http.Header, privateKeyHex, bodyString st
 	return setSignatureHeaders(header, authData)
 }
 
+// UnreserveUtxos will unreserve utxos from draft transaction
+func (h *TransportHTTP) UnreserveUtxos(ctx context.Context, referenceID string) ResponseError {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldReferenceID: referenceID,
+	})
+	if err != nil {
+		return WrapError(err)
+	}
+
+	return h.doHTTPRequest(ctx, http.MethodPatch, "/utxos/unreserve", jsonStr, h.xPriv, h.signRequest, nil)
+}
+
 // createSignatureAccessKey will create a signature for the given access key & body contents
 func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *buxmodels.AuthPayload, err error) {
 	// No key?
@@ -589,6 +602,10 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
 		return WrapResponseError(resp)
+	}
+
+	if responseJSON == nil {
+		return nil
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&responseJSON)

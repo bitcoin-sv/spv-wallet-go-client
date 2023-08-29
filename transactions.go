@@ -78,3 +78,8 @@ func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transpor
 
 	return b.RecordTransaction(ctx, hex, draft.ID, metadata)
 }
+
+// UnreserveUtxos unreserves utxos from draft transaction
+func (b *BuxClient) UnreserveUtxos(ctx context.Context, referenceID string) transports.ResponseError {
+	return b.transport.UnreserveUtxos(ctx, referenceID)
+}
