@@ -7,9 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
-
 	buxmodels "github.com/BuxOrg/bux-models"
+	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/machinebox/graphql"
@@ -845,7 +844,7 @@ func (g *TransportGraphQL) UnreserveUtxos(ctx context.Context, referenceID strin
 	  mutation ($draft_id: String!) {
         utxos_unreserve (
 		  draft_id: $draft_id
-        ) 
+        )
       }`
 	variables := map[string]interface{}{
 		"draft_id": referenceID,

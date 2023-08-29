@@ -2,9 +2,9 @@ package buxclient
 
 import (
 	"context"
-	"github.com/BuxOrg/go-buxclient/transports"
 
 	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/BuxOrg/go-buxclient/transports"
 )
 
 // NewXpub registers a new xpub - admin key needed

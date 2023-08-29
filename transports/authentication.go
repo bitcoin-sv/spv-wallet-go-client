@@ -3,11 +3,11 @@ package transports
 import (
 	"encoding/hex"
 	"fmt"
-	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"net/http"
 	"time"
 
 	buxmodels "github.com/BuxOrg/bux-models"
+	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"github.com/BuxOrg/go-buxclient/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"

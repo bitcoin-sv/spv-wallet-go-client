@@ -2,6 +2,7 @@ package buxclient
 
 import (
 	"context"
+
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/go-buxclient/transports"
 )
