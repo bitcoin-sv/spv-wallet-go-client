@@ -78,6 +78,27 @@ func (h *TransportHTTP) NewPaymail(ctx context.Context, rawXpub, paymailAddress,
 	)
 }
 
+// DeletePaymail will delete a paymail address
+func (h *TransportHTTP) DeletePaymail(ctx context.Context, paymailAddress string) ResponseError {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldAddress: paymailAddress,
+	})
+	if err != nil {
+		return WrapError(err)
+	}
+
+	if err := h.doHTTPRequest(
+		ctx, http.MethodDelete, "/paymail", jsonStr, h.xPriv, true, nil,
+	); err != nil {
+		return WrapError(err)
+	}
+	if h.debug {
+		log.Printf("delete paymail: %v\n", paymailAddress)
+	}
+
+	return nil
+}
+
 // GetXPub will get the xpub of the current xpub
 func (h *TransportHTTP) GetXPub(ctx context.Context) (*buxmodels.Xpub, ResponseError) {
 	var xPub buxmodels.Xpub
