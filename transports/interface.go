@@ -20,6 +20,7 @@ type AccessKeyService interface {
 	CreateAccessKey(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.AccessKey, ResponseError)
 	GetAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError)
 	GetAccessKeys(ctx context.Context, metadataConditions *buxmodels.Metadata) ([]*buxmodels.AccessKey, ResponseError)
+	GetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
 	RevokeAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError)
 }
 
