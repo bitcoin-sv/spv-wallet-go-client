@@ -50,6 +50,7 @@ type TransactionService interface {
 // PaymailService is the paymail related requests
 type PaymailService interface {
 	NewPaymail(ctx context.Context, rawXpub, paymailAddress, avatar, publicName string, metadata *buxmodels.Metadata) ResponseError
+	DeletePaymail(ctx context.Context, paymailAddress string) ResponseError
 }
 
 // AdminService is the admin related requests

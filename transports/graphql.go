@@ -129,6 +129,12 @@ func (g *TransportGraphQL) NewPaymail(_ context.Context, _, _, _, _ string, _ *b
 	return nil
 }
 
+// DeletePaymail will delete a paymail address
+func (g *TransportGraphQL) DeletePaymail(_ context.Context, _ string) ResponseError {
+	// TODO: Implement this
+	return nil
+}
+
 // GetXpub will get an xPub
 func (g *TransportGraphQL) GetXpub(_ context.Context, _ string) (*buxmodels.Xpub, ResponseError) {
 	// TODO: Implement this
