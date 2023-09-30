@@ -280,6 +280,27 @@ func (g *TransportGraphQL) CreateAccessKey(ctx context.Context, metadata *buxmod
 	return respData.AccessKey, nil
 }
 
+// GetAccessKeysCount will get the count of access keys
+func (g *TransportGraphQL) GetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError) {
+	reqBody := `
+	query ($conditions: Map, $metadata: Metadata) {
+		  access_keys_count (
+        conditions: $conditions
+        metadata: $metadata
+	  )
+  }`
+	variables := map[string]interface{}{
+		"conditions": conditions,
+		"metadata":   metadata,
+	}
+	var count int64
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 // RevokeAccessKey will revoke the given access key
 func (g *TransportGraphQL) RevokeAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError) {
 	reqBody := `

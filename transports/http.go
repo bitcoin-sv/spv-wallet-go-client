@@ -169,6 +169,29 @@ func (h *TransportHTTP) GetAccessKeys(ctx context.Context, metadataConditions *b
 	return accessKey, nil
 }
 
+// GetAccessKeysCount will get the count of access keys
+func (h *TransportHTTP) GetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldConditions: conditions,
+		FieldMetadata:   processMetadata(metadata),
+	})
+	if err != nil {
+		return 0, WrapError(err)
+	}
+
+	var count int64
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPost, "/access-key/count", jsonStr, h.xPriv, true, &count,
+	); err != nil {
+		return 0, err
+	}
+	if h.debug {
+		log.Printf("Access keys count: %v\n", count)
+	}
+
+	return count, nil
+}
+
 // RevokeAccessKey will revoke an access key by id
 func (h *TransportHTTP) RevokeAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError) {
 	var accessKey buxmodels.AccessKey
