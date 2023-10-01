@@ -560,6 +560,27 @@ func (g *TransportGraphQL) GetDestinations(ctx context.Context, metadataConditio
 	return respData.Destinations, nil
 }
 
+// GetDestinationsCount will get the count of destinations matching the metadata filter
+func (g *TransportGraphQL) GetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError) {
+	reqBody := `
+	query ($conditions: Map, $metadata: Metadata) {
+		destinations_count (
+        conditions: $conditions
+        metadata: $metadata
+	  )
+  }`
+	variables := map[string]interface{}{
+		"conditions": conditions,
+		"metadata":   metadata,
+	}
+	var count int64
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 // NewDestination will get a new destination
 func (g *TransportGraphQL) NewDestination(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError) {
 	reqBody := `

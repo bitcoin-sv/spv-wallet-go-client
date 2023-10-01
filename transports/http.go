@@ -288,6 +288,26 @@ func (h *TransportHTTP) GetDestinations(ctx context.Context, metadataConditions 
 	return destinations, nil
 }
 
+// GetDestinationsCount will get the count of destinations matching the metadata filter
+func (h *TransportHTTP) GetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldConditions: conditions,
+		FieldMetadata:   processMetadata(metadata),
+	})
+	if err != nil {
+		return 0, WrapError(err)
+	}
+
+	var count int64
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPost, "/destination/count", jsonStr, h.xPriv, true, &count,
+	); err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 // NewDestination will create a new destination and return it
 func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
