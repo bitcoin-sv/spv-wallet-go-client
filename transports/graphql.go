@@ -92,6 +92,11 @@ type NewTransactionData struct {
 	Transaction *buxmodels.Transaction `json:"transaction"`
 }
 
+// UtxoData is a utxo
+type UtxoData struct {
+	Utxo *buxmodels.Utxo `json:"utxo"`
+}
+
 // Init will initialize
 func (g *TransportGraphQL) Init() error {
 	g.client = graphql.NewClient(g.server, graphql.WithHTTPClient(g.httpClient))
@@ -863,6 +868,45 @@ func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID s
 	}
 
 	return respData.Transaction, nil
+}
+
+// GetUtxo will get a utxo by transaction ID
+func (g *TransportGraphQL) GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*buxmodels.Utxo, ResponseError) {
+	reqBody := `
+		query ($tx_id: String!, $output_index: Uint32!) {
+			utxo (
+				tx_id: $tx_id
+				output_index: $output_index
+			) {
+				id
+				transaction_id
+				xpub_id
+				output_index
+				satoshis
+				script_pub_key
+				type
+				draft_id
+				reserved_at
+				spending_tx_id
+				metadata
+				transaction
+				created_at
+				updated_at
+				deleted_at
+			}
+		}`
+
+	variables := map[string]interface{}{
+		FieldTransactionID: txID,
+		FieldOutputIndex:   outputIndex,
+	}
+
+	var respData UtxoData
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		return nil, err
+	}
+
+	return respData.Utxo, nil
 }
 
 // UnreserveUtxos will unreserve utxos from draft transaction

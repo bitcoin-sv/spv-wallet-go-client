@@ -5,8 +5,10 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	buxmodels "github.com/BuxOrg/bux-models"
 	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
@@ -571,6 +573,26 @@ func SetSignatureFromAccessKey(header *http.Header, privateKeyHex, bodyString st
 	return setSignatureHeaders(header, authData)
 }
 
+// GetUtxo will get a utxo by transaction ID
+func (h *TransportHTTP) GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*buxmodels.Utxo, ResponseError) {
+	outputIndexStr := strconv.FormatUint(uint64(outputIndex), 10)
+
+	url := fmt.Sprintf("/utxo?%s=%s&%s=%s", FieldTransactionID, txID, FieldOutputIndex, outputIndexStr)
+
+	var utxo buxmodels.Utxo
+	if err := h.doHTTPRequest(
+		ctx, http.MethodGet, url, nil, h.xPriv, true, &utxo,
+	); err != nil {
+		return nil, err
+	}
+
+	if h.debug {
+		log.Printf("utxo: %v\n", utxo)
+	}
+
+	return &utxo, nil
+}
+
 // UnreserveUtxos will unreserve utxos from draft transaction
 func (h *TransportHTTP) UnreserveUtxos(ctx context.Context, referenceID string) ResponseError {
 	jsonStr, err := json.Marshal(map[string]interface{}{
@@ -580,7 +602,7 @@ func (h *TransportHTTP) UnreserveUtxos(ctx context.Context, referenceID string) 
 		return WrapError(err)
 	}
 
-	return h.doHTTPRequest(ctx, http.MethodPatch, "/utxos/unreserve", jsonStr, h.xPriv, h.signRequest, nil)
+	return h.doHTTPRequest(ctx, http.MethodPatch, "/utxo/unreserve", jsonStr, h.xPriv, h.signRequest, nil)
 }
 
 // createSignatureAccessKey will create a signature for the given access key & body contents
