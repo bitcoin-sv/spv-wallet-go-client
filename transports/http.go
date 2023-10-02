@@ -613,6 +613,30 @@ func (h *TransportHTTP) GetUtxo(ctx context.Context, txID string, outputIndex ui
 	return &utxo, nil
 }
 
+// GetUtxos will get a list of utxos filtered by conditions and metadata
+func (h *TransportHTTP) GetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Utxo, ResponseError) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldConditions:  conditions,
+		FieldMetadata:    processMetadata(metadata),
+		FieldQueryParams: queryParams,
+	})
+	if err != nil {
+		return nil, WrapError(err)
+	}
+
+	var utxos []*buxmodels.Utxo
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPost, "/utxo/search", jsonStr, h.xPriv, h.signRequest, &utxos,
+	); err != nil {
+		return nil, err
+	}
+	if h.debug {
+		log.Printf("utxos: %d\n", len(utxos))
+	}
+
+	return utxos, nil
+}
+
 // UnreserveUtxos will unreserve utxos from draft transaction
 func (h *TransportHTTP) UnreserveUtxos(ctx context.Context, referenceID string) ResponseError {
 	jsonStr, err := json.Marshal(map[string]interface{}{
