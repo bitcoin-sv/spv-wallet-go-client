@@ -94,4 +94,10 @@ const (
 
 	// FieldTransactionConfig is the field for the config of a new transaction
 	FieldTransactionConfig = "transaction_config"
+
+	// FieldTransactionID is the field for transaction ID
+	FieldTransactionID = "tx_id"
+
+	// FieldOutputIndex is the field for "output_index"
+	FieldOutputIndex = "output_index"
 )
