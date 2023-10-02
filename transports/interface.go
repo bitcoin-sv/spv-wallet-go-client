@@ -30,6 +30,7 @@ type DestinationService interface {
 	GetDestinationByID(ctx context.Context, id string) (*buxmodels.Destination, ResponseError)
 	GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*buxmodels.Destination, ResponseError)
 	GetDestinations(ctx context.Context, metadataConditions *buxmodels.Metadata) ([]*buxmodels.Destination, ResponseError)
+	GetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
 	NewDestination(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError)
 	UpdateDestinationMetadataByAddress(ctx context.Context, lockingScript string, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError)
 	UpdateDestinationMetadataByID(ctx context.Context, id string, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError)
