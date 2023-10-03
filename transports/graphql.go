@@ -97,6 +97,11 @@ type UtxoData struct {
 	Utxo *buxmodels.Utxo `json:"utxo"`
 }
 
+// UtxosData is a slice of utxos
+type UtxosData struct {
+	Utxos []*buxmodels.Utxo `json:"utxos"`
+}
+
 // Init will initialize
 func (g *TransportGraphQL) Init() error {
 	g.client = graphql.NewClient(g.server, graphql.WithHTTPClient(g.httpClient))
@@ -930,14 +935,40 @@ func (g *TransportGraphQL) GetUtxo(ctx context.Context, txID string, outputIndex
 	return respData.Utxo, nil
 }
 
+// GetUtxos will get a list of utxos filtered by conditions and metadata
+func (g *TransportGraphQL) GetUtxos(
+	ctx context.Context,
+	conditions map[string]interface{},
+	metadata *buxmodels.Metadata,
+	queryParams *QueryParams, //nolint:revive // TODO: implement this field
+) ([]*buxmodels.Utxo, ResponseError) {
+	reqBody := `
+		query ($conditions: Map, $metadata: Metadata) {
+			utxos (
+				conditions: $conditions
+				metadata: $metadata
+			)
+		}`
+
+	variables := map[string]interface{}{
+		"conditions": conditions,
+		"metadata":   metadata,
+	}
+
+	var respData UtxosData
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		return nil, err
+	}
+
+	return respData.Utxos, nil
+}
+
 // UnreserveUtxos will unreserve utxos from draft transaction
 func (g *TransportGraphQL) UnreserveUtxos(ctx context.Context, referenceID string) ResponseError {
 	reqBody := `
 	  mutation ($draft_id: String!) {
-        utxos_unreserve (
-		  draft_id: $draft_id
-        )
-      }`
+			utxos_unreserve (draft_id: $draft_id)
+		}`
 	variables := map[string]interface{}{
 		"draft_id": referenceID,
 	}
