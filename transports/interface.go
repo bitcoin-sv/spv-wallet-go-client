@@ -48,6 +48,7 @@ type TransactionService interface {
 	UpdateTransactionMetadata(ctx context.Context, txID string, metadata *buxmodels.Metadata) (*buxmodels.Transaction, ResponseError)
 	GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*buxmodels.Utxo, ResponseError)
 	GetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Utxo, ResponseError)
+	GetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
 	UnreserveUtxos(ctx context.Context, referenceID string) ResponseError
 }
 
