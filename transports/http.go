@@ -637,6 +637,29 @@ func (h *TransportHTTP) GetUtxos(ctx context.Context, conditions map[string]inte
 	return utxos, nil
 }
 
+// GetUtxosCount will get the count of utxos filtered by conditions and metadata
+func (h *TransportHTTP) GetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldConditions: conditions,
+		FieldMetadata:   processMetadata(metadata),
+	})
+	if err != nil {
+		return 0, WrapError(err)
+	}
+
+	var count int64
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPost, "/utxo/count", jsonStr, h.xPriv, h.signRequest, &count,
+	); err != nil {
+		return 0, err
+	}
+	if h.debug {
+		log.Printf("utxos count: %v\n", count)
+	}
+
+	return count, nil
+}
+
 // UnreserveUtxos will unreserve utxos from draft transaction
 func (h *TransportHTTP) UnreserveUtxos(ctx context.Context, referenceID string) ResponseError {
 	jsonStr, err := json.Marshal(map[string]interface{}{

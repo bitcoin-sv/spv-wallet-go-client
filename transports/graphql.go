@@ -963,6 +963,33 @@ func (g *TransportGraphQL) GetUtxos(
 	return respData.Utxos, nil
 }
 
+// GetUtxosCount will get the count of utxos filtered by conditions and metadata
+func (g *TransportGraphQL) GetUtxosCount(
+	ctx context.Context,
+	conditions map[string]interface{},
+	metadata *buxmodels.Metadata,
+) (int64, ResponseError) {
+	reqBody := `
+		query ($conditions: Map, $metadata: Metadata) {
+			utxos_count (
+				conditions: $conditions
+				metadata: $metadata
+			)
+		}`
+
+	variables := map[string]interface{}{
+		"conditions": conditions,
+		"metadata":   metadata,
+	}
+
+	var respData int64
+	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		return 0, err
+	}
+
+	return respData, nil
+}
+
 // UnreserveUtxos will unreserve utxos from draft transaction
 func (g *TransportGraphQL) UnreserveUtxos(ctx context.Context, referenceID string) ResponseError {
 	reqBody := `
