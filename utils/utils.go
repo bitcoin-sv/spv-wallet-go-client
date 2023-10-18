@@ -5,9 +5,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
-	"github.com/libsv/go-bk/bip39"
-	"github.com/libsv/go-bk/chaincfg"
 	"math"
 	"strconv"
 
@@ -85,39 +82,4 @@ func GetChildNumsFromHex(hexHash string) ([]uint32, error) {
 	}
 
 	return childNums, nil
-}
-
-// GenerateRandomSetOfKeys generates a random set of keys - xpriv, xpb and address
-func GenerateRandomSetOfKeys() (hdXpriv *bip32.ExtendedKey, hdXpub *bip32.ExtendedKey) {
-	entropy, err := bip39.GenerateEntropy(160)
-	if err != nil {
-		panic(err)
-	}
-
-	_, seed, err := bip39.Mnemonic(entropy, "")
-
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-
-	hdXpriv, err = bip32.NewMaster(seed, &chaincfg.MainNet)
-
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-
-	hdXpub, err = hdXpriv.Neuter()
-	return
-}
-
-// GetPublicKeyFromHDPrivateKey returns the public key from the HD private key
-func GetPublicKeyFromHDPrivateKey(hdXpriv string) (hdXpub *bip32.ExtendedKey, err error) {
-	hdKey, err := bip32.NewKeyFromString(hdXpriv)
-	hdXpub, err = hdKey.Neuter()
-	if err != nil {
-		return nil, err
-	}
-	return
 }

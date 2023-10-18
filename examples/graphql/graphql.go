@@ -1,21 +1,23 @@
 package main
 
 import (
+	"github.com/BuxOrg/go-buxclient/xkeys"
 	"log"
 
 	"github.com/BuxOrg/go-buxclient"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 )
 
 func main() {
 
-	// Example xPub
-	masterKey, _ := bitcoin.GenerateHDKey(bitcoin.SecureSeedLength)
-	// rawXPub, _ := bitcoin.GetExtendedPublicKey(masterKey)
+	// Generate keys
+	keys, resErr := xkeys.Generate()
+	if resErr != nil {
+		log.Fatalln(resErr.Error())
+	}
 
 	// Create a client
 	buxClient, err := buxclient.New(
-		buxclient.WithXPriv(masterKey.String()),
+		buxclient.WithXPriv(keys.Xpriv.String()),
 		buxclient.WithGraphQL("localhost:3001"),
 		buxclient.WithDebugging(true),
 		buxclient.WithSignRequest(true),

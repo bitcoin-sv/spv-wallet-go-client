@@ -2,23 +2,23 @@ package main
 
 import (
 	"context"
+	"github.com/BuxOrg/go-buxclient/xkeys"
 	"log"
-
-	"github.com/bitcoinschema/go-bitcoin/v2"
 
 	"github.com/BuxOrg/go-buxclient"
 )
 
 func main() {
 
-	// Example xPub
-	masterKey, _ := bitcoin.GenerateHDKey(bitcoin.SecureSeedLength)
-
-	rawXPub, _ := bitcoin.GetExtendedPublicKey(masterKey)
+	// Generate keys
+	keys, resErr := xkeys.Generate()
+	if resErr != nil {
+		log.Fatalln(resErr.Error())
+	}
 
 	// Create a client
 	buxClient, err := buxclient.New(
-		buxclient.WithXPriv(masterKey.String()),
+		buxclient.WithXPriv(keys.Xpriv.String()),
 		buxclient.WithHTTP("localhost:3001"),
 		buxclient.WithDebugging(true),
 		buxclient.WithSignRequest(true),
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	log.Printf("client loaded - bux debug: %v", buxClient.IsDebug())
-	err = buxClient.NewPaymail(context.Background(), rawXPub, "foo@domain.com", "", "Foo", nil)
+	err = buxClient.NewPaymail(context.Background(), keys.Xpub.String(), "foo@domain.com", "", "Foo", nil)
 
 	if err != nil {
 		log.Fatalln(err.Error())
