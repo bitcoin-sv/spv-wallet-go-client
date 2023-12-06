@@ -24,14 +24,14 @@ func main() {
 		buxclient.WithSignRequest(true),
 	)
 	if err != nil {
-		log.Fatal().Err(err).Str("examples", "new_paymail").Msg(err.Error())
+		log.Fatal().Stack().Msg(err.Error())
 	}
 
 	log.Printf("client loaded - bux debug: %v", buxClient.IsDebug())
 	err = buxClient.NewPaymail(context.Background(), rawXPub, "foo@domain.com", "", "Foo", nil)
 
 	if err != nil {
-		log.Fatal().Err(err).Str("examples", "new_paymail").Msg(err.Error())
+		log.Fatal().Stack().Msg(err.Error())
 	}
 	log.Printf("paymail added")
 

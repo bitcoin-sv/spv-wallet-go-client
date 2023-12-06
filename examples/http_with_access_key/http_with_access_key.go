@@ -19,7 +19,7 @@ func main() {
 		buxclient.WithSignRequest(true),
 	)
 	if err != nil {
-		log.Fatal().Err(err).Str("examples", "http_with_access_key").Msg(err.Error())
+		log.Fatal().Stack().Msg(err.Error())
 	}
 
 	log.Printf("client loaded - bux debug: %v", client.IsDebug())

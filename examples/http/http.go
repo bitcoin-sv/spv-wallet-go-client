@@ -21,7 +21,7 @@ func main() {
 		buxclient.WithSignRequest(true),
 	)
 	if err != nil {
-		log.Fatal().Err(err).Str("examples", "http").Msg(err.Error())
+		log.Fatal().Stack().Msg(err.Error())
 	}
 
 	log.Printf("client loaded - bux debug: %v", buxClient.IsDebug())

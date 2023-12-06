@@ -12,7 +12,7 @@ import (
 func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *buxmodels.Metadata) ResponseError {
 	// Adding a xpub needs to be signed by an admin key
 	if h.adminXPriv == nil {
-		Log.Error().Err(ErrAdminKey).Str("http_admin", "NewXpub").Msg(ErrAdminKey.Error())
+		Log.Error().Stack().Msg(ErrAdminKey.Error())
 		return WrapError(ErrAdminKey)
 	}
 
@@ -21,7 +21,7 @@ func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *b
 		FieldXpubKey:  rawXPub,
 	})
 	if err != nil {
-		Log.Error().Err(err).Str("http_admin", "NewXpub").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return WrapError(err)
 	}
 
@@ -43,7 +43,7 @@ func (h *TransportHTTP) AdminGetStatus(ctx context.Context) (bool, ResponseError
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/admin/status", nil, h.xPriv, true, &status,
 	); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetStatus").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return false, err
 	}
 	if h.debug {
@@ -59,7 +59,7 @@ func (h *TransportHTTP) AdminGetStats(ctx context.Context) (*buxmodels.AdminStat
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/admin/stats", nil, h.xPriv, true, &stats,
 	); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetStats").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
@@ -75,7 +75,7 @@ func (h *TransportHTTP) AdminGetAccessKeys(ctx context.Context, conditions map[s
 ) ([]*buxmodels.AccessKey, ResponseError) {
 	var models []*buxmodels.AccessKey
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/access-keys/search", &models); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetAccessKeys").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -95,7 +95,7 @@ func (h *TransportHTTP) AdminGetBlockHeaders(ctx context.Context, conditions map
 ) ([]*buxmodels.BlockHeader, ResponseError) {
 	var models []*buxmodels.BlockHeader
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/block-headers/search", &models); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetBlockHeaders").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -115,7 +115,7 @@ func (h *TransportHTTP) AdminGetDestinations(ctx context.Context, conditions map
 ) ([]*buxmodels.Destination, ResponseError) {
 	var models []*buxmodels.Destination
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/destinations/search", &models); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetDestinations").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -135,7 +135,7 @@ func (h *TransportHTTP) AdminGetPaymail(ctx context.Context, address string) (*b
 		FieldAddress: address,
 	})
 	if err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetPaymail").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -143,7 +143,7 @@ func (h *TransportHTTP) AdminGetPaymail(ctx context.Context, address string) (*b
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/admin/paymail/get", jsonStr, h.xPriv, true, &model,
 	); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetPaymail").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
@@ -159,7 +159,7 @@ func (h *TransportHTTP) AdminGetPaymails(ctx context.Context, conditions map[str
 ) ([]*buxmodels.PaymailAddress, ResponseError) {
 	var models []*buxmodels.PaymailAddress
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/paymails/search", &models); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetPaymails").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -182,7 +182,7 @@ func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, xPubID string, a
 		FieldAvatar:     avatar,
 	})
 	if err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminCreatePaymail").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -190,7 +190,7 @@ func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, xPubID string, a
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/admin/paymail/create", jsonStr, h.xPriv, true, &model,
 	); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminCreatePaymail").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
@@ -206,7 +206,7 @@ func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) 
 		FieldAddress: address,
 	})
 	if err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminDeletePaymail").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -214,7 +214,7 @@ func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) 
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/admin/paymail/delete", jsonStr, h.xPriv, true, &model,
 	); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminDeletePaymail").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
@@ -230,7 +230,7 @@ func (h *TransportHTTP) AdminGetTransactions(ctx context.Context, conditions map
 ) ([]*buxmodels.Transaction, ResponseError) {
 	var models []*buxmodels.Transaction
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/transactions/search", &models); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetTransactions").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -250,7 +250,7 @@ func (h *TransportHTTP) AdminGetUtxos(ctx context.Context, conditions map[string
 ) ([]*buxmodels.Utxo, ResponseError) {
 	var models []*buxmodels.Utxo
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/utxos/search", &models); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetUtxos").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -270,7 +270,7 @@ func (h *TransportHTTP) AdminGetXPubs(ctx context.Context, conditions map[string
 ) ([]*buxmodels.Xpub, ResponseError) {
 	var models []*buxmodels.Xpub
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/xpubs/search", &models); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminGetXPubs").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -293,14 +293,14 @@ func (h *TransportHTTP) adminGetModels(ctx context.Context, conditions map[strin
 		FieldQueryParams: queryParams,
 	})
 	if err != nil {
-		Log.Error().Err(err).Str("http_admin", "adminGetModels").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return WrapError(err)
 	}
 
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, path, jsonStr, h.xPriv, true, &models,
 	); err != nil {
-		Log.Error().Err(err).Str("http_admin", "adminGetModels").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return err
 	}
 	if h.debug {
@@ -323,7 +323,7 @@ func (h *TransportHTTP) adminCount(ctx context.Context, conditions map[string]in
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, path, jsonStr, h.xPriv, true, &count,
 	); err != nil {
-		Log.Error().Err(err).Str("http_admin", "adminCount").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return 0, err
 	}
 	if h.debug {
@@ -346,7 +346,7 @@ func (h *TransportHTTP) AdminRecordTransaction(ctx context.Context, hex string) 
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/admin/transactions/record", jsonStr, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
-		Log.Error().Err(err).Str("http_admin", "AdminRecordTransaction").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {

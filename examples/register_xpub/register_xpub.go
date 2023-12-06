@@ -23,13 +23,13 @@ func main() {
 		buxclient.WithSignRequest(true),
 	)
 	if err != nil {
-		log.Fatal().Err(err).Str("examples", "register_xpub").Msg(err.Error())
+		log.Fatal().Stack().Msg(err.Error())
 	}
 
 	if err = buxClient.NewXpub(
 		context.Background(), rawXPub, &buxmodels.Metadata{"example_field": "example_data"},
 	); err != nil {
-		log.Fatal().Err(err).Str("examples", "register_xpub").Msg(err.Error())
+		log.Fatal().Stack().Msg(err.Error())
 	}
 
 	log.Print("registered xPub: " + rawXPub)

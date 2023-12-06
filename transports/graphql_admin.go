@@ -10,7 +10,7 @@ import (
 func (g *TransportGraphQL) NewXpub(ctx context.Context, rawXPub string, metadata *buxmodels.Metadata) ResponseError {
 	// adding a xpub needs to be signed by an admin key
 	if g.adminXPriv == nil {
-		Log.Error().Err(ErrAdminKey).Str("Graphql_admin", "NewXpub").Msg(ErrAdminKey.Error())
+		Log.Error().Stack().Err(ErrAdminKey).Msg("")
 		return WrapError(ErrAdminKey)
 	}
 
@@ -31,11 +31,11 @@ func (g *TransportGraphQL) NewXpub(ctx context.Context, rawXPub string, metadata
 
 	bodyString, err := getBodyString(reqBody, variables)
 	if err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "NewXpub").Msg(err.Error())
+		Log.Error().Stack().Err(err).Msg("")
 		return err
 	}
 	if err := addSignature(&req.Header, g.adminXPriv, bodyString); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "NewXpub").Msg(err.Error())
+		Log.Error().Stack().Err(err).Msg("")
 		return err
 	}
 
@@ -59,7 +59,7 @@ func (g *TransportGraphQL) AdminGetStatus(ctx context.Context) (bool, ResponseEr
 
 	var status bool
 	if err := g.doGraphQLAdminQuery(ctx, reqBody, nil, &status); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetStatus").Msg(err.Error())
+		Log.Error().Stack().Err(err).Msg("")
 		return false, err
 	}
 
@@ -84,7 +84,7 @@ func (g *TransportGraphQL) AdminGetStats(ctx context.Context) (*buxmodels.AdminS
 
 	var stats *buxmodels.AdminStats
 	if err := g.doGraphQLAdminQuery(ctx, reqBody, nil, &stats); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetStats").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -109,7 +109,7 @@ func (g *TransportGraphQL) AdminGetAccessKeys(ctx context.Context, conditions ma
     `
 
 	if err := g.adminGetModels(ctx, conditions, metadata, queryParams, method, fields, &models); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetAccessKeys").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -145,7 +145,7 @@ func (g *TransportGraphQL) AdminGetBlockHeaders(ctx context.Context, conditions 
     `
 
 	if err := g.adminGetModels(ctx, conditions, metadata, queryParams, method, fields, &models); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetBlockHeaders").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -181,7 +181,7 @@ func (g *TransportGraphQL) AdminGetDestinations(ctx context.Context, conditions 
     `
 
 	if err := g.adminGetModels(ctx, conditions, metadata, queryParams, method, fields, &models); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetDestinations").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -220,7 +220,7 @@ func (g *TransportGraphQL) AdminGetPaymail(ctx context.Context, address string) 
 
 	var paymail *buxmodels.PaymailAddress
 	if err := g.doGraphQLAdminQuery(ctx, reqBody, variables, &paymail); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetPaymail").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -246,7 +246,7 @@ func (g *TransportGraphQL) AdminGetPaymails(ctx context.Context, conditions map[
     `
 
 	if err := g.adminGetModels(ctx, conditions, metadata, queryParams, method, fields, &models); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetPaymails").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -298,7 +298,7 @@ func (g *TransportGraphQL) AdminCreatePaymail(ctx context.Context, xPubID string
 
 	var paymail *buxmodels.PaymailAddress
 	if err := g.doGraphQLAdminQuery(ctx, reqBody, variables, &paymail); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminCreatePaymail").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -332,7 +332,7 @@ func (g *TransportGraphQL) AdminDeletePaymail(ctx context.Context, address strin
 
 	var paymail *buxmodels.PaymailAddress
 	if err := g.doGraphQLAdminQuery(ctx, reqBody, variables, &paymail); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminDeletePaymail").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -362,7 +362,7 @@ func (g *TransportGraphQL) AdminGetTransactions(ctx context.Context, conditions 
     `
 
 	if err := g.adminGetModels(ctx, conditions, metadata, queryParams, method, fields, &models); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetTransactions").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -397,7 +397,7 @@ func (g *TransportGraphQL) AdminGetUtxos(ctx context.Context, conditions map[str
     `
 
 	if err := g.adminGetModels(ctx, conditions, metadata, queryParams, method, fields, &models); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetUtxos").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -427,7 +427,7 @@ func (g *TransportGraphQL) AdminGetXPubs(ctx context.Context, conditions map[str
     `
 
 	if err := g.adminGetModels(ctx, conditions, metadata, queryParams, method, fields, &models); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminGetXPubs").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
@@ -468,7 +468,7 @@ func (g *TransportGraphQL) adminCount(ctx context.Context, conditions map[string
 ) (int64, ResponseError) {
 	// adding a xpub needs to be signed by an admin key
 	if g.adminXPriv == nil {
-		Log.Error().Err(ErrAdminKey).Str("Graphql_admin", "adminCount").Msg(ErrAdminKey.Error())
+		Log.Error().Stack().Msg(ErrAdminKey.Error())
 		return 0, WrapError(ErrAdminKey)
 	}
 
@@ -490,18 +490,18 @@ func (g *TransportGraphQL) adminCount(ctx context.Context, conditions map[string
 
 	bodyString, err := getBodyString(reqBody, variables)
 	if err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "adminCount").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return 0, err
 	}
 	if err = addSignature(&req.Header, g.adminXPriv, bodyString); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "adminCount").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return 0, err
 	}
 
 	// run it and capture the response
 	var count int64
 	if err := g.client.Run(ctx, req, &count); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "adminCount").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return 0, WrapError(err)
 	}
 
@@ -518,13 +518,13 @@ func (g *TransportGraphQL) doGraphQLAdminQuery(ctx context.Context, reqBody stri
 
 	err := g.signGraphQLRequest(req, reqBody, variables, g.adminXPriv, nil)
 	if err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "doGraphQLAdminQuery").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return err
 	}
 
 	// run it and capture the response
 	if err := g.client.Run(ctx, req, &respData); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "doGraphQLAdminQuery").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return WrapError(err)
 	}
 	if g.debug {
@@ -561,14 +561,14 @@ func (g *TransportGraphQL) AdminRecordTransaction(ctx context.Context, hex strin
 
 	err := g.signGraphQLRequest(req, reqBody, nil, g.xPriv, g.xPub)
 	if err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminRecordTransaction").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, err
 	}
 
 	// run it and capture the response
 	var respData NewTransactionData
 	if err := g.client.Run(ctx, req, &respData); err != nil {
-		Log.Error().Err(err).Str("Graphql_admin", "AdminRecordTransaction").Msg(err.Error())
+		Log.Error().Stack().Msg(err.Error())
 		return nil, WrapError(err)
 	}
 	transaction := respData.Transaction
