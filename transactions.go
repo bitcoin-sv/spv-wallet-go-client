@@ -66,13 +66,16 @@ func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transpor
 ) (*buxmodels.Transaction, transports.ResponseError) {
 	draft, err := b.DraftToRecipients(ctx, recipients, metadata)
 	if err != nil {
+		Log.Error().Err(err).Str("transactions", "SendToRecipients").Msg(err.Error())
 		return nil, err
 	} else if draft == nil {
+		Log.Error().Err(buxerrors.ErrDraftNotFound).Str("transactions", "SendToRecipients").Msg(buxerrors.ErrDraftNotFound.Error())
 		return nil, transports.WrapError(buxerrors.ErrDraftNotFound)
 	}
 
 	var hex string
 	if hex, err = b.FinalizeTransaction(draft); err != nil {
+		Log.Error().Err(err).Str("transactions", "SendToRecipients").Msg(err.Error())
 		return nil, err
 	}
 

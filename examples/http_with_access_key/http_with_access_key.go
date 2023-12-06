@@ -1,12 +1,12 @@
 package main
 
 import (
-	"log"
-
 	"github.com/BuxOrg/go-buxclient"
+	"github.com/BuxOrg/go-buxclient/logger"
 )
 
 func main() {
+	log := logger.Get()
 
 	//Replace with created access key
 	exampleAccessKey := "some_generated_access_key"
@@ -19,7 +19,7 @@ func main() {
 		buxclient.WithSignRequest(true),
 	)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal().Err(err).Str("examples", "http_with_access_key").Msg(err.Error())
 	}
 
 	log.Printf("client loaded - bux debug: %v", client.IsDebug())

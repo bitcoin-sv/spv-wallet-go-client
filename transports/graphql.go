@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	buxmodels "github.com/BuxOrg/bux-models"
@@ -169,6 +168,7 @@ func (g *TransportGraphQL) GetXPub(ctx context.Context) (*buxmodels.Xpub, Respon
 
 	var respData XPubData
 	if err := g.doGraphQLQuery(ctx, reqBody, nil, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetXPub").Msg(err.Error())
 		return nil, err
 	}
 
@@ -198,6 +198,7 @@ func (g *TransportGraphQL) UpdateXPubMetadata(ctx context.Context, metadata *bux
 
 	var respData XPubMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "UpdateXPubMetadata").Msg(err.Error())
 		return nil, err
 	}
 
@@ -226,6 +227,7 @@ func (g *TransportGraphQL) GetAccessKey(ctx context.Context, id string) (*buxmod
 	if err := g.doGraphQLQuery(ctx, reqBody, map[string]interface{}{
 		FieldID: id,
 	}, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetAccessKey").Msg(err.Error())
 		return nil, err
 	}
 
@@ -255,6 +257,7 @@ func (g *TransportGraphQL) GetAccessKeys(ctx context.Context, metadata *buxmodel
 
 	var respData AccessKeysData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetAccessKeys").Msg(err.Error())
 		return nil, err
 	}
 
@@ -284,6 +287,7 @@ func (g *TransportGraphQL) CreateAccessKey(ctx context.Context, metadata *buxmod
 
 	var respData AccessKeyData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "CreateAccessKey").Msg(err.Error())
 		return nil, err
 	}
 
@@ -334,6 +338,7 @@ func (g *TransportGraphQL) RevokeAccessKey(ctx context.Context, id string) (*bux
 
 	var respData AccessKeyData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "RevokeAccessKey").Msg(err.Error())
 		return nil, err
 	}
 
@@ -366,6 +371,7 @@ func (g *TransportGraphQL) GetDestinationByID(ctx context.Context, id string) (*
 
 	var respData DestinationData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetDestinationByID").Msg(err.Error())
 		return nil, err
 	}
 
@@ -398,6 +404,7 @@ func (g *TransportGraphQL) GetDestinationByLockingScript(ctx context.Context, lo
 
 	var respData DestinationData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetDestinationByLockingScript").Msg(err.Error())
 		return nil, err
 	}
 
@@ -430,6 +437,7 @@ func (g *TransportGraphQL) GetDestinationByAddress(ctx context.Context, address 
 
 	var respData DestinationData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetDestinationByAddress").Msg(err.Error())
 		return nil, err
 	}
 
@@ -464,6 +472,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByID(ctx context.Context, id
 
 	var respData DestinationMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "UpdateDestinationMetadataByID").Msg(err.Error())
 		return nil, err
 	}
 
@@ -498,6 +507,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByAddress(ctx context.Contex
 
 	var respData DestinationMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "UpdateDestinationMetadataByAddress").Msg(err.Error())
 		return nil, err
 	}
 
@@ -532,6 +542,7 @@ func (g *TransportGraphQL) UpdateDestinationMetadataByLockingScript(ctx context.
 
 	var respData DestinationMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "UpdateDestinationMetadataByLockingScript").Msg(err.Error())
 		return nil, err
 	}
 
@@ -564,6 +575,7 @@ func (g *TransportGraphQL) GetDestinations(ctx context.Context, metadataConditio
 
 	var respData DestinationsData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetDestinations").Msg(err.Error())
 		return nil, err
 	}
 
@@ -585,6 +597,7 @@ func (g *TransportGraphQL) GetDestinationsCount(ctx context.Context, conditions 
 	}
 	var count int64
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &count); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetDestinationsCount").Msg(err.Error())
 		return 0, err
 	}
 
@@ -614,6 +627,7 @@ func (g *TransportGraphQL) NewDestination(ctx context.Context, metadata *buxmode
 
 	var respData DestinationData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "NewDestination").Msg(err.Error())
 		return nil, err
 	}
 
@@ -645,6 +659,7 @@ func (g *TransportGraphQL) GetTransaction(ctx context.Context, txID string) (*bu
 	}`
 	var respData TransactionData
 	if err := g.doGraphQLQuery(ctx, reqBody, nil, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetTransaction").Msg(err.Error())
 		return nil, err
 	}
 
@@ -704,6 +719,7 @@ func (g *TransportGraphQL) GetTransactions(ctx context.Context, conditions map[s
 
 	var respData TransactionsData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetTransactions").Msg(err.Error())
 		return nil, err
 	}
 
@@ -725,6 +741,7 @@ func (g *TransportGraphQL) GetTransactionsCount(ctx context.Context, conditions 
 	}
 	var respData int64
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetTransactionsCount").Msg(err.Error())
 		return 0, err
 	}
 
@@ -792,17 +809,19 @@ func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody s
 ) (*buxmodels.DraftTransaction, ResponseError) {
 	err := g.signGraphQLRequest(req, reqBody, variables, g.xPriv, g.xPub)
 	if err != nil {
+		Log.Error().Err(err).Str("graphql", "draftTransactionCommon").Msg(err.Error())
 		return nil, err
 	}
 
 	// run it and capture the response
 	var respData DraftTransactionData
 	if err := g.client.Run(ctx, req, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "draftTransactionCommon").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 	draftTransaction := respData.NewTransaction
 	if g.debug {
-		log.Printf("Draft transaction: %v\n", draftTransaction)
+		Log.Printf("Draft transaction: %v\n", draftTransaction)
 	}
 
 	return draftTransaction, nil
@@ -843,17 +862,19 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 	}
 	err := g.signGraphQLRequest(req, reqBody, variables, g.xPriv, g.xPub)
 	if err != nil {
+		Log.Error().Err(err).Str("graphql", "RecordTransaction").Msg(err.Error())
 		return nil, err
 	}
 
 	// run it and capture the response
 	var respData NewTransactionData
 	if err := g.client.Run(ctx, req, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "RecordTransaction").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 	transaction := respData.Transaction
 	if g.debug {
-		log.Printf("transaction: %s\n", transaction.ID)
+		Log.Printf("transaction: %s\n", transaction.ID)
 	}
 
 	return transaction, nil
@@ -890,6 +911,7 @@ func (g *TransportGraphQL) UpdateTransactionMetadata(ctx context.Context, txID s
 
 	var respData TransactionMetadataData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "UpdateTransactionMetadata").Msg(err.Error())
 		return nil, err
 	}
 
@@ -929,6 +951,7 @@ func (g *TransportGraphQL) GetUtxo(ctx context.Context, txID string, outputIndex
 
 	var respData UtxoData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetUtxo").Msg(err.Error())
 		return nil, err
 	}
 
@@ -957,6 +980,7 @@ func (g *TransportGraphQL) GetUtxos(
 
 	var respData UtxosData
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetUtxos").Msg(err.Error())
 		return nil, err
 	}
 
@@ -984,6 +1008,7 @@ func (g *TransportGraphQL) GetUtxosCount(
 
 	var respData int64
 	if err := g.doGraphQLQuery(ctx, reqBody, variables, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "GetUtxosCount").Msg(err.Error())
 		return 0, err
 	}
 
@@ -1014,15 +1039,17 @@ func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, v
 
 	err := g.signGraphQLRequest(req, reqBody, variables, g.xPriv, g.xPub)
 	if err != nil {
+		Log.Error().Err(err).Str("graphql", "doGraphQLQuery").Msg(err.Error())
 		return err
 	}
 
 	// run it and capture the response
 	if err := g.client.Run(ctx, req, &respData); err != nil {
+		Log.Error().Err(err).Str("graphql", "doGraphQLQuery").Msg(err.Error())
 		return WrapError(err)
 	}
 	if g.debug {
-		log.Printf("model: %v\n", respData)
+		Log.Printf("model: %v\n", respData)
 	}
 
 	return nil
@@ -1039,6 +1066,7 @@ func getBodyString(reqBody string, variables map[string]interface{}) (string, Re
 
 	body, err := json.Marshal(requestBodyObj)
 	if err != nil {
+		Log.Error().Err(err).Str("graphql", "getBodyString").Msg(err.Error())
 		return "", WrapError(err)
 	}
 
@@ -1053,6 +1081,7 @@ func (g *TransportGraphQL) signGraphQLRequest(req *graphql.Request, reqBody stri
 	} else if g.accessKey != nil {
 		return g.authenticateWithAccessKey(req, reqBody, variables)
 	} else {
+		Log.Error().Err(buxerrors.ErrMissingXPriv).Str("graphql", "signGraphQLRequest").Msg(buxerrors.ErrMissingXPriv.Error())
 		return WrapError(buxerrors.ErrMissingXPriv)
 	}
 }
@@ -1061,10 +1090,12 @@ func (g *TransportGraphQL) authenticateWithXpriv(req *graphql.Request, reqBody s
 	if g.signRequest {
 		bodyString, err := getBodyString(reqBody, variables)
 		if err != nil {
+			Log.Error().Err(err).Str("graphql", "authenticateWithXpriv").Msg(err.Error())
 			return err
 		}
 		err = addSignature(&req.Header, xPriv, bodyString)
 		if err != nil {
+			Log.Error().Err(err).Str("graphql", "authenticateWithXpriv").Msg(err.Error())
 			return err
 		}
 	} else {
@@ -1076,6 +1107,7 @@ func (g *TransportGraphQL) authenticateWithXpriv(req *graphql.Request, reqBody s
 func (g *TransportGraphQL) authenticateWithAccessKey(req *graphql.Request, reqBody string, variables map[string]interface{}) ResponseError {
 	bodyString, err := getBodyString(reqBody, variables)
 	if err != nil {
+		Log.Error().Err(err).Str("graphql", "authenticateWithAccessKey").Msg(err.Error())
 		return err
 	}
 	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(g.accessKey.Serialise()), bodyString)

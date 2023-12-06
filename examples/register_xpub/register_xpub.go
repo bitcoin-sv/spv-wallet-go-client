@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"log"
-
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/go-buxclient"
+	"github.com/BuxOrg/go-buxclient/logger"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 )
 
 func main() {
+	log := logger.Get()
+
 	// Example xPub
 	masterKey, _ := bitcoin.GenerateHDKey(bitcoin.SecureSeedLength)
 	rawXPub, _ := bitcoin.GetExtendedPublicKey(masterKey)
@@ -22,14 +23,14 @@ func main() {
 		buxclient.WithSignRequest(true),
 	)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal().Err(err).Str("examples", "register_xpub").Msg(err.Error())
 	}
 
 	if err = buxClient.NewXpub(
 		context.Background(), rawXPub, &buxmodels.Metadata{"example_field": "example_data"},
 	); err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal().Err(err).Str("examples", "register_xpub").Msg(err.Error())
 	}
 
-	log.Println("registered xPub: " + rawXPub)
+	log.Print("registered xPub: " + rawXPub)
 }

@@ -3,6 +3,7 @@ package transports
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/BuxOrg/go-buxclient/logger"
 	"net/http"
 	"time"
 
@@ -17,11 +18,14 @@ import (
 	"github.com/libsv/go-bt/v2/sighash"
 )
 
+var Log = logger.Get()
+
 // SetSignature will set the signature on the header for the request
 func SetSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
 	// Create the signature
 	authData, err := createSignature(xPriv, bodyString)
 	if err != nil {
+		Log.Error().Err(err).Str("authentication", "SetSignature").Msg(err.Error())
 		return WrapError(err)
 	}
 
@@ -37,6 +41,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 	// Start a bt draft transaction
 	var txDraft *bt.Tx
 	if txDraft, err = bt.NewTxFromString(dt.Hex); err != nil {
+		Log.Error().Err(err).Str("authentication", "SignInputs").Msg(err.Error())
 		resError = WrapError(err)
 		return
 	}
@@ -49,6 +54,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if ls, err = bscript.NewFromHexString(
 			input.Destination.LockingScript,
 		); err != nil {
+			Log.Error().Err(err).Str("authentication", "SignInputs").Msg(err.Error())
 			resError = WrapError(err)
 			return
 		}
@@ -60,6 +66,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if chainKey, err = xPriv.Child(
 			input.Destination.Chain,
 		); err != nil {
+			Log.Error().Err(err).Str("authentication", "SignInputs").Msg(err.Error())
 			resError = WrapError(err)
 			return
 		}
@@ -69,6 +76,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if numKey, err = chainKey.Child(
 			input.Destination.Num,
 		); err != nil {
+			Log.Error().Err(err).Str("authentication", "SignInputs").Msg(err.Error())
 			resError = WrapError(err)
 			return
 		}
@@ -78,6 +86,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(
 			numKey,
 		); err != nil {
+			Log.Error().Err(err).Str("authentication", "SignInputs").Msg(err.Error())
 			resError = WrapError(err)
 			return
 		}
@@ -87,6 +96,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if s, err = GetUnlockingScript(
 			txDraft, uint32(index), privateKey,
 		); err != nil {
+			Log.Error().Err(err).Str("authentication", "SignInputs").Msg(err.Error())
 			resError = WrapError(err)
 			return
 		}
@@ -95,6 +105,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 		if err = txDraft.InsertInputUnlockingScript(
 			uint32(index), s,
 		); err != nil {
+			Log.Error().Err(err).Str("authentication", "SignInputs").Msg(err.Error())
 			resError = WrapError(err)
 			return
 		}
@@ -111,11 +122,13 @@ func GetUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey
 
 	sigHash, err := tx.CalcInputSignatureHash(inputIndex, sigHashFlags)
 	if err != nil {
+		Log.Error().Err(err).Str("authentication", "GetUnlockingScript").Msg(err.Error())
 		return nil, err
 	}
 
 	var sig *bec.Signature
 	if sig, err = privateKey.Sign(sigHash); err != nil {
+		Log.Error().Err(err).Str("authentication", "GetUnlockingScript").Msg(err.Error())
 		return nil, err
 	}
 
@@ -134,6 +147,7 @@ func GetUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey
 func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *buxmodels.AuthPayload, err error) {
 	// No key?
 	if xPriv == nil {
+		Log.Error().Err(err).Str("authentication", "createSignature").Msg(err.Error())
 		err = buxerrors.ErrMissingXPriv
 		return
 	}
@@ -143,12 +157,14 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *buxm
 	if payload.XPub, err = bitcoin.GetExtendedPublicKey(
 		xPriv,
 	); err != nil { // Should never error if key is correct
+		Log.Error().Err(err).Str("authentication", "createSignature").Msg(err.Error())
 		return
 	}
 
 	// auth_nonce is a random unique string to seed the signing message
 	// this can be checked server side to make sure the request is not being replayed
 	if payload.AuthNonce, err = utils.RandomHex(32); err != nil { // Should never error if key is correct
+		Log.Error().Err(err).Str("authentication", "createSignature").Msg(err.Error())
 		return
 	}
 
@@ -157,6 +173,7 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *buxm
 	if key, err = utils.DeriveChildKeyFromHex(
 		xPriv, payload.AuthNonce,
 	); err != nil {
+		Log.Error().Err(err).Str("authentication", "createSignature").Msg(err.Error())
 		return
 	}
 
@@ -188,6 +205,7 @@ func createSignatureCommon(payload *buxmodels.AuthPayload, bodyString string, pr
 		getSigningMessage(key, payload),
 		true,
 	); err != nil {
+		Log.Error().Err(err).Str("authentication", "createSignatureCommon").Msg(err.Error())
 		return nil, err
 	}
 
@@ -196,6 +214,7 @@ func createSignatureCommon(payload *buxmodels.AuthPayload, bodyString string, pr
 
 // getSigningMessage will build the signing message string
 func getSigningMessage(xPub string, auth *buxmodels.AuthPayload) string {
+	Log.Info().Str("authentication", "getSigningMessage").Msgf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
 	return fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
 }
 
@@ -206,6 +225,7 @@ func setSignatureHeaders(header *http.Header, authData *buxmodels.AuthPayload) R
 	// Set the nonce
 	header.Set(buxmodels.AuthHeaderNonce, authData.AuthNonce)
 
+	Log.Info().Str("authentication", "setSignatureHeaders").Msgf("%d", authData.AuthTime)
 	// Set the time
 	header.Set(buxmodels.AuthHeaderTime, fmt.Sprintf("%d", authData.AuthTime))
 

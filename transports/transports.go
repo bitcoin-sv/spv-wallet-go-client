@@ -38,16 +38,19 @@ func NewTransport(opts ...ClientOps) (TransportService, error) {
 	}
 
 	if client.transport == nil {
+		Log.Error().Err(ErrNoClientSet).Str("transport", "NewTransport").Msg(ErrNoClientSet.Error())
 		return nil, ErrNoClientSet
 	}
 
 	if err := client.transport.Init(); err != nil {
+		Log.Error().Err(err).Str("transport", "NewTransport").Msg(err.Error())
 		return nil, err
 	}
 
 	if client.adminKey != "" {
 		adminXPriv, err := bip32.NewKeyFromString(client.adminKey)
 		if err != nil {
+			Log.Error().Err(err).Str("transport", "NewTransport").Msg(err.Error())
 			return nil, err
 		}
 		client.adminXPriv = adminXPriv

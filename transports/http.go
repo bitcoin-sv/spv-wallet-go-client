@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -70,6 +69,7 @@ func (h *TransportHTTP) NewPaymail(ctx context.Context, rawXpub, paymailAddress,
 		FieldXpubKey:    rawXpub,
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "NewPaymail").Msg(err.Error())
 		return WrapError(err)
 	}
 
@@ -86,16 +86,18 @@ func (h *TransportHTTP) DeletePaymail(ctx context.Context, paymailAddress string
 		FieldAddress: paymailAddress,
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "DeletePaymail").Msg(err.Error())
 		return WrapError(err)
 	}
 
 	if err := h.doHTTPRequest(
 		ctx, http.MethodDelete, "/paymail", jsonStr, h.xPriv, true, nil,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "NewPaymail").Msg(err.Error())
 		return WrapError(err)
 	}
 	if h.debug {
-		log.Printf("delete paymail: %v\n", paymailAddress)
+		Log.Printf("delete paymail: %v\n", paymailAddress)
 	}
 
 	return nil
@@ -107,10 +109,11 @@ func (h *TransportHTTP) GetXPub(ctx context.Context) (*buxmodels.Xpub, ResponseE
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/xpub", nil, h.xPriv, true, &xPub,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetXPub").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("xpub: %v\n", xPub)
+		Log.Printf("xpub: %v\n", xPub)
 	}
 
 	return &xPub, nil
@@ -122,6 +125,7 @@ func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *buxmod
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "UpdateXPubMetadata").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -129,10 +133,11 @@ func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *buxmod
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/xpub", jsonStr, h.xPriv, true, &xPub,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "UpdateXPubMetadata").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("xpub: %v\n", xPub)
+		Log.Printf("xpub: %v\n", xPub)
 	}
 
 	return &xPub, nil
@@ -144,10 +149,11 @@ func (h *TransportHTTP) GetAccessKey(ctx context.Context, id string) (*buxmodels
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/access-key?"+FieldID+"="+id, nil, h.xPriv, true, &accessKey,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetAccessKey").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("access key: %v\n", accessKey)
+		Log.Printf("access key: %v\n", accessKey)
 	}
 
 	return &accessKey, nil
@@ -159,12 +165,14 @@ func (h *TransportHTTP) GetAccessKeys(ctx context.Context, metadataConditions *b
 		FieldMetadata: processMetadata(metadataConditions),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "GetAccessKeys").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 	var accessKey []*buxmodels.AccessKey
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/access-key/search", jsonStr, h.xPriv, true, &accessKey,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetAccessKeys").Msg(err.Error())
 		return nil, err
 	}
 
@@ -178,6 +186,7 @@ func (h *TransportHTTP) GetAccessKeysCount(ctx context.Context, conditions map[s
 		FieldMetadata:   processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "GetAccessKeysCount").Msg(err.Error())
 		return 0, WrapError(err)
 	}
 
@@ -185,10 +194,11 @@ func (h *TransportHTTP) GetAccessKeysCount(ctx context.Context, conditions map[s
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/access-key/count", jsonStr, h.xPriv, true, &count,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetAccessKeysCount").Msg(err.Error())
 		return 0, err
 	}
 	if h.debug {
-		log.Printf("Access keys count: %v\n", count)
+		Log.Printf("Access keys count: %v\n", count)
 	}
 
 	return count, nil
@@ -200,10 +210,11 @@ func (h *TransportHTTP) RevokeAccessKey(ctx context.Context, id string) (*buxmod
 	if err := h.doHTTPRequest(
 		ctx, http.MethodDelete, "/access-key?"+FieldID+"="+id, nil, h.xPriv, true, &accessKey,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "RevokeAccessKey").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("access key: %v\n", accessKey)
+		Log.Printf("access key: %v\n", accessKey)
 	}
 
 	return &accessKey, nil
@@ -215,12 +226,14 @@ func (h *TransportHTTP) CreateAccessKey(ctx context.Context, metadata *buxmodels
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "CreateAccessKey").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 	var accessKey buxmodels.AccessKey
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/access-key", jsonStr, h.xPriv, true, &accessKey,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "CreateAccessKey").Msg(err.Error())
 		return nil, err
 	}
 
@@ -233,10 +246,11 @@ func (h *TransportHTTP) GetDestinationByID(ctx context.Context, id string) (*bux
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/destination?"+FieldID+"="+id, nil, h.xPriv, true, &destination,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetDestinationByID").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("destination: %v\n", destination)
+		Log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -248,10 +262,11 @@ func (h *TransportHTTP) GetDestinationByAddress(ctx context.Context, address str
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/destination?"+FieldAddress+"="+address, nil, h.xPriv, true, &destination,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetDestinationByAddress").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("destination: %v\n", destination)
+		Log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -263,10 +278,11 @@ func (h *TransportHTTP) GetDestinationByLockingScript(ctx context.Context, locki
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/destination?"+FieldLockingScript+"="+lockingScript, nil, h.xPriv, true, &destination,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetDestinationByLockingScript").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("destination: %v\n", destination)
+		Log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -278,12 +294,14 @@ func (h *TransportHTTP) GetDestinations(ctx context.Context, metadataConditions 
 		FieldMetadata: processMetadata(metadataConditions),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "GetDestinations").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 	var destinations []*buxmodels.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/destination/search", jsonStr, h.xPriv, true, &destinations,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetDestinations").Msg(err.Error())
 		return nil, err
 	}
 
@@ -297,6 +315,7 @@ func (h *TransportHTTP) GetDestinationsCount(ctx context.Context, conditions map
 		FieldMetadata:   processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "GetDestinationsCount").Msg(err.Error())
 		return 0, WrapError(err)
 	}
 
@@ -304,6 +323,7 @@ func (h *TransportHTTP) GetDestinationsCount(ctx context.Context, conditions map
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/destination/count", jsonStr, h.xPriv, true, &count,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetDestinationsCount").Msg(err.Error())
 		return 0, err
 	}
 
@@ -316,16 +336,18 @@ func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *buxmodels.
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "NewDestination").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 	var destination buxmodels.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "NewDestination").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("new destination: %v\n", destination)
+		Log.Printf("new destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -340,6 +362,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id st
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "UpdateDestinationMetadataByID").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -347,10 +370,11 @@ func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id st
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "UpdateDestinationMetadataByID").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("destination: %v\n", destination)
+		Log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -365,6 +389,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, 
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "UpdateDestinationMetadataByAddress").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -372,10 +397,11 @@ func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, 
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "UpdateDestinationMetadataByAddress").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("destination: %v\n", destination)
+		Log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -390,6 +416,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Con
 		FieldMetadata:      processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "UpdateDestinationMetadataByLockingScript").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -397,10 +424,11 @@ func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Con
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "UpdateDestinationMetadataByLockingScript").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("destination: %v\n", destination)
+		Log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -412,10 +440,11 @@ func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*buxmo
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetTransaction").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("Transaction: %v\n", transaction)
+		Log.Printf("Transaction: %v\n", transaction)
 	}
 
 	return &transaction, nil
@@ -431,6 +460,7 @@ func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[stri
 		FieldQueryParams: queryParams,
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "GetTransactions").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -438,10 +468,11 @@ func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[stri
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/transaction/search", jsonStr, h.xPriv, h.signRequest, &transactions,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetTransactions").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("transactions: %d\n", len(transactions))
+		Log.Printf("transactions: %d\n", len(transactions))
 	}
 
 	return transactions, nil
@@ -456,6 +487,7 @@ func (h *TransportHTTP) GetTransactionsCount(ctx context.Context, conditions map
 		FieldMetadata:   processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "GetTransactionsCount").Msg(err.Error())
 		return 0, WrapError(err)
 	}
 
@@ -463,10 +495,11 @@ func (h *TransportHTTP) GetTransactionsCount(ctx context.Context, conditions map
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/transaction/count", jsonStr, h.xPriv, h.signRequest, &count,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetTransactionsCount").Msg(err.Error())
 		return 0, err
 	}
 	if h.debug {
-		log.Printf("Transactions count: %v\n", count)
+		Log.Printf("Transactions count: %v\n", count)
 	}
 
 	return count, nil
@@ -509,6 +542,7 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context,
 ) (*buxmodels.DraftTransaction, ResponseError) {
 	jsonStr, err := json.Marshal(jsonData)
 	if err != nil {
+		Log.Error().Err(err).Str("http", "createDraftTransaction").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -516,12 +550,14 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context,
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/transaction", jsonStr, h.xPriv, true, &draftTransaction,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "createDraftTransaction").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("draft transaction: %v\n", draftTransaction)
+		Log.Printf("draft transaction: %v\n", draftTransaction)
 	}
 	if draftTransaction == nil {
+		Log.Error().Err(buxerrors.ErrDraftNotFound).Str("http", "createDraftTransaction").Msg(buxerrors.ErrDraftNotFound.Error())
 		return nil, WrapError(buxerrors.ErrDraftNotFound)
 	}
 
@@ -538,6 +574,7 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 		FieldMetadata:    processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "RecordTransaction").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -545,10 +582,11 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/transaction/record", jsonStr, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "RecordTransaction").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("transaction: %s\n", transaction.ID)
+		Log.Printf("transaction: %s\n", transaction.ID)
 	}
 
 	return &transaction, nil
@@ -563,6 +601,7 @@ func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID stri
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "UpdateTransactionMetadata").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -570,10 +609,11 @@ func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID stri
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/transaction", jsonStr, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "UpdateTransactionMetadata").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("Transaction: %v\n", transaction)
+		Log.Printf("Transaction: %v\n", transaction)
 	}
 
 	return &transaction, nil
@@ -584,6 +624,7 @@ func SetSignatureFromAccessKey(header *http.Header, privateKeyHex, bodyString st
 	// Create the signature
 	authData, err := createSignatureAccessKey(privateKeyHex, bodyString)
 	if err != nil {
+		Log.Error().Err(err).Str("http", "SetSignatureFromAccessKey").Msg(err.Error())
 		return WrapError(err)
 	}
 
@@ -603,11 +644,12 @@ func (h *TransportHTTP) GetUtxo(ctx context.Context, txID string, outputIndex ui
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, url, nil, h.xPriv, true, &utxo,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetUtxo").Msg(err.Error())
 		return nil, err
 	}
 
 	if h.debug {
-		log.Printf("utxo: %v\n", utxo)
+		Log.Printf("utxo: %v\n", utxo)
 	}
 
 	return &utxo, nil
@@ -621,6 +663,7 @@ func (h *TransportHTTP) GetUtxos(ctx context.Context, conditions map[string]inte
 		FieldQueryParams: queryParams,
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "GetUtxos").Msg(err.Error())
 		return nil, WrapError(err)
 	}
 
@@ -628,10 +671,11 @@ func (h *TransportHTTP) GetUtxos(ctx context.Context, conditions map[string]inte
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/utxo/search", jsonStr, h.xPriv, h.signRequest, &utxos,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetUtxo").Msg(err.Error())
 		return nil, err
 	}
 	if h.debug {
-		log.Printf("utxos: %d\n", len(utxos))
+		Log.Printf("utxos: %d\n", len(utxos))
 	}
 
 	return utxos, nil
@@ -644,6 +688,7 @@ func (h *TransportHTTP) GetUtxosCount(ctx context.Context, conditions map[string
 		FieldMetadata:   processMetadata(metadata),
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "GetUtxosCount").Msg(err.Error())
 		return 0, WrapError(err)
 	}
 
@@ -651,10 +696,11 @@ func (h *TransportHTTP) GetUtxosCount(ctx context.Context, conditions map[string
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/utxo/count", jsonStr, h.xPriv, h.signRequest, &count,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "GetUtxosCount").Msg(err.Error())
 		return 0, err
 	}
 	if h.debug {
-		log.Printf("utxos count: %v\n", count)
+		Log.Printf("utxos count: %v\n", count)
 	}
 
 	return count, nil
@@ -666,6 +712,7 @@ func (h *TransportHTTP) UnreserveUtxos(ctx context.Context, referenceID string) 
 		FieldReferenceID: referenceID,
 	})
 	if err != nil {
+		Log.Error().Err(err).Str("http", "UnreserveUtxos").Msg(err.Error())
 		return WrapError(err)
 	}
 
@@ -684,6 +731,7 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *buxmod
 	if privateKey, err = bitcoin.PrivateKeyFromString(
 		privateKeyHex,
 	); err != nil {
+		Log.Error().Err(err).Str("http", "createSignatureAccessKey").Msg(err.Error())
 		return
 	}
 	publicKey := privateKey.PubKey()
@@ -696,6 +744,7 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *buxmod
 	// this can be checked server side to make sure the request is not being replayed
 	payload.AuthNonce, err = utils.RandomHex(32)
 	if err != nil {
+		Log.Error().Err(err).Str("http", "createSignatureAccessKey").Msg(err.Error())
 		return nil, err
 	}
 
@@ -708,6 +757,7 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 ) ResponseError {
 	req, err := http.NewRequestWithContext(ctx, method, h.server+path, bytes.NewBuffer(rawJSON))
 	if err != nil {
+		Log.Error().Err(err).Str("http", "doHTTPRequest").Msg(err.Error())
 		return WrapError(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -715,11 +765,13 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 	if xPriv != nil {
 		err := h.authenticateWithXpriv(sign, req, xPriv, rawJSON)
 		if err != nil {
+			Log.Error().Err(err).Str("http", "doHTTPRequest").Msg(err.Error())
 			return err
 		}
 	} else {
 		err := h.authenticateWithAccessKey(req, rawJSON)
 		if err != nil {
+			Log.Error().Err(err).Str("http", "doHTTPRequest").Msg(err.Error())
 			return err
 		}
 	}
@@ -731,9 +783,11 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 		}
 	}()
 	if resp, err = h.httpClient.Do(req); err != nil {
+		Log.Error().Err(err).Str("http", "doHTTPRequest").Msg(err.Error())
 		return WrapError(err)
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
+		Log.Info().Str("http", "doHTTPRequest").Msgf("Resp status code: %d", resp.StatusCode)
 		return WrapResponseError(resp)
 	}
 
@@ -743,6 +797,7 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 
 	err = json.NewDecoder(resp.Body).Decode(&responseJSON)
 	if err != nil {
+		Log.Error().Err(err).Str("http", "doHTTPRequest").Msg(err.Error())
 		return WrapError(err)
 	}
 	return nil
@@ -751,12 +806,14 @@ func (h *TransportHTTP) doHTTPRequest(ctx context.Context, method string, path s
 func (h *TransportHTTP) authenticateWithXpriv(sign bool, req *http.Request, xPriv *bip32.ExtendedKey, rawJSON []byte) ResponseError {
 	if sign {
 		if err := addSignature(&req.Header, xPriv, string(rawJSON)); err != nil {
+			Log.Error().Err(err).Str("http", "authenticateWithXpriv").Msg(err.Error())
 			return err
 		}
 	} else {
 		var xPub string
 		xPub, err := bitcoin.GetExtendedPublicKey(xPriv)
 		if err != nil {
+			Log.Error().Err(err).Str("http", "authenticateWithXpriv").Msg(err.Error())
 			return WrapError(err)
 		}
 		req.Header.Set(buxmodels.AuthHeader, xPub)

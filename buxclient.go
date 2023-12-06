@@ -7,6 +7,7 @@
 package buxclient
 
 import (
+	"github.com/BuxOrg/go-buxclient/logger"
 	"github.com/BuxOrg/go-buxclient/transports"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
@@ -14,6 +15,8 @@ import (
 	"github.com/libsv/go-bk/wif"
 	"github.com/pkg/errors"
 )
+
+var Log = logger.Get()
 
 // ClientOps are used for client options
 type ClientOps func(c *BuxClient)
@@ -43,14 +46,17 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 	var err error
 	if client.xPrivString != "" {
 		if client.xPriv, err = bitcoin.GenerateHDKeyFromString(client.xPrivString); err != nil {
+			Log.Error().Err(err).Str("buxclient", "New/xpriv").Msg(err.Error())
 			return nil, err
 		}
 		if client.xPub, err = client.xPriv.Neuter(); err != nil {
+			Log.Error().Err(err).Str("buxclient", "New/xpub").Msg(err.Error())
 			return nil, err
 		}
 	} else if client.xPubString != "" {
 		client.xPriv = nil
 		if client.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(client.xPubString); err != nil {
+			Log.Error().Err(err).Str("buxclient", "New").Msg(err.Error())
 			return nil, err
 		}
 	} else if client.accessKeyString != "" {
@@ -63,6 +69,7 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 			// try as a hex string
 			var errHex error
 			if privateKey, errHex = bitcoin.PrivateKeyFromString(client.accessKeyString); errHex != nil {
+				Log.Error().Err(errHex).Str("buxclient", "New").Msg(errHex.Error())
 				return nil, errors.Wrap(err, errHex.Error())
 			}
 		} else {
@@ -70,6 +77,7 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 		}
 		client.accessKey = privateKey
 	} else {
+		Log.Error().Str("buxclient", "New").Msg("no keys available")
 		return nil, errors.New("no keys available")
 	}
 
@@ -87,6 +95,7 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 	}
 
 	if client.transport, err = transports.NewTransport(transportOptions...); err != nil {
+		Log.Error().Err(err).Str("buxclient", "New").Msg(err.Error())
 		return nil, err
 	}
 
@@ -97,6 +106,7 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 func (b *BuxClient) SetAdminKey(adminKeyString string) error {
 	adminKey, err := bip32.NewKeyFromString(adminKeyString)
 	if err != nil {
+		Log.Error().Err(err).Str("buxclient", "SetAdminKey").Msg(err.Error())
 		return err
 	}
 
