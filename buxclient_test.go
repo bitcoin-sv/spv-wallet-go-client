@@ -607,6 +607,16 @@ func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 			clientMethod: func(c *BuxClient) (any, error) { return c.GetAccessKeys(context.Background(), anyMetadataConditions) },
 		},
 		{
+			caseTitle:    "CreateAccessKey",
+			path:         "/access-key",
+			clientMethod: func(c *BuxClient) (any, error) { return c.CreateAccessKey(context.Background(), anyMetadataConditions) },
+		},
+		{
+			caseTitle:    "RevokeAccessKey",
+			path:         "/access-key",
+			clientMethod: func(c *BuxClient) (any, error) { return c.RevokeAccessKey(context.Background(), anyParam) },
+		},
+		{
 			caseTitle:    "GetDestinationByID",
 			path:         "/destination",
 			clientMethod: func(c *BuxClient) (any, error) { return c.GetDestinationByID(context.Background(), anyParam) },
