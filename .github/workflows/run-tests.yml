@@ -44,7 +44,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Install Go from go.mod
-        uses: actions/setup-go@v5.0.0
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
       - name: Cache code
