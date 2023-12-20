@@ -13,7 +13,7 @@ func main() {
 	}
 
 	fmt.Println("<-- Generate method")
-	fmt.Println("XPriv: ", keys.String())
+	fmt.Println("XPriv: ", keys.XPriv())
 	fmt.Println("XPub: ", keys.XPub().String())
 	fmt.Println("Mnemonic: ", keys.Mnemonic())
 
@@ -24,18 +24,18 @@ func main() {
 	}
 
 	fmt.Println("<-- FromMnemonic method")
-	fmt.Println("XPriv: ", xpriv3.String())
+	fmt.Println("XPriv: ", xpriv3.XPriv())
 	fmt.Println("XPub: ", xpriv3.XPub().String())
 	fmt.Println("Mnemonic: ", xpriv3.Mnemonic())
 
 	//Generate keys from string
-	xpriv2, err := xpriv.FromString(keys.String())
+	xpriv2, err := xpriv.FromString(keys.XPriv())
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("<-- FromString method")
-	fmt.Println("XPriv: ", xpriv2.String())
+	fmt.Println("XPriv: ", xpriv2.XPriv())
 	fmt.Println("XPub: ", xpriv2.XPub().String())
 	fmt.Println("Can not get mnemonic from keys generated from string")
 }

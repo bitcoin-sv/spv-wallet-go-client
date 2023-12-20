@@ -22,7 +22,7 @@ type PublicKey struct {
 
 // Key represents basic key methods
 type Key interface {
-	String() string
+	XPriv() string
 	XPub() PubKey
 }
 
@@ -42,8 +42,8 @@ func (k *Keys) XPub() PubKey {
 	return k.xpub
 }
 
-// String return hierarchical deterministic private key
-func (k *Keys) String() string {
+// XPriv return hierarchical deterministic private key
+func (k *Keys) XPriv() string {
 	return k.xpriv
 }
 

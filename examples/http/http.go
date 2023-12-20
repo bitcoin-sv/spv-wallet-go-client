@@ -17,7 +17,7 @@ func main() {
 
 	// Create a client
 	buxClient, err := buxclient.New(
-		buxclient.WithXPriv(keys.String()),
+		buxclient.WithXPriv(keys.XPriv()),
 		buxclient.WithHTTP("localhost:3001"),
 		buxclient.WithDebugging(true),
 		buxclient.WithSignRequest(true),
