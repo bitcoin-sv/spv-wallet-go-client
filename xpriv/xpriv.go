@@ -125,13 +125,13 @@ func FromString(xpriv string) (Key, error) {
 	return keys, nil
 }
 
-func createXPrivAndXPub(seed []byte) (*bip32.ExtendedKey, *bip32.ExtendedKey, error) {
-	hdXpriv, err := bip32.NewMaster(seed, &chaincfg.MainNet)
+func createXPrivAndXPub(seed []byte) (hdXpriv *bip32.ExtendedKey, hdXpub *bip32.ExtendedKey, err error) {
+	hdXpriv, err = bip32.NewMaster(seed, &chaincfg.MainNet)
 	if err != nil {
 		return nil, nil, fmt.Errorf("key generation error when creating hd private key: %w", err)
 	}
 
-	hdXpub, err := hdXpriv.Neuter()
+	hdXpub, err = hdXpriv.Neuter()
 	if err != nil {
 		return nil, nil, fmt.Errorf("key generation error when creating hd public hey: %w", err)
 	}
