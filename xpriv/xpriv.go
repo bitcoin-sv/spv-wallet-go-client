@@ -16,9 +16,7 @@ type Keys struct {
 }
 
 // PublicKey is a struct containing public key information
-type PublicKey struct {
-	Xpub string
-}
+type PublicKey string
 
 // Key represents basic key methods
 type Key interface {
@@ -54,7 +52,7 @@ func (k *Keys) Mnemonic() string {
 
 // String return hierarchical deterministic publick ey
 func (k PublicKey) String() string {
-	return k.Xpub
+	return string(k)
 }
 
 // Generate generates a random set of keys - xpriv, xpb and mnemonic
@@ -77,7 +75,7 @@ func Generate() (KeyWithMnemonic, error) {
 
 	keys := &Keys{
 		xpriv:    hdXpriv.String(),
-		xpub:     PublicKey{hdXpub.String()},
+		xpub:     PublicKey(hdXpub.String()),
 		mnemonic: mnemonic,
 	}
 
@@ -98,7 +96,7 @@ func FromMnemonic(mnemonic string) (KeyWithMnemonic, error) {
 
 	keys := &Keys{
 		xpriv:    hdXpriv.String(),
-		xpub:     PublicKey{hdXpub.String()},
+		xpub:     PublicKey(hdXpub.String()),
 		mnemonic: mnemonic,
 	}
 
@@ -119,7 +117,7 @@ func FromString(xpriv string) (Key, error) {
 
 	keys := &Keys{
 		xpriv: hdXpriv.String(),
-		xpub:  PublicKey{hdXpub.String()},
+		xpub:  PublicKey(hdXpub.String()),
 	}
 
 	return keys, nil
