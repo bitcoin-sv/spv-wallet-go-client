@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"github.com/BuxOrg/go-buxclient/logger"
-	"github.com/bitcoinschema/go-bitcoin/v2"
+
+	"github.com/BuxOrg/go-buxclient/xpriv"
 
 	"github.com/BuxOrg/go-buxclient"
 )
@@ -11,14 +12,15 @@ import (
 func main() {
 	log := logger.Get()
 
-	// Example xPub
-	masterKey, _ := bitcoin.GenerateHDKey(bitcoin.SecureSeedLength)
-
-	rawXPub, _ := bitcoin.GetExtendedPublicKey(masterKey)
+	// Generate keys
+	keys, resErr := xpriv.Generate()
+	if resErr != nil {
+		log.Fatal().Msg(resErr.Error())
+	}
 
 	// Create a client
 	buxClient, err := buxclient.New(
-		buxclient.WithXPriv(masterKey.String()),
+		buxclient.WithXPriv(keys.XPriv()),
 		buxclient.WithHTTP("localhost:3001"),
 		buxclient.WithDebugging(true),
 		buxclient.WithSignRequest(true),
@@ -28,7 +30,7 @@ func main() {
 	}
 
 	log.Printf("client loaded - bux debug: %v", buxClient.IsDebug())
-	err = buxClient.NewPaymail(context.Background(), rawXPub, "foo@domain.com", "", "Foo", nil)
+	err = buxClient.NewPaymail(context.Background(), keys.XPub().String(), "foo@domain.com", "", "Foo", nil)
 
 	if err != nil {
 		log.Fatal().Stack().Msg(err.Error())

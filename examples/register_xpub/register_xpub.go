@@ -2,22 +2,25 @@ package main
 
 import (
 	"context"
+	"github.com/BuxOrg/go-buxclient/xpriv"
+
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/go-buxclient"
 	"github.com/BuxOrg/go-buxclient/logger"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 )
 
 func main() {
 	log := logger.Get()
 
-	// Example xPub
-	masterKey, _ := bitcoin.GenerateHDKey(bitcoin.SecureSeedLength)
-	rawXPub, _ := bitcoin.GetExtendedPublicKey(masterKey)
+	// Generate keys
+	keys, resErr := xpriv.Generate()
+	if resErr != nil {
+		log.Fatal().Stack().Msg(resErr.Error())
+	}
 
 	// Create a client
 	buxClient, err := buxclient.New(
-		buxclient.WithXPriv(masterKey.String()),
+		buxclient.WithXPriv(keys.XPriv()),
 		buxclient.WithHTTP("localhost:3001"),
 		buxclient.WithDebugging(true),
 		buxclient.WithSignRequest(true),
@@ -27,10 +30,10 @@ func main() {
 	}
 
 	if err = buxClient.NewXpub(
-		context.Background(), rawXPub, &buxmodels.Metadata{"example_field": "example_data"},
+		context.Background(), keys.XPub().String(), &buxmodels.Metadata{"example_field": "example_data"},
 	); err != nil {
 		log.Fatal().Stack().Msg(err.Error())
 	}
 
-	log.Print("registered xPub: " + rawXPub)
+	log.Printf("registered xPub: %s", keys.XPub().String())
 }

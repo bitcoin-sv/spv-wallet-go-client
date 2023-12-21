@@ -321,7 +321,7 @@ func (h *TransportHTTP) adminCount(ctx context.Context, conditions map[string]in
 
 	var count int64
 	if err := h.doHTTPRequest(
-		ctx, http.MethodGet, path, jsonStr, h.xPriv, true, &count,
+		ctx, http.MethodPost, path, jsonStr, h.xPriv, true, &count,
 	); err != nil {
 		Log.Error().Stack().Msg(err.Error())
 		return 0, err

@@ -99,6 +99,8 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 		return nil, err
 	}
 
+	client.TransportService = client.transport
+
 	return client, nil
 }
 
