@@ -1,6 +1,6 @@
 module github.com/BuxOrg/go-buxclient
 
-go 1.19
+go 1.21
 
 require (
 	github.com/BuxOrg/bux-models v0.2.1
