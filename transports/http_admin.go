@@ -141,7 +141,7 @@ func (h *TransportHTTP) AdminGetPaymail(ctx context.Context, address string) (*b
 
 	var model *buxmodels.PaymailAddress
 	if err := h.doHTTPRequest(
-		ctx, http.MethodGet, "/admin/paymail/get", jsonStr, h.xPriv, true, &model,
+		ctx, http.MethodPost, "/admin/paymail/get", jsonStr, h.xPriv, true, &model,
 	); err != nil {
 		Log.Error().Stack().Msg(err.Error())
 		return nil, err
