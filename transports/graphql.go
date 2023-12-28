@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	buxmodels "github.com/BuxOrg/bux-models"
@@ -24,7 +23,6 @@ type TransportGraphQL struct {
 	accessKey   *bec.PrivateKey
 	adminXPriv  *bip32.ExtendedKey
 	client      graphQlService
-	debug       bool
 	httpClient  *http.Client
 	server      string
 	signRequest bool
@@ -111,16 +109,6 @@ func (g *TransportGraphQL) Init() error {
 // SetAdminKey set the admin key
 func (g *TransportGraphQL) SetAdminKey(adminKey *bip32.ExtendedKey) {
 	g.adminXPriv = adminKey
-}
-
-// SetDebug turn the debugging on or off
-func (g *TransportGraphQL) SetDebug(debug bool) {
-	g.debug = debug
-}
-
-// IsDebug return the debugging status
-func (g *TransportGraphQL) IsDebug() bool {
-	return g.debug
 }
 
 // SetSignRequest turn the signing of the HTTP request on or off
@@ -801,9 +789,6 @@ func (g *TransportGraphQL) draftTransactionCommon(ctx context.Context, reqBody s
 		return nil, WrapError(err)
 	}
 	draftTransaction := respData.NewTransaction
-	if g.debug {
-		log.Printf("Draft transaction: %v\n", draftTransaction)
-	}
 
 	return draftTransaction, nil
 }
@@ -852,9 +837,6 @@ func (g *TransportGraphQL) RecordTransaction(ctx context.Context, hex, reference
 		return nil, WrapError(err)
 	}
 	transaction := respData.Transaction
-	if g.debug {
-		log.Printf("transaction: %s\n", transaction.ID)
-	}
 
 	return transaction, nil
 }
@@ -1020,9 +1002,6 @@ func (g *TransportGraphQL) doGraphQLQuery(ctx context.Context, reqBody string, v
 	// run it and capture the response
 	if err := g.client.Run(ctx, req, &respData); err != nil {
 		return WrapError(err)
-	}
-	if g.debug {
-		log.Printf("model: %v\n", respData)
 	}
 
 	return nil

@@ -2,8 +2,6 @@ package transports
 
 import (
 	"context"
-	"log"
-
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/machinebox/graphql"
 )
@@ -508,9 +506,6 @@ func (g *TransportGraphQL) doGraphQLAdminQuery(ctx context.Context, reqBody stri
 	if err := g.client.Run(ctx, req, &respData); err != nil {
 		return WrapError(err)
 	}
-	if g.debug {
-		log.Printf("model: %v\n", respData)
-	}
 
 	return nil
 }
@@ -551,9 +546,6 @@ func (g *TransportGraphQL) AdminRecordTransaction(ctx context.Context, hex strin
 		return nil, WrapError(err)
 	}
 	transaction := respData.Transaction
-	if g.debug {
-		log.Printf("transaction: %s\n", transaction.ID)
-	}
 
 	return transaction, nil
 }

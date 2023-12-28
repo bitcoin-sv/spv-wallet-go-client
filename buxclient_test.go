@@ -161,36 +161,6 @@ func TestSetAdminKey(t *testing.T) {
 	})
 }
 
-// TestSetDebug will test the debug setter
-func TestSetDebug(t *testing.T) {
-	t.Run("true", func(t *testing.T) {
-		client, _ := New(
-			WithXPriv(xPrivString),
-			WithHTTP(serverURL),
-		)
-		client.SetDebug(true)
-		assert.True(t, client.IsDebug())
-	})
-
-	t.Run("false", func(t *testing.T) {
-		client, _ := New(
-			WithXPriv(xPrivString),
-			WithHTTP(serverURL),
-		)
-		client.SetDebug(false)
-		assert.False(t, client.IsDebug())
-	})
-
-	t.Run("false", func(t *testing.T) {
-		_, err := New(
-			WithXPriv(xPrivString),
-			WithDebugging(false),
-			WithHTTP(serverURL),
-		)
-		require.NoError(t, err)
-	})
-}
-
 // TestSetSignRequest will test the sign request setter
 func TestSetSignRequest(t *testing.T) {
 	t.Run("true", func(t *testing.T) {
@@ -214,7 +184,6 @@ func TestSetSignRequest(t *testing.T) {
 	t.Run("false", func(t *testing.T) {
 		_, err := New(
 			WithXPriv(xPrivString),
-			WithDebugging(false),
 			WithHTTP(serverURL),
 		)
 		require.NoError(t, err)
@@ -573,7 +542,6 @@ func TestGetTransport(t *testing.T) {
 			WithXPriv(xPrivString),
 			WithGraphQL(serverURL),
 			WithAdminKey(xPrivString),
-			WithDebugging(true),
 			WithSignRequest(false),
 		)
 		transport := client.GetTransport()

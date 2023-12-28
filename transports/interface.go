@@ -91,9 +91,7 @@ type TransportService interface {
 	TransactionService
 	XpubService
 	Init() error
-	IsDebug() bool
 	IsSignRequest() bool
 	SetAdminKey(adminKey *bip32.ExtendedKey)
-	SetDebug(debug bool)
-	SetSignRequest(debug bool)
+	SetSignRequest(signRequest bool)
 }
