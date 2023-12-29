@@ -23,7 +23,6 @@ type BuxClient struct {
 	transports.TransportService
 	accessKey        *bec.PrivateKey
 	accessKeyString  string
-	debug            bool
 	transport        transports.TransportService
 	transportOptions []transports.ClientOps
 	xPriv            *bip32.ExtendedKey
@@ -105,17 +104,6 @@ func (b *BuxClient) SetAdminKey(adminKeyString string) error {
 	b.transport.SetAdminKey(adminKey)
 
 	return nil
-}
-
-// SetDebug turn the debugging on or off
-func (b *BuxClient) SetDebug(debug bool) {
-	b.debug = debug
-	b.transport.SetDebug(debug)
-}
-
-// IsDebug return the debugging status
-func (b *BuxClient) IsDebug() bool {
-	return b.transport.IsDebug()
 }
 
 // SetSignRequest turn the signing of the http request on or off

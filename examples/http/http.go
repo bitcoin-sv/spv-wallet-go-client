@@ -1,30 +1,19 @@
 package main
 
 import (
-	"github.com/BuxOrg/go-buxclient/xpriv"
-	"log"
-
 	"github.com/BuxOrg/go-buxclient"
+	"github.com/BuxOrg/go-buxclient/xpriv"
 )
 
 func main() {
 
 	// Generate keys
-	keys, resErr := xpriv.Generate()
-	if resErr != nil {
-		log.Fatalln(resErr.Error())
-	}
+	keys, _ := xpriv.Generate()
 
 	// Create a client
-	buxClient, err := buxclient.New(
+	_, _ = buxclient.New(
 		buxclient.WithXPriv(keys.XPriv()),
 		buxclient.WithHTTP("localhost:3001"),
-		buxclient.WithDebugging(true),
 		buxclient.WithSignRequest(true),
 	)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	log.Printf("client loaded - bux debug: %v", buxClient.IsDebug())
 }

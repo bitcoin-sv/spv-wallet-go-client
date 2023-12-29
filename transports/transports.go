@@ -14,7 +14,6 @@ type Client struct {
 	accessKey   *bec.PrivateKey
 	adminKey    string
 	adminXPriv  *bip32.ExtendedKey
-	debug       bool
 	signRequest bool
 	transport   TransportService
 	xPriv       *bip32.ExtendedKey

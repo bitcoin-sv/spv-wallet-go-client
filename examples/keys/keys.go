@@ -12,11 +12,6 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("<-- Generate method")
-	fmt.Println("XPriv: ", keys.XPriv())
-	fmt.Println("XPub: ", keys.XPub().String())
-	fmt.Println("Mnemonic: ", keys.Mnemonic())
-
 	//Generate keys from mnemonic string
 	xpriv3, err := xpriv.FromMnemonic(keys.Mnemonic())
 	if err != nil {

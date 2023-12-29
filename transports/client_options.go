@@ -39,7 +39,6 @@ func WithGraphQL(serverURL string) ClientOps {
 	return func(c *Client) {
 		if c != nil {
 			c.transport = NewTransportService(&TransportGraphQL{
-				debug:       c.debug,
 				server:      serverURL,
 				signRequest: c.signRequest,
 				adminXPriv:  c.adminXPriv,
@@ -57,7 +56,6 @@ func WithHTTP(serverURL string) ClientOps {
 	return func(c *Client) {
 		if c != nil {
 			c.transport = NewTransportService(&TransportHTTP{
-				debug:       c.debug,
 				server:      serverURL,
 				signRequest: c.signRequest,
 				adminXPriv:  c.adminXPriv,
@@ -75,7 +73,6 @@ func WithGraphQLClient(serverURL string, httpClient *http.Client) ClientOps {
 	return func(c *Client) {
 		if c != nil {
 			c.transport = NewTransportService(&TransportGraphQL{
-				debug:       c.debug,
 				server:      serverURL,
 				signRequest: c.signRequest,
 				adminXPriv:  c.adminXPriv,
@@ -93,7 +90,6 @@ func WithHTTPClient(serverURL string, httpClient *http.Client) ClientOps {
 	return func(c *Client) {
 		if c != nil {
 			c.transport = NewTransportService(&TransportHTTP{
-				debug:       c.debug,
 				server:      serverURL,
 				signRequest: c.signRequest,
 				adminXPriv:  c.adminXPriv,
@@ -122,18 +118,6 @@ func WithSignRequest(signRequest bool) ClientOps {
 			c.signRequest = signRequest
 			if c.transport != nil {
 				c.transport.SetSignRequest(signRequest)
-			}
-		}
-	}
-}
-
-// WithDebugging will set whether to turn debugging on
-func WithDebugging(debug bool) ClientOps {
-	return func(c *Client) {
-		if c != nil {
-			c.debug = debug
-			if c.transport != nil {
-				c.transport.SetDebug(debug)
 			}
 		}
 	}

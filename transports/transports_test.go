@@ -7,39 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestWithDebugging will test the method WithDebugging()
-func TestWithDebugging(t *testing.T) {
-
-	t.Run("get opts", func(t *testing.T) {
-		opt := WithDebugging(false)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("debug false", func(t *testing.T) {
-		opts := []ClientOps{
-			WithDebugging(false),
-			WithHTTP(""),
-		}
-		c, err := NewTransport(opts...)
-		require.NoError(t, err)
-		require.NotNil(t, c)
-
-		assert.Equal(t, false, c.IsDebug())
-	})
-
-	t.Run("debug true", func(t *testing.T) {
-		opts := []ClientOps{
-			WithDebugging(true),
-			WithHTTP(""),
-		}
-		c, err := NewTransport(opts...)
-		require.NoError(t, err)
-		require.NotNil(t, c)
-
-		assert.Equal(t, true, c.IsDebug())
-	})
-}
-
 // TestWithSignRequest will test the method WithSignRequest()
 func TestWithSignRequest(t *testing.T) {
 
@@ -48,7 +15,7 @@ func TestWithSignRequest(t *testing.T) {
 		assert.IsType(t, *new(ClientOps), opt)
 	})
 
-	t.Run("debug false", func(t *testing.T) {
+	t.Run("sign request false", func(t *testing.T) {
 		opts := []ClientOps{
 			WithSignRequest(false),
 			WithHTTP(""),
@@ -60,7 +27,7 @@ func TestWithSignRequest(t *testing.T) {
 		assert.Equal(t, false, c.IsSignRequest())
 	})
 
-	t.Run("debug true", func(t *testing.T) {
+	t.Run("sign request true", func(t *testing.T) {
 		opts := []ClientOps{
 			WithSignRequest(true),
 			WithHTTP(""),

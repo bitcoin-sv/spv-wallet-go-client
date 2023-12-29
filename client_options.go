@@ -86,12 +86,3 @@ func WithSignRequest(signRequest bool) ClientOps {
 		}
 	}
 }
-
-// WithDebugging will set whether to turn debugging on
-func WithDebugging(debug bool) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithDebugging(debug))
-		}
-	}
-}

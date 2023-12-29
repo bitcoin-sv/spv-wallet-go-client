@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -22,7 +21,6 @@ import (
 type TransportHTTP struct {
 	accessKey   *bec.PrivateKey
 	adminXPriv  *bip32.ExtendedKey
-	debug       bool
 	httpClient  *http.Client
 	server      string
 	signRequest bool
@@ -33,16 +31,6 @@ type TransportHTTP struct {
 // Init will initialize
 func (h *TransportHTTP) Init() error {
 	return nil
-}
-
-// SetDebug turn the debugging on or off
-func (h *TransportHTTP) SetDebug(debug bool) {
-	h.debug = debug
-}
-
-// IsDebug return the debugging status
-func (h *TransportHTTP) IsDebug() bool {
-	return h.debug
 }
 
 // SetSignRequest turn the signing of the http request on or off
@@ -94,9 +82,6 @@ func (h *TransportHTTP) DeletePaymail(ctx context.Context, paymailAddress string
 	); err != nil {
 		return WrapError(err)
 	}
-	if h.debug {
-		log.Printf("delete paymail: %v\n", paymailAddress)
-	}
 
 	return nil
 }
@@ -108,9 +93,6 @@ func (h *TransportHTTP) GetXPub(ctx context.Context) (*buxmodels.Xpub, ResponseE
 		ctx, http.MethodGet, "/xpub", nil, h.xPriv, true, &xPub,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("xpub: %v\n", xPub)
 	}
 
 	return &xPub, nil
@@ -131,9 +113,6 @@ func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *buxmod
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("xpub: %v\n", xPub)
-	}
 
 	return &xPub, nil
 }
@@ -145,9 +124,6 @@ func (h *TransportHTTP) GetAccessKey(ctx context.Context, id string) (*buxmodels
 		ctx, http.MethodGet, "/access-key?"+FieldID+"="+id, nil, h.xPriv, true, &accessKey,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("access key: %v\n", accessKey)
 	}
 
 	return &accessKey, nil
@@ -187,9 +163,6 @@ func (h *TransportHTTP) GetAccessKeysCount(ctx context.Context, conditions map[s
 	); err != nil {
 		return 0, err
 	}
-	if h.debug {
-		log.Printf("Access keys count: %v\n", count)
-	}
 
 	return count, nil
 }
@@ -201,9 +174,6 @@ func (h *TransportHTTP) RevokeAccessKey(ctx context.Context, id string) (*buxmod
 		ctx, http.MethodDelete, "/access-key?"+FieldID+"="+id, nil, h.xPriv, true, &accessKey,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("access key: %v\n", accessKey)
 	}
 
 	return &accessKey, nil
@@ -235,9 +205,6 @@ func (h *TransportHTTP) GetDestinationByID(ctx context.Context, id string) (*bux
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("destination: %v\n", destination)
-	}
 
 	return &destination, nil
 }
@@ -250,9 +217,6 @@ func (h *TransportHTTP) GetDestinationByAddress(ctx context.Context, address str
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("destination: %v\n", destination)
-	}
 
 	return &destination, nil
 }
@@ -264,9 +228,6 @@ func (h *TransportHTTP) GetDestinationByLockingScript(ctx context.Context, locki
 		ctx, http.MethodGet, "/destination?"+FieldLockingScript+"="+lockingScript, nil, h.xPriv, true, &destination,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -324,9 +285,6 @@ func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *buxmodels.
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("new destination: %v\n", destination)
-	}
 
 	return &destination, nil
 }
@@ -348,9 +306,6 @@ func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id st
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("destination: %v\n", destination)
 	}
 
 	return &destination, nil
@@ -374,9 +329,6 @@ func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, 
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("destination: %v\n", destination)
-	}
 
 	return &destination, nil
 }
@@ -399,9 +351,6 @@ func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Con
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("destination: %v\n", destination)
-	}
 
 	return &destination, nil
 }
@@ -413,9 +362,6 @@ func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*buxmo
 		ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("Transaction: %v\n", transaction)
 	}
 
 	return &transaction, nil
@@ -440,9 +386,6 @@ func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[stri
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("transactions: %d\n", len(transactions))
-	}
 
 	return transactions, nil
 }
@@ -464,9 +407,6 @@ func (h *TransportHTTP) GetTransactionsCount(ctx context.Context, conditions map
 		ctx, http.MethodPost, "/transaction/count", jsonStr, h.xPriv, h.signRequest, &count,
 	); err != nil {
 		return 0, err
-	}
-	if h.debug {
-		log.Printf("Transactions count: %v\n", count)
 	}
 
 	return count, nil
@@ -518,9 +458,6 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context,
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("draft transaction: %v\n", draftTransaction)
-	}
 	if draftTransaction == nil {
 		return nil, WrapError(buxerrors.ErrDraftNotFound)
 	}
@@ -547,9 +484,6 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("transaction: %s\n", transaction.ID)
-	}
 
 	return &transaction, nil
 }
@@ -571,9 +505,6 @@ func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID stri
 		ctx, http.MethodPatch, "/transaction", jsonStr, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("Transaction: %v\n", transaction)
 	}
 
 	return &transaction, nil
@@ -606,10 +537,6 @@ func (h *TransportHTTP) GetUtxo(ctx context.Context, txID string, outputIndex ui
 		return nil, err
 	}
 
-	if h.debug {
-		log.Printf("utxo: %v\n", utxo)
-	}
-
 	return &utxo, nil
 }
 
@@ -630,9 +557,6 @@ func (h *TransportHTTP) GetUtxos(ctx context.Context, conditions map[string]inte
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("utxos: %d\n", len(utxos))
-	}
 
 	return utxos, nil
 }
@@ -652,9 +576,6 @@ func (h *TransportHTTP) GetUtxosCount(ctx context.Context, conditions map[string
 		ctx, http.MethodPost, "/utxo/count", jsonStr, h.xPriv, h.signRequest, &count,
 	); err != nil {
 		return 0, err
-	}
-	if h.debug {
-		log.Printf("utxos count: %v\n", count)
 	}
 
 	return count, nil

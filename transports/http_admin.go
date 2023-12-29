@@ -3,7 +3,6 @@ package transports
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	buxmodels "github.com/BuxOrg/bux-models"
@@ -44,9 +43,6 @@ func (h *TransportHTTP) AdminGetStatus(ctx context.Context) (bool, ResponseError
 	); err != nil {
 		return false, err
 	}
-	if h.debug {
-		log.Printf("admin status: %v\n", status)
-	}
 
 	return status, nil
 }
@@ -58,9 +54,6 @@ func (h *TransportHTTP) AdminGetStats(ctx context.Context) (*buxmodels.AdminStat
 		ctx, http.MethodGet, "/admin/stats", nil, h.xPriv, true, &stats,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("admin stats: %v\n", stats)
 	}
 
 	return stats, nil
@@ -138,9 +131,6 @@ func (h *TransportHTTP) AdminGetPaymail(ctx context.Context, address string) (*b
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("admin get paymail: %v\n", model)
-	}
 
 	return model, nil
 }
@@ -182,9 +172,6 @@ func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, xPubID string, a
 	); err != nil {
 		return nil, err
 	}
-	if h.debug {
-		log.Printf("admin create paymail: %v\n", model)
-	}
 
 	return model, nil
 }
@@ -203,9 +190,6 @@ func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) 
 		ctx, http.MethodPost, "/admin/paymail/delete", jsonStr, h.xPriv, true, &model,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("admin delete paymail: %v\n", model)
 	}
 
 	return model, nil
@@ -285,9 +269,6 @@ func (h *TransportHTTP) adminGetModels(ctx context.Context, conditions map[strin
 	); err != nil {
 		return err
 	}
-	if h.debug {
-		log.Printf(path+": %v\n", models)
-	}
 
 	return nil
 }
@@ -307,9 +288,6 @@ func (h *TransportHTTP) adminCount(ctx context.Context, conditions map[string]in
 	); err != nil {
 		return 0, err
 	}
-	if h.debug {
-		log.Printf(path+": %v\n", count)
-	}
 
 	return count, nil
 }
@@ -328,9 +306,6 @@ func (h *TransportHTTP) AdminRecordTransaction(ctx context.Context, hex string) 
 		ctx, http.MethodPost, "/admin/transactions/record", jsonStr, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
 		return nil, err
-	}
-	if h.debug {
-		log.Printf("transaction: %s\n", transaction.ID)
 	}
 
 	return &transaction, nil
