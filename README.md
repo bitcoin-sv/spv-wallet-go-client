@@ -200,6 +200,25 @@ Read more about this Go project's [code standards](.github/CODE_STANDARDS.md).
 <br/>
 
 ## Usage
+
+
+```
+// http example
+func main() {
+
+	// Generate keys
+	keys, _ := xpriv.Generate()
+
+	// Create a client
+	_, _ = buxclient.New(
+		buxclient.WithXPriv(keys.XPriv()),
+		buxclient.WithHTTP("localhost:3001"),
+		buxclient.WithSignRequest(true),
+	)
+}
+
+```
+
 Checkout all the [examples](examples)!
 
 <br/>
