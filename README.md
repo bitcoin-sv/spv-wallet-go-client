@@ -210,11 +210,12 @@ func main() {
 	keys, _ := xpriv.Generate()
 
 	// Create a client
-	_, _ = buxclient.New(
-		buxclient.WithXPriv(keys.XPriv()),
-		buxclient.WithHTTP("localhost:3001"),
-		buxclient.WithSignRequest(true),
-	)
+	client, _ := buxclient.New(
+        buxclient.WithXPriv(keys.XPriv()),
+        buxclient.WithHTTP("localhost:3001"),
+        buxclient.WithSignRequest(true))
+    
+    fmt.Println(client.IsSignRequest())
 }
 
 ```
