@@ -9,11 +9,12 @@ import (
 	"testing"
 
 	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/go-buxclient/transports"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bt/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/BuxOrg/go-buxclient/transports"
 )
 
 const (
@@ -21,7 +22,6 @@ const (
 	adminKeyXpub       = "xprv9s21ZrQH143K4Z8JnrQ7XsYxzKbFNsAEPyHMaMU2fbMtoY1YmsJLFo3XBkg2m7e9UJLS6xvd2HjZ5WN9fQbMSGU7uXEE2pksvbQYCXswLB5"
 	destinationJSON    = `{"id":"90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce","xpub_id":"9fe44728bf16a2dde3748f72cc65ea661f3bf18653b320d31eafcab37cf7fb36","locking_script":"76a9140e0eb4911d79e9b7683f268964f595b66fa3604588ac","type":"pubkeyhash","chain":0,"num":245,"address":"12HL5RyEy3Rt6SCwxgpiFSTigem1Pzbq22","metadata":{"test":"test value"}}}`
 	draftTxJSON        = `{"created_at":"2022-02-09T16:28:39.000639Z","updated_at":"0001-01-01T00:00:00Z","deleted_at":null,"id":"fe6fe12c25b81106b7332d58fe87dab7bc6e56c8c21ca45b4de05f673f3f653c","hex":"010000000141e3be4d5a3f25e11157bfdd100e7c3497b9be2b80b57eb55e5376b075e7dc5d0200000000ffffffff02e8030000000000001976a9147ff514e6ae3deb46e6644caac5cdd0bf2388906588ac170e0000000000001976a9143dbdb346aaf1c3dc501a2f8c186c3d3e8a87764588ac00000000","xpub_id":"9fe44728bf16a2dde3748f72cc65ea661f3bf18653b320d31eafcab37cf7fb36","expires_at":"2022-02-09T16:29:08.991801Z","metadata":{"testkey":"test-value"},"configuration":{"change_destinations":[{"created_at":"2022-02-09T16:28:38.997313Z","updated_at":"0001-01-01T00:00:00Z","deleted_at":null,"id":"252e8a915a5f05effab827a887e261a2416a76f3d3aada946a70a575c0bb76a7","xpub_id":"9fe44728bf16a2dde3748f72cc65ea661f3bf18653b320d31eafcab37cf7fb36","locking_script":"76a9143dbdb346aaf1c3dc501a2f8c186c3d3e8a87764588ac","type":"pubkeyhash","chain":1,"num":100,"address":"16dTUJwi7qT3JqzAUMcDHaVV3sB4fH85Ep","draft_id":"fe6fe12c25b81106b7332d58fe87dab7bc6e56c8c21ca45b4de05f673f3f653c"}],"change_destinations_strategy":"","change_minimum_satoshis":0,"change_number_of_destinations":0,"change_satoshis":3607,"expires_in":0,"fee":97,"fee_unit":{"satoshis":1,"bytes":2},"from_utxos":null,"inputs":[{"created_at":"2022-01-28T13:45:02.352Z","updated_at":"2022-02-09T16:28:38.993207Z","deleted_at":null,"id":"efe383eea1a6f7925afb2621b69ea9ba6bd0623e8d61827bad994f8be85161fc","transaction_id":"5ddce775b076535eb57eb5802bbeb997347c0e10ddbf5711e1253f5a4dbee341","xpub_id":"9fe44728bf16a2dde3748f72cc65ea661f3bf18653b320d31eafcab37cf7fb36","output_index":2,"satoshis":4704,"script_pub_key":"76a914c746bf0f295375cbea4a5ef25b36c84ff9801bac88ac","type":"pubkeyhash","draft_id":"fe6fe12c25b81106b7332d58fe87dab7bc6e56c8c21ca45b4de05f673f3f653c","reserved_at":"2022-02-09T16:28:38.993205Z","spending_tx_id":null,"destination":{"created_at":"2022-01-28T13:45:02.324Z","updated_at":"0001-01-01T00:00:00Z","metadata":{"client_id":"8","run":90,"run_id":"3108aa426fc7102488bb0ffd","xbench":"destination for testing"},"deleted_at":null,"id":"b8bfa56e37c90f1b25df2e571f727cfec80dd17c5d1845c4b93e21034f7f6a0b","xpub_id":"9fe44728bf16a2dde3748f72cc65ea661f3bf18653b320d31eafcab37cf7fb36","locking_script":"76a914c746bf0f295375cbea4a5ef25b36c84ff9801bac88ac","type":"pubkeyhash","chain":0,"num":212,"address":"1KAgDiUasnC7roCjQZM1XLJUpq4BYHjdp6","draft_id":""}}],"miner":"","outputs":[{"satoshis":1000,"scripts":[{"address":"1CfaQw9udYNPccssFJFZ94DN8MqNZm9nGt","satoshis":1000,"script":"76a9147ff514e6ae3deb46e6644caac5cdd0bf2388906588ac","script_type":"pubkeyhash"}],"to":"1CfaQw9udYNPccssFJFZ94DN8MqNZm9nGt","op_return":null},{"satoshis":3607,"scripts":[{"address":"16dTUJwi7qT3JqzAUMcDHaVV3sB4fH85Ep","satoshis":3607,"script":"76a9143dbdb346aaf1c3dc501a2f8c186c3d3e8a87764588ac","script_type":""}],"to":"16dTUJwi7qT3JqzAUMcDHaVV3sB4fH85Ep","op_return":null}],"send_all_to":{},"sync":null},"status":"draft"}`
-	requestTypeGraphQL = "graphql"
 	requestTypeHTTP    = "http"
 	serverURL          = "https://example.com/"
 	testAddress        = "1CfaQw9udYNPccssFJFZ94DN8MqNZm9nGt"
@@ -32,6 +32,7 @@ const (
 	xPrivString        = "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ"
 	xPubID             = "9fe44728bf16a2dde3748f72cc65ea661f3bf18653b320d31eafcab37cf7fb36"
 	xpubJSON           = `{"data":{"xpub":{"id":"0092de4d2aafa59a71a1f90342c138e1c4f19cd1b10e2d17422b34a1d06733e0"}}}`
+	xPubJSON           = `{"id":"0092de4d2aafa59a71a1f90342c138e1c4f19cd1b10e2d17422b34a1d06733e0"}`
 	xPubString         = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
 )
 
@@ -192,101 +193,77 @@ func TestSetSignRequest(t *testing.T) {
 
 // TestDraftTransaction will test the DraftTransaction method
 func TestDraftTransaction(t *testing.T) {
-	transportHandlers := []testTransportHandler{{
+	transportHandler := testTransportHandler{
 		Type:      requestTypeHTTP,
 		Path:      "/transaction",
 		Result:    draftTxJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
-	}, {
-		Type:      requestTypeGraphQL,
-		Path:      "/graphql",
-		Result:    `{"data":{"new_transaction":` + draftTxJSON + `}}`,
-		ClientURL: serverURL + `graphql`,
-		Client:    WithGraphQLClient,
-	}}
-
-	for _, transportHandler := range transportHandlers {
-		t.Run("draft transaction "+transportHandler.Type, func(t *testing.T) {
-			client := getTestBuxClient(transportHandler, false)
-			config := &buxmodels.TransactionConfig{
-				Outputs: []*buxmodels.TransactionOutput{{
-					Satoshis: 1000,
-					To:       testAddress,
-				}},
-			}
-			metadata := &buxmodels.Metadata{
-				"test-key": "test-value",
-			}
-
-			draft, err := client.DraftTransaction(context.Background(), config, metadata)
-			assert.NoError(t, err)
-			checkDraftTransactionOutput(t, draft)
-		})
 	}
+
+	t.Run("draft transaction", func(t *testing.T) {
+		client := getTestBuxClient(transportHandler, false)
+		config := &buxmodels.TransactionConfig{
+			Outputs: []*buxmodels.TransactionOutput{{
+				Satoshis: 1000,
+				To:       testAddress,
+			}},
+		}
+		metadata := &buxmodels.Metadata{
+			"test-key": "test-value",
+		}
+
+		draft, err := client.DraftTransaction(context.Background(), config, metadata)
+		assert.NoError(t, err)
+		checkDraftTransactionOutput(t, draft)
+	})
 }
 
 // TestNewXpub will test the NewXpub method
 func TestNewXpub(t *testing.T) {
-	transportHandlers := []testTransportHandler{{
+	transportHandler := testTransportHandler{
 		Type:      requestTypeHTTP,
 		Path:      "/xpub",
 		Result:    xpubJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
-	}, {
-		Type:      requestTypeGraphQL,
-		Path:      "/graphql",
-		Result:    `{"data":{"xpub":` + xpubJSON + `}}`,
-		ClientURL: serverURL + `graphql`,
-		Client:    WithGraphQLClient,
-	}}
-
-	for _, transportHandler := range transportHandlers {
-		t.Run("NewXpub "+transportHandler.Type, func(t *testing.T) {
-			client := getTestBuxClient(transportHandler, true)
-			metadata := &buxmodels.Metadata{
-				"test-key": "test-value",
-			}
-			err := client.NewXpub(context.Background(), xPubString, metadata)
-			assert.NoError(t, err)
-		})
 	}
+
+	t.Run("NewXpub", func(t *testing.T) {
+		client := getTestBuxClient(transportHandler, true)
+		metadata := &buxmodels.Metadata{
+			"test-key": "test-value",
+		}
+		err := client.NewXpub(context.Background(), xPubString, metadata)
+		assert.NoError(t, err)
+	})
 }
 
 // TestDraftToRecipients will test the DraftToRecipients method
 func TestDraftToRecipients(t *testing.T) {
-	transportHandlers := []testTransportHandler{{
+	transportHandler := testTransportHandler{
 		Type:      requestTypeHTTP,
 		Path:      "/transaction",
 		Result:    draftTxJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
-	}, {
-		Type:      requestTypeGraphQL,
-		Path:      "/graphql",
-		Result:    `{"data":{"new_transaction":` + draftTxJSON + `}}`,
-		ClientURL: serverURL + `graphql`,
-		Client:    WithGraphQLClient,
-	}}
-
-	for _, transportHandler := range transportHandlers {
-		t.Run("DraftToRecipients "+transportHandler.Type, func(t *testing.T) {
-			client := getTestBuxClient(transportHandler, false)
-
-			recipients := []*transports.Recipients{{
-				Satoshis: 1000,
-				To:       testAddress,
-			}}
-			metadata := &buxmodels.Metadata{
-				"test-key": "test-value",
-			}
-
-			draft, err := client.DraftToRecipients(context.Background(), recipients, metadata)
-			assert.NoError(t, err)
-			checkDraftTransactionOutput(t, draft)
-		})
 	}
+
+	t.Run("DraftToRecipients "+transportHandler.Type, func(t *testing.T) {
+		client := getTestBuxClient(transportHandler, false)
+
+		recipients := []*transports.Recipients{{
+			Satoshis: 1000,
+			To:       testAddress,
+		}}
+		metadata := &buxmodels.Metadata{
+			"test-key": "test-value",
+		}
+
+		draft, err := client.DraftToRecipients(context.Background(), recipients, metadata)
+		assert.NoError(t, err)
+		checkDraftTransactionOutput(t, draft)
+	})
 }
 
 func checkDraftTransactionOutput(t *testing.T, draft *buxmodels.DraftTransaction) {
@@ -300,149 +277,117 @@ func checkDraftTransactionOutput(t *testing.T, draft *buxmodels.DraftTransaction
 
 // TestNewDestination will test the NewDestination method
 func TestNewDestination(t *testing.T) {
-	transportHandlers := []testTransportHandler{{
+	transportHandler := testTransportHandler{
 		Type:      requestTypeHTTP,
 		Path:      "/destination",
 		Result:    destinationJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
-	}, {
-		Type:      requestTypeGraphQL,
-		Path:      "/graphql",
-		Result:    `{"data":{"destination":` + destinationJSON + `}}`,
-		ClientURL: serverURL + `graphql`,
-		Client:    WithGraphQLClient,
-	}}
-
-	for _, transportHandler := range transportHandlers {
-		t.Run("new destination "+transportHandler.Type, func(t *testing.T) {
-			client := getTestBuxClient(transportHandler, false)
-
-			destination, err := client.NewDestination(context.Background(), nil)
-			assert.NoError(t, err)
-			assert.IsType(t, buxmodels.Destination{}, *destination)
-			assert.Equal(t, "90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce", destination.ID)
-			assert.Equal(t, xPubID, destination.XpubID)
-			assert.Equal(t, "76a9140e0eb4911d79e9b7683f268964f595b66fa3604588ac", destination.LockingScript)
-			assert.Equal(t, uint32(0), destination.Chain)
-			assert.Equal(t, uint32(245), destination.Num)
-			assert.Equal(t, "12HL5RyEy3Rt6SCwxgpiFSTigem1Pzbq22", destination.Address)
-		})
 	}
+
+	t.Run("new destination"+transportHandler.Type, func(t *testing.T) {
+		client := getTestBuxClient(transportHandler, false)
+
+		destination, err := client.NewDestination(context.Background(), nil)
+		assert.NoError(t, err)
+		assert.IsType(t, buxmodels.Destination{}, *destination)
+		assert.Equal(t, "90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce", destination.ID)
+		assert.Equal(t, xPubID, destination.XpubID)
+		assert.Equal(t, "76a9140e0eb4911d79e9b7683f268964f595b66fa3604588ac", destination.LockingScript)
+		assert.Equal(t, uint32(0), destination.Chain)
+		assert.Equal(t, uint32(245), destination.Num)
+		assert.Equal(t, "12HL5RyEy3Rt6SCwxgpiFSTigem1Pzbq22", destination.Address)
+	})
 }
 
 // TestGetTransaction will test the GetTransaction method
 func TestGetTransaction(t *testing.T) {
-	transportHandlers := []testTransportHandler{{
+	transportHandler := testTransportHandler{
 		Type:      requestTypeHTTP,
 		Path:      "/transaction",
 		Result:    transactionJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
-	}, {
-		Type:      requestTypeGraphQL,
-		Path:      "/graphql",
-		Result:    `{"data":{"transaction":` + transactionJSON + `}}`,
-		ClientURL: serverURL + `graphql`,
-		Client:    WithGraphQLClient,
-	}}
-
-	for _, transportHandler := range transportHandlers {
-		t.Run("get transaction "+transportHandler.Type, func(t *testing.T) {
-			client := getTestBuxClient(transportHandler, false)
-
-			transaction, err := client.GetTransaction(context.Background(), txID)
-			assert.NoError(t, err)
-			assert.IsType(t, buxmodels.Transaction{}, *transaction)
-			assert.Equal(t, txID, transaction.ID)
-			assert.Equal(t, uint64(354), transaction.Fee)
-			assert.Equal(t, uint32(4), transaction.NumberOfInputs)
-			assert.Equal(t, uint32(4), transaction.NumberOfOutputs)
-			assert.Equal(t, uint64(6955), transaction.TotalValue)
-		})
 	}
+
+	t.Run("get transaction", func(t *testing.T) {
+		client := getTestBuxClient(transportHandler, false)
+
+		transaction, err := client.GetTransaction(context.Background(), txID)
+		assert.NoError(t, err)
+		assert.IsType(t, buxmodels.Transaction{}, *transaction)
+		assert.Equal(t, txID, transaction.ID)
+		assert.Equal(t, uint64(354), transaction.Fee)
+		assert.Equal(t, uint32(4), transaction.NumberOfInputs)
+		assert.Equal(t, uint32(4), transaction.NumberOfOutputs)
+		assert.Equal(t, uint64(6955), transaction.TotalValue)
+	})
 }
 
 // TestGetTransactions will test the GetTransactions method
 func TestGetTransactions(t *testing.T) {
-	transportHandlers := []testTransportHandler{{
+	transportHandler := testTransportHandler{
 		Type:      requestTypeHTTP,
 		Path:      "/transaction/search",
 		Result:    transactionsJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
-	}, {
-		Type:      requestTypeGraphQL,
-		Path:      "/graphql",
-		Result:    `{"data":{"transactions":` + transactionsJSON + `}}`,
-		ClientURL: serverURL + `graphql`,
-		Client:    WithGraphQLClient,
-	}}
-
-	for _, transportHandler := range transportHandlers {
-		t.Run("get transactions "+transportHandler.Type, func(t *testing.T) {
-			client := getTestBuxClient(transportHandler, false)
-
-			conditions := map[string]interface{}{
-				"fee": map[string]interface{}{
-					"$lt": 100,
-				},
-				"total_value": map[string]interface{}{
-					"$lt": 740,
-				},
-			}
-			metadata := &buxmodels.Metadata{
-				"run_id": "3108aa426fc7102488bb0ffd",
-			}
-			transactions, err := client.GetTransactions(context.Background(), conditions, metadata, &transports.QueryParams{})
-			assert.NoError(t, err)
-			assert.IsType(t, []*buxmodels.Transaction{}, transactions)
-			assert.Len(t, transactions, 2)
-			assert.Equal(t, "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda", transactions[0].ID)
-			assert.Equal(t, uint64(97), transactions[0].Fee)
-			assert.Equal(t, uint64(733), transactions[0].TotalValue)
-			assert.Equal(t, "5f4fd2be162769852e8bd1362bb8d815a89e137707b4985249876a7f0ebbb071", transactions[1].ID)
-			assert.Equal(t, uint64(97), transactions[1].Fee)
-			assert.Equal(t, uint64(423), transactions[1].TotalValue)
-		})
 	}
+
+	t.Run("get transactions "+transportHandler.Type, func(t *testing.T) {
+		client := getTestBuxClient(transportHandler, false)
+
+		conditions := map[string]interface{}{
+			"fee": map[string]interface{}{
+				"$lt": 100,
+			},
+			"total_value": map[string]interface{}{
+				"$lt": 740,
+			},
+		}
+		metadata := &buxmodels.Metadata{
+			"run_id": "3108aa426fc7102488bb0ffd",
+		}
+		transactions, err := client.GetTransactions(context.Background(), conditions, metadata, &transports.QueryParams{})
+		assert.NoError(t, err)
+		assert.IsType(t, []*buxmodels.Transaction{}, transactions)
+		assert.Len(t, transactions, 2)
+		assert.Equal(t, "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda", transactions[0].ID)
+		assert.Equal(t, uint64(97), transactions[0].Fee)
+		assert.Equal(t, uint64(733), transactions[0].TotalValue)
+		assert.Equal(t, "5f4fd2be162769852e8bd1362bb8d815a89e137707b4985249876a7f0ebbb071", transactions[1].ID)
+		assert.Equal(t, uint64(97), transactions[1].Fee)
+		assert.Equal(t, uint64(423), transactions[1].TotalValue)
+	})
 }
 
 // TestRecordTransaction will test the RecordTransaction method
 func TestRecordTransaction(t *testing.T) {
-	transportHandlers := []testTransportHandler{{
+	transportHandler := testTransportHandler{
 		Type:      requestTypeHTTP,
 		Path:      "/transaction/record",
 		Result:    transactionJSON,
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
-	}, {
-		Type:      requestTypeGraphQL,
-		Path:      "/graphql",
-		Result:    `{"data":{"transaction":` + transactionJSON + `}}`,
-		ClientURL: serverURL + `graphql`,
-		Client:    WithGraphQLClient,
-	}}
-
-	for _, transportHandler := range transportHandlers {
-		t.Run("record transaction "+transportHandler.Type, func(t *testing.T) {
-			client := getTestBuxClient(transportHandler, false)
-
-			hex := ""
-			metadata := &buxmodels.Metadata{
-				"test-key": "test-value",
-			}
-			transaction, err := client.RecordTransaction(context.Background(), hex, "", metadata)
-			assert.NoError(t, err)
-			assert.IsType(t, buxmodels.Transaction{}, *transaction)
-			assert.Equal(t, txID, transaction.ID)
-		})
 	}
+
+	t.Run("record transaction"+transportHandler.Type, func(t *testing.T) {
+		client := getTestBuxClient(transportHandler, false)
+
+		hex := ""
+		metadata := &buxmodels.Metadata{
+			"test-key": "test-value",
+		}
+		transaction, err := client.RecordTransaction(context.Background(), hex, "", metadata)
+		assert.NoError(t, err)
+		assert.IsType(t, buxmodels.Transaction{}, *transaction)
+		assert.Equal(t, txID, transaction.ID)
+	})
 }
 
 // TestSendToRecipients will test the SendToRecipients method
 func TestSendToRecipients(t *testing.T) {
-	transportHandlers := []testTransportHandler{{
+	transportHandler := testTransportHandler{
 		Type: requestTypeHTTP,
 		Queries: []*testTransportHandlerRequest{{
 			Path: "/transaction",
@@ -459,43 +404,26 @@ func TestSendToRecipients(t *testing.T) {
 		}},
 		ClientURL: serverURL,
 		Client:    WithHTTPClient,
-	}, {
-		Type: requestTypeGraphQL,
-		Queries: []*testTransportHandlerRequest{{
-			Path: "/graphql",
-			Result: func(w http.ResponseWriter, req *http.Request) {
-				result := `{"data":{"transaction":` + transactionJSON + `}}`
-				if req.ContentLength > 1000 {
-					result = `{"data":{"new_transaction":` + draftTxJSON + `}}`
-				}
-				w.Header().Set("Content-Type", "application/json")
-				mustWrite(w, result)
-			},
-		}},
-		ClientURL: serverURL + `graphql`,
-		Client:    WithGraphQLClient,
-	}}
-
-	for _, transportHandler := range transportHandlers {
-		t.Run("send to recipients "+transportHandler.Type, func(t *testing.T) {
-			client := getTestBuxClient(transportHandler, false)
-
-			recipients := []*transports.Recipients{{
-				To:       testAddress,
-				Satoshis: 1234,
-			}, {
-				To:       testAddress2,
-				Satoshis: 4321,
-			}}
-			metadata := &buxmodels.Metadata{
-				"test-key": "test-value",
-			}
-			transaction, err := client.SendToRecipients(context.Background(), recipients, metadata)
-			require.NoError(t, err)
-			assert.IsType(t, buxmodels.Transaction{}, *transaction)
-			assert.Equal(t, txID, transaction.ID)
-		})
 	}
+
+	t.Run("send to recipients", func(t *testing.T) {
+		client := getTestBuxClient(transportHandler, false)
+
+		recipients := []*transports.Recipients{{
+			To:       testAddress,
+			Satoshis: 1234,
+		}, {
+			To:       testAddress2,
+			Satoshis: 4321,
+		}}
+		metadata := &buxmodels.Metadata{
+			"test-key": "test-value",
+		}
+		transaction, err := client.SendToRecipients(context.Background(), recipients, metadata)
+		require.NoError(t, err)
+		assert.IsType(t, buxmodels.Transaction{}, *transaction)
+		assert.Equal(t, txID, transaction.ID)
+	})
 }
 
 // TestFinalizeTransaction will test the FinalizeTransaction method
@@ -540,12 +468,12 @@ func TestGetTransport(t *testing.T) {
 	t.Run("client GetTransport", func(t *testing.T) {
 		client, _ := New(
 			WithXPriv(xPrivString),
-			WithGraphQL(serverURL),
+			WithHTTP(serverURL),
 			WithAdminKey(xPrivString),
 			WithSignRequest(false),
 		)
 		transport := client.GetTransport()
-		assert.IsType(t, &transports.TransportGraphQL{}, *transport)
+		assert.IsType(t, &transports.TransportHTTP{}, *transport)
 	})
 }
 
@@ -626,29 +554,6 @@ func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 				}},
 				ClientURL: serverURL,
 				Client:    WithHTTPClient,
-			}
-
-			client := getTestBuxClientWithOpts(transportHandler, WithAccessKey(accessKeyString))
-
-			_, err := test.clientMethod(client)
-			if err != nil {
-				t.Log(err)
-			}
-		})
-
-		t.Run("graphqlClient."+test.caseTitle, func(t *testing.T) {
-			transportHandler := testTransportHandler{
-				Type: requestTypeGraphQL,
-				Queries: []*testTransportHandlerRequest{{
-					Path: "/graphql",
-					Result: func(w http.ResponseWriter, req *http.Request) {
-						assertAuthHeaders(t, req)
-						w.Header().Set("Content-Type", "application/json")
-						mustWrite(w, `{"data":{}}`)
-					},
-				}},
-				ClientURL: serverURL + `graphql`,
-				Client:    WithGraphQLClient,
 			}
 
 			client := getTestBuxClientWithOpts(transportHandler, WithAccessKey(accessKeyString))
