@@ -42,29 +42,11 @@ func WithHTTP(serverURL string) ClientOps {
 	}
 }
 
-// WithGraphQL will overwrite the default client with a custom client
-func WithGraphQL(serverURL string) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithGraphQL(serverURL))
-		}
-	}
-}
-
 // WithHTTPClient will overwrite the default client with a custom client
 func WithHTTPClient(serverURL string, httpClient *http.Client) ClientOps {
 	return func(c *BuxClient) {
 		if c != nil {
 			c.transportOptions = append(c.transportOptions, transports.WithHTTPClient(serverURL, httpClient))
-		}
-	}
-}
-
-// WithGraphQLClient will overwrite the default client with a custom client
-func WithGraphQLClient(serverURL string, httpClient *http.Client) ClientOps {
-	return func(c *BuxClient) {
-		if c != nil {
-			c.transportOptions = append(c.transportOptions, transports.WithGraphQLClient(serverURL, httpClient))
 		}
 	}
 }
