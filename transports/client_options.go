@@ -34,23 +34,6 @@ func WithAccessKey(accessKey *bec.PrivateKey) ClientOps {
 	}
 }
 
-// WithGraphQL will overwrite the default client with a custom client
-func WithGraphQL(serverURL string) ClientOps {
-	return func(c *Client) {
-		if c != nil {
-			c.transport = NewTransportService(&TransportGraphQL{
-				server:      serverURL,
-				signRequest: c.signRequest,
-				adminXPriv:  c.adminXPriv,
-				httpClient:  &http.Client{},
-				xPriv:       c.xPriv,
-				xPub:        c.xPub,
-				accessKey:   c.accessKey,
-			})
-		}
-	}
-}
-
 // WithHTTP will overwrite the default client with a custom client
 func WithHTTP(serverURL string) ClientOps {
 	return func(c *Client) {
@@ -60,23 +43,6 @@ func WithHTTP(serverURL string) ClientOps {
 				signRequest: c.signRequest,
 				adminXPriv:  c.adminXPriv,
 				httpClient:  &http.Client{},
-				xPriv:       c.xPriv,
-				xPub:        c.xPub,
-				accessKey:   c.accessKey,
-			})
-		}
-	}
-}
-
-// WithGraphQLClient will overwrite the default client with a custom client
-func WithGraphQLClient(serverURL string, httpClient *http.Client) ClientOps {
-	return func(c *Client) {
-		if c != nil {
-			c.transport = NewTransportService(&TransportGraphQL{
-				server:      serverURL,
-				signRequest: c.signRequest,
-				adminXPriv:  c.adminXPriv,
-				httpClient:  httpClient,
 				xPriv:       c.xPriv,
 				xPub:        c.xPub,
 				accessKey:   c.accessKey,
