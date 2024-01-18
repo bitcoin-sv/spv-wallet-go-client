@@ -64,8 +64,6 @@ type AdminService interface {
 	AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, ResponseError)
 	AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.AccessKey, ResponseError)
 	AdminGetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.BlockHeader, ResponseError)
-	AdminGetBlockHeadersCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
 	AdminGetDestinations(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Destination, ResponseError)
 	AdminGetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
 	AdminGetPaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, ResponseError)

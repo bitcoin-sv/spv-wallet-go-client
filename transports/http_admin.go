@@ -78,25 +78,6 @@ func (h *TransportHTTP) AdminGetAccessKeysCount(ctx context.Context, conditions 
 	return h.adminCount(ctx, conditions, metadata, "/admin/access-keys/count")
 }
 
-// AdminGetBlockHeaders get all block headers filtered by conditions
-func (h *TransportHTTP) AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *QueryParams,
-) ([]*buxmodels.BlockHeader, ResponseError) {
-	var models []*buxmodels.BlockHeader
-	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/block-headers/search", &models); err != nil {
-		return nil, err
-	}
-
-	return models, nil
-}
-
-// AdminGetBlockHeadersCount get a count of all the block headers filtered by conditions
-func (h *TransportHTTP) AdminGetBlockHeadersCount(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata,
-) (int64, ResponseError) {
-	return h.adminCount(ctx, conditions, metadata, "/admin/block-headers/count")
-}
-
 // AdminGetDestinations get all block destinations filtered by conditions
 func (h *TransportHTTP) AdminGetDestinations(ctx context.Context, conditions map[string]interface{},
 	metadata *buxmodels.Metadata, queryParams *QueryParams,
