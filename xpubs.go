@@ -10,7 +10,6 @@ import (
 // NewXpub registers a new xpub - admin key needed
 func (b *BuxClient) NewXpub(ctx context.Context, rawXPub string, metadata *buxmodels.Metadata) transports.ResponseError {
 	return b.transport.NewXpub(ctx, rawXPub, metadata)
-	//return nil
 }
 
 // GetXPub gets the current xpub

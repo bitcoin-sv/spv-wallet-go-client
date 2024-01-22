@@ -8,17 +8,18 @@ import (
 
 	buxmodels "github.com/BuxOrg/bux-models"
 	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
-	"github.com/BuxOrg/go-buxclient/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-bt/v2/bscript"
 	"github.com/libsv/go-bt/v2/sighash"
+
+	"github.com/BuxOrg/go-buxclient/utils"
 )
 
 // SetSignature will set the signature on the header for the request
-func SetSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
+func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
 	// Create the signature
 	authData, err := createSignature(xPriv, bodyString)
 	if err != nil {
@@ -84,7 +85,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 
 		// Get the unlocking script
 		var s *bscript.Script
-		if s, err = GetUnlockingScript(
+		if s, err = getUnlockingScript(
 			txDraft, uint32(index), privateKey,
 		); err != nil {
 			resError = WrapError(err)
@@ -106,7 +107,7 @@ func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signe
 }
 
 // GetUnlockingScript will generate an unlocking script
-func GetUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey) (*bscript.Script, error) {
+func getUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey) (*bscript.Script, error) {
 	sigHashFlags := sighash.AllForkID
 
 	sigHash, err := tx.CalcInputSignatureHash(inputIndex, sigHashFlags)
