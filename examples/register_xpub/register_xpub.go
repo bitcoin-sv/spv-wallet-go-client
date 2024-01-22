@@ -15,7 +15,7 @@ func main() {
 	// Create a client
 	buxClient, _ := buxclient.New(
 		buxclient.WithXPriv(keys.XPriv()),
-		buxclient.WithHTTP("http://localhost:3003/v1"),
+		buxclient.WithHTTP("localhost:3003/v1"),
 		buxclient.WithSignRequest(true),
 	)
 
