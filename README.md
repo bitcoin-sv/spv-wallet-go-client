@@ -1,35 +1,38 @@
+<div align="center">
+
 # BUX: Go Client
-> Get started using [BUX](https://getbux.io) in five minutes
 
 [![Release](https://img.shields.io/github/release-pre/BuxOrg/go-buxclient.svg?logo=github&style=flat&v=2)](https://github.com/BuxOrg/go-buxclient/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/BuxOrg/go-buxclient/run-tests.yml?branch=master&v=2)](https://github.com/BuxOrg/go-buxclient/actions)
 [![Report](https://goreportcard.com/badge/github.com/BuxOrg/go-buxclient?style=flat&v=2)](https://goreportcard.com/report/github.com/BuxOrg/go-buxclient)
 [![codecov](https://codecov.io/gh/BuxOrg/go-buxclient/branch/master/graph/badge.svg?v=2)](https://codecov.io/gh/BuxOrg/go-buxclient)
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/BuxOrg/go-buxclient&style=flat&v=2)](https://mergify.io)
-[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/go-buxclient?v=2)](https://golang.org/)
 <br>
+
+[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/go-buxclient?v=2)](https://golang.org/)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=2)](https://gitpod.io/#https://github.com/BuxOrg/go-buxclient)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=2)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=2)](Makefile)
-[![Sponsor](https://img.shields.io/badge/sponsor-BuxOrg-181717.svg?logo=github&style=flat&v=2)](https://github.com/sponsors/BuxOrg)
-[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat&v=2)](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=go-buxclient&utm_term=go-buxclient&utm_content=go-buxclient)
 
 <br/>
+</div>
+
+> Get started using [BUX](https://getbux.io) in five minutes
 
 ## Table of Contents
-- [What is BUX?](#what-is-bux)
+- [About](#about)
 - [Installation](#installation)
 - [Documentation](#documentation)
-- [Examples & Tests](#examples--tests)
-- [Benchmarks](#benchmarks)
-- [Code Standards](#code-standards)
 - [Usage](#usage)
+  - [Examples & Tests](#examples--tests)
+  - [Benchmarks](#benchmarks)
+- [Code Standards](#code-standards)
 - [Contributing](#contributing)
 - [License](#license)
 
 <br/>
 
-## What is BUX?
+## About
 [Read more about BUX](https://getbux.io)
 
 <br/>
@@ -166,7 +169,12 @@ vet                           Run the Go vet application
 
 <br/>
 
-## Examples & Tests
+## Usage
+Checkout all the [examples](examples)!
+
+<br/>
+
+### Examples & Tests
 All unit tests and [examples](examples) run via [GitHub Actions](https://github.com/BuxOrg/go-buxclient/actions) and
 uses [Go version 1.19.x](https://golang.org/doc/go1.19). View the [configuration file](.github/workflows/run-tests.yml).
 
@@ -186,7 +194,7 @@ make test-short
 
 <br/>
 
-## Benchmarks
+### Benchmarks
 Run the Go benchmarks:
 ```shell script
 make bench
@@ -225,39 +233,11 @@ Checkout all the [examples](examples)!
 <br/>
 
 ## Contributing
-View the [contributing guidelines](.github/CONTRIBUTING.md) and follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
-
+All kinds of contributions are welcome!
 <br/>
-
-### How can I help?
-All kinds of contributions are welcome :raised_hands:!
-The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:.
-You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/BuxOrg) :clap:
-or by making a [**bitcoin donation**](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=go-buxclient&utm_term=go-buxclient&utm_content=go-buxclient) to ensure this journey continues indefinitely! :rocket:
-
-[![Stars](https://img.shields.io/github/stars/BuxOrg/go-buxclient?label=Please%20like%20us&style=social&v=2)](https://github.com/BuxOrg/go-buxclient/stargazers)
-
+To get started, take a look at [code standards](.github/CODE_STANDARDS.md).
 <br/>
-
-### Contributors ✨
-Thank you to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://mrz1818.com"><img src="https://avatars.githubusercontent.com/u/3743002?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mr. Z</b></sub></a><br /><a href="#infra-mrz1836" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/BuxOrg/go-buxclient/commits?author=mrz1836" title="Code">💻</a> <a href="#maintenance-mrz1836" title="Maintenance">🚧</a> <a href="#security-mrz1836" title="Security">🛡️</a></td>
-    <td align="center"><a href="https://github.com/icellan"><img src="https://avatars.githubusercontent.com/u/4411176?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Siggi</b></sub></a><br /><a href="#infra-icellan" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/BuxOrg/go-buxclient/commits?author=icellan" title="Code">💻</a> <a href="#security-icellan" title="Security">🛡️</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-> This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
+View the [contributing guidelines](.github/CODE_STANDARDS.md#3-contributing) and follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
 
 <br/>
 

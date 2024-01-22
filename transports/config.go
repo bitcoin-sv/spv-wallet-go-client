@@ -2,7 +2,7 @@ package transports
 
 import buxmodels "github.com/BuxOrg/bux-models"
 
-// TransportType the type of transport being used (http or graphql)
+// TransportType the type of transport being used ('http' for usage or 'mock' for testing)
 type TransportType string
 
 // BuxUserAgent the bux user agent sent to the bux server
@@ -14,9 +14,6 @@ const BuxClientVersion = "v0.3.13"
 const (
 	// BuxTransportHTTP uses the http transport for all bux server actions
 	BuxTransportHTTP TransportType = "http"
-
-	// BuxTransportGraphQL uses the graphql transport for all bux server actions
-	BuxTransportGraphQL TransportType = "graphql"
 
 	// BuxTransportMock uses the mock transport for all bux server actions
 	BuxTransportMock TransportType = "mock"
