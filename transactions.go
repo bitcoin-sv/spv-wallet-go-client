@@ -4,7 +4,6 @@ import (
 	"context"
 
 	buxmodels "github.com/BuxOrg/bux-models"
-	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
 	"github.com/BuxOrg/go-buxclient/transports"
 )
 
@@ -67,8 +66,6 @@ func (b *BuxClient) SendToRecipients(ctx context.Context, recipients []*transpor
 	draft, err := b.DraftToRecipients(ctx, recipients, metadata)
 	if err != nil {
 		return nil, err
-	} else if draft == nil {
-		return nil, transports.WrapError(buxerrors.ErrDraftNotFound)
 	}
 
 	var hex string
