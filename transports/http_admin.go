@@ -187,7 +187,7 @@ func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) 
 
 	var model *buxmodels.PaymailAddress
 	if err := h.doHTTPRequest(
-		ctx, http.MethodPost, "/admin/paymail/delete", jsonStr, h.xPriv, true, &model,
+		ctx, http.MethodDelete, "/admin/paymail/delete", jsonStr, h.xPriv, true, &model,
 	); err != nil {
 		return nil, err
 	}
