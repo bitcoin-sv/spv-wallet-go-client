@@ -263,6 +263,24 @@ func TestTransactions(t *testing.T) {
 		assert.Len(t, txDraft.Inputs, len(fixtures.DraftTx.Configuration.Inputs))
 		assert.Len(t, txDraft.Outputs, len(fixtures.DraftTx.Configuration.Outputs))
 	})
+
+	t.Run("CountUtxos", func(t *testing.T) {
+		// given
+		transportHandler := testTransportHandler{
+			Type:      fixtures.RequestType,
+			Path:      "/utxo/count",
+			ClientURL: fixtures.ServerURL,
+			Result:    "0",
+			Client:    WithHTTPClient,
+		}
+		client := getTestBuxClient(transportHandler, false)
+
+		// when
+		_, err := client.GetUtxosCount(context.Background(), map[string]interface{}{}, fixtures.TestMetadata)
+
+		// then
+		assert.NoError(t, err)
+	})
 }
 
 // TestDraftTransactions will test the DraftTransaction methods
