@@ -263,23 +263,6 @@ func TestTransactions(t *testing.T) {
 		assert.Len(t, txDraft.Inputs, len(fixtures.DraftTx.Configuration.Inputs))
 		assert.Len(t, txDraft.Outputs, len(fixtures.DraftTx.Configuration.Outputs))
 	})
-
-	t.Run("UnreserveUtxos", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/utxo/unreserve",
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestBuxClient(transportHandler, false)
-
-		// when
-		err := client.UnreserveUtxos(context.Background(), fixtures.DraftTx.Configuration.Outputs[0].PaymailP4.ReferenceID)
-
-		// then
-		assert.NoError(t, err)
-	})
 }
 
 // TestDraftTransactions will test the DraftTransaction methods
