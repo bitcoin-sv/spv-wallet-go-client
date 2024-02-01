@@ -359,7 +359,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Con
 func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*buxmodels.Transaction, ResponseError) {
 	var transaction buxmodels.Transaction
 	if err := h.doHTTPRequest(
-		ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, h.xPriv, h.signRequest, &transaction,
+		ctx, http.MethodPost, "/transaction?"+FieldID+"="+txID, nil, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
 		return nil, err
 	}
