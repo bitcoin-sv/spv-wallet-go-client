@@ -71,6 +71,9 @@ type AdminService interface {
 	AdminGetPaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, ResponseError)
 	AdminGetPaymails(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.PaymailAddress, ResponseError)
 	AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
+	// AdminCreatePaymail Create a paymail.
+	//
+	// Paymail address (ie. example@bux.org)
 	AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*buxmodels.PaymailAddress, ResponseError)
 	AdminDeletePaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, ResponseError)
 	AdminGetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Transaction, ResponseError)
