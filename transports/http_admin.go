@@ -265,7 +265,7 @@ func (h *TransportHTTP) adminGetModels(ctx context.Context, conditions map[strin
 	}
 
 	if err := h.doHTTPRequest(
-		ctx, http.MethodGet, path, jsonStr, h.xPriv, true, &models,
+		ctx, http.MethodPost, path, jsonStr, h.xPriv, true, &models,
 	); err != nil {
 		return err
 	}
