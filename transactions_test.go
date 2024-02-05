@@ -264,18 +264,19 @@ func TestTransactions(t *testing.T) {
 		assert.Len(t, txDraft.Outputs, len(fixtures.DraftTx.Configuration.Outputs))
 	})
 
-	t.Run("UnreserveUtxos", func(t *testing.T) {
+	t.Run("CountUtxos", func(t *testing.T) {
 		// given
 		transportHandler := testTransportHandler{
 			Type:      fixtures.RequestType,
-			Path:      "/utxo/unreserve",
+			Path:      "/utxo/count",
 			ClientURL: fixtures.ServerURL,
+			Result:    "0",
 			Client:    WithHTTPClient,
 		}
 		client := getTestBuxClient(transportHandler, false)
 
 		// when
-		err := client.UnreserveUtxos(context.Background(), fixtures.DraftTx.Configuration.Outputs[0].PaymailP4.ReferenceID)
+		_, err := client.GetUtxosCount(context.Background(), map[string]interface{}{}, fixtures.TestMetadata)
 
 		// then
 		assert.NoError(t, err)
