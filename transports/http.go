@@ -581,18 +581,6 @@ func (h *TransportHTTP) GetUtxosCount(ctx context.Context, conditions map[string
 	return count, nil
 }
 
-// UnreserveUtxos will unreserve utxos from draft transaction
-func (h *TransportHTTP) UnreserveUtxos(ctx context.Context, referenceID string) ResponseError {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldReferenceID: referenceID,
-	})
-	if err != nil {
-		return WrapError(err)
-	}
-
-	return h.doHTTPRequest(ctx, http.MethodPatch, "/utxo/unreserve", jsonStr, h.xPriv, h.signRequest, nil)
-}
-
 // createSignatureAccessKey will create a signature for the given access key & body contents
 func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *buxmodels.AuthPayload, err error) {
 	// No key?
