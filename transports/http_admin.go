@@ -8,8 +8,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// NewXpub will register an xPub
-func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError {
+// AdminNewXpub will register an xPub
+func (h *TransportHTTP) AdminNewXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError {
 	// Adding a xpub needs to be signed by an admin key
 	if h.adminXPriv == nil {
 		return WrapError(ErrAdminKey)
@@ -26,13 +26,8 @@ func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *m
 	var xPubData models.Xpub
 
 	return h.doHTTPRequest(
-		ctx, http.MethodPost, "/xpub", jsonStr, h.adminXPriv, true, &xPubData,
+		ctx, http.MethodPost, "/admin/xpub", jsonStr, h.adminXPriv, true, &xPubData,
 	)
-}
-
-// RegisterXpub alias for NewXpub
-func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError {
-	return h.NewXpub(ctx, rawXPub, metadata)
 }
 
 // AdminGetStatus get whether admin key is valid
@@ -177,22 +172,21 @@ func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, xPubID string, a
 }
 
 // AdminDeletePaymail delete a paymail address from the database
-func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError) {
+func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) ResponseError {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldAddress: address,
 	})
 	if err != nil {
-		return nil, WrapError(err)
+		return WrapError(err)
 	}
 
-	var model *models.PaymailAddress
 	if err := h.doHTTPRequest(
-		ctx, http.MethodDelete, "/admin/paymail/delete", jsonStr, h.xPriv, true, &model,
+		ctx, http.MethodDelete, "/admin/paymail/delete", jsonStr, h.xPriv, true, nil,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return model, nil
+	return nil
 }
 
 // AdminGetTransactions get all block transactions filtered by conditions

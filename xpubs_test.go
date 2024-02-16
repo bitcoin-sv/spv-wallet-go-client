@@ -19,17 +19,6 @@ func TestXpub(t *testing.T) {
 		Client:    WithHTTPClient,
 	}
 
-	t.Run("NewXpub", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, true)
-
-		// when
-		err := client.NewXpub(context.Background(), fixtures.XPubString, fixtures.TestMetadata)
-
-		// then
-		assert.NoError(t, err)
-	})
-
 	t.Run("GetXPub", func(t *testing.T) {
 		// given
 		client := getTestWalletClient(transportHandler, true)

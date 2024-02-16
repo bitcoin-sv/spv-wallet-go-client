@@ -7,11 +7,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// NewXpub registers a new xpub - admin key needed
-func (b *WalletClient) NewXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) transports.ResponseError {
-	return b.transport.NewXpub(ctx, rawXPub, metadata)
-}
-
 // GetXPub gets the current xpub
 func (b *WalletClient) GetXPub(ctx context.Context) (*models.Xpub, transports.ResponseError) {
 	return b.transport.GetXPub(ctx)
