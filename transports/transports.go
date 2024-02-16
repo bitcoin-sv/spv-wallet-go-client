@@ -1,4 +1,4 @@
-// Package transports encapsulates the different ways to communicate with BUX
+// Package transports encapsulates the different ways to communicate with SPV Wallet
 package transports
 
 import (

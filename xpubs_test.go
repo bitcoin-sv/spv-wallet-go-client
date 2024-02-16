@@ -1,4 +1,4 @@
-package buxclient
+package walletclient
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/BuxOrg/go-buxclient/fixtures"
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 // TestXpub will test the Xpub methods
@@ -21,7 +21,7 @@ func TestXpub(t *testing.T) {
 
 	t.Run("NewXpub", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, true)
+		client := getTestWalletClient(transportHandler, true)
 
 		// when
 		err := client.NewXpub(context.Background(), fixtures.XPubString, fixtures.TestMetadata)
@@ -32,7 +32,7 @@ func TestXpub(t *testing.T) {
 
 	t.Run("GetXPub", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, true)
+		client := getTestWalletClient(transportHandler, true)
 
 		// when
 		xpub, err := client.GetXPub(context.Background())
@@ -44,7 +44,7 @@ func TestXpub(t *testing.T) {
 
 	t.Run("UpdateXPubMetadata", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, true)
+		client := getTestWalletClient(transportHandler, true)
 
 		// when
 		xpub, err := client.UpdateXPubMetadata(context.Background(), fixtures.TestMetadata)

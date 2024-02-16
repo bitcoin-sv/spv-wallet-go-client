@@ -1,4 +1,4 @@
-module github.com/BuxOrg/go-buxclient
+module github.com/bitcoin-sv/spv-wallet-go-client
 
 go 1.21
 

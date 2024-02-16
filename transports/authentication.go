@@ -15,7 +15,7 @@ import (
 	"github.com/libsv/go-bt/v2/bscript"
 	"github.com/libsv/go-bt/v2/sighash"
 
-	"github.com/BuxOrg/go-buxclient/utils"
+	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 )
 
 // SetSignature will set the signature on the header for the request

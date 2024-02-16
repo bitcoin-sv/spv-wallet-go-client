@@ -1,4 +1,4 @@
-package buxclient
+package walletclient
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/BuxOrg/go-buxclient/fixtures"
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 // TestDestinations will test the Destinations methods
@@ -22,7 +22,7 @@ func TestDestinations(t *testing.T) {
 
 	t.Run("GetDestinationByID", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		destination, err := client.GetDestinationByID(context.Background(), fixtures.Destination.ID)
@@ -34,7 +34,7 @@ func TestDestinations(t *testing.T) {
 
 	t.Run("GetDestinationByAddress", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		destination, err := client.GetDestinationByAddress(context.Background(), fixtures.Destination.Address)
@@ -46,7 +46,7 @@ func TestDestinations(t *testing.T) {
 
 	t.Run("GetDestinationByLockingScript", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		destination, err := client.GetDestinationByLockingScript(context.Background(), fixtures.Destination.LockingScript)
@@ -65,7 +65,7 @@ func TestDestinations(t *testing.T) {
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		destinations, err := client.GetDestinations(context.Background(), fixtures.TestMetadata)
@@ -77,7 +77,7 @@ func TestDestinations(t *testing.T) {
 
 	t.Run("NewDestination", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		destination, err := client.NewDestination(context.Background(), fixtures.TestMetadata)
@@ -89,7 +89,7 @@ func TestDestinations(t *testing.T) {
 
 	t.Run("UpdateDestinationMetadataByID", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		destination, err := client.UpdateDestinationMetadataByID(context.Background(), fixtures.Destination.ID, fixtures.TestMetadata)
@@ -101,7 +101,7 @@ func TestDestinations(t *testing.T) {
 
 	t.Run("UpdateDestinationMetadataByAddress", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		destination, err := client.UpdateDestinationMetadataByAddress(context.Background(), fixtures.Destination.Address, fixtures.TestMetadata)
@@ -113,7 +113,7 @@ func TestDestinations(t *testing.T) {
 
 	t.Run("UpdateDestinationMetadataByLockingScript", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		destination, err := client.UpdateDestinationMetadataByLockingScript(context.Background(), fixtures.Destination.LockingScript, fixtures.TestMetadata)

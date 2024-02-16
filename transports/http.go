@@ -11,7 +11,7 @@ import (
 
 	buxmodels "github.com/BuxOrg/bux-models"
 	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
-	"github.com/BuxOrg/go-buxclient/utils"
+	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"

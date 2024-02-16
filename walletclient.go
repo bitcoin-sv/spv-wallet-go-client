@@ -1,13 +1,8 @@
-// Package buxclient is a Go client for interacting with Bux Servers
-//
-// If you have any suggestions or comments, please feel free to open an issue on
-// this GitHub repository!
-//
-// By BuxOrg (https://github.com/BuxOrg)
-package buxclient
+// Package walletclient is a Go client for interacting with Spv Wallet.
+package walletclient
 
 import (
-	"github.com/BuxOrg/go-buxclient/transports"
+	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
@@ -16,10 +11,10 @@ import (
 )
 
 // ClientOps are used for client options
-type ClientOps func(c *BuxClient)
+type ClientOps func(c *WalletClient)
 
-// BuxClient is the go-buxclient
-type BuxClient struct {
+// WalletClient is the spv wallet go client representation.
+type WalletClient struct {
 	transports.TransportService
 	accessKey        *bec.PrivateKey
 	accessKeyString  string
@@ -31,9 +26,9 @@ type BuxClient struct {
 	xPubString       string
 }
 
-// New create a new bux client
-func New(opts ...ClientOps) (*BuxClient, error) {
-	client := &BuxClient{}
+// New create a new wallet client
+func New(opts ...ClientOps) (*WalletClient, error) {
+	client := &WalletClient{}
 
 	for _, opt := range opts {
 		opt(client)
@@ -95,7 +90,7 @@ func New(opts ...ClientOps) (*BuxClient, error) {
 }
 
 // SetAdminKey set the admin key to use to create new xpubs
-func (b *BuxClient) SetAdminKey(adminKeyString string) error {
+func (b *WalletClient) SetAdminKey(adminKeyString string) error {
 	adminKey, err := bip32.NewKeyFromString(adminKeyString)
 	if err != nil {
 		return err
@@ -107,16 +102,16 @@ func (b *BuxClient) SetAdminKey(adminKeyString string) error {
 }
 
 // SetSignRequest turn the signing of the http request on or off
-func (b *BuxClient) SetSignRequest(signRequest bool) {
+func (b *WalletClient) SetSignRequest(signRequest bool) {
 	b.transport.SetSignRequest(signRequest)
 }
 
 // IsSignRequest return whether to sign all requests
-func (b *BuxClient) IsSignRequest() bool {
+func (b *WalletClient) IsSignRequest() bool {
 	return b.transport.IsSignRequest()
 }
 
 // GetTransport returns the current transport service
-func (b *BuxClient) GetTransport() *transports.TransportService {
+func (b *WalletClient) GetTransport() *transports.TransportService {
 	return &b.transport
 }
