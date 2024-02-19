@@ -6,10 +6,7 @@ import buxmodels "github.com/BuxOrg/bux-models"
 type TransportType string
 
 // SPVWalletUserAgent the spv wallet user agent sent to the spv wallet.
-const SPVWalletUserAgent = "SPV-Wallet: go-client " + SPVWalletClientVersion
-
-// SPVWalletClientVersion is the version of the client
-const SPVWalletClientVersion = "v0.3.13"
+const SPVWalletUserAgent = "SPV-Wallet: go-client"
 
 const (
 	// SPVWalletTransportHTTP uses the http transport for all spv-wallet actions
