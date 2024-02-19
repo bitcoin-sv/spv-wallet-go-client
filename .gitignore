@@ -24,6 +24,9 @@ go.list
 # Eclipse
 .project
 
+# VS Code
+.vscode/
+
 # Notes
 todo.md
 
@@ -32,3 +35,4 @@ dist
 
 # Code coverage
 coverage.txt
+
