@@ -60,30 +60,6 @@ type PaymailService interface {
 // AdminService is the admin related requests
 type AdminService interface {
 	AdminGetStatus(ctx context.Context) (bool, ResponseError)
-<<<<<<< HEAD
-	AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, ResponseError)
-	AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.AccessKey, ResponseError)
-	AdminGetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.BlockHeader, ResponseError)
-	AdminGetBlockHeadersCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetDestinations(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Destination, ResponseError)
-	AdminGetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetPaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, ResponseError)
-	AdminGetPaymails(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.PaymailAddress, ResponseError)
-	AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	// AdminCreatePaymail Create a paymail.
-	//
-	// Paymail address (ie. example@bux.org)
-	AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*buxmodels.PaymailAddress, ResponseError)
-	AdminDeletePaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, ResponseError)
-	AdminGetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Transaction, ResponseError)
-	AdminGetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Utxo, ResponseError)
-	AdminGetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetXPubs(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Xpub, ResponseError)
-	AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminRecordTransaction(ctx context.Context, hex string) (*buxmodels.Transaction, ResponseError)
-=======
 	AdminGetStats(ctx context.Context) (*models.AdminStats, ResponseError)
 	AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.AccessKey, ResponseError)
 	AdminGetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
@@ -94,6 +70,9 @@ type AdminService interface {
 	AdminGetPaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError)
 	AdminGetPaymails(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.PaymailAddress, ResponseError)
 	AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	// AdminCreatePaymail Create a paymail.
+	//
+	// Paymail address (ie. example@bux.org)
 	AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*models.PaymailAddress, ResponseError)
 	AdminDeletePaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError)
 	AdminGetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Transaction, ResponseError)
@@ -103,7 +82,6 @@ type AdminService interface {
 	AdminGetXPubs(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Xpub, ResponseError)
 	AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
 	AdminRecordTransaction(ctx context.Context, hex string) (*models.Transaction, ResponseError)
->>>>>>> 04fb30c (feat: replace go-models)
 }
 
 // TransportService the transport service interface
