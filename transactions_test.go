@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/libsv/go-bt/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -40,7 +40,7 @@ func TestTransactions(t *testing.T) {
 		transportHandler := testTransportHandler{
 			Type:      fixtures.RequestType,
 			Path:      "/transaction/search",
-			Result:    fixtures.MarshallForTestHandler([]*buxmodels.Transaction{fixtures.Transaction}),
+			Result:    fixtures.MarshallForTestHandler([]*models.Transaction{fixtures.Transaction}),
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
@@ -59,7 +59,7 @@ func TestTransactions(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, []*buxmodels.Transaction{fixtures.Transaction}, txs)
+		assert.Equal(t, []*models.Transaction{fixtures.Transaction}, txs)
 	})
 
 	t.Run("GetTransactionsCount", func(t *testing.T) {
@@ -219,7 +219,7 @@ func TestTransactions(t *testing.T) {
 					Path: "/transaction",
 					Result: func(w http.ResponseWriter, req *http.Request) {
 						w.Header().Set("Content-Type", "application/json")
-						mustWrite(w, fixtures.MarshallForTestHandler(buxmodels.DraftTransaction{}))
+						mustWrite(w, fixtures.MarshallForTestHandler(models.DraftTransaction{}))
 					},
 				},
 			},

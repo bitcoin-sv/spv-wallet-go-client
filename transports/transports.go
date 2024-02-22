@@ -4,7 +4,7 @@ package transports
 import (
 	"net/http"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 )
@@ -62,9 +62,9 @@ func NewTransportService(transportService TransportService) TransportService {
 }
 
 // processMetadata will process the metadata
-func processMetadata(metadata *buxmodels.Metadata) *buxmodels.Metadata {
+func processMetadata(metadata *models.Metadata) *models.Metadata {
 	if metadata == nil {
-		m := make(buxmodels.Metadata)
+		m := make(models.Metadata)
 		metadata = &m
 	}
 

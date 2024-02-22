@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
@@ -61,7 +61,7 @@ func TestDestinations(t *testing.T) {
 		transportHandler := testTransportHandler{
 			Type:      fixtures.RequestType,
 			Path:      "/destination/search",
-			Result:    fixtures.MarshallForTestHandler([]*buxmodels.Destination{fixtures.Destination}),
+			Result:    fixtures.MarshallForTestHandler([]*models.Destination{fixtures.Destination}),
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
@@ -72,7 +72,7 @@ func TestDestinations(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, destinations, []*buxmodels.Destination{fixtures.Destination})
+		assert.Equal(t, destinations, []*models.Destination{fixtures.Destination})
 	})
 
 	t.Run("NewDestination", func(t *testing.T) {

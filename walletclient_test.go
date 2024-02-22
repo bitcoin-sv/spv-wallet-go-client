@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -223,7 +223,7 @@ func TestGetTransport(t *testing.T) {
 
 func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 	anyConditions := make(map[string]interface{}, 0)
-	var anyMetadataConditions *buxmodels.Metadata
+	var anyMetadataConditions *models.Metadata
 	anyParam := "sth"
 
 	testCases := []struct {

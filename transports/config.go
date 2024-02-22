@@ -1,6 +1,6 @@
 package transports
 
-import buxmodels "github.com/BuxOrg/bux-models"
+import "github.com/bitcoin-sv/spv-wallet/models"
 
 // TransportType the type of transport being used ('http' for usage or 'mock' for testing)
 type TransportType string
@@ -18,9 +18,9 @@ const (
 
 // Recipients is a struct for recipients
 type Recipients struct {
-	OpReturn *buxmodels.OpReturn `json:"op_return"`
-	Satoshis uint64              `json:"satoshis"`
-	To       string              `json:"to"`
+	OpReturn *models.OpReturn `json:"op_return"`
+	Satoshis uint64           `json:"satoshis"`
+	To       string           `json:"to"`
 }
 
 // QueryParams object to use when limiting and sorting database query results

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
@@ -37,7 +37,7 @@ func TestAccessKeys(t *testing.T) {
 		transportHandler = testTransportHandler{
 			Type:      fixtures.RequestType,
 			Path:      "/access-key/search",
-			Result:    fixtures.MarshallForTestHandler([]*buxmodels.AccessKey{fixtures.AccessKey}),
+			Result:    fixtures.MarshallForTestHandler([]*models.AccessKey{fixtures.AccessKey}),
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
@@ -48,7 +48,7 @@ func TestAccessKeys(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, accessKeys, []*buxmodels.AccessKey{fixtures.AccessKey})
+		assert.Equal(t, accessKeys, []*models.AccessKey{fixtures.AccessKey})
 	})
 
 	t.Run("CreateAccessKey", func(t *testing.T) {
