@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// Generate keys
+	// Replace with your admin keys
 	keys, _ := xpriv.Generate()
 
 	// Create a client
@@ -18,5 +18,5 @@ func main() {
 		walletclient.WithSignRequest(true),
 	)
 
-	_ = walletclient.NewPaymail(context.Background(), keys.XPub().String(), "foo@domain.com", "", "Foo", nil)
+	walletclient.AdminCreatePaymail(context.Background(), keys.XPub().String(), "foo@domain.com", "", "Foo")
 }
