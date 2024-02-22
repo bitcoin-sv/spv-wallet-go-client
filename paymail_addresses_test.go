@@ -1,4 +1,4 @@
-package buxclient
+package walletclient
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/BuxOrg/go-buxclient/fixtures"
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 // TestPaymailAddresses will test Paymail Addresses methods
@@ -21,7 +21,7 @@ func TestPaymailAddresses(t *testing.T) {
 
 	t.Run("NewPaymail", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		err := client.NewPaymail(context.Background(), fixtures.XPubString, fixtures.PaymailAddress, "", "", fixtures.TestMetadata)

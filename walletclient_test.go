@@ -1,4 +1,4 @@
-package buxclient
+package walletclient
 
 import (
 	"context"
@@ -7,13 +7,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/BuxOrg/go-buxclient/fixtures"
-	"github.com/BuxOrg/go-buxclient/transports"
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
+	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 )
 
 // localRoundTripper is an http.RoundTripper that executes HTTP transactions
@@ -49,8 +49,8 @@ type testTransportHandlerRequest struct {
 	Result func(w http.ResponseWriter, req *http.Request)
 }
 
-// TestNewBuxClient will test the TestNewBuxClient method
-func TestNewBuxClient(t *testing.T) {
+// TestNewWalletClient will test the TestNewWalletClient method
+func TestNewWalletClient(t *testing.T) {
 	t.Run("no keys", func(t *testing.T) {
 		client, err := New()
 		assert.Error(t, err)
@@ -79,7 +79,7 @@ func TestNewBuxClient(t *testing.T) {
 			WithHTTP(fixtures.ServerURL),
 		)
 		require.NoError(t, err)
-		assert.IsType(t, BuxClient{}, *client)
+		assert.IsType(t, WalletClient{}, *client)
 	})
 
 	t.Run("valid xPub client", func(t *testing.T) {
@@ -88,7 +88,7 @@ func TestNewBuxClient(t *testing.T) {
 			WithHTTP(fixtures.ServerURL),
 		)
 		require.NoError(t, err)
-		assert.IsType(t, BuxClient{}, *client)
+		assert.IsType(t, WalletClient{}, *client)
 	})
 
 	t.Run("invalid xPub client", func(t *testing.T) {
@@ -106,7 +106,7 @@ func TestNewBuxClient(t *testing.T) {
 			WithHTTP(fixtures.ServerURL),
 		)
 		require.NoError(t, err)
-		assert.IsType(t, BuxClient{}, *client)
+		assert.IsType(t, WalletClient{}, *client)
 	})
 
 	t.Run("invalid access keys", func(t *testing.T) {
@@ -125,7 +125,7 @@ func TestNewBuxClient(t *testing.T) {
 			WithHTTP(fixtures.ServerURL),
 		)
 		require.NoError(t, err)
-		assert.IsType(t, BuxClient{}, *client)
+		assert.IsType(t, WalletClient{}, *client)
 	})
 }
 
@@ -223,64 +223,68 @@ func TestGetTransport(t *testing.T) {
 
 func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 	anyConditions := make(map[string]interface{}, 0)
-	var anyMetadataConditions *buxmodels.Metadata
+	var anyMetadataConditions *models.Metadata
 	anyParam := "sth"
 
 	testCases := []struct {
 		caseTitle    string
 		path         string
-		clientMethod func(*BuxClient) (any, error)
+		clientMethod func(*WalletClient) (any, error)
 	}{
 		{
 			caseTitle:    "GetXPub",
 			path:         "/xpub",
-			clientMethod: func(c *BuxClient) (any, error) { return c.GetXPub(context.Background()) },
+			clientMethod: func(c *WalletClient) (any, error) { return c.GetXPub(context.Background()) },
 		},
 		{
 			caseTitle:    "GetAccessKey",
 			path:         "/access-key",
-			clientMethod: func(c *BuxClient) (any, error) { return c.GetAccessKey(context.Background(), anyParam) },
+			clientMethod: func(c *WalletClient) (any, error) { return c.GetAccessKey(context.Background(), anyParam) },
 		},
 		{
-			caseTitle:    "GetAccessKeys",
-			path:         "/access-key",
-			clientMethod: func(c *BuxClient) (any, error) { return c.GetAccessKeys(context.Background(), anyMetadataConditions) },
+			caseTitle: "GetAccessKeys",
+			path:      "/access-key",
+			clientMethod: func(c *WalletClient) (any, error) {
+				return c.GetAccessKeys(context.Background(), anyMetadataConditions)
+			},
 		},
 		{
 			caseTitle:    "GetDestinationByID",
 			path:         "/destination",
-			clientMethod: func(c *BuxClient) (any, error) { return c.GetDestinationByID(context.Background(), anyParam) },
+			clientMethod: func(c *WalletClient) (any, error) { return c.GetDestinationByID(context.Background(), anyParam) },
 		},
 		{
-			caseTitle:    "GetDestinationByAddress",
-			path:         "/destination",
-			clientMethod: func(c *BuxClient) (any, error) { return c.GetDestinationByAddress(context.Background(), anyParam) },
+			caseTitle: "GetDestinationByAddress",
+			path:      "/destination",
+			clientMethod: func(c *WalletClient) (any, error) {
+				return c.GetDestinationByAddress(context.Background(), anyParam)
+			},
 		},
 		{
 			caseTitle: "GetDestinationByLockingScript",
 			path:      "/destination",
-			clientMethod: func(c *BuxClient) (any, error) {
+			clientMethod: func(c *WalletClient) (any, error) {
 				return c.GetDestinationByLockingScript(context.Background(), anyParam)
 			},
 		},
 		{
 			caseTitle: "GetDestinations",
 			path:      "/destination/search",
-			clientMethod: func(c *BuxClient) (any, error) {
+			clientMethod: func(c *WalletClient) (any, error) {
 				return c.GetDestinations(context.Background(), nil)
 			},
 		},
 		{
 			caseTitle: "GetTransaction",
 			path:      "/transaction",
-			clientMethod: func(c *BuxClient) (any, error) {
+			clientMethod: func(c *WalletClient) (any, error) {
 				return c.GetTransaction(context.Background(), fixtures.Transaction.ID)
 			},
 		},
 		{
 			caseTitle: "GetTransactions",
 			path:      "/transaction/search",
-			clientMethod: func(c *BuxClient) (any, error) {
+			clientMethod: func(c *WalletClient) (any, error) {
 				return c.GetTransactions(context.Background(), anyConditions, anyMetadataConditions, &transports.QueryParams{})
 			},
 		},
@@ -302,7 +306,7 @@ func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 				Client:    WithHTTPClient,
 			}
 
-			client := getTestBuxClientWithOpts(transportHandler, WithAccessKey(fixtures.AccessKeyString))
+			client := getTestWalletClientWithOpts(transportHandler, WithAccessKey(fixtures.AccessKeyString))
 
 			_, err := test.clientMethod(client)
 			if err != nil {
@@ -313,15 +317,15 @@ func TestAuthenticationWithOnlyAccessKey(t *testing.T) {
 }
 
 func assertAuthHeaders(t *testing.T, req *http.Request) {
-	assert.Empty(t, req.Header.Get("bux-auth-xpub"), "Header value bux-auth-xpub should be empty")
-	assert.NotEmpty(t, req.Header.Get("bux-auth-key"), "Header value bux-auth-key should not be empty")
-	assert.NotEmpty(t, req.Header.Get("bux-auth-time"), "Header value bux-auth-time should not be empty")
-	assert.NotEmpty(t, req.Header.Get("bux-auth-hash"), "Header value bux-auth-hash should not be empty")
-	assert.NotEmpty(t, req.Header.Get("bux-auth-nonce"), "Header value bux-auth-nonce should not be empty")
-	assert.NotEmpty(t, req.Header.Get("bux-auth-signature"), "Header value bux-auth-signature should not be empty")
+	assert.Empty(t, req.Header.Get("x-auth-xpub"), "Header value x-auth-xpub should be empty")
+	assert.NotEmpty(t, req.Header.Get("x-auth-key"), "Header value x-auth-key should not be empty")
+	assert.NotEmpty(t, req.Header.Get("x-auth-time"), "Header value x-auth-time should not be empty")
+	assert.NotEmpty(t, req.Header.Get("x-auth-hash"), "Header value x-auth-hash should not be empty")
+	assert.NotEmpty(t, req.Header.Get("x-auth-nonce"), "Header value x-auth-nonce should not be empty")
+	assert.NotEmpty(t, req.Header.Get("x-auth-signature"), "Header value x-auth-signature should not be empty")
 }
 
-func getTestBuxClient(transportHandler testTransportHandler, adminKey bool) *BuxClient {
+func getTestWalletClient(transportHandler testTransportHandler, adminKey bool) *WalletClient {
 	opts := []ClientOps{
 		WithXPriv(fixtures.XPrivString),
 	}
@@ -329,10 +333,10 @@ func getTestBuxClient(transportHandler testTransportHandler, adminKey bool) *Bux
 		opts = append(opts, WithAdminKey(fixtures.XPrivString))
 	}
 
-	return getTestBuxClientWithOpts(transportHandler, opts...)
+	return getTestWalletClientWithOpts(transportHandler, opts...)
 }
 
-func getTestBuxClientWithOpts(transportHandler testTransportHandler, options ...ClientOps) *BuxClient {
+func getTestWalletClientWithOpts(transportHandler testTransportHandler, options ...ClientOps) *WalletClient {
 	mux := http.NewServeMux()
 	if transportHandler.Queries != nil {
 		for _, query := range transportHandler.Queries {

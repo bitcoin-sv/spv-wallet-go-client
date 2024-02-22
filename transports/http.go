@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"strconv"
 
-	buxmodels "github.com/BuxOrg/bux-models"
-	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
-	"github.com/BuxOrg/go-buxclient/utils"
+	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/apierrors"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
@@ -49,7 +49,7 @@ func (h *TransportHTTP) SetAdminKey(adminKey *bip32.ExtendedKey) {
 }
 
 // NewPaymail will register a new paymail
-func (h *TransportHTTP) NewPaymail(ctx context.Context, rawXpub, paymailAddress, avatar, publicName string, metadata *buxmodels.Metadata) ResponseError {
+func (h *TransportHTTP) NewPaymail(ctx context.Context, rawXpub, paymailAddress, avatar, publicName string, metadata *models.Metadata) ResponseError {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldAddress:    paymailAddress,
 		FieldAvatar:     avatar,
@@ -87,8 +87,8 @@ func (h *TransportHTTP) DeletePaymail(ctx context.Context, paymailAddress string
 }
 
 // GetXPub will get the xpub of the current xpub
-func (h *TransportHTTP) GetXPub(ctx context.Context) (*buxmodels.Xpub, ResponseError) {
-	var xPub buxmodels.Xpub
+func (h *TransportHTTP) GetXPub(ctx context.Context) (*models.Xpub, ResponseError) {
+	var xPub models.Xpub
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/xpub", nil, h.xPriv, true, &xPub,
 	); err != nil {
@@ -99,7 +99,7 @@ func (h *TransportHTTP) GetXPub(ctx context.Context) (*buxmodels.Xpub, ResponseE
 }
 
 // UpdateXPubMetadata update the metadata of the logged in xpub
-func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Xpub, ResponseError) {
+func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *models.Metadata) (*models.Xpub, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldMetadata: processMetadata(metadata),
 	})
@@ -107,7 +107,7 @@ func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *buxmod
 		return nil, WrapError(err)
 	}
 
-	var xPub buxmodels.Xpub
+	var xPub models.Xpub
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/xpub", jsonStr, h.xPriv, true, &xPub,
 	); err != nil {
@@ -118,8 +118,8 @@ func (h *TransportHTTP) UpdateXPubMetadata(ctx context.Context, metadata *buxmod
 }
 
 // GetAccessKey will get an access key by id
-func (h *TransportHTTP) GetAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError) {
-	var accessKey buxmodels.AccessKey
+func (h *TransportHTTP) GetAccessKey(ctx context.Context, id string) (*models.AccessKey, ResponseError) {
+	var accessKey models.AccessKey
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/access-key?"+FieldID+"="+id, nil, h.xPriv, true, &accessKey,
 	); err != nil {
@@ -130,14 +130,14 @@ func (h *TransportHTTP) GetAccessKey(ctx context.Context, id string) (*buxmodels
 }
 
 // GetAccessKeys will get all access keys matching the metadata filter
-func (h *TransportHTTP) GetAccessKeys(ctx context.Context, metadataConditions *buxmodels.Metadata) ([]*buxmodels.AccessKey, ResponseError) {
+func (h *TransportHTTP) GetAccessKeys(ctx context.Context, metadataConditions *models.Metadata) ([]*models.AccessKey, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldMetadata: processMetadata(metadataConditions),
 	})
 	if err != nil {
 		return nil, WrapError(err)
 	}
-	var accessKey []*buxmodels.AccessKey
+	var accessKey []*models.AccessKey
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/access-key/search", jsonStr, h.xPriv, true, &accessKey,
 	); err != nil {
@@ -148,7 +148,7 @@ func (h *TransportHTTP) GetAccessKeys(ctx context.Context, metadataConditions *b
 }
 
 // GetAccessKeysCount will get the count of access keys
-func (h *TransportHTTP) GetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError) {
+func (h *TransportHTTP) GetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions: conditions,
 		FieldMetadata:   processMetadata(metadata),
@@ -168,8 +168,8 @@ func (h *TransportHTTP) GetAccessKeysCount(ctx context.Context, conditions map[s
 }
 
 // RevokeAccessKey will revoke an access key by id
-func (h *TransportHTTP) RevokeAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError) {
-	var accessKey buxmodels.AccessKey
+func (h *TransportHTTP) RevokeAccessKey(ctx context.Context, id string) (*models.AccessKey, ResponseError) {
+	var accessKey models.AccessKey
 	if err := h.doHTTPRequest(
 		ctx, http.MethodDelete, "/access-key?"+FieldID+"="+id, nil, h.xPriv, true, &accessKey,
 	); err != nil {
@@ -180,14 +180,14 @@ func (h *TransportHTTP) RevokeAccessKey(ctx context.Context, id string) (*buxmod
 }
 
 // CreateAccessKey will create new access key
-func (h *TransportHTTP) CreateAccessKey(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.AccessKey, ResponseError) {
+func (h *TransportHTTP) CreateAccessKey(ctx context.Context, metadata *models.Metadata) (*models.AccessKey, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
 		return nil, WrapError(err)
 	}
-	var accessKey buxmodels.AccessKey
+	var accessKey models.AccessKey
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/access-key", jsonStr, h.xPriv, true, &accessKey,
 	); err != nil {
@@ -198,8 +198,8 @@ func (h *TransportHTTP) CreateAccessKey(ctx context.Context, metadata *buxmodels
 }
 
 // GetDestinationByID will get a destination by id
-func (h *TransportHTTP) GetDestinationByID(ctx context.Context, id string) (*buxmodels.Destination, ResponseError) {
-	var destination buxmodels.Destination
+func (h *TransportHTTP) GetDestinationByID(ctx context.Context, id string) (*models.Destination, ResponseError) {
+	var destination models.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/destination?"+FieldID+"="+id, nil, h.xPriv, true, &destination,
 	); err != nil {
@@ -210,8 +210,8 @@ func (h *TransportHTTP) GetDestinationByID(ctx context.Context, id string) (*bux
 }
 
 // GetDestinationByAddress will get a destination by address
-func (h *TransportHTTP) GetDestinationByAddress(ctx context.Context, address string) (*buxmodels.Destination, ResponseError) {
-	var destination buxmodels.Destination
+func (h *TransportHTTP) GetDestinationByAddress(ctx context.Context, address string) (*models.Destination, ResponseError) {
+	var destination models.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/destination?"+FieldAddress+"="+address, nil, h.xPriv, true, &destination,
 	); err != nil {
@@ -222,8 +222,8 @@ func (h *TransportHTTP) GetDestinationByAddress(ctx context.Context, address str
 }
 
 // GetDestinationByLockingScript will get a destination by locking script
-func (h *TransportHTTP) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*buxmodels.Destination, ResponseError) {
-	var destination buxmodels.Destination
+func (h *TransportHTTP) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*models.Destination, ResponseError) {
+	var destination models.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/destination?"+FieldLockingScript+"="+lockingScript, nil, h.xPriv, true, &destination,
 	); err != nil {
@@ -234,14 +234,14 @@ func (h *TransportHTTP) GetDestinationByLockingScript(ctx context.Context, locki
 }
 
 // GetDestinations will get all destinations matching the metadata filter
-func (h *TransportHTTP) GetDestinations(ctx context.Context, metadataConditions *buxmodels.Metadata) ([]*buxmodels.Destination, ResponseError) {
+func (h *TransportHTTP) GetDestinations(ctx context.Context, metadataConditions *models.Metadata) ([]*models.Destination, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldMetadata: processMetadata(metadataConditions),
 	})
 	if err != nil {
 		return nil, WrapError(err)
 	}
-	var destinations []*buxmodels.Destination
+	var destinations []*models.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/destination/search", jsonStr, h.xPriv, true, &destinations,
 	); err != nil {
@@ -252,7 +252,7 @@ func (h *TransportHTTP) GetDestinations(ctx context.Context, metadataConditions 
 }
 
 // GetDestinationsCount will get the count of destinations matching the metadata filter
-func (h *TransportHTTP) GetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError) {
+func (h *TransportHTTP) GetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions: conditions,
 		FieldMetadata:   processMetadata(metadata),
@@ -272,14 +272,14 @@ func (h *TransportHTTP) GetDestinationsCount(ctx context.Context, conditions map
 }
 
 // NewDestination will create a new destination and return it
-func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError) {
+func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *models.Metadata) (*models.Destination, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldMetadata: processMetadata(metadata),
 	})
 	if err != nil {
 		return nil, WrapError(err)
 	}
-	var destination buxmodels.Destination
+	var destination models.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
@@ -291,8 +291,8 @@ func (h *TransportHTTP) NewDestination(ctx context.Context, metadata *buxmodels.
 
 // UpdateDestinationMetadataByID updates the destination metadata by id
 func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id string,
-	metadata *buxmodels.Metadata,
-) (*buxmodels.Destination, ResponseError) {
+	metadata *models.Metadata,
+) (*models.Destination, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldID:       id,
 		FieldMetadata: processMetadata(metadata),
@@ -301,7 +301,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id st
 		return nil, WrapError(err)
 	}
 
-	var destination buxmodels.Destination
+	var destination models.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
@@ -313,8 +313,8 @@ func (h *TransportHTTP) UpdateDestinationMetadataByID(ctx context.Context, id st
 
 // UpdateDestinationMetadataByAddress updates the destination metadata by address
 func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, address string,
-	metadata *buxmodels.Metadata,
-) (*buxmodels.Destination, ResponseError) {
+	metadata *models.Metadata,
+) (*models.Destination, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldAddress:  address,
 		FieldMetadata: processMetadata(metadata),
@@ -323,7 +323,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, 
 		return nil, WrapError(err)
 	}
 
-	var destination buxmodels.Destination
+	var destination models.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
@@ -335,8 +335,8 @@ func (h *TransportHTTP) UpdateDestinationMetadataByAddress(ctx context.Context, 
 
 // UpdateDestinationMetadataByLockingScript updates the destination metadata by locking script
 func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string,
-	metadata *buxmodels.Metadata,
-) (*buxmodels.Destination, ResponseError) {
+	metadata *models.Metadata,
+) (*models.Destination, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldLockingScript: lockingScript,
 		FieldMetadata:      processMetadata(metadata),
@@ -345,7 +345,7 @@ func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Con
 		return nil, WrapError(err)
 	}
 
-	var destination buxmodels.Destination
+	var destination models.Destination
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/destination", jsonStr, h.xPriv, true, &destination,
 	); err != nil {
@@ -356,8 +356,8 @@ func (h *TransportHTTP) UpdateDestinationMetadataByLockingScript(ctx context.Con
 }
 
 // GetTransaction will get a transaction by ID
-func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*buxmodels.Transaction, ResponseError) {
-	var transaction buxmodels.Transaction
+func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*models.Transaction, ResponseError) {
+	var transaction models.Transaction
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
@@ -369,8 +369,8 @@ func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*buxmo
 
 // GetTransactions will get a transactions by conditions
 func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadataConditions *buxmodels.Metadata, queryParams *QueryParams,
-) ([]*buxmodels.Transaction, ResponseError) {
+	metadataConditions *models.Metadata, queryParams *QueryParams,
+) ([]*models.Transaction, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions:  conditions,
 		FieldMetadata:    processMetadata(metadataConditions),
@@ -380,7 +380,7 @@ func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[stri
 		return nil, WrapError(err)
 	}
 
-	var transactions []*buxmodels.Transaction
+	var transactions []*models.Transaction
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/transaction/search", jsonStr, h.xPriv, h.signRequest, &transactions,
 	); err != nil {
@@ -392,7 +392,7 @@ func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[stri
 
 // GetTransactionsCount get number of user transactions
 func (h *TransportHTTP) GetTransactionsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata,
+	metadata *models.Metadata,
 ) (int64, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions: conditions,
@@ -414,8 +414,8 @@ func (h *TransportHTTP) GetTransactionsCount(ctx context.Context, conditions map
 
 // DraftToRecipients is a draft transaction to a slice of recipients
 func (h *TransportHTTP) DraftToRecipients(ctx context.Context, recipients []*Recipients,
-	metadata *buxmodels.Metadata,
-) (*buxmodels.DraftTransaction, ResponseError) {
+	metadata *models.Metadata,
+) (*models.DraftTransaction, ResponseError) {
 	outputs := make([]map[string]interface{}, 0)
 	for _, recipient := range recipients {
 		outputs = append(outputs, map[string]interface{}{
@@ -434,9 +434,9 @@ func (h *TransportHTTP) DraftToRecipients(ctx context.Context, recipients []*Rec
 }
 
 // DraftTransaction is a draft transaction
-func (h *TransportHTTP) DraftTransaction(ctx context.Context, transactionConfig *buxmodels.TransactionConfig,
-	metadata *buxmodels.Metadata,
-) (*buxmodels.DraftTransaction, ResponseError) {
+func (h *TransportHTTP) DraftTransaction(ctx context.Context, transactionConfig *models.TransactionConfig,
+	metadata *models.Metadata,
+) (*models.DraftTransaction, ResponseError) {
 	return h.createDraftTransaction(ctx, map[string]interface{}{
 		FieldConfig:   transactionConfig,
 		FieldMetadata: processMetadata(metadata),
@@ -446,20 +446,20 @@ func (h *TransportHTTP) DraftTransaction(ctx context.Context, transactionConfig 
 // createDraftTransaction will create a draft transaction
 func (h *TransportHTTP) createDraftTransaction(ctx context.Context,
 	jsonData map[string]interface{},
-) (*buxmodels.DraftTransaction, ResponseError) {
+) (*models.DraftTransaction, ResponseError) {
 	jsonStr, err := json.Marshal(jsonData)
 	if err != nil {
 		return nil, WrapError(err)
 	}
 
-	var draftTransaction *buxmodels.DraftTransaction
+	var draftTransaction *models.DraftTransaction
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/transaction", jsonStr, h.xPriv, true, &draftTransaction,
 	); err != nil {
 		return nil, err
 	}
 	if draftTransaction == nil {
-		return nil, WrapError(buxerrors.ErrDraftNotFound)
+		return nil, WrapError(apierrors.ErrDraftNotFound)
 	}
 
 	return draftTransaction, nil
@@ -467,8 +467,8 @@ func (h *TransportHTTP) createDraftTransaction(ctx context.Context,
 
 // RecordTransaction will record a transaction
 func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID string,
-	metadata *buxmodels.Metadata,
-) (*buxmodels.Transaction, ResponseError) {
+	metadata *models.Metadata,
+) (*models.Transaction, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldHex:         hex,
 		FieldReferenceID: referenceID,
@@ -478,7 +478,7 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 		return nil, WrapError(err)
 	}
 
-	var transaction buxmodels.Transaction
+	var transaction models.Transaction
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/transaction/record", jsonStr, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
@@ -490,8 +490,8 @@ func (h *TransportHTTP) RecordTransaction(ctx context.Context, hex, referenceID 
 
 // UpdateTransactionMetadata update the metadata of a transaction
 func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID string,
-	metadata *buxmodels.Metadata,
-) (*buxmodels.Transaction, ResponseError) {
+	metadata *models.Metadata,
+) (*models.Transaction, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldID:       txID,
 		FieldMetadata: processMetadata(metadata),
@@ -500,7 +500,7 @@ func (h *TransportHTTP) UpdateTransactionMetadata(ctx context.Context, txID stri
 		return nil, WrapError(err)
 	}
 
-	var transaction buxmodels.Transaction
+	var transaction models.Transaction
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPatch, "/transaction", jsonStr, h.xPriv, h.signRequest, &transaction,
 	); err != nil {
@@ -519,18 +519,18 @@ func SetSignatureFromAccessKey(header *http.Header, privateKeyHex, bodyString st
 	}
 
 	// Set the auth header
-	header.Set(buxmodels.AuthAccessKey, authData.AccessKey)
+	header.Set(models.AuthAccessKey, authData.AccessKey)
 
 	return setSignatureHeaders(header, authData)
 }
 
 // GetUtxo will get a utxo by transaction ID
-func (h *TransportHTTP) GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*buxmodels.Utxo, ResponseError) {
+func (h *TransportHTTP) GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*models.Utxo, ResponseError) {
 	outputIndexStr := strconv.FormatUint(uint64(outputIndex), 10)
 
 	url := fmt.Sprintf("/utxo?%s=%s&%s=%s", FieldTransactionID, txID, FieldOutputIndex, outputIndexStr)
 
-	var utxo buxmodels.Utxo
+	var utxo models.Utxo
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, url, nil, h.xPriv, true, &utxo,
 	); err != nil {
@@ -541,7 +541,7 @@ func (h *TransportHTTP) GetUtxo(ctx context.Context, txID string, outputIndex ui
 }
 
 // GetUtxos will get a list of utxos filtered by conditions and metadata
-func (h *TransportHTTP) GetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Utxo, ResponseError) {
+func (h *TransportHTTP) GetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Utxo, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions:  conditions,
 		FieldMetadata:    processMetadata(metadata),
@@ -551,7 +551,7 @@ func (h *TransportHTTP) GetUtxos(ctx context.Context, conditions map[string]inte
 		return nil, WrapError(err)
 	}
 
-	var utxos []*buxmodels.Utxo
+	var utxos []*models.Utxo
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/utxo/search", jsonStr, h.xPriv, h.signRequest, &utxos,
 	); err != nil {
@@ -562,7 +562,7 @@ func (h *TransportHTTP) GetUtxos(ctx context.Context, conditions map[string]inte
 }
 
 // GetUtxosCount will get the count of utxos filtered by conditions and metadata
-func (h *TransportHTTP) GetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError) {
+func (h *TransportHTTP) GetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions: conditions,
 		FieldMetadata:   processMetadata(metadata),
@@ -582,10 +582,10 @@ func (h *TransportHTTP) GetUtxosCount(ctx context.Context, conditions map[string
 }
 
 // createSignatureAccessKey will create a signature for the given access key & body contents
-func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *buxmodels.AuthPayload, err error) {
+func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models.AuthPayload, err error) {
 	// No key?
 	if privateKeyHex == "" {
-		err = buxerrors.ErrMissingAccessKey
+		err = apierrors.ErrMissingAccessKey
 		return
 	}
 
@@ -598,7 +598,7 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *buxmod
 	publicKey := privateKey.PubKey()
 
 	// Get the xPub
-	payload = new(buxmodels.AuthPayload)
+	payload = new(models.AuthPayload)
 	payload.AccessKey = hex.EncodeToString(publicKey.SerialiseCompressed())
 
 	// auth_nonce is a random unique string to seed the signing message
@@ -668,7 +668,7 @@ func (h *TransportHTTP) authenticateWithXpriv(sign bool, req *http.Request, xPri
 		if err != nil {
 			return WrapError(err)
 		}
-		req.Header.Set(buxmodels.AuthHeader, xPub)
+		req.Header.Set(models.AuthHeader, xPub)
 		req.Header.Set("", xPub)
 	}
 	return nil

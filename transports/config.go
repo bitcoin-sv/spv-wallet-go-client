@@ -1,29 +1,26 @@
 package transports
 
-import buxmodels "github.com/BuxOrg/bux-models"
+import "github.com/bitcoin-sv/spv-wallet/models"
 
 // TransportType the type of transport being used ('http' for usage or 'mock' for testing)
 type TransportType string
 
-// BuxUserAgent the bux user agent sent to the bux server
-const BuxUserAgent = "BUX: go-client " + BuxClientVersion
-
-// BuxClientVersion is the version of the client
-const BuxClientVersion = "v0.3.13"
+// SPVWalletUserAgent the spv wallet user agent sent to the spv wallet.
+const SPVWalletUserAgent = "SPVWallet: go-client"
 
 const (
-	// BuxTransportHTTP uses the http transport for all bux server actions
-	BuxTransportHTTP TransportType = "http"
+	// SPVWalletTransportHTTP uses the http transport for all spv-wallet actions
+	SPVWalletTransportHTTP TransportType = "http"
 
-	// BuxTransportMock uses the mock transport for all bux server actions
-	BuxTransportMock TransportType = "mock"
+	// SPVWalletTransportMock uses the mock transport for all spv-wallet actions
+	SPVWalletTransportMock TransportType = "mock"
 )
 
 // Recipients is a struct for recipients
 type Recipients struct {
-	OpReturn *buxmodels.OpReturn `json:"op_return"`
-	Satoshis uint64              `json:"satoshis"`
-	To       string              `json:"to"`
+	OpReturn *models.OpReturn `json:"op_return"`
+	Satoshis uint64           `json:"satoshis"`
+	To       string           `json:"to"`
 }
 
 // QueryParams object to use when limiting and sorting database query results

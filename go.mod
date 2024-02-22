@@ -1,9 +1,9 @@
-module github.com/BuxOrg/go-buxclient
+module github.com/bitcoin-sv/spv-wallet-go-client
 
 go 1.21
 
 require (
-	github.com/BuxOrg/bux-models v0.3.0
+	github.com/bitcoin-sv/spv-wallet/models v0.15.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.5

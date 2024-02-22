@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	buxmodels "github.com/BuxOrg/bux-models"
-	buxerrors "github.com/BuxOrg/bux-models/bux-errors"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/apierrors"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
@@ -15,7 +15,7 @@ import (
 	"github.com/libsv/go-bt/v2/bscript"
 	"github.com/libsv/go-bt/v2/sighash"
 
-	"github.com/BuxOrg/go-buxclient/utils"
+	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 )
 
 // SetSignature will set the signature on the header for the request
@@ -27,13 +27,13 @@ func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 	}
 
 	// Set the auth header
-	header.Set(buxmodels.AuthHeader, authData.XPub)
+	header.Set(models.AuthHeader, authData.XPub)
 
 	return setSignatureHeaders(header, authData)
 }
 
 // SignInputs will sign all the inputs using the given xPriv key
-func SignInputs(dt *buxmodels.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, resError ResponseError) {
+func SignInputs(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, resError ResponseError) {
 	var err error
 	// Start a bt draft transaction
 	var txDraft *bt.Tx
@@ -132,15 +132,15 @@ func getUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey
 }
 
 // createSignature will create a signature for the given key & body contents
-func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *buxmodels.AuthPayload, err error) {
+func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *models.AuthPayload, err error) {
 	// No key?
 	if xPriv == nil {
-		err = buxerrors.ErrMissingXPriv
+		err = apierrors.ErrMissingXPriv
 		return
 	}
 
 	// Get the xPub
-	payload = new(buxmodels.AuthPayload)
+	payload = new(models.AuthPayload)
 	if payload.XPub, err = bitcoin.GetExtendedPublicKey(
 		xPriv,
 	); err != nil { // Should never error if key is correct
@@ -170,7 +170,7 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *buxm
 }
 
 // createSignatureCommon will create a signature
-func createSignatureCommon(payload *buxmodels.AuthPayload, bodyString string, privateKey *bec.PrivateKey) (*buxmodels.AuthPayload, error) {
+func createSignatureCommon(payload *models.AuthPayload, bodyString string, privateKey *bec.PrivateKey) (*models.AuthPayload, error) {
 	// Create the auth header hash
 	payload.AuthHash = utils.Hash(bodyString)
 
@@ -196,22 +196,22 @@ func createSignatureCommon(payload *buxmodels.AuthPayload, bodyString string, pr
 }
 
 // getSigningMessage will build the signing message string
-func getSigningMessage(xPub string, auth *buxmodels.AuthPayload) string {
+func getSigningMessage(xPub string, auth *models.AuthPayload) string {
 	return fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
 }
 
-func setSignatureHeaders(header *http.Header, authData *buxmodels.AuthPayload) ResponseError {
+func setSignatureHeaders(header *http.Header, authData *models.AuthPayload) ResponseError {
 	// Create the auth header hash
-	header.Set(buxmodels.AuthHeaderHash, authData.AuthHash)
+	header.Set(models.AuthHeaderHash, authData.AuthHash)
 
 	// Set the nonce
-	header.Set(buxmodels.AuthHeaderNonce, authData.AuthNonce)
+	header.Set(models.AuthHeaderNonce, authData.AuthNonce)
 
 	// Set the time
-	header.Set(buxmodels.AuthHeaderTime, fmt.Sprintf("%d", authData.AuthTime))
+	header.Set(models.AuthHeaderTime, fmt.Sprintf("%d", authData.AuthTime))
 
 	// Set the signature
-	header.Set(buxmodels.AuthSignature, authData.Signature)
+	header.Set(models.AuthSignature, authData.Signature)
 
 	return nil
 }

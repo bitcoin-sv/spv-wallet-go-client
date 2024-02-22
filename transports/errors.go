@@ -50,7 +50,7 @@ func WrapResponseError(res *http.Response) ResponseError {
 	if err != nil {
 		// if EOF, then body is empty and we return response status as error message
 		if !errors.Is(err, io.EOF) {
-			errorMsg = fmt.Sprintf("bux-server error message can't be decoded. Reason: %s", err.Error())
+			errorMsg = fmt.Sprintf("spv-wallet error message can't be decoded. Reason: %s", err.Error())
 		}
 		errorMsg = res.Status
 	}

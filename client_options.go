@@ -1,14 +1,14 @@
-package buxclient
+package walletclient
 
 import (
 	"net/http"
 
-	"github.com/BuxOrg/go-buxclient/transports"
+	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 )
 
 // WithXPriv will set xPrivString on the client
 func WithXPriv(xPrivString string) ClientOps {
-	return func(c *BuxClient) {
+	return func(c *WalletClient) {
 		if c != nil {
 			c.xPrivString = xPrivString
 		}
@@ -17,7 +17,7 @@ func WithXPriv(xPrivString string) ClientOps {
 
 // WithXPub will set xPubString on the client
 func WithXPub(xPubString string) ClientOps {
-	return func(c *BuxClient) {
+	return func(c *WalletClient) {
 		if c != nil {
 			c.xPubString = xPubString
 		}
@@ -26,7 +26,7 @@ func WithXPub(xPubString string) ClientOps {
 
 // WithAccessKey will set the access key on the client
 func WithAccessKey(accessKeyString string) ClientOps {
-	return func(c *BuxClient) {
+	return func(c *WalletClient) {
 		if c != nil {
 			c.accessKeyString = accessKeyString
 		}
@@ -35,7 +35,7 @@ func WithAccessKey(accessKeyString string) ClientOps {
 
 // WithHTTP will overwrite the default client with a custom client
 func WithHTTP(serverURL string) ClientOps {
-	return func(c *BuxClient) {
+	return func(c *WalletClient) {
 		if c != nil {
 			c.transportOptions = append(c.transportOptions, transports.WithHTTP(serverURL))
 		}
@@ -44,7 +44,7 @@ func WithHTTP(serverURL string) ClientOps {
 
 // WithHTTPClient will overwrite the default client with a custom client
 func WithHTTPClient(serverURL string, httpClient *http.Client) ClientOps {
-	return func(c *BuxClient) {
+	return func(c *WalletClient) {
 		if c != nil {
 			c.transportOptions = append(c.transportOptions, transports.WithHTTPClient(serverURL, httpClient))
 		}
@@ -53,7 +53,7 @@ func WithHTTPClient(serverURL string, httpClient *http.Client) ClientOps {
 
 // WithAdminKey will set the admin key for admin requests
 func WithAdminKey(adminKey string) ClientOps {
-	return func(c *BuxClient) {
+	return func(c *WalletClient) {
 		if c != nil {
 			c.transportOptions = append(c.transportOptions, transports.WithAdminKey(adminKey))
 		}
@@ -62,7 +62,7 @@ func WithAdminKey(adminKey string) ClientOps {
 
 // WithSignRequest will set whether to sign all requests
 func WithSignRequest(signRequest bool) ClientOps {
-	return func(c *BuxClient) {
+	return func(c *WalletClient) {
 		if c != nil {
 			c.transportOptions = append(c.transportOptions, transports.WithSignRequest(signRequest))
 		}

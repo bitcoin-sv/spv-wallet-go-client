@@ -3,85 +3,85 @@ package transports
 import (
 	"context"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/libsv/go-bk/bip32"
 )
 
 // XpubService is the xPub related requests
 type XpubService interface {
-	GetXPub(ctx context.Context) (*buxmodels.Xpub, ResponseError)
-	NewXpub(ctx context.Context, rawXPub string, metadata *buxmodels.Metadata) ResponseError
-	RegisterXpub(ctx context.Context, rawXPub string, metadata *buxmodels.Metadata) ResponseError
-	UpdateXPubMetadata(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Xpub, ResponseError)
+	GetXPub(ctx context.Context) (*models.Xpub, ResponseError)
+	NewXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError
+	RegisterXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError
+	UpdateXPubMetadata(ctx context.Context, metadata *models.Metadata) (*models.Xpub, ResponseError)
 }
 
 // AccessKeyService is the access key related requests
 type AccessKeyService interface {
-	CreateAccessKey(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.AccessKey, ResponseError)
-	GetAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError)
-	GetAccessKeys(ctx context.Context, metadataConditions *buxmodels.Metadata) ([]*buxmodels.AccessKey, ResponseError)
-	GetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	RevokeAccessKey(ctx context.Context, id string) (*buxmodels.AccessKey, ResponseError)
+	CreateAccessKey(ctx context.Context, metadata *models.Metadata) (*models.AccessKey, ResponseError)
+	GetAccessKey(ctx context.Context, id string) (*models.AccessKey, ResponseError)
+	GetAccessKeys(ctx context.Context, metadataConditions *models.Metadata) ([]*models.AccessKey, ResponseError)
+	GetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	RevokeAccessKey(ctx context.Context, id string) (*models.AccessKey, ResponseError)
 }
 
 // DestinationService is the destination related requests
 type DestinationService interface {
-	GetDestinationByAddress(ctx context.Context, address string) (*buxmodels.Destination, ResponseError)
-	GetDestinationByID(ctx context.Context, id string) (*buxmodels.Destination, ResponseError)
-	GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*buxmodels.Destination, ResponseError)
-	GetDestinations(ctx context.Context, metadataConditions *buxmodels.Metadata) ([]*buxmodels.Destination, ResponseError)
-	GetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	NewDestination(ctx context.Context, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError)
-	UpdateDestinationMetadataByAddress(ctx context.Context, lockingScript string, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError)
-	UpdateDestinationMetadataByID(ctx context.Context, id string, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError)
-	UpdateDestinationMetadataByLockingScript(ctx context.Context, address string, metadata *buxmodels.Metadata) (*buxmodels.Destination, ResponseError)
+	GetDestinationByAddress(ctx context.Context, address string) (*models.Destination, ResponseError)
+	GetDestinationByID(ctx context.Context, id string) (*models.Destination, ResponseError)
+	GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*models.Destination, ResponseError)
+	GetDestinations(ctx context.Context, metadataConditions *models.Metadata) ([]*models.Destination, ResponseError)
+	GetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	NewDestination(ctx context.Context, metadata *models.Metadata) (*models.Destination, ResponseError)
+	UpdateDestinationMetadataByAddress(ctx context.Context, lockingScript string, metadata *models.Metadata) (*models.Destination, ResponseError)
+	UpdateDestinationMetadataByID(ctx context.Context, id string, metadata *models.Metadata) (*models.Destination, ResponseError)
+	UpdateDestinationMetadataByLockingScript(ctx context.Context, address string, metadata *models.Metadata) (*models.Destination, ResponseError)
 }
 
 // TransactionService is the transaction related requests
 type TransactionService interface {
-	DraftToRecipients(ctx context.Context, recipients []*Recipients, metadata *buxmodels.Metadata) (*buxmodels.DraftTransaction, ResponseError)
-	DraftTransaction(ctx context.Context, transactionConfig *buxmodels.TransactionConfig, metadata *buxmodels.Metadata) (*buxmodels.DraftTransaction, ResponseError)
-	GetTransaction(ctx context.Context, txID string) (*buxmodels.Transaction, ResponseError)
-	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadataConditions *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Transaction, ResponseError)
-	GetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *buxmodels.Metadata) (*buxmodels.Transaction, ResponseError)
-	UpdateTransactionMetadata(ctx context.Context, txID string, metadata *buxmodels.Metadata) (*buxmodels.Transaction, ResponseError)
-	GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*buxmodels.Utxo, ResponseError)
-	GetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Utxo, ResponseError)
-	GetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
+	DraftToRecipients(ctx context.Context, recipients []*Recipients, metadata *models.Metadata) (*models.DraftTransaction, ResponseError)
+	DraftTransaction(ctx context.Context, transactionConfig *models.TransactionConfig, metadata *models.Metadata) (*models.DraftTransaction, ResponseError)
+	GetTransaction(ctx context.Context, txID string) (*models.Transaction, ResponseError)
+	GetTransactions(ctx context.Context, conditions map[string]interface{}, metadataConditions *models.Metadata, queryParams *QueryParams) ([]*models.Transaction, ResponseError)
+	GetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	RecordTransaction(ctx context.Context, hex, referenceID string, metadata *models.Metadata) (*models.Transaction, ResponseError)
+	UpdateTransactionMetadata(ctx context.Context, txID string, metadata *models.Metadata) (*models.Transaction, ResponseError)
+	GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*models.Utxo, ResponseError)
+	GetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Utxo, ResponseError)
+	GetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
 }
 
 // PaymailService is the paymail related requests
 type PaymailService interface {
-	NewPaymail(ctx context.Context, rawXpub, paymailAddress, avatar, publicName string, metadata *buxmodels.Metadata) ResponseError
+	NewPaymail(ctx context.Context, rawXpub, paymailAddress, avatar, publicName string, metadata *models.Metadata) ResponseError
 	DeletePaymail(ctx context.Context, paymailAddress string) ResponseError
 }
 
 // AdminService is the admin related requests
 type AdminService interface {
 	AdminGetStatus(ctx context.Context) (bool, ResponseError)
-	AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, ResponseError)
-	AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.AccessKey, ResponseError)
-	AdminGetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.BlockHeader, ResponseError)
-	AdminGetBlockHeadersCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetDestinations(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Destination, ResponseError)
-	AdminGetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetPaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, ResponseError)
-	AdminGetPaymails(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.PaymailAddress, ResponseError)
-	AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
+	AdminGetStats(ctx context.Context) (*models.AdminStats, ResponseError)
+	AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.AccessKey, ResponseError)
+	AdminGetAccessKeysCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.BlockHeader, ResponseError)
+	AdminGetBlockHeadersCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	AdminGetDestinations(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Destination, ResponseError)
+	AdminGetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	AdminGetPaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError)
+	AdminGetPaymails(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.PaymailAddress, ResponseError)
+	AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
 	// AdminCreatePaymail Create a paymail.
 	//
 	// Paymail address (ie. example@bux.org)
-	AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*buxmodels.PaymailAddress, ResponseError)
-	AdminDeletePaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, ResponseError)
-	AdminGetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Transaction, ResponseError)
-	AdminGetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Utxo, ResponseError)
-	AdminGetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminGetXPubs(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, queryParams *QueryParams) ([]*buxmodels.Xpub, ResponseError)
-	AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata) (int64, ResponseError)
-	AdminRecordTransaction(ctx context.Context, hex string) (*buxmodels.Transaction, ResponseError)
+	AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*models.PaymailAddress, ResponseError)
+	AdminDeletePaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError)
+	AdminGetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Transaction, ResponseError)
+	AdminGetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	AdminGetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Utxo, ResponseError)
+	AdminGetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	AdminGetXPubs(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Xpub, ResponseError)
+	AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	AdminRecordTransaction(ctx context.Context, hex string) (*models.Transaction, ResponseError)
 }
 
 // TransportService the transport service interface

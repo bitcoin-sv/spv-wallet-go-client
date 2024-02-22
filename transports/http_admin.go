@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // NewXpub will register an xPub
-func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *buxmodels.Metadata) ResponseError {
+func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError {
 	// Adding a xpub needs to be signed by an admin key
 	if h.adminXPriv == nil {
 		return WrapError(ErrAdminKey)
@@ -23,7 +23,7 @@ func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *b
 		return WrapError(err)
 	}
 
-	var xPubData buxmodels.Xpub
+	var xPubData models.Xpub
 
 	return h.doHTTPRequest(
 		ctx, http.MethodPost, "/xpub", jsonStr, h.adminXPriv, true, &xPubData,
@@ -31,7 +31,7 @@ func (h *TransportHTTP) NewXpub(ctx context.Context, rawXPub string, metadata *b
 }
 
 // RegisterXpub alias for NewXpub
-func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metadata *buxmodels.Metadata) ResponseError {
+func (h *TransportHTTP) RegisterXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError {
 	return h.NewXpub(ctx, rawXPub, metadata)
 }
 
@@ -48,8 +48,8 @@ func (h *TransportHTTP) AdminGetStatus(ctx context.Context) (bool, ResponseError
 }
 
 // AdminGetStats get admin stats
-func (h *TransportHTTP) AdminGetStats(ctx context.Context) (*buxmodels.AdminStats, ResponseError) {
-	var stats *buxmodels.AdminStats
+func (h *TransportHTTP) AdminGetStats(ctx context.Context) (*models.AdminStats, ResponseError) {
+	var stats *models.AdminStats
 	if err := h.doHTTPRequest(
 		ctx, http.MethodGet, "/admin/stats", nil, h.xPriv, true, &stats,
 	); err != nil {
@@ -61,9 +61,9 @@ func (h *TransportHTTP) AdminGetStats(ctx context.Context) (*buxmodels.AdminStat
 
 // AdminGetAccessKeys get all access keys filtered by conditions
 func (h *TransportHTTP) AdminGetAccessKeys(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *QueryParams,
-) ([]*buxmodels.AccessKey, ResponseError) {
-	var models []*buxmodels.AccessKey
+	metadata *models.Metadata, queryParams *QueryParams,
+) ([]*models.AccessKey, ResponseError) {
+	var models []*models.AccessKey
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/access-keys/search", &models); err != nil {
 		return nil, err
 	}
@@ -73,16 +73,16 @@ func (h *TransportHTTP) AdminGetAccessKeys(ctx context.Context, conditions map[s
 
 // AdminGetAccessKeysCount get a count of all the access keys filtered by conditions
 func (h *TransportHTTP) AdminGetAccessKeysCount(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata,
+	metadata *models.Metadata,
 ) (int64, ResponseError) {
 	return h.adminCount(ctx, conditions, metadata, "/admin/access-keys/count")
 }
 
 // AdminGetBlockHeaders get all block headers filtered by conditions
 func (h *TransportHTTP) AdminGetBlockHeaders(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *QueryParams,
-) ([]*buxmodels.BlockHeader, ResponseError) {
-	var models []*buxmodels.BlockHeader
+	metadata *models.Metadata, queryParams *QueryParams,
+) ([]*models.BlockHeader, ResponseError) {
+	var models []*models.BlockHeader
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/block-headers/search", &models); err != nil {
 		return nil, err
 	}
@@ -92,16 +92,16 @@ func (h *TransportHTTP) AdminGetBlockHeaders(ctx context.Context, conditions map
 
 // AdminGetBlockHeadersCount get a count of all the block headers filtered by conditions
 func (h *TransportHTTP) AdminGetBlockHeadersCount(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata,
+	metadata *models.Metadata,
 ) (int64, ResponseError) {
 	return h.adminCount(ctx, conditions, metadata, "/admin/block-headers/count")
 }
 
 // AdminGetDestinations get all block destinations filtered by conditions
 func (h *TransportHTTP) AdminGetDestinations(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *QueryParams,
-) ([]*buxmodels.Destination, ResponseError) {
-	var models []*buxmodels.Destination
+	metadata *models.Metadata, queryParams *QueryParams,
+) ([]*models.Destination, ResponseError) {
+	var models []*models.Destination
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/destinations/search", &models); err != nil {
 		return nil, err
 	}
@@ -111,13 +111,13 @@ func (h *TransportHTTP) AdminGetDestinations(ctx context.Context, conditions map
 
 // AdminGetDestinationsCount get a count of all the destinations filtered by conditions
 func (h *TransportHTTP) AdminGetDestinationsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata,
+	metadata *models.Metadata,
 ) (int64, ResponseError) {
 	return h.adminCount(ctx, conditions, metadata, "/admin/destinations/count")
 }
 
 // AdminGetPaymail get a paymail by address
-func (h *TransportHTTP) AdminGetPaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, ResponseError) {
+func (h *TransportHTTP) AdminGetPaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldAddress: address,
 	})
@@ -125,7 +125,7 @@ func (h *TransportHTTP) AdminGetPaymail(ctx context.Context, address string) (*b
 		return nil, WrapError(err)
 	}
 
-	var model *buxmodels.PaymailAddress
+	var model *models.PaymailAddress
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/admin/paymail/get", jsonStr, h.xPriv, true, &model,
 	); err != nil {
@@ -137,9 +137,9 @@ func (h *TransportHTTP) AdminGetPaymail(ctx context.Context, address string) (*b
 
 // AdminGetPaymails get all block paymails filtered by conditions
 func (h *TransportHTTP) AdminGetPaymails(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *QueryParams,
-) ([]*buxmodels.PaymailAddress, ResponseError) {
-	var models []*buxmodels.PaymailAddress
+	metadata *models.Metadata, queryParams *QueryParams,
+) ([]*models.PaymailAddress, ResponseError) {
+	var models []*models.PaymailAddress
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/paymails/search", &models); err != nil {
 		return nil, err
 	}
@@ -149,13 +149,13 @@ func (h *TransportHTTP) AdminGetPaymails(ctx context.Context, conditions map[str
 
 // AdminGetPaymailsCount get a count of all the paymails filtered by conditions
 func (h *TransportHTTP) AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata,
+	metadata *models.Metadata,
 ) (int64, ResponseError) {
 	return h.adminCount(ctx, conditions, metadata, "/admin/paymails/count")
 }
 
 // AdminCreatePaymail create a new paymail for a xpub
-func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*buxmodels.PaymailAddress, ResponseError) {
+func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*models.PaymailAddress, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldXpubID:     xPubID,
 		FieldAddress:    address,
@@ -166,7 +166,7 @@ func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, xPubID string, a
 		return nil, WrapError(err)
 	}
 
-	var model *buxmodels.PaymailAddress
+	var model *models.PaymailAddress
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/admin/paymail/create", jsonStr, h.xPriv, true, &model,
 	); err != nil {
@@ -177,7 +177,7 @@ func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, xPubID string, a
 }
 
 // AdminDeletePaymail delete a paymail address from the database
-func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) (*buxmodels.PaymailAddress, ResponseError) {
+func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldAddress: address,
 	})
@@ -185,7 +185,7 @@ func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) 
 		return nil, WrapError(err)
 	}
 
-	var model *buxmodels.PaymailAddress
+	var model *models.PaymailAddress
 	if err := h.doHTTPRequest(
 		ctx, http.MethodDelete, "/admin/paymail/delete", jsonStr, h.xPriv, true, &model,
 	); err != nil {
@@ -197,9 +197,9 @@ func (h *TransportHTTP) AdminDeletePaymail(ctx context.Context, address string) 
 
 // AdminGetTransactions get all block transactions filtered by conditions
 func (h *TransportHTTP) AdminGetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *QueryParams,
-) ([]*buxmodels.Transaction, ResponseError) {
-	var models []*buxmodels.Transaction
+	metadata *models.Metadata, queryParams *QueryParams,
+) ([]*models.Transaction, ResponseError) {
+	var models []*models.Transaction
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/transactions/search", &models); err != nil {
 		return nil, err
 	}
@@ -209,16 +209,16 @@ func (h *TransportHTTP) AdminGetTransactions(ctx context.Context, conditions map
 
 // AdminGetTransactionsCount get a count of all the transactions filtered by conditions
 func (h *TransportHTTP) AdminGetTransactionsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata,
+	metadata *models.Metadata,
 ) (int64, ResponseError) {
 	return h.adminCount(ctx, conditions, metadata, "/admin/transactions/count")
 }
 
 // AdminGetUtxos get all block utxos filtered by conditions
 func (h *TransportHTTP) AdminGetUtxos(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *QueryParams,
-) ([]*buxmodels.Utxo, ResponseError) {
-	var models []*buxmodels.Utxo
+	metadata *models.Metadata, queryParams *QueryParams,
+) ([]*models.Utxo, ResponseError) {
+	var models []*models.Utxo
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/utxos/search", &models); err != nil {
 		return nil, err
 	}
@@ -228,16 +228,16 @@ func (h *TransportHTTP) AdminGetUtxos(ctx context.Context, conditions map[string
 
 // AdminGetUtxosCount get a count of all the utxos filtered by conditions
 func (h *TransportHTTP) AdminGetUtxosCount(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata,
+	metadata *models.Metadata,
 ) (int64, ResponseError) {
 	return h.adminCount(ctx, conditions, metadata, "/admin/utxos/count")
 }
 
 // AdminGetXPubs get all block xpubs filtered by conditions
 func (h *TransportHTTP) AdminGetXPubs(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *QueryParams,
-) ([]*buxmodels.Xpub, ResponseError) {
-	var models []*buxmodels.Xpub
+	metadata *models.Metadata, queryParams *QueryParams,
+) ([]*models.Xpub, ResponseError) {
+	var models []*models.Xpub
 	if err := h.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/xpubs/search", &models); err != nil {
 		return nil, err
 	}
@@ -247,13 +247,13 @@ func (h *TransportHTTP) AdminGetXPubs(ctx context.Context, conditions map[string
 
 // AdminGetXPubsCount get a count of all the xpubs filtered by conditions
 func (h *TransportHTTP) AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata,
+	metadata *models.Metadata,
 ) (int64, ResponseError) {
 	return h.adminCount(ctx, conditions, metadata, "/admin/xpubs/count")
 }
 
 func (h *TransportHTTP) adminGetModels(ctx context.Context, conditions map[string]interface{},
-	metadata *buxmodels.Metadata, queryParams *QueryParams, path string, models interface{},
+	metadata *models.Metadata, queryParams *QueryParams, path string, models interface{},
 ) ResponseError {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions:  conditions,
@@ -273,7 +273,7 @@ func (h *TransportHTTP) adminGetModels(ctx context.Context, conditions map[strin
 	return nil
 }
 
-func (h *TransportHTTP) adminCount(ctx context.Context, conditions map[string]interface{}, metadata *buxmodels.Metadata, path string) (int64, ResponseError) {
+func (h *TransportHTTP) adminCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, path string) (int64, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions: conditions,
 		FieldMetadata:   processMetadata(metadata),
@@ -293,7 +293,7 @@ func (h *TransportHTTP) adminCount(ctx context.Context, conditions map[string]in
 }
 
 // AdminRecordTransaction will record a transaction as an admin
-func (h *TransportHTTP) AdminRecordTransaction(ctx context.Context, hex string) (*buxmodels.Transaction, ResponseError) {
+func (h *TransportHTTP) AdminRecordTransaction(ctx context.Context, hex string) (*models.Transaction, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldHex: hex,
 	})
@@ -301,7 +301,7 @@ func (h *TransportHTTP) AdminRecordTransaction(ctx context.Context, hex string) 
 		return nil, WrapError(err)
 	}
 
-	var transaction buxmodels.Transaction
+	var transaction models.Transaction
 	if err := h.doHTTPRequest(
 		ctx, http.MethodPost, "/admin/transactions/record", jsonStr, h.xPriv, h.signRequest, &transaction,
 	); err != nil {

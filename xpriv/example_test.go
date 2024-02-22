@@ -3,7 +3,7 @@ package xpriv_test
 import (
 	"fmt"
 
-	"github.com/BuxOrg/go-buxclient/xpriv"
+	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 )
 
 func ExampleGenerate() {

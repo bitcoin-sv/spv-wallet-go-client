@@ -1,13 +1,13 @@
-package buxclient
+package walletclient
 
 import (
 	"context"
 	"testing"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/BuxOrg/go-buxclient/fixtures"
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 // TestAccessKeys will test the AccessKey methods
@@ -22,7 +22,7 @@ func TestAccessKeys(t *testing.T) {
 
 	t.Run("GetAccessKey", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, true)
+		client := getTestWalletClient(transportHandler, true)
 
 		// when
 		accessKey, err := client.GetAccessKey(context.Background(), fixtures.AccessKey.ID)
@@ -37,23 +37,23 @@ func TestAccessKeys(t *testing.T) {
 		transportHandler := testTransportHandler{
 			Type:      fixtures.RequestType,
 			Path:      "/access-key/search",
-			Result:    fixtures.MarshallForTestHandler([]*buxmodels.AccessKey{fixtures.AccessKey}),
+			Result:    fixtures.MarshallForTestHandler([]*models.AccessKey{fixtures.AccessKey}),
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, true)
+		client := getTestWalletClient(transportHandler, true)
 
 		// when
 		accessKeys, err := client.GetAccessKeys(context.Background(), fixtures.TestMetadata)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, accessKeys, []*buxmodels.AccessKey{fixtures.AccessKey})
+		assert.Equal(t, accessKeys, []*models.AccessKey{fixtures.AccessKey})
 	})
 
 	t.Run("CreateAccessKey", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, true)
+		client := getTestWalletClient(transportHandler, true)
 
 		// when
 		accessKey, err := client.CreateAccessKey(context.Background(), fixtures.TestMetadata)
@@ -65,7 +65,7 @@ func TestAccessKeys(t *testing.T) {
 
 	t.Run("RevokeAccessKey", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, true)
+		client := getTestWalletClient(transportHandler, true)
 
 		// when
 		accessKey, err := client.RevokeAccessKey(context.Background(), fixtures.AccessKey.ID)

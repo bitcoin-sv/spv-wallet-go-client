@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/BuxOrg/go-buxclient/xpriv"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 )
 
 func main() {
-	//Generate keys
+	// Generate keys
 	keys, err := xpriv.Generate()
 	if err != nil {
 		panic(err)
 	}
 
-	//Generate keys from mnemonic string
+	// Generate keys from mnemonic string
 	xpriv3, err := xpriv.FromMnemonic(keys.Mnemonic())
 	if err != nil {
 		panic(err)
@@ -23,7 +24,7 @@ func main() {
 	fmt.Println("XPub: ", xpriv3.XPub().String())
 	fmt.Println("Mnemonic: ", xpriv3.Mnemonic())
 
-	//Generate keys from string
+	// Generate keys from string
 	xpriv2, err := xpriv.FromString(keys.XPriv())
 	if err != nil {
 		panic(err)

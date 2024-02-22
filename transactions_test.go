@@ -1,17 +1,17 @@
-package buxclient
+package walletclient
 
 import (
 	"context"
 	"net/http"
 	"testing"
 
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/libsv/go-bt/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/BuxOrg/go-buxclient/fixtures"
-	"github.com/BuxOrg/go-buxclient/transports"
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
+	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 )
 
 // TestTransactions will test the Transaction methods
@@ -25,7 +25,7 @@ func TestTransactions(t *testing.T) {
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		tx, err := client.GetTransaction(context.Background(), fixtures.Transaction.ID)
@@ -40,11 +40,11 @@ func TestTransactions(t *testing.T) {
 		transportHandler := testTransportHandler{
 			Type:      fixtures.RequestType,
 			Path:      "/transaction/search",
-			Result:    fixtures.MarshallForTestHandler([]*buxmodels.Transaction{fixtures.Transaction}),
+			Result:    fixtures.MarshallForTestHandler([]*models.Transaction{fixtures.Transaction}),
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 		conditions := map[string]interface{}{
 			"fee": map[string]interface{}{
 				"$lt": 100,
@@ -59,7 +59,7 @@ func TestTransactions(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, []*buxmodels.Transaction{fixtures.Transaction}, txs)
+		assert.Equal(t, []*models.Transaction{fixtures.Transaction}, txs)
 	})
 
 	t.Run("GetTransactionsCount", func(t *testing.T) {
@@ -71,7 +71,7 @@ func TestTransactions(t *testing.T) {
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 		conditions := map[string]interface{}{
 			"fee": map[string]interface{}{
 				"$lt": 100,
@@ -98,7 +98,7 @@ func TestTransactions(t *testing.T) {
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		tx, err := client.RecordTransaction(context.Background(), fixtures.Transaction.Hex, "", fixtures.TestMetadata)
@@ -117,7 +117,7 @@ func TestTransactions(t *testing.T) {
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		tx, err := client.UpdateTransactionMetadata(context.Background(), fixtures.Transaction.ID, fixtures.TestMetadata)
@@ -150,7 +150,7 @@ func TestTransactions(t *testing.T) {
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 		recipients := []*transports.Recipients{{
 			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
 			Satoshis: 1000,
@@ -188,7 +188,7 @@ func TestTransactions(t *testing.T) {
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 		recipients := []*transports.Recipients{{
 			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
 			Satoshis: 1000,
@@ -219,14 +219,14 @@ func TestTransactions(t *testing.T) {
 					Path: "/transaction",
 					Result: func(w http.ResponseWriter, req *http.Request) {
 						w.Header().Set("Content-Type", "application/json")
-						mustWrite(w, fixtures.MarshallForTestHandler(buxmodels.DraftTransaction{}))
+						mustWrite(w, fixtures.MarshallForTestHandler(models.DraftTransaction{}))
 					},
 				},
 			},
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 		recipients := []*transports.Recipients{{
 			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
 			Satoshis: 1000,
@@ -250,7 +250,7 @@ func TestTransactions(t *testing.T) {
 			ClientURL: fixtures.ServerURL,
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		signedHex, err := client.FinalizeTransaction(fixtures.DraftTx)
@@ -273,7 +273,7 @@ func TestTransactions(t *testing.T) {
 			Result:    "0",
 			Client:    WithHTTPClient,
 		}
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		_, err := client.GetUtxosCount(context.Background(), map[string]interface{}{}, fixtures.TestMetadata)
@@ -295,7 +295,7 @@ func TestDraftTransactions(t *testing.T) {
 
 	t.Run("DraftToRecipients", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		recipients := []*transports.Recipients{{
 			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
@@ -313,7 +313,7 @@ func TestDraftTransactions(t *testing.T) {
 
 	t.Run("DraftTransaction", func(t *testing.T) {
 		// given
-		client := getTestBuxClient(transportHandler, false)
+		client := getTestWalletClient(transportHandler, false)
 
 		// when
 		draft, err := client.DraftTransaction(context.Background(), &fixtures.DraftTx.Configuration, fixtures.TestMetadata)
