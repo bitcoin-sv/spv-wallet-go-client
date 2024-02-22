@@ -34,7 +34,7 @@ func TestAccessKeys(t *testing.T) {
 
 	t.Run("GetAccessKeys", func(t *testing.T) {
 		// given
-		transportHandler = testTransportHandler{
+		transportHandler := testTransportHandler{
 			Type:      fixtures.RequestType,
 			Path:      "/access-key/search",
 			Result:    fixtures.MarshallForTestHandler([]*models.AccessKey{fixtures.AccessKey}),
