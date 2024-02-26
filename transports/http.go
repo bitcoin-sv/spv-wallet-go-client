@@ -48,44 +48,6 @@ func (h *TransportHTTP) SetAdminKey(adminKey *bip32.ExtendedKey) {
 	h.adminXPriv = adminKey
 }
 
-// NewPaymail will register a new paymail
-func (h *TransportHTTP) NewPaymail(ctx context.Context, rawXpub, paymailAddress, avatar, publicName string, metadata *models.Metadata) ResponseError {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldAddress:    paymailAddress,
-		FieldAvatar:     avatar,
-		FieldPublicName: publicName,
-		FieldMetadata:   processMetadata(metadata),
-		FieldXpubKey:    rawXpub,
-	})
-	if err != nil {
-		return WrapError(err)
-	}
-
-	var paymailData interface{}
-
-	return h.doHTTPRequest(
-		ctx, http.MethodPost, "/paymail", jsonStr, h.xPriv, true, &paymailData,
-	)
-}
-
-// DeletePaymail will delete a paymail address
-func (h *TransportHTTP) DeletePaymail(ctx context.Context, paymailAddress string) ResponseError {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldAddress: paymailAddress,
-	})
-	if err != nil {
-		return WrapError(err)
-	}
-
-	if err := h.doHTTPRequest(
-		ctx, http.MethodDelete, "/paymail", jsonStr, h.xPriv, true, nil,
-	); err != nil {
-		return WrapError(err)
-	}
-
-	return nil
-}
-
 // GetXPub will get the xpub of the current xpub
 func (h *TransportHTTP) GetXPub(ctx context.Context) (*models.Xpub, ResponseError) {
 	var xPub models.Xpub

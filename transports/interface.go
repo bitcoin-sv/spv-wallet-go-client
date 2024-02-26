@@ -10,8 +10,6 @@ import (
 // XpubService is the xPub related requests
 type XpubService interface {
 	GetXPub(ctx context.Context) (*models.Xpub, ResponseError)
-	NewXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError
-	RegisterXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError
 	UpdateXPubMetadata(ctx context.Context, metadata *models.Metadata) (*models.Xpub, ResponseError)
 }
 
@@ -51,12 +49,6 @@ type TransactionService interface {
 	GetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
 }
 
-// PaymailService is the paymail related requests
-type PaymailService interface {
-	NewPaymail(ctx context.Context, rawXpub, paymailAddress, avatar, publicName string, metadata *models.Metadata) ResponseError
-	DeletePaymail(ctx context.Context, paymailAddress string) ResponseError
-}
-
 // AdminService is the admin related requests
 type AdminService interface {
 	AdminGetStatus(ctx context.Context) (bool, ResponseError)
@@ -70,15 +62,13 @@ type AdminService interface {
 	AdminGetPaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError)
 	AdminGetPaymails(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.PaymailAddress, ResponseError)
 	AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
-	// AdminCreatePaymail Create a paymail.
-	//
-	// Paymail address (ie. example@bux.org)
 	AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*models.PaymailAddress, ResponseError)
-	AdminDeletePaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError)
+	AdminDeletePaymail(ctx context.Context, address string) ResponseError
 	AdminGetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Transaction, ResponseError)
 	AdminGetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
 	AdminGetUtxos(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Utxo, ResponseError)
 	AdminGetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
+	AdminNewXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError
 	AdminGetXPubs(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Xpub, ResponseError)
 	AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
 	AdminRecordTransaction(ctx context.Context, hex string) (*models.Transaction, ResponseError)
@@ -89,7 +79,6 @@ type TransportService interface {
 	AccessKeyService
 	AdminService
 	DestinationService
-	PaymailService
 	TransactionService
 	XpubService
 	Init() error
