@@ -72,6 +72,7 @@ type AdminService interface {
 	AdminGetXPubs(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Xpub, ResponseError)
 	AdminGetXPubsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
 	AdminRecordTransaction(ctx context.Context, hex string) (*models.Transaction, ResponseError)
+	AdminGetSharedConfig(ctx context.Context) (*models.SharedConfig, ResponseError)
 }
 
 // TransportService the transport service interface
