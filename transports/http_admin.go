@@ -304,3 +304,15 @@ func (h *TransportHTTP) AdminRecordTransaction(ctx context.Context, hex string) 
 
 	return &transaction, nil
 }
+
+// AdminGetSharedConfig gets the shared config
+func (h *TransportHTTP) AdminGetSharedConfig(ctx context.Context) (*models.SharedConfig, ResponseError) {
+	var model *models.SharedConfig
+	if err := h.doHTTPRequest(
+		ctx, http.MethodGet, "/admin/shared-config", nil, h.xPriv, true, &model,
+	); err != nil {
+		return nil, err
+	}
+
+	return model, nil
+}
