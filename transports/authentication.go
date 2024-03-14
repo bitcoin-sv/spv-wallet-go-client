@@ -44,11 +44,12 @@ func SignInputs(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHe
 
 	// Sign the inputs
 	for index, input := range dt.Configuration.Inputs {
+		dst := input.Destination
 
 		// Get the locking script
 		var ls *bscript.Script
 		if ls, err = bscript.NewFromHexString(
-			input.Destination.LockingScript,
+			dst.LockingScript,
 		); err != nil {
 			resError = WrapError(err)
 			return
@@ -59,7 +60,7 @@ func SignInputs(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHe
 		// Derive the child key (chain)
 		var chainKey *bip32.ExtendedKey
 		if chainKey, err = xPriv.Child(
-			input.Destination.Chain,
+			dst.Chain,
 		); err != nil {
 			resError = WrapError(err)
 			return
@@ -68,10 +69,20 @@ func SignInputs(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHe
 		// Derive the child key (num)
 		var numKey *bip32.ExtendedKey
 		if numKey, err = chainKey.Child(
-			input.Destination.Num,
+			dst.Num,
 		); err != nil {
 			resError = WrapError(err)
 			return
+		}
+
+		// Derive key for paymail destination
+		if dst.PaymailExternalDerivationNum != nil {
+			if numKey, err = chainKey.Child(
+				*dst.PaymailExternalDerivationNum,
+			); err != nil {
+				resError = WrapError(err)
+				return
+			}
 		}
 
 		// Get the private key
