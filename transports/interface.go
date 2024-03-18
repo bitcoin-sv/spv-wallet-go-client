@@ -49,6 +49,12 @@ type TransactionService interface {
 	GetUtxosCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
 }
 
+// ContactService is the contact related requests
+type ContactService interface {
+	AcceptContact(ctx context.Context, paymail string) ResponseError
+	RejectContact(ctx context.Context, paymail string) ResponseError
+}
+
 // AdminService is the admin related requests
 type AdminService interface {
 	AdminGetStatus(ctx context.Context) (bool, ResponseError)
@@ -79,6 +85,7 @@ type AdminService interface {
 type TransportService interface {
 	AccessKeyService
 	AdminService
+	ContactService
 	DestinationService
 	TransactionService
 	XpubService
