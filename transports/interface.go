@@ -62,7 +62,7 @@ type AdminService interface {
 	AdminGetPaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError)
 	AdminGetPaymails(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.PaymailAddress, ResponseError)
 	AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
-	AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*models.PaymailAddress, ResponseError)
+	AdminCreatePaymail(ctx context.Context, rawXPub string, address string, publicName string, avatar string) (*models.PaymailAddress, ResponseError)
 	AdminDeletePaymail(ctx context.Context, address string) ResponseError
 	AdminGetTransactions(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Transaction, ResponseError)
 	AdminGetTransactionsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError)
