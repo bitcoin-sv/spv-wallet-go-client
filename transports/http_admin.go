@@ -150,9 +150,9 @@ func (h *TransportHTTP) AdminGetPaymailsCount(ctx context.Context, conditions ma
 }
 
 // AdminCreatePaymail create a new paymail for a xpub
-func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, xPubID string, address string, publicName string, avatar string) (*models.PaymailAddress, ResponseError) {
+func (h *TransportHTTP) AdminCreatePaymail(ctx context.Context, rawXPub string, address string, publicName string, avatar string) (*models.PaymailAddress, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldXpubID:     xPubID,
+		FieldXpubKey:    rawXPub,
 		FieldAddress:    address,
 		FieldPublicName: publicName,
 		FieldAvatar:     avatar,
