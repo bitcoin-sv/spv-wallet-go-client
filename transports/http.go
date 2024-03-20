@@ -639,3 +639,25 @@ func (h *TransportHTTP) authenticateWithXpriv(sign bool, req *http.Request, xPri
 func (h *TransportHTTP) authenticateWithAccessKey(req *http.Request, rawJSON []byte) ResponseError {
 	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(h.accessKey.Serialise()), string(rawJSON))
 }
+
+// AcceptContact will accept a contact by paymail
+func (h *TransportHTTP) AcceptContact(ctx context.Context, paymail string) ResponseError {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPatch, "/contact/accept/"+paymail, nil, h.xPriv, h.signRequest, nil,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// RejectContact will accept a contact by paymail
+func (h *TransportHTTP) RejectContact(ctx context.Context, paymail string) ResponseError {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPatch, "/contact/reject/"+paymail, nil, h.xPriv, h.signRequest, nil,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
