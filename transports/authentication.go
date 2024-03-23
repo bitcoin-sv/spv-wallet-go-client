@@ -57,27 +57,16 @@ func SignInputs(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHe
 		txDraft.Inputs[index].PreviousTxScript = ls
 		txDraft.Inputs[index].PreviousTxSatoshis = input.Satoshis
 
-		// Derive the child key (chain)
-		var chainKey *bip32.ExtendedKey
-		if chainKey, err = xPriv.Child(
-			dst.Chain,
-		); err != nil {
+		// Derive the child key (m/chain/num)
+		var derivedKey *bip32.ExtendedKey
+		if derivedKey, err = bitcoin.GetHDKeyByPath(xPriv, dst.Chain, dst.Num); err != nil {
 			resError = WrapError(err)
 			return
 		}
 
-		// Derive the child key (num)
-		var numKey *bip32.ExtendedKey
-		if numKey, err = chainKey.Child(
-			dst.Num,
-		); err != nil {
-			resError = WrapError(err)
-			return
-		}
-
-		// Derive key for paymail destination
+		// Derive key for paymail destination (m/chain/num/paymailNum)
 		if dst.PaymailExternalDerivationNum != nil {
-			if numKey, err = chainKey.Child(
+			if derivedKey, err = derivedKey.Child(
 				*dst.PaymailExternalDerivationNum,
 			); err != nil {
 				resError = WrapError(err)
@@ -87,9 +76,7 @@ func SignInputs(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHe
 
 		// Get the private key
 		var privateKey *bec.PrivateKey
-		if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(
-			numKey,
-		); err != nil {
+		if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(derivedKey); err != nil {
 			resError = WrapError(err)
 			return
 		}
