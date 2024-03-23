@@ -32,75 +32,78 @@ func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 	return setSignatureHeaders(header, authData)
 }
 
-// SignInputs will sign all the inputs using the given xPriv key
-func SignInputs(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, resError ResponseError) {
-	var err error
-	// Start a bt draft transaction
-	var txDraft *bt.Tx
-	if txDraft, err = bt.NewTxFromString(dt.Hex); err != nil {
-		resError = WrapError(err)
+// GetSignedHex will sign all the inputs using the given xPriv key
+func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, err error) {
+	var tx *bt.Tx
+	if tx, err = bt.NewTxFromString(dt.Hex); err != nil {
 		return
 	}
 
-	// Sign the inputs
-	for index, input := range dt.Configuration.Inputs {
-		dst := input.Destination
+	// Enrich inputs
+	for index, draftInput := range dt.Configuration.Inputs {
+		tx.Inputs[index].PreviousTxSatoshis = draftInput.Satoshis
 
-		// Get the locking script
-		var ls *bscript.Script
-		if ls, err = bscript.NewFromHexString(
-			dst.LockingScript,
-		); err != nil {
-			resError = WrapError(err)
-			return
-		}
-		txDraft.Inputs[index].PreviousTxScript = ls
-		txDraft.Inputs[index].PreviousTxSatoshis = input.Satoshis
-
-		// Derive the child key (m/chain/num)
-		var derivedKey *bip32.ExtendedKey
-		if derivedKey, err = bitcoin.GetHDKeyByPath(xPriv, dst.Chain, dst.Num); err != nil {
-			resError = WrapError(err)
+		dst := draftInput.Destination
+		if err = setPreviousTxScript(tx, uint32(index), &dst); err != nil {
 			return
 		}
 
-		// Derive key for paymail destination (m/chain/num/paymailNum)
-		if dst.PaymailExternalDerivationNum != nil {
-			if derivedKey, err = derivedKey.Child(
-				*dst.PaymailExternalDerivationNum,
-			); err != nil {
-				resError = WrapError(err)
-				return
-			}
-		}
-
-		// Get the private key
-		var privateKey *bec.PrivateKey
-		if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(derivedKey); err != nil {
-			resError = WrapError(err)
-			return
-		}
-
-		// Get the unlocking script
-		var s *bscript.Script
-		if s, err = getUnlockingScript(
-			txDraft, uint32(index), privateKey,
-		); err != nil {
-			resError = WrapError(err)
-			return
-		}
-
-		// Insert the locking script
-		if err = txDraft.InsertInputUnlockingScript(
-			uint32(index), s,
-		); err != nil {
-			resError = WrapError(err)
+		if err = setUnlockingScript(tx, uint32(index), xPriv, &dst); err != nil {
 			return
 		}
 	}
 
 	// Return the signed hex
-	signedHex = txDraft.String()
+	signedHex = tx.String()
+	return
+}
+
+func setPreviousTxScript(tx *bt.Tx, inputIndex uint32, dst *models.Destination) (err error) {
+	var ls *bscript.Script
+	if ls, err = bscript.NewFromHexString(dst.LockingScript); err != nil {
+		return
+	}
+
+	tx.Inputs[inputIndex].PreviousTxScript = ls
+	return
+}
+
+func setUnlockingScript(tx *bt.Tx, inputIndex uint32, xPriv *bip32.ExtendedKey, dst *models.Destination) (err error) {
+	var key *bec.PrivateKey
+	if key, err = getDerivedKeyForDestination(xPriv, dst); err != nil {
+		return
+	}
+
+	var s *bscript.Script
+	if s, err = getUnlockingScript(tx, inputIndex, key); err != nil {
+		return
+	}
+
+	tx.Inputs[inputIndex].UnlockingScript = s
+	return
+}
+
+func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destination) (key *bec.PrivateKey, err error) {
+	// Derive the child key (m/chain/num)
+	var derivedKey *bip32.ExtendedKey
+	if derivedKey, err = bitcoin.GetHDKeyByPath(xPriv, dst.Chain, dst.Num); err != nil {
+		return
+	}
+
+	// Derive key for paymail destination (m/chain/num/paymailNum)
+	if dst.PaymailExternalDerivationNum != nil {
+		if derivedKey, err = derivedKey.Child(
+			*dst.PaymailExternalDerivationNum,
+		); err != nil {
+			return
+		}
+	}
+
+	// Get the private key
+	if key, err = bitcoin.GetPrivateKeyFromHDKey(derivedKey); err != nil {
+		return
+	}
+
 	return
 }
 
