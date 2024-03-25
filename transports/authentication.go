@@ -99,7 +99,6 @@ func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destinati
 		}
 	}
 
-	// Get the private key
 	if key, err = bitcoin.GetPrivateKeyFromHDKey(derivedKey); err != nil {
 		return
 	}
