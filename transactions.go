@@ -56,7 +56,12 @@ func (b *WalletClient) UpdateTransactionMetadata(ctx context.Context, txID strin
 
 // FinalizeTransaction will finalize the transaction
 func (b *WalletClient) FinalizeTransaction(draft *models.DraftTransaction) (string, transports.ResponseError) {
-	return transports.SignInputs(draft, b.xPriv)
+	res, err := transports.GetSignedHex(draft, b.xPriv)
+	if err != nil {
+		return "", transports.WrapError(err)
+	}
+
+	return res, nil
 }
 
 // SendToRecipients send to recipients
