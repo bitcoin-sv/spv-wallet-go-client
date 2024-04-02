@@ -55,6 +55,7 @@ type ContactService interface {
 	RejectContact(ctx context.Context, paymail string) ResponseError
 	ConfirmContact(ctx context.Context, paymail string) ResponseError
 	GetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Contact, ResponseError)
+	UpsertContact(ctx context.Context, paymail, fullName string, metadata *models.Metadata, requesterPaymail string) (*models.Contact, ResponseError)
 }
 
 // AdminService is the admin related requests

@@ -693,3 +693,29 @@ func (h *TransportHTTP) GetContacts(ctx context.Context, conditions map[string]i
 
 	return result, nil
 }
+
+// UpsertContact add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
+func (h *TransportHTTP) UpsertContact(ctx context.Context, paymail, fullName string, metadata *models.Metadata, requesterPaymail string) (*models.Contact, ResponseError) {
+	payload := map[string]interface{}{
+		"fullName":    fullName,
+		FieldMetadata: processMetadata(metadata),
+	}
+
+	if requesterPaymail != "" {
+		payload["requesterPaymail"] = requesterPaymail
+	}
+
+	jsonStr, err := json.Marshal(payload)
+	if err != nil {
+		return nil, WrapError(err)
+	}
+
+	var result models.Contact
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPut, "/contact/"+paymail, jsonStr, h.xPriv, h.signRequest, &result,
+	); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
