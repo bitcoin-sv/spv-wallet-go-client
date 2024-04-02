@@ -53,6 +53,8 @@ type TransactionService interface {
 type ContactService interface {
 	AcceptContact(ctx context.Context, paymail string) ResponseError
 	RejectContact(ctx context.Context, paymail string) ResponseError
+	ConfirmContact(ctx context.Context, paymail string) ResponseError
+	GetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Contact, ResponseError)
 }
 
 // AdminService is the admin related requests

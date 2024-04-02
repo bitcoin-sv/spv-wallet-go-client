@@ -329,7 +329,7 @@ func (h *TransportHTTP) GetTransaction(ctx context.Context, txID string) (*model
 	return &transaction, nil
 }
 
-// GetTransactions will get a transactions by conditions
+// GetTransactions will get transactions by conditions
 func (h *TransportHTTP) GetTransactions(ctx context.Context, conditions map[string]interface{},
 	metadataConditions *models.Metadata, queryParams *QueryParams,
 ) ([]*models.Transaction, ResponseError) {
@@ -640,10 +640,10 @@ func (h *TransportHTTP) authenticateWithAccessKey(req *http.Request, rawJSON []b
 	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(h.accessKey.Serialise()), string(rawJSON))
 }
 
-// AcceptContact will accept a contact by paymail
+// AcceptContact will accept the contact associated with the paymail
 func (h *TransportHTTP) AcceptContact(ctx context.Context, paymail string) ResponseError {
 	if err := h.doHTTPRequest(
-		ctx, http.MethodPatch, "/contact/accept/"+paymail, nil, h.xPriv, h.signRequest, nil,
+		ctx, http.MethodPatch, "/contact/accepted/"+paymail, nil, h.xPriv, h.signRequest, nil,
 	); err != nil {
 		return err
 	}
@@ -651,13 +651,45 @@ func (h *TransportHTTP) AcceptContact(ctx context.Context, paymail string) Respo
 	return nil
 }
 
-// RejectContact will accept a contact by paymail
+// RejectContact will reject the contact associated with the paymail
 func (h *TransportHTTP) RejectContact(ctx context.Context, paymail string) ResponseError {
 	if err := h.doHTTPRequest(
-		ctx, http.MethodPatch, "/contact/reject/"+paymail, nil, h.xPriv, h.signRequest, nil,
+		ctx, http.MethodPatch, "/contact/rejected/"+paymail, nil, h.xPriv, h.signRequest, nil,
 	); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// ConfirmContact will confirm the contact associated with the paymail
+func (h *TransportHTTP) ConfirmContact(ctx context.Context, paymail string) ResponseError {
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPatch, "/contact/confirmed/"+paymail, nil, h.xPriv, h.signRequest, nil,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetContacts will get contacts by conditions
+func (h *TransportHTTP) GetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Contact, ResponseError) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldConditions:  conditions,
+		FieldMetadata:    processMetadata(metadata),
+		FieldQueryParams: queryParams,
+	})
+	if err != nil {
+		return nil, WrapError(err)
+	}
+
+	var result []*models.Contact
+	if err := h.doHTTPRequest(
+		ctx, http.MethodPost, "/contact/search", jsonStr, h.xPriv, h.signRequest, &result,
+	); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

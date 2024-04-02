@@ -8,45 +8,54 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestAcceptContact will test the AcceptContact method
-func TestAcceptContact(t *testing.T) {
-	transportHandler := testTransportHandler{
-		Type:      fixtures.RequestType,
-		Path:      "/contact/accept/",
-		ClientURL: fixtures.ServerURL,
-		Client:    WithHTTPClient,
-	}
-
-	t.Run("AcceptContact", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, true)
-
-		// when
-		err := client.AcceptContact(context.Background(), fixtures.PaymailAddress)
-
-		// then
-		assert.NoError(t, err)
-	})
-}
-
 // TestRejectContact will test the RejectContact method
-func TestRejectContact(t *testing.T) {
-	transportHandler := testTransportHandler{
-		Type:      fixtures.RequestType,
-		Path:      "/contact/reject/",
-		Result:    fixtures.MarshallForTestHandler(""),
-		ClientURL: fixtures.ServerURL,
-		Client:    WithHTTPClient,
+func TestContactActionsRouting(t *testing.T) {
+	tcs := []struct {
+		name  string
+		route string
+		f     func(c *WalletClient) error
+	}{
+		{
+			name:  "RejectContact",
+			route: "/contact/rejected/",
+			f:     func(c *WalletClient) error { return c.RejectContact(context.Background(), fixtures.PaymailAddress) },
+		},
+		{
+			name:  "AcceptContact",
+			route: "/contact/accepted/",
+			f:     func(c *WalletClient) error { return c.AcceptContact(context.Background(), fixtures.PaymailAddress) },
+		},
+		{
+			name:  "ConfirmContact",
+			route: "/contact/confirmed/",
+			f:     func(c *WalletClient) error { return c.ConfirmContact(context.Background(), fixtures.PaymailAddress) },
+		},
+		{
+			name:  "GetContacts",
+			route: "/contact/search/",
+			f:     func(c *WalletClient) error { _, err := c.GetContacts(context.Background(), nil, nil, nil); return err },
+		},
 	}
 
-	t.Run("RejectContact", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, true)
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			// given
+			tmq := testTransportHandler{
+				Type:      fixtures.RequestType,
+				Path:      tc.route,
+				Result:    "[]",
+				ClientURL: fixtures.ServerURL,
+				Client:    WithHTTPClient,
+			}
 
-		// when
-		err := client.RejectContact(context.Background(), fixtures.PaymailAddress)
+			client := getTestWalletClient(tmq, true)
 
-		// then
-		assert.NoError(t, err)
-	})
+			// when
+			err := tc.f(client)
+
+			// then
+			assert.NoError(t, err)
+		})
+	}
+
 }
