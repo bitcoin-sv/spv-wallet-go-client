@@ -65,6 +65,7 @@ func TestTotpService(t *testing.T) {
 
 		sut := &Service{
 			Digits: 2,
+			Period: givenSeconds,
 		}
 		a_passcode, err := sut.GenarateTotp(a_xpriv, b_xpub)
 		require.NoError(t, err)
