@@ -29,12 +29,6 @@ func TestContactActionsRouting(t *testing.T) {
 			f:               func(c *WalletClient) error { return c.AcceptContact(context.Background(), fixtures.PaymailAddress) },
 		},
 		{
-			name:            "ConfirmContact",
-			route:           "/contact/confirmed/",
-			responsePayload: "{}",
-			f:               func(c *WalletClient) error { return c.ConfirmContact(context.Background(), fixtures.PaymailAddress) },
-		},
-		{
 			name:            "GetContacts",
 			route:           "/contact/search/",
 			responsePayload: "[]",

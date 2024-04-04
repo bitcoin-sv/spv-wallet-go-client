@@ -2,6 +2,8 @@ package walletclient
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -27,9 +29,18 @@ func (b *WalletClient) RejectContact(ctx context.Context, paymail string) transp
 	return b.transport.RejectContact(ctx, paymail)
 }
 
-// ConfirmContact will confirm the contact associated with the paymail
-func (b *WalletClient) ConfirmContact(ctx context.Context, paymail string) transports.ResponseError {
-	return b.transport.ConfirmContact(ctx, paymail)
+// ConfirmContact will try to confirm the contact
+func (b *WalletClient) ConfirmContact(ctx context.Context, contact *models.Contact, passcode string, validationPeriod, digits uint) transports.ResponseError {
+	isTotpValid, err := b.ConfirmTotpForContact(contact, passcode, validationPeriod, digits)
+	if err != nil {
+		return transports.WrapError(fmt.Errorf("totp validation failed: %w", err))
+	}
+
+	if !isTotpValid {
+		return transports.WrapError(errors.New("totp is invalid"))
+	}
+
+	return b.transport.ConfirmContact(ctx, contact.Paymail)
 }
 
 // GetContacts will get contacts by conditions
