@@ -11,6 +11,7 @@ import (
 	"github.com/libsv/go-bk/bip32"
 )
 
+// GenerateTotpForContact creates one time-based one-time password based on secret shared between the user and the contact
 func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, validationPeriod, digits uint) (string, error) {
 	if b.xPriv == nil {
 		return "", errors.New("init client with xPriv first")
@@ -34,7 +35,8 @@ func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, validatio
 	return ts.GenarateTotp(xpriv, cXpub)
 }
 
-func (b *WalletClient) ConfirmTotpForContact(contact *models.Contact, passcode string, validationPeriod, digits uint) (bool, error) {
+// ValidateTotpForContact validates one time-based one-time password based on secret shared between the user and the contact
+func (b *WalletClient) ValidateTotpForContact(contact *models.Contact, passcode string, validationPeriod, digits uint) (bool, error) {
 	if b.xPriv == nil {
 		return false, errors.New("init client with xPriv first")
 	}
@@ -58,9 +60,9 @@ func (b *WalletClient) ConfirmTotpForContact(contact *models.Contact, passcode s
 }
 
 func deriveXprivForPki(xpriv *bip32.ExtendedKey) (*bip32.ExtendedKey, error) {
-	// derive xpriv for current PKI
-	// TODO: currently we don't support PKI rotation
 	// PKI derivation path: m/0/0/0
+	// NOTICE: we currently do not support PKI rotation; however, adjustments will be made if and when we decide to implement it
+
 	pkiXpriv, err := bitcoin.GetHDKeyByPath(xpriv, utils.ChainExternal, 0)
 	if err != nil {
 		return nil, err
