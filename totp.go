@@ -1,6 +1,7 @@
 package walletclient
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 
@@ -8,13 +9,16 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoinschema/go-bitcoin/v2"
+	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 )
+
+var ErrClientInitNoXpriv = errors.New("init client with xPriv first")
 
 // GenerateTotpForContact creates one time-based one-time password based on secret shared between the user and the contact
 func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, validationPeriod, digits uint) (string, error) {
 	if b.xPriv == nil {
-		return "", errors.New("init client with xPriv first")
+		return "", ErrClientInitNoXpriv
 	}
 
 	xpriv, err := deriveXprivForPki(b.xPriv)
@@ -22,7 +26,7 @@ func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, validatio
 		return "", err
 	}
 
-	cXpub, err := bip32.NewKeyFromString(contact.PubKey)
+	cXpub, err := convertPubKey(contact.PubKey)
 	if err != nil {
 		return "", fmt.Errorf("contact's PubKey is invalid: %w", err)
 	}
@@ -32,13 +36,13 @@ func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, validatio
 		Digits: digits,
 	}
 
-	return ts.GenarateTotp(xpriv, cXpub)
+	return ts.GenerateTotp(xpriv, cXpub)
 }
 
 // ValidateTotpForContact validates one time-based one-time password based on secret shared between the user and the contact
 func (b *WalletClient) ValidateTotpForContact(contact *models.Contact, passcode string, validationPeriod, digits uint) (bool, error) {
 	if b.xPriv == nil {
-		return false, errors.New("init client with xPriv first")
+		return false, ErrClientInitNoXpriv
 	}
 
 	xpriv, err := deriveXprivForPki(b.xPriv)
@@ -46,7 +50,7 @@ func (b *WalletClient) ValidateTotpForContact(contact *models.Contact, passcode 
 		return false, err
 	}
 
-	cXpub, err := bip32.NewKeyFromString(contact.PubKey)
+	cXpub, err := convertPubKey(contact.PubKey)
 	if err != nil {
 		return false, fmt.Errorf("contact's PubKey is invalid: %w", err)
 	}
@@ -69,4 +73,13 @@ func deriveXprivForPki(xpriv *bip32.ExtendedKey) (*bip32.ExtendedKey, error) {
 	}
 
 	return pkiXpriv.Child(0)
+}
+
+func convertPubKey(pubKey string) (*bec.PublicKey, error) {
+	hex, err := hex.DecodeString(pubKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return bec.ParsePubKey(hex, bec.S256())
 }

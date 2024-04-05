@@ -17,8 +17,8 @@ type Service struct {
 }
 
 // GenerateTotp creates one time-based one-time password based on secrets calculated from the keys
-func (s *Service) GenarateTotp(xPriv, xPub *bip32.ExtendedKey) (string, error) {
-	secret, err := sharedSecret(xPriv, xPub)
+func (s *Service) GenerateTotp(xPriv *bip32.ExtendedKey, pubKey *bec.PublicKey) (string, error) {
+	secret, err := sharedSecret(xPriv, pubKey)
 	if err != nil {
 		return "", err
 	}
@@ -27,8 +27,8 @@ func (s *Service) GenarateTotp(xPriv, xPub *bip32.ExtendedKey) (string, error) {
 }
 
 // ValidateTotp checks if given one-time password is valid
-func (s *Service) ValidateTotp(xPriv, xPub *bip32.ExtendedKey, passcode string) (bool, error) {
-	secret, err := sharedSecret(xPriv, xPub)
+func (s *Service) ValidateTotp(xPriv *bip32.ExtendedKey, pubKey *bec.PublicKey, passcode string) (bool, error) {
+	secret, err := sharedSecret(xPriv, pubKey)
 	if err != nil {
 		return false, err
 	}
@@ -43,13 +43,8 @@ func (s *Service) getOpts() totp.ValidateOpts {
 	}
 }
 
-func sharedSecret(xPriv, xPub *bip32.ExtendedKey) (string, error) {
+func sharedSecret(xPriv *bip32.ExtendedKey, pubKey *bec.PublicKey) (string, error) {
 	privKey, err := xPriv.ECPrivKey()
-	if err != nil {
-		return "", err
-	}
-
-	pubKey, err := xPub.ECPubKey()
 	if err != nil {
 		return "", err
 	}

@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/stretchr/testify/require"
 )
@@ -16,16 +17,15 @@ func TestTotpService(t *testing.T) {
 		// given
 		const givenDigits = 4
 
-		a_xpriv, _ := bip32.NewKeyFromString(a_xprivStr)
-		b_xpriv, _ := bip32.NewKeyFromString(b_xprivStr)
-		b_xpub, _ := b_xpriv.Neuter()
+		a_xpriv, _ := getKeyPair(a_xprivStr)
+		_, b_pk := getKeyPair(b_xprivStr)
 
 		sut := &Service{
 			Digits: givenDigits,
 		}
 
 		// when
-		pc, err := sut.GenarateTotp(a_xpriv, b_xpub)
+		pc, err := sut.GenerateTotp(a_xpriv, b_pk)
 
 		// then
 		require.NoError(t, err)
@@ -34,19 +34,17 @@ func TestTotpService(t *testing.T) {
 
 	t.Run("Passcode is valid", func(t *testing.T) {
 		// given
-		a_xpriv, _ := bip32.NewKeyFromString(a_xprivStr)
-		a_xpub, _ := a_xpriv.Neuter()
-		b_xpriv, _ := bip32.NewKeyFromString(b_xprivStr)
-		b_xpub, _ := b_xpriv.Neuter()
+		a_xpriv, a_pk := getKeyPair(a_xprivStr)
+		b_xpriv, b_pk := getKeyPair(b_xprivStr)
 
 		sut := &Service{
 			Digits: 2,
 		}
-		a_passcode, err := sut.GenarateTotp(a_xpriv, b_xpub)
+		a_passcode, err := sut.GenerateTotp(a_xpriv, b_pk)
 		require.NoError(t, err)
 
 		// when
-		isValid, err := sut.ValidateTotp(b_xpriv, a_xpub, a_passcode)
+		isValid, err := sut.ValidateTotp(b_xpriv, a_pk, a_passcode)
 		require.NoError(t, err)
 
 		// then
@@ -58,30 +56,36 @@ func TestTotpService(t *testing.T) {
 		// given
 		const givenSeconds = 3
 
-		a_xpriv, _ := bip32.NewKeyFromString(a_xprivStr)
-		a_xpub, _ := a_xpriv.Neuter()
-		b_xpriv, _ := bip32.NewKeyFromString(b_xprivStr)
-		b_xpub, _ := b_xpriv.Neuter()
+		a_xpriv, a_pk := getKeyPair(a_xprivStr)
+		b_xpriv, b_pk := getKeyPair(b_xprivStr)
 
 		sut := &Service{
 			Digits: 2,
 			Period: givenSeconds,
 		}
-		a_passcode, err := sut.GenarateTotp(a_xpriv, b_xpub)
+		a_passcode, err := sut.GenerateTotp(a_xpriv, b_pk)
 		require.NoError(t, err)
 
 		// when
-		isValid, err := sut.ValidateTotp(b_xpriv, a_xpub, a_passcode)
+		isValid, err := sut.ValidateTotp(b_xpriv, a_pk, a_passcode)
 		require.NoError(t, err)
 		require.True(t, isValid)
 
 		time.Sleep(givenSeconds * time.Second)
 
-		isValid, err = sut.ValidateTotp(b_xpriv, a_xpub, a_passcode)
+		isValid, err = sut.ValidateTotp(b_xpriv, a_pk, a_passcode)
 
 		// then
 		require.NoError(t, err)
 		require.False(t, isValid)
 	})
 
+}
+
+func getKeyPair(xprivStr string) (xpriv *bip32.ExtendedKey, pk *bec.PublicKey) {
+	xpriv, _ = bip32.NewKeyFromString(xprivStr)
+	xpub, _ := xpriv.Neuter()
+	pk, _ = xpub.ECPubKey()
+
+	return
 }
