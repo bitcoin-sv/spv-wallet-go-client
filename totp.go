@@ -18,6 +18,13 @@ import (
 
 var ErrClientInitNoXpriv = errors.New("init client with xPriv first")
 
+const (
+	// Default number of seconds a TOTP is valid for.
+	TotpDefaultPeriod uint = 30
+	// Default TOTP length
+	TotpDefaultDigits uint = 2
+)
+
 // GenerateTotpForContact creates one time-based one-time password based on secret shared between the user and the contact
 func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, period, digits uint) (string, error) {
 	secret, err := sharedSecret(b, contact)
@@ -25,12 +32,8 @@ func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, period, d
 		return "", err
 	}
 
-	opts := totp.ValidateOpts{
-		Period: period,
-		Digits: otp.Digits(digits),
-	}
-
-	return totp.GenerateCodeCustom(string(secret), time.Now(), opts)
+	opts := getTotpOpts(period, digits)
+	return totp.GenerateCodeCustom(string(secret), time.Now(), *opts)
 }
 
 // ValidateTotpForContact validates one time-based one-time password based on secret shared between the user and the contact
@@ -40,12 +43,8 @@ func (b *WalletClient) ValidateTotpForContact(contact *models.Contact, passcode 
 		return false, err
 	}
 
-	opts := totp.ValidateOpts{
-		Period: period,
-		Digits: otp.Digits(digits),
-	}
-
-	return totp.ValidateCustom(passcode, string(secret), time.Now(), opts)
+	opts := getTotpOpts(period, digits)
+	return totp.ValidateCustom(passcode, string(secret), time.Now(), *opts)
 }
 
 func sharedSecret(b *WalletClient, c *models.Contact) (string, error) {
@@ -56,6 +55,21 @@ func sharedSecret(b *WalletClient, c *models.Contact) (string, error) {
 
 	x, _ := bec.S256().ScalarMult(pubKey.X, pubKey.Y, privKey.D.Bytes())
 	return base32.StdEncoding.EncodeToString(x.Bytes()), nil
+}
+
+func getTotpOpts(period, digits uint) *totp.ValidateOpts {
+	if period == 0 {
+		period = TotpDefaultPeriod
+	}
+
+	if digits == 0 {
+		digits = TotpDefaultDigits
+	}
+
+	return &totp.ValidateOpts{
+		Period: period,
+		Digits: otp.Digits(digits),
+	}
 }
 
 func getSharedSecretFactors(b *WalletClient, c *models.Contact) (*bec.PrivateKey, *bec.PublicKey, error) {

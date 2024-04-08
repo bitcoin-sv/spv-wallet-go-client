@@ -36,18 +36,6 @@ func TestGenerateTotpForContact(t *testing.T) {
 		require.ErrorIs(t, err, ErrClientInitNoXpriv)
 	})
 
-	t.Run("WalletClient without xPriv - returns error", func(t *testing.T) {
-		// given
-		sut, err := New(WithXPub(fixtures.XPubString), WithHTTP("localhost:3001"))
-		require.NoError(t, err)
-
-		// when
-		_, err = sut.GenerateTotpForContact(nil, 30, 2)
-
-		// then
-		require.ErrorIs(t, err, ErrClientInitNoXpriv)
-	})
-
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
 		// given
 		sut, err := New(WithXPriv(fixtures.XPrivString), WithHTTP("localhost:3001"))
