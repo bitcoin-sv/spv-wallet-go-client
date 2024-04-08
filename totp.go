@@ -1,66 +1,84 @@
 package walletclient
 
 import (
+	"encoding/base32"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"time"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/totp"
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
+	"github.com/pquerna/otp"
+	"github.com/pquerna/otp/totp"
 )
 
 var ErrClientInitNoXpriv = errors.New("init client with xPriv first")
 
 // GenerateTotpForContact creates one time-based one-time password based on secret shared between the user and the contact
-func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, validationPeriod, digits uint) (string, error) {
-	if b.xPriv == nil {
-		return "", ErrClientInitNoXpriv
-	}
-
-	xpriv, err := deriveXprivForPki(b.xPriv)
+func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, period, digits uint) (string, error) {
+	secret, err := sharedSecret(b, contact)
 	if err != nil {
 		return "", err
 	}
 
-	cXpub, err := convertPubKey(contact.PubKey)
-	if err != nil {
-		return "", fmt.Errorf("contact's PubKey is invalid: %w", err)
+	opts := totp.ValidateOpts{
+		Period: period,
+		Digits: otp.Digits(digits),
 	}
 
-	ts := &totp.Service{
-		Period: validationPeriod,
-		Digits: digits,
-	}
-
-	return ts.GenerateTotp(xpriv, cXpub)
+	return totp.GenerateCodeCustom(string(secret), time.Now(), opts)
 }
 
 // ValidateTotpForContact validates one time-based one-time password based on secret shared between the user and the contact
-func (b *WalletClient) ValidateTotpForContact(contact *models.Contact, passcode string, validationPeriod, digits uint) (bool, error) {
-	if b.xPriv == nil {
-		return false, ErrClientInitNoXpriv
-	}
-
-	xpriv, err := deriveXprivForPki(b.xPriv)
+func (b *WalletClient) ValidateTotpForContact(contact *models.Contact, passcode string, period, digits uint) (bool, error) {
+	secret, err := sharedSecret(b, contact)
 	if err != nil {
 		return false, err
 	}
 
-	cXpub, err := convertPubKey(contact.PubKey)
+	opts := totp.ValidateOpts{
+		Period: period,
+		Digits: otp.Digits(digits),
+	}
+
+	return totp.ValidateCustom(passcode, string(secret), time.Now(), opts)
+}
+
+func sharedSecret(b *WalletClient, c *models.Contact) (string, error) {
+	privKey, pubKey, err := getSharedSecretFactors(b, c)
 	if err != nil {
-		return false, fmt.Errorf("contact's PubKey is invalid: %w", err)
+		return "", err
 	}
 
-	ts := &totp.Service{
-		Period: validationPeriod,
-		Digits: digits,
+	x, _ := bec.S256().ScalarMult(pubKey.X, pubKey.Y, privKey.D.Bytes())
+	return base32.StdEncoding.EncodeToString(x.Bytes()), nil
+}
+
+func getSharedSecretFactors(b *WalletClient, c *models.Contact) (*bec.PrivateKey, *bec.PublicKey, error) {
+	if b.xPriv == nil {
+		return nil, nil, ErrClientInitNoXpriv
 	}
 
-	return ts.ValidateTotp(xpriv, cXpub, passcode)
+	xpriv, err := deriveXprivForPki(b.xPriv)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	privKey, err := xpriv.ECPrivKey()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pubKey, err := convertPubKey(c.PubKey)
+	if err != nil {
+		return nil, nil, fmt.Errorf("contact's PubKey is invalid: %w", err)
+	}
+
+	return privKey, pubKey, nil
 }
 
 func deriveXprivForPki(xpriv *bip32.ExtendedKey) (*bip32.ExtendedKey, error) {

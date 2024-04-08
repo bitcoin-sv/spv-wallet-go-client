@@ -57,7 +57,8 @@ func TestContactActionsRouting(t *testing.T) {
 				return err
 			},
 		},
-		{name: "ConfirmContact",
+		{
+			name:            "ConfirmContact",
 			route:           "/contact/confirmed/",
 			responsePayload: "{}",
 			f: func(c *WalletClient) error {
@@ -80,7 +81,7 @@ func TestContactActionsRouting(t *testing.T) {
 				Client:    WithHTTPClient,
 			}
 
-			client := getTestWalletClient(tmq, false)
+			client := getTestWalletClientWithOpts(tmq, WithXPriv(fixtures.XPrivString))
 
 			// when
 			err := tc.f(client)
@@ -103,7 +104,7 @@ func TestConfirmContact(t *testing.T) {
 			Client:    WithHTTPClient,
 		}
 
-		client := getTestWalletClient(tmq, false)
+		client := getTestWalletClientWithOpts(tmq, WithXPriv(fixtures.XPrivString))
 
 		contact := &models.Contact{PubKey: fixtures.PubKey}
 		totp, err := client.GenerateTotpForContact(contact, 30, 2)
@@ -126,7 +127,7 @@ func TestConfirmContact(t *testing.T) {
 			Client:    WithHTTPClient,
 		}
 
-		client := getTestWalletClient(tmq, false)
+		client := getTestWalletClientWithOpts(tmq, WithXPriv(fixtures.XPrivString))
 
 		alice := &models.Contact{PubKey: "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"}
 		a_totp, err := client.GenerateTotpForContact(alice, 30, 2)
