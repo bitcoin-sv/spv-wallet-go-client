@@ -14,6 +14,7 @@ const (
 	XPrivString     = "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ"
 	AccessKeyString = "7779d24ca6f8821f225042bf55e8f80aa41b08b879b72827f51e41e6523b9cd0"
 	PaymailAddress  = "address@paymail.com"
+	PubKey          = "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
 )
 
 func MarshallForTestHandler(object any) string {
