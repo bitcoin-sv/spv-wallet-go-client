@@ -3,9 +3,9 @@
 # SPV Wallet: Go Client
 
 [![Release](https://img.shields.io/github/release-pre/bitcoin-sv/spv-wallet-go-client.svg?logo=github&style=flat&v=2)](https://github.com/bitcoin-sv/spv-wallet-go-client/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet-go-client/run-tests.yml?branch=master&v=2)](https://github.com/bitcoin-sv/spv-wallet-go-client/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet-go-client/run-tests.yml?branch=main&v=2)](https://github.com/bitcoin-sv/spv-wallet-go-client/actions)
 [![Report](https://goreportcard.com/badge/github.com/bitcoin-sv/spv-wallet-go-client?style=flat&v=2)](https://goreportcard.com/report/github.com/bitcoin-sv/spv-wallet-go-client)
-[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet-go-client/branch/master/graph/badge.svg?v=2)](https://codecov.io/gh/bitcoin-sv/spv-wallet-go-client)
+[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet-go-client/branch/main/graph/badge.svg?v=2)](https://codecov.io/gh/bitcoin-sv/spv-wallet-go-client)
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/bitcoin-sv/spv-wallet-go-client&style=flat&v=2)](https://mergify.io)
 <br>
 
