@@ -14,6 +14,7 @@
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=2)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=2)](Makefile)
 
+
 <br/>
 </div>
 
@@ -46,6 +47,8 @@ go get -u github.com/bitcoin-sv/spv-wallet-go-client
 
 ## Documentation
 View the generated [documentation](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet-go-client)
+
+For in-depth information and guidance, please refer to the [SPV Wallet Documentation](https://bsvblockchain.gitbook.io/docs).
 
 [![GoDoc](https://godoc.org/github.com/bitcoin-sv/spv-wallet-go-client?status.svg&style=flat&v=2)](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet-go-client)
 
