@@ -3,9 +3,9 @@
 # SPV Wallet: Go Client
 
 [![Release](https://img.shields.io/github/release-pre/bitcoin-sv/spv-wallet-go-client.svg?logo=github&style=flat&v=2)](https://github.com/bitcoin-sv/spv-wallet-go-client/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet-go-client/run-tests.yml?branch=master&v=2)](https://github.com/bitcoin-sv/spv-wallet-go-client/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet-go-client/run-tests.yml?branch=main&v=2)](https://github.com/bitcoin-sv/spv-wallet-go-client/actions)
 [![Report](https://goreportcard.com/badge/github.com/bitcoin-sv/spv-wallet-go-client?style=flat&v=2)](https://goreportcard.com/report/github.com/bitcoin-sv/spv-wallet-go-client)
-[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet-go-client/branch/master/graph/badge.svg?v=2)](https://codecov.io/gh/bitcoin-sv/spv-wallet-go-client)
+[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet-go-client/branch/main/graph/badge.svg?v=2)](https://codecov.io/gh/bitcoin-sv/spv-wallet-go-client)
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/bitcoin-sv/spv-wallet-go-client&style=flat&v=2)](https://mergify.io)
 <br>
 
@@ -13,6 +13,7 @@
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=2)](https://gitpod.io/#https://github.com/bitcoin-sv/spv-wallet-go-client)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=2)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=2)](Makefile)
+
 
 <br/>
 </div>
@@ -46,6 +47,8 @@ go get -u github.com/bitcoin-sv/spv-wallet-go-client
 
 ## Documentation
 View the generated [documentation](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet-go-client)
+
+For in-depth information and guidance, please refer to the [SPV Wallet Documentation](https://bsvblockchain.gitbook.io/docs).
 
 [![GoDoc](https://godoc.org/github.com/bitcoin-sv/spv-wallet-go-client?status.svg&style=flat&v=2)](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet-go-client)
 
