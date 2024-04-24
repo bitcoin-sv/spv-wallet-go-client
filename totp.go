@@ -30,7 +30,7 @@ Basic flow:
 Alice generates passcodeForBob with (sharedSecret+(contact.Paymail as bobPaymail))
 Alice sends passcodeForBob to Bob (e.g. via email)
 Bob validates passcodeForBob with (sharedSecret+(requesterPaymail as bobPaymail))
-The (sharedSecret+paymail) is a "directedSecret". It prevents that passcodeForBob-from-Alice != passcodeForAlice-from-Bob.
+The (sharedSecret+paymail) is a "directedSecret". This ensures that passcodeForBob-from-Alice != passcodeForAlice-from-Bob.
 The flow looks the same for Bob generating passcodeForAlice.
 */
 
