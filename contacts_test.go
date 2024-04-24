@@ -2,10 +2,10 @@ package walletclient
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -57,17 +57,6 @@ func TestContactActionsRouting(t *testing.T) {
 				return err
 			},
 		},
-		{
-			name:            "ConfirmContact",
-			route:           "/contact/confirmed/",
-			responsePayload: "{}",
-			f: func(c *WalletClient) error {
-				contact := models.Contact{PubKey: fixtures.PubKey}
-
-				passcode, _ := c.GenerateTotpForContact(&contact, 30, 2)
-				return c.ConfirmContact(context.Background(), &contact, passcode, 30, 2)
-			},
-		},
 	}
 
 	for _, tc := range tcs {
@@ -104,14 +93,18 @@ func TestConfirmContact(t *testing.T) {
 			Client:    WithHTTPClient,
 		}
 
-		client := getTestWalletClientWithOpts(tmq, WithXPriv(fixtures.XPrivString))
+		clientMaker := func(opts ...ClientOps) (*WalletClient, error) {
+			return getTestWalletClientWithOpts(tmq, opts...), nil
+		}
 
-		contact := &models.Contact{PubKey: fixtures.PubKey}
-		totp, err := client.GenerateTotpForContact(contact, 30, 2)
+		alice := makeMockUser("alice", clientMaker)
+		bob := makeMockUser("bob", clientMaker)
+
+		totp, err := alice.client.GenerateTotpForContact(bob.contact, 30, 2)
 		require.NoError(t, err)
 
 		// when
-		result := client.ConfirmContact(context.Background(), contact, totp, 30, 2)
+		result := bob.client.ConfirmContact(context.Background(), alice.contact, totp, bob.paymail, 30, 2)
 
 		// then
 		require.Nil(t, result)
@@ -127,19 +120,40 @@ func TestConfirmContact(t *testing.T) {
 			Client:    WithHTTPClient,
 		}
 
-		client := getTestWalletClientWithOpts(tmq, WithXPriv(fixtures.XPrivString))
+		clientMaker := func(opts ...ClientOps) (*WalletClient, error) {
+			return getTestWalletClientWithOpts(tmq, opts...), nil
+		}
 
-		alice := &models.Contact{PubKey: "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"}
-		a_totp, err := client.GenerateTotpForContact(alice, 30, 2)
+		alice := makeMockUser("alice", clientMaker)
+		bob := makeMockUser("bob", clientMaker)
+
+		totp, err := alice.client.GenerateTotpForContact(bob.contact, 30, 2)
 		require.NoError(t, err)
 
-		bob := &models.Contact{PubKey: "02dde493752f7bc89822ed8a13e0e4aa04550c6c4430800e4be1e5e5c2556cf65b"}
+		//make sure the wrongTotp is not the same as the generated one
+		wrongTotp := incrementDigits(totp) //the length should remain the same
 
 		// when
-		result := client.ConfirmContact(context.Background(), bob, a_totp, 30, 2)
+		result := bob.client.ConfirmContact(context.Background(), alice.contact, wrongTotp, bob.paymail, 30, 2)
 
 		// then
 		require.NotNil(t, result)
 		require.Equal(t, result.Error(), "totp is invalid")
 	})
+}
+
+// incrementDigits takes a string of digits and increments each digit by 1.
+// Digits wrap around such that '9' becomes '0'.
+func incrementDigits(input string) string {
+	var result strings.Builder
+
+	for _, c := range input {
+		if c == '9' {
+			result.WriteRune('0')
+		} else {
+			result.WriteRune(c + 1)
+		}
+	}
+
+	return result.String()
 }

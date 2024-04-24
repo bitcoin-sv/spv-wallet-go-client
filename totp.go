@@ -19,42 +19,51 @@ import (
 var ErrClientInitNoXpriv = errors.New("init client with xPriv first")
 
 const (
-	// Default number of seconds a TOTP is valid for.
+	// TotpDefaultPeriod - Default number of seconds a TOTP is valid for.
 	TotpDefaultPeriod uint = 30
-	// Default TOTP length
+	// TotpDefaultDigits - Default TOTP length
 	TotpDefaultDigits uint = 2
 )
 
+/*
+Basic flow:
+Alice generates passcodeForBob with (sharedSecret+(contact.Paymail as bobPaymail))
+Alice sends passcodeForBob to Bob (e.g. via email)
+Bob validates passcodeForBob with (sharedSecret+(requesterPaymail as bobPaymail))
+The (sharedSecret+paymail) is a "directedSecret". It prevents that passcodeForBob-from-Alice != passcodeForAlice-from-Bob.
+The flow looks the same for Bob generating passcodeForAlice.
+*/
+
 // GenerateTotpForContact creates one time-based one-time password based on secret shared between the user and the contact
 func (b *WalletClient) GenerateTotpForContact(contact *models.Contact, period, digits uint) (string, error) {
-	secret, err := sharedSecret(b, contact)
+	sharedSecret, err := makeSharedSecret(b, contact)
 	if err != nil {
 		return "", err
 	}
 
 	opts := getTotpOpts(period, digits)
-	return totp.GenerateCodeCustom(string(secret), time.Now(), *opts)
+	return totp.GenerateCodeCustom(directedSecret(sharedSecret, contact.Paymail), time.Now(), *opts)
 }
 
 // ValidateTotpForContact validates one time-based one-time password based on secret shared between the user and the contact
-func (b *WalletClient) ValidateTotpForContact(contact *models.Contact, passcode string, period, digits uint) (bool, error) {
-	secret, err := sharedSecret(b, contact)
+func (b *WalletClient) ValidateTotpForContact(contact *models.Contact, passcode, requesterPaymail string, period, digits uint) (bool, error) {
+	sharedSecret, err := makeSharedSecret(b, contact)
 	if err != nil {
 		return false, err
 	}
 
 	opts := getTotpOpts(period, digits)
-	return totp.ValidateCustom(passcode, string(secret), time.Now(), *opts)
+	return totp.ValidateCustom(passcode, directedSecret(sharedSecret, requesterPaymail), time.Now(), *opts)
 }
 
-func sharedSecret(b *WalletClient, c *models.Contact) (string, error) {
+func makeSharedSecret(b *WalletClient, c *models.Contact) ([]byte, error) {
 	privKey, pubKey, err := getSharedSecretFactors(b, c)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	x, _ := bec.S256().ScalarMult(pubKey.X, pubKey.Y, privKey.D.Bytes())
-	return base32.StdEncoding.EncodeToString(x.Bytes()), nil
+	return x.Bytes(), nil
 }
 
 func getTotpOpts(period, digits uint) *totp.ValidateOpts {
@@ -114,4 +123,9 @@ func convertPubKey(pubKey string) (*bec.PublicKey, error) {
 	}
 
 	return bec.ParsePubKey(hex, bec.S256())
+}
+
+// directedSecret appends a paymail to the secret and encodes it into base32 string
+func directedSecret(sharedSecret []byte, paymail string) string {
+	return base32.StdEncoding.EncodeToString(append(sharedSecret, []byte(paymail)...))
 }
