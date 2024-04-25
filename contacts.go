@@ -30,8 +30,8 @@ func (b *WalletClient) RejectContact(ctx context.Context, paymail string) transp
 }
 
 // ConfirmContact will try to confirm the contact
-func (b *WalletClient) ConfirmContact(ctx context.Context, contact *models.Contact, passcode string, period, digits uint) transports.ResponseError {
-	isTotpValid, err := b.ValidateTotpForContact(contact, passcode, period, digits)
+func (b *WalletClient) ConfirmContact(ctx context.Context, contact *models.Contact, passcode, requesterPaymail string, period, digits uint) transports.ResponseError {
+	isTotpValid, err := b.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits)
 	if err != nil {
 		return transports.WrapError(fmt.Errorf("totp validation failed: %w", err))
 	}
