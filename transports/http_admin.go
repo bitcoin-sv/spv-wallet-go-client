@@ -3,6 +3,7 @@ package transports
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -315,4 +316,50 @@ func (h *TransportHTTP) AdminGetSharedConfig(ctx context.Context) (*models.Share
 	}
 
 	return model, nil
+}
+
+func (h *TransportHTTP) AdminGetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Contact, ResponseError) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldConditions:  conditions,
+		FieldMetadata:    processMetadata(metadata),
+		FieldQueryParams: queryParams,
+	})
+	if err != nil {
+		return nil, WrapError(err)
+	}
+
+	var contacts []*models.Contact
+	err = h.doHTTPRequest(ctx, http.MethodPost, "admin/contact/search", jsonStr, h.adminXPriv, h.IsSignRequest(), contacts)
+	return contacts, WrapError(err)
+}
+
+func (h *TransportHTTP) AdminUpdateContact(ctx context.Context, id, fullName string, metadata *models.Metadata) (*models.Contact, ResponseError) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		"fullName":    fullName,
+		FieldMetadata: processMetadata(metadata),
+	})
+	if err != nil {
+		return nil, WrapError(err)
+	}
+	var contact *models.Contact
+	err = h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("admin/contact/%s", id), jsonStr, h.adminXPriv, h.IsSignRequest(), contact)
+	return contact, WrapError(err)
+}
+
+func (h *TransportHTTP) AdminDeleteContact(ctx context.Context, id string) ResponseError {
+	var contact *models.Contact
+	err := h.doHTTPRequest(ctx, http.MethodDelete, "", nil, h.adminXPriv, h.IsSignRequest(), contact)
+	return WrapError(err)
+}
+
+func (h *TransportHTTP) AdminAcceptContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
+	var contact *models.Contact
+	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("admin/contact/accepted/%s", id), nil, h.adminXPriv, h.IsSignRequest(), contact)
+	return contact, WrapError(err)
+}
+
+func (h *TransportHTTP) AdminRejectContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
+	var contact *models.Contact
+	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("admin/contact/rejected/%s", id), nil, h.adminXPriv, h.IsSignRequest(), contact)
+	return contact, WrapError(err)
 }
