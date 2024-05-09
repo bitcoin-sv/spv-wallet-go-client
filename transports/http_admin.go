@@ -329,7 +329,7 @@ func (h *TransportHTTP) AdminGetContacts(ctx context.Context, conditions map[str
 	}
 
 	var contacts []*models.Contact
-	err = h.doHTTPRequest(ctx, http.MethodPost, "admin/contact/search", jsonStr, h.adminXPriv, h.IsSignRequest(), contacts)
+	err = h.doHTTPRequest(ctx, http.MethodPost, "/admin/contact/search", jsonStr, h.adminXPriv, true, &contacts)
 	return contacts, WrapError(err)
 }
 
@@ -342,24 +342,23 @@ func (h *TransportHTTP) AdminUpdateContact(ctx context.Context, id, fullName str
 		return nil, WrapError(err)
 	}
 	var contact *models.Contact
-	err = h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("admin/contact/%s", id), jsonStr, h.adminXPriv, h.IsSignRequest(), contact)
+	err = h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/%s", id), jsonStr, h.adminXPriv, true, &contact)
 	return contact, WrapError(err)
 }
 
 func (h *TransportHTTP) AdminDeleteContact(ctx context.Context, id string) ResponseError {
-	var contact *models.Contact
-	err := h.doHTTPRequest(ctx, http.MethodDelete, "", nil, h.adminXPriv, h.IsSignRequest(), contact)
+	err := h.doHTTPRequest(ctx, http.MethodDelete, fmt.Sprintf("/admin/contact/%s", id), nil, h.adminXPriv, true, nil)
 	return WrapError(err)
 }
 
 func (h *TransportHTTP) AdminAcceptContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
 	var contact *models.Contact
-	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("admin/contact/accepted/%s", id), nil, h.adminXPriv, h.IsSignRequest(), contact)
+	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/accepted/%s", id), nil, h.adminXPriv, true, &contact)
 	return contact, WrapError(err)
 }
 
 func (h *TransportHTTP) AdminRejectContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
 	var contact *models.Contact
-	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("admin/contact/rejected/%s", id), nil, h.adminXPriv, h.IsSignRequest(), contact)
+	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/rejected/%s", id), nil, h.adminXPriv, true, &contact)
 	return contact, WrapError(err)
 }

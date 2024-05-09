@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 	"github.com/bitcoin-sv/spv-wallet/models"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 )
 
 // UpsertContact add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
