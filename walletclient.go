@@ -1,19 +1,16 @@
-// Package walletclient is a Go client for interacting with Spv Wallet.
 package walletclient
 
 import (
-	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/libsv/go-bk/wif"
 	"github.com/pkg/errors"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 )
 
-// ClientOps are used for client options
-type ClientOps func(c *WalletClient)
-
-// WalletClient is the spv wallet go client representation.
+// WalletClient is the spv wallet Go client representation.
 type WalletClient struct {
 	transports.TransportService
 	accessKey        *bec.PrivateKey
@@ -26,61 +23,21 @@ type WalletClient struct {
 	xPubString       string
 }
 
-// New create a new wallet client
-func New(opts ...ClientOps) (*WalletClient, error) {
+// New creates a new WalletClient using the provided configuration options.
+func New(configurators ...WalletClientConfigurator) (*WalletClient, error) {
 	client := &WalletClient{}
 
-	for _, opt := range opts {
-		opt(client)
+	for _, configurator := range configurators {
+		configurator.Configure(client)
 	}
 
-	var err error
-	if client.xPrivString != "" {
-		if client.xPriv, err = bitcoin.GenerateHDKeyFromString(client.xPrivString); err != nil {
-			return nil, err
-		}
-		if client.xPub, err = client.xPriv.Neuter(); err != nil {
-			return nil, err
-		}
-	} else if client.xPubString != "" {
-		client.xPriv = nil
-		if client.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(client.xPubString); err != nil {
-			return nil, err
-		}
-	} else if client.accessKeyString != "" {
-		client.xPriv = nil
-		client.xPub = nil
-
-		var privateKey *bec.PrivateKey
-		var decodedWIF *wif.WIF
-		if decodedWIF, err = wif.DecodeWIF(client.accessKeyString); err != nil {
-			// try as a hex string
-			var errHex error
-			if privateKey, errHex = bitcoin.PrivateKeyFromString(client.accessKeyString); errHex != nil {
-				return nil, errors.Wrap(err, errHex.Error())
-			}
-		} else {
-			privateKey = decodedWIF.PrivKey
-		}
-		client.accessKey = privateKey
-	} else {
-		return nil, errors.New("no keys available")
+	// Initialize keys based on provided strings
+	if err := client.initializeKeys(); err != nil {
+		return nil, err
 	}
 
-	transportOptions := make([]transports.ClientOps, 0)
-	if client.xPriv != nil {
-		transportOptions = append(transportOptions, transports.WithXPriv(client.xPriv))
-		transportOptions = append(transportOptions, transports.WithXPub(client.xPub))
-	} else if client.xPub != nil {
-		transportOptions = append(transportOptions, transports.WithXPub(client.xPub))
-	} else if client.accessKey != nil {
-		transportOptions = append(transportOptions, transports.WithAccessKey(client.accessKey))
-	}
-	if len(client.transportOptions) > 0 {
-		transportOptions = append(transportOptions, client.transportOptions...)
-	}
-
-	if client.transport, err = transports.NewTransport(transportOptions...); err != nil {
+	// Setup transport based on initialized keys
+	if err := client.setupTransport(); err != nil {
 		return nil, err
 	}
 
@@ -89,29 +46,68 @@ func New(opts ...ClientOps) (*WalletClient, error) {
 	return client, nil
 }
 
-// SetAdminKey set the admin key to use to create new xpubs
-func (b *WalletClient) SetAdminKey(adminKeyString string) error {
-	adminKey, err := bip32.NewKeyFromString(adminKeyString)
-	if err != nil {
-		return err
+// initializeKeys handles the initialization of keys based on the existing fields.
+func (c *WalletClient) initializeKeys() error {
+	var err error
+	switch {
+	case c.xPrivString != "":
+		if c.xPriv, err = bitcoin.GenerateHDKeyFromString(c.xPrivString); err != nil {
+			return err
+		}
+		if c.xPub, err = c.xPriv.Neuter(); err != nil {
+			return err
+		}
+	case c.xPubString != "":
+		if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(c.xPubString); err != nil {
+			return err
+		}
+	case c.accessKeyString != "":
+		return c.initializeAccessKey()
+	default:
+		return errors.New("no keys provided for initialization")
 	}
-
-	b.transport.SetAdminKey(adminKey)
-
 	return nil
 }
 
-// SetSignRequest turn the signing of the http request on or off
-func (b *WalletClient) SetSignRequest(signRequest bool) {
-	b.transport.SetSignRequest(signRequest)
+// initializeAccessKey handles the specific initialization of the access key.
+func (c *WalletClient) initializeAccessKey() error {
+	var err error
+	var privateKey *bec.PrivateKey
+	var decodedWIF *wif.WIF
+
+	if decodedWIF, err = wif.DecodeWIF(c.accessKeyString); err != nil {
+		if privateKey, err = bitcoin.PrivateKeyFromString(c.accessKeyString); err != nil {
+			return errors.Wrap(err, "failed to decode access key")
+		}
+	} else {
+		privateKey = decodedWIF.PrivKey
+	}
+
+	c.accessKey = privateKey
+	return nil
 }
 
-// IsSignRequest return whether to sign all requests
-func (b *WalletClient) IsSignRequest() bool {
-	return b.transport.IsSignRequest()
-}
+// setupTransport configures the transport service based on the available keys.
+func (c *WalletClient) setupTransport() error {
+	var err error
+	transportOptions := make([]transports.ClientOps, 0)
 
-// GetTransport returns the current transport service
-func (b *WalletClient) GetTransport() *transports.TransportService {
-	return &b.transport
+	if c.xPriv != nil {
+		transportOptions = append(transportOptions, transports.WithXPriv(c.xPriv))
+		transportOptions = append(transportOptions, transports.WithXPub(c.xPub))
+	} else if c.xPub != nil {
+		transportOptions = append(transportOptions, transports.WithXPub(c.xPub))
+	} else if c.accessKey != nil {
+		transportOptions = append(transportOptions, transports.WithAccessKey(c.accessKey))
+	}
+
+	if len(c.transportOptions) > 0 {
+		transportOptions = append(transportOptions, c.transportOptions...)
+	}
+
+	if c.transport, err = transports.NewTransport(transportOptions...); err != nil {
+		return err
+	}
+
+	return nil
 }
