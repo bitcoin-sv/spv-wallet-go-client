@@ -3,6 +3,7 @@ package transports
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -315,4 +316,54 @@ func (h *TransportHTTP) AdminGetSharedConfig(ctx context.Context) (*models.Share
 	}
 
 	return model, nil
+}
+
+// AdminGetContacts executes an HTTP POST request to search for contacts based on specified conditions, metadata, and query parameters.
+func (h *TransportHTTP) AdminGetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Contact, ResponseError) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		FieldConditions:  conditions,
+		FieldMetadata:    processMetadata(metadata),
+		FieldQueryParams: queryParams,
+	})
+	if err != nil {
+		return nil, WrapError(err)
+	}
+
+	var contacts []*models.Contact
+	err = h.doHTTPRequest(ctx, http.MethodPost, "/admin/contact/search", jsonStr, h.adminXPriv, true, &contacts)
+	return contacts, WrapError(err)
+}
+
+// AdminUpdateContact executes an HTTP PATCH request to update a specific contact's full name using their ID.
+func (h *TransportHTTP) AdminUpdateContact(ctx context.Context, id, fullName string, metadata *models.Metadata) (*models.Contact, ResponseError) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		"fullName":    fullName,
+		FieldMetadata: processMetadata(metadata),
+	})
+	if err != nil {
+		return nil, WrapError(err)
+	}
+	var contact models.Contact
+	err = h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/%s", id), jsonStr, h.adminXPriv, true, &contact)
+	return &contact, WrapError(err)
+}
+
+// AdminDeleteContact executes an HTTP DELETE request to remove a contact using their ID.
+func (h *TransportHTTP) AdminDeleteContact(ctx context.Context, id string) ResponseError {
+	err := h.doHTTPRequest(ctx, http.MethodDelete, fmt.Sprintf("/admin/contact/%s", id), nil, h.adminXPriv, true, nil)
+	return WrapError(err)
+}
+
+// AdminAcceptContact executes an HTTP PATCH request to mark a contact as accepted using their ID.
+func (h *TransportHTTP) AdminAcceptContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
+	var contact models.Contact
+	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/accepted/%s", id), nil, h.adminXPriv, true, &contact)
+	return &contact, WrapError(err)
+}
+
+// AdminRejectContact executes an HTTP PATCH request to mark a contact as rejected using their ID.
+func (h *TransportHTTP) AdminRejectContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
+	var contact models.Contact
+	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/rejected/%s", id), nil, h.adminXPriv, true, &contact)
+	return &contact, WrapError(err)
 }
