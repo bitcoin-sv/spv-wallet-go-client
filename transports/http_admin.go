@@ -343,9 +343,9 @@ func (h *TransportHTTP) AdminUpdateContact(ctx context.Context, id, fullName str
 	if err != nil {
 		return nil, WrapError(err)
 	}
-	var contact *models.Contact
+	var contact models.Contact
 	err = h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/%s", id), jsonStr, h.adminXPriv, true, &contact)
-	return contact, WrapError(err)
+	return &contact, WrapError(err)
 }
 
 // AdminDeleteContact executes an HTTP DELETE request to remove a contact using their ID.
@@ -356,14 +356,14 @@ func (h *TransportHTTP) AdminDeleteContact(ctx context.Context, id string) Respo
 
 // AdminAcceptContact executes an HTTP PATCH request to mark a contact as accepted using their ID.
 func (h *TransportHTTP) AdminAcceptContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
-	var contact *models.Contact
+	var contact models.Contact
 	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/accepted/%s", id), nil, h.adminXPriv, true, &contact)
-	return contact, WrapError(err)
+	return &contact, WrapError(err)
 }
 
 // AdminRejectContact executes an HTTP PATCH request to mark a contact as rejected using their ID.
 func (h *TransportHTTP) AdminRejectContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
-	var contact *models.Contact
+	var contact models.Contact
 	err := h.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/rejected/%s", id), nil, h.adminXPriv, true, &contact)
-	return contact, WrapError(err)
+	return &contact, WrapError(err)
 }
