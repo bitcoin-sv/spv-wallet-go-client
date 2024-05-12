@@ -16,7 +16,6 @@ import (
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 )
 
@@ -693,7 +692,7 @@ func (wc *WalletClient) UpsertContact(ctx context.Context, paymail, fullName str
 	return wc.UpsertContactForPaymail(ctx, paymail, fullName, metadata, "")
 }
 
-func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fullName string, metadata *models.Metadata, requesterPaymail string) (*models.Contact, transports.ResponseError) {
+func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fullName string, metadata *models.Metadata, requesterPaymail string) (*models.Contact, ResponseError) {
 	payload := map[string]interface{}{
 		"fullName":    fullName,
 		FieldMetadata: processMetadata(metadata),
