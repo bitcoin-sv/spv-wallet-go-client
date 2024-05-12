@@ -1,26 +1,28 @@
 package walletclient
 
 import (
+	"net/http"
+
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/libsv/go-bk/wif"
 	"github.com/pkg/errors"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 )
 
 // WalletClient is the spv wallet Go client representation.
 type WalletClient struct {
-	transports.TransportService
-	accessKey        *bec.PrivateKey
-	accessKeyString  string
-	transport        transports.TransportService
-	transportOptions []transports.ClientOps
-	xPriv            *bip32.ExtendedKey
-	xPrivString      string
-	xPub             *bip32.ExtendedKey
-	xPubString       string
+	accessKeyString string
+	xPrivString     string
+	xPubString      string
+	accessKey       *bec.PrivateKey
+	adminXPriv      *bip32.ExtendedKey
+	httpClient      *http.Client
+	server          string
+	signRequest     bool
+	xPriv           *bip32.ExtendedKey
+	xPub            *bip32.ExtendedKey
 }
 
 // New creates a new WalletClient using the provided configuration options.
@@ -35,13 +37,6 @@ func New(configurators ...WalletClientConfigurator) (*WalletClient, error) {
 	if err := client.initializeKeys(); err != nil {
 		return nil, err
 	}
-
-	// Setup transport based on initialized keys
-	if err := client.setupTransport(); err != nil {
-		return nil, err
-	}
-
-	client.TransportService = client.transport
 
 	return client, nil
 }
@@ -87,27 +82,17 @@ func (c *WalletClient) initializeAccessKey() error {
 	return nil
 }
 
-// setupTransport configures the transport service based on the available keys.
-func (c *WalletClient) setupTransport() error {
-	var err error
-	transportOptions := make([]transports.ClientOps, 0)
-
-	if c.xPriv != nil {
-		transportOptions = append(transportOptions, transports.WithXPriv(c.xPriv))
-		transportOptions = append(transportOptions, transports.WithXPub(c.xPub))
-	} else if c.xPub != nil {
-		transportOptions = append(transportOptions, transports.WithXPub(c.xPub))
-	} else if c.accessKey != nil {
-		transportOptions = append(transportOptions, transports.WithAccessKey(c.accessKey))
+// processMetadata will process the metadata
+func processMetadata(metadata *models.Metadata) *models.Metadata {
+	if metadata == nil {
+		m := make(models.Metadata)
+		metadata = &m
 	}
 
-	if len(c.transportOptions) > 0 {
-		transportOptions = append(transportOptions, c.transportOptions...)
-	}
+	return metadata
+}
 
-	if c.transport, err = transports.NewTransport(transportOptions...); err != nil {
-		return err
-	}
-
-	return nil
+// addSignature will add the signature to the request
+func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
+	return setSignature(header, xPriv, bodyString)
 }
