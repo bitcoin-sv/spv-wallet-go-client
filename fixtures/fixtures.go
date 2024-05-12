@@ -7,7 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/common"
 )
 
-const (
+var (
 	RequestType     = "http"
 	ServerURL       = "https://example.com/"
 	XPubString      = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"

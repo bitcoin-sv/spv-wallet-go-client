@@ -1,8 +1,9 @@
 package walletclient
 
 import (
-	"fmt"
 	"net/http"
+
+	"github.com/bitcoinschema/go-bitcoin/v2"
 )
 
 // WalletClientConfigurator is the interface for configuring WalletClient
@@ -12,17 +13,16 @@ type WalletClientConfigurator interface {
 
 // WithXPriv sets the xPrivString field of a WalletClient
 type WithXPriv struct {
-	XPrivString string
+	XPrivString *string
 }
 
 func (w *WithXPriv) Configure(c *WalletClient) {
-	fmt.Printf("withXpriv configure: %#v\n", w)
 	c.xPrivString = w.XPrivString
 }
 
 // WithXPub sets the xPubString on the client
 type WithXPub struct {
-	XPubString string
+	XPubString *string
 }
 
 func (w *WithXPub) Configure(c *WalletClient) {
@@ -31,7 +31,7 @@ func (w *WithXPub) Configure(c *WalletClient) {
 
 // WithAccessKey sets the accessKeyString on the client
 type WithAccessKey struct {
-	AccessKeyString string
+	AccessKeyString *string
 }
 
 func (w *WithAccessKey) Configure(c *WalletClient) {
@@ -40,29 +40,36 @@ func (w *WithAccessKey) Configure(c *WalletClient) {
 
 // WithAdminKey sets the admin key for creating new xpubs
 type WithAdminKey struct {
-	AdminKeyString string
+	AdminKeyString *string
 }
 
 func (w *WithAdminKey) Configure(c *WalletClient) {
-	fmt.Printf("withAdminKey configure: %#v\n", w)
-	fmt.Printf("withAdminKey configure adminxpriv: %v  \n", w.AdminKeyString)
-	c.adminXPriv = w.AdminKeyString
+	var err error
+	c.adminXPriv, err = bitcoin.GenerateHDKeyFromString(*w.AdminKeyString)
+	if err != nil {
+		c.adminXPriv = nil
+	}
 }
 
 // WithHTTP sets the URL and HTTP client of a WalletClient
 type WithHTTP struct {
-	ServerURL  string
+	ServerURL  *string
 	HTTPClient *http.Client
 }
 
 func (w *WithHTTP) Configure(c *WalletClient) {
 	c.server = w.ServerURL
 	c.httpClient = w.HTTPClient
+	if w.HTTPClient != nil {
+		c.httpClient = w.HTTPClient
+	} else {
+		c.httpClient = http.DefaultClient
+	}
 }
 
 // WithSignRequest configures whether to sign HTTP requests
 type WithSignRequest struct {
-	Sign bool
+	Sign *bool
 }
 
 func (w *WithSignRequest) Configure(c *WalletClient) {

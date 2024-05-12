@@ -5,7 +5,7 @@ package walletclient
 // 	return b.transport.UpsertContact(ctx, paymail, fullName, metadata, "")
 // }
 
-// // UpsertContactForPaymail add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user specified paymail in their contacts.
+// UpsertContactForPaymail add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user specified paymail in their contacts.
 // func (b *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fullName string, metadata *models.Metadata, requesterPaymail string) (*models.Contact, transports.ResponseError) {
 // 	return b.transport.UpsertContact(ctx, paymail, fullName, metadata, requesterPaymail)
 // }

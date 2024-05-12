@@ -31,12 +31,7 @@ func main() {
 func setupAdminClient() (*walletclient.WalletClient, error) {
 
 	// Set up a client with administrative privileges
-	return walletclient.New(
-		&walletclient.WithXPriv{XPrivString: adminKey},
-		&walletclient.WithAdminKey{AdminKeyString: adminKey},
-		&walletclient.WithHTTP{ServerURL: serverURL},
-		&walletclient.WithSignRequest{Sign: true},
-	)
+	return walletclient.NewWalletClientWithAdminKey(adminKey, serverURL, true)
 }
 
 func handleUsers(ctx context.Context, clientAdmin *walletclient.WalletClient) {
@@ -155,11 +150,7 @@ func createUser(ctx context.Context, name string, adminClient *walletclient.Wall
 		return nil, "", fmt.Errorf("failed to create paymail: %v", err)
 	}
 
-	userClient, err := walletclient.New(
-		&walletclient.WithXPriv{XPrivString: keys.XPriv()},
-		&walletclient.WithHTTP{ServerURL: serverURL},
-		&walletclient.WithSignRequest{Sign: true},
-	)
+	userClient, err := walletclient.NewWalletClientWithXPrivate(keys.XPriv(), serverURL, true)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to create user client: %v", err)
 	}

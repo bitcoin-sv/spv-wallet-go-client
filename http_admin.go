@@ -12,11 +12,9 @@ import (
 // AdminNewXpub will register an xPub
 func (wc *WalletClient) AdminNewXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError {
 	// Adding a xpub needs to be signed by an admin key
-	fmt.Printf("here1 %+v\n\n", wc)
 	if wc.adminXPriv == nil {
 		return WrapError(ErrAdminKey)
 	}
-	fmt.Println("here")
 
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldMetadata: processMetadata(metadata),
@@ -300,7 +298,7 @@ func (wc *WalletClient) AdminRecordTransaction(ctx context.Context, hex string) 
 
 	var transaction models.Transaction
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/admin/transactions/record", jsonStr, wc.xPriv, wc.signRequest, &transaction,
+		ctx, http.MethodPost, "/admin/transactions/record", jsonStr, wc.xPriv, *wc.signRequest, &transaction,
 	); err != nil {
 		return nil, err
 	}

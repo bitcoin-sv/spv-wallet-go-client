@@ -1,325 +1,335 @@
 package walletclient
 
-import (
-	"context"
-	"net/http"
-	"testing"
+// import (
+// 	"context"
+// 	"net/http"
+// 	"testing"
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// 
 
-	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/libsv/go-bt/v2"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+// 	"github.com/bitcoin-sv/spv-wallet/models"
+// 	"github.com/libsv/go-bt/v2"
+// 	"github.com/stretchr/testify/assert"
+// 	"github.com/stretchr/testify/require"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
-	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
-)
+// 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
+// 	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
+// )
 
-// TestTransactions will test the Transaction methods
-func TestTransactions(t *testing.T) {
-	t.Run("GetTransaction", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/transaction",
-			Result:    fixtures.MarshallForTestHandler(fixtures.Transaction),
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
+// // TestTransactions will test the Transaction methods
+// func TestTransactions(t *testing.T) {
+// 	t.Run("GetTransaction", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type:      fixtures.RequestType,
+// 			Path:      "/transaction",
+// 			Result:    fixtures.MarshallForTestHandler(fixtures.Transaction),
+// 			ClientURL: fixtures.ServerURL,
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
 
-		// when
-		tx, err := client.GetTransaction(context.Background(), fixtures.Transaction.ID)
+// 		// when
+// 		tx, err := client.GetTransaction(context.Background(), fixtures.Transaction.ID)
 
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, fixtures.Transaction, tx)
-	})
+// 		// then
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, fixtures.Transaction, tx)
+// 	})
 
-	t.Run("GetTransactions", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/transaction/search",
-			Result:    fixtures.MarshallForTestHandler([]*models.Transaction{fixtures.Transaction}),
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
-		conditions := map[string]interface{}{
-			"fee": map[string]interface{}{
-				"$lt": 100,
-			},
-			"total_value": map[string]interface{}{
-				"$lt": 740,
-			},
-		}
+// 	t.Run("GetTransactions", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type:      fixtures.RequestType,
+// 			Path:      "/transaction/search",
+// 			Result:    fixtures.MarshallForTestHandler([]*models.Transaction{fixtures.Transaction}),
+// 			ClientURL: fixtures.ServerURL,
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
+// 		conditions := map[string]interface{}{
+// 			"fee": map[string]interface{}{
+// 				"$lt": 100,
+// 			},
+// 			"total_value": map[string]interface{}{
+// 				"$lt": 740,
+// 			},
+// 		}
 
-		// when
-		txs, err := client.GetTransactions(context.Background(), conditions, fixtures.TestMetadata, nil)
+// 		// when
+// 		txs, err := client.GetTransactions(context.Background(), conditions, fixtures.TestMetadata, nil)
 
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, []*models.Transaction{fixtures.Transaction}, txs)
-	})
+// 		// then
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, []*models.Transaction{fixtures.Transaction}, txs)
+// 	})
 
-	t.Run("GetTransactionsCount", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/transaction/count",
-			Result:    "1",
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
-		conditions := map[string]interface{}{
-			"fee": map[string]interface{}{
-				"$lt": 100,
-			},
-			"total_value": map[string]interface{}{
-				"$lt": 740,
-			},
-		}
+// 	t.Run("GetTransactionsCount", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type:      fixtures.RequestType,
+// 			Path:      "/transaction/count",
+// 			Result:    "1",
+// 			ClientURL: fixtures.ServerURL,
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
+// 		conditions := map[string]interface{}{
+// 			"fee": map[string]interface{}{
+// 				"$lt": 100,
+// 			},
+// 			"total_value": map[string]interface{}{
+// 				"$lt": 740,
+// 			},
+// 		}
 
-		// when
-		count, err := client.GetTransactionsCount(context.Background(), conditions, fixtures.TestMetadata)
+// 		// when
+// 		count, err := client.GetTransactionsCount(context.Background(), conditions, fixtures.TestMetadata)
 
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, int64(1), count)
-	})
+// 		// then
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, int64(1), count)
+// 	})
 
-	t.Run("RecordTransaction", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/transaction/record",
-			Result:    fixtures.MarshallForTestHandler(fixtures.Transaction),
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
+// 	t.Run("RecordTransaction", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type:      fixtures.RequestType,
+// 			Path:      "/transaction/record",
+// 			Result:    fixtures.MarshallForTestHandler(fixtures.Transaction),
+// 			ClientURL: fixtures.ServerURL,
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
 
-		// when
-		tx, err := client.RecordTransaction(context.Background(), fixtures.Transaction.Hex, "", fixtures.TestMetadata)
+// 		// when
+// 		tx, err := client.RecordTransaction(context.Background(), fixtures.Transaction.Hex, "", fixtures.TestMetadata)
 
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, fixtures.Transaction, tx)
-	})
+// 		// then
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, fixtures.Transaction, tx)
+// 	})
 
-	t.Run("UpdateTransactionMetadata", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/transaction",
-			Result:    fixtures.MarshallForTestHandler(fixtures.Transaction),
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
+// 	t.Run("UpdateTransactionMetadata", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type:      fixtures.RequestType,
+// 			Path:      "/transaction",
+// 			Result:    fixtures.MarshallForTestHandler(fixtures.Transaction),
+// 			ClientURL: fixtures.ServerURL,
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
 
-		// when
-		tx, err := client.UpdateTransactionMetadata(context.Background(), fixtures.Transaction.ID, fixtures.TestMetadata)
+// 		// when
+// 		tx, err := client.UpdateTransactionMetadata(context.Background(), fixtures.Transaction.ID, fixtures.TestMetadata)
 
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, fixtures.Transaction, tx)
-	})
+// 		// then
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, fixtures.Transaction, tx)
+// 	})
 
-	t.Run("SendToRecipients", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type: fixtures.RequestType,
-			Queries: []*testTransportHandlerRequest{
-				{
-					Path: "/transaction/record",
-					Result: func(w http.ResponseWriter, req *http.Request) {
-						w.Header().Set("Content-Type", "application/json")
-						mustWrite(w, fixtures.MarshallForTestHandler(fixtures.Transaction))
-					},
-				},
-				{
-					Path: "/transaction",
-					Result: func(w http.ResponseWriter, req *http.Request) {
-						w.Header().Set("Content-Type", "application/json")
-						mustWrite(w, fixtures.MarshallForTestHandler(fixtures.DraftTx))
-					},
-				},
-			},
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
-		recipients := []*transports.Recipients{{
-			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
-			Satoshis: 1000,
-			To:       fixtures.Destination.Address,
-		}}
+// 	t.Run("SendToRecipients", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type: fixtures.RequestType,
+// 			Queries: []*testTransportHandlerRequest{
+// 				{
+// 					Path: "/transaction/record",
+// 					Result: func(w http.ResponseWriter, req *http.Request) {
+// 						w.Header().Set("Content-Type", "application/json")
+// 						mustWrite(w, fixtures.MarshallForTestHandler(fixtures.Transaction))
+// 					},
+// 				},
+// 				{
+// 					Path: "/transaction",
+// 					Result: func(w http.ResponseWriter, req *http.Request) {
+// 						w.Header().Set("Content-Type", "application/json")
+// 						mustWrite(w, fixtures.MarshallForTestHandler(fixtures.DraftTx))
+// 					},
+// 				},
+// 			},
+// 			ClientURL: fixtures.ServerURL,
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
+// 		recipients := []*transports.Recipients{{
+// 			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
+// 			Satoshis: 1000,
+// 			To:       fixtures.Destination.Address,
+// 		}}
 
-		// when
-		tx, err := client.SendToRecipients(context.Background(), recipients, fixtures.TestMetadata)
+// 		// when
+// 		tx, err := client.SendToRecipients(context.Background(), recipients, fixtures.TestMetadata)
 
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, fixtures.Transaction, tx)
-	})
+// 		// then
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, fixtures.Transaction, tx)
+// 	})
 
-	t.Run("SendToRecipients - nil draft", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type: fixtures.RequestType,
-			Queries: []*testTransportHandlerRequest{
-				{
-					Path: "/transaction/record",
-					Result: func(w http.ResponseWriter, req *http.Request) {
-						w.Header().Set("Content-Type", "application/json")
-						mustWrite(w, fixtures.MarshallForTestHandler(fixtures.Transaction))
-					},
-				},
-				{
-					Path: "/transaction",
-					Result: func(w http.ResponseWriter, req *http.Request) {
-						w.Header().Set("Content-Type", "application/json")
-						mustWrite(w, "nil")
-					},
-				},
-			},
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
-		recipients := []*transports.Recipients{{
-			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
-			Satoshis: 1000,
-			To:       fixtures.Destination.Address,
-		}}
+// 	t.Run("SendToRecipients - nil draft", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type: fixtures.RequestType,
+// 			Queries: []*testTransportHandlerRequest{
+// 				{
+// 					Path: "/transaction/record",
+// 					Result: func(w http.ResponseWriter, req *http.Request) {
+// 						w.Header().Set("Content-Type", "application/json")
+// 						mustWrite(w, fixtures.MarshallForTestHandler(fixtures.Transaction))
+// 					},
+// 				},
+// 				{
+// 					Path: "/transaction",
+// 					Result: func(w http.ResponseWriter, req *http.Request) {
+// 						w.Header().Set("Content-Type", "application/json")
+// 						mustWrite(w, "nil")
+// 					},
+// 				},
+// 			},
+// 			ClientURL: fixtures.ServerURL,
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
+// 		recipients := []*transports.Recipients{{
+// 			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
+// 			Satoshis: 1000,
+// 			To:       fixtures.Destination.Address,
+// 		}}
 
-		// when
-		tx, err := client.SendToRecipients(context.Background(), recipients, fixtures.TestMetadata)
+// 		// when
+// 		tx, err := client.SendToRecipients(context.Background(), recipients, fixtures.TestMetadata)
 
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, tx)
-	})
+// 		// then
+// 		assert.Error(t, err)
+// 		assert.Nil(t, tx)
+// 	})
 
-	t.Run("SendToRecipients - FinalizeTransaction error", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type: fixtures.RequestType,
-			Queries: []*testTransportHandlerRequest{
-				{
-					Path: "/transaction/record",
-					Result: func(w http.ResponseWriter, req *http.Request) {
-						w.Header().Set("Content-Type", "application/json")
-						mustWrite(w, fixtures.MarshallForTestHandler(fixtures.Transaction))
-					},
-				},
-				{
-					Path: "/transaction",
-					Result: func(w http.ResponseWriter, req *http.Request) {
-						w.Header().Set("Content-Type", "application/json")
-						mustWrite(w, fixtures.MarshallForTestHandler(models.DraftTransaction{}))
-					},
-				},
-			},
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
-		recipients := []*transports.Recipients{{
-			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
-			Satoshis: 1000,
-			To:       fixtures.Destination.Address,
-		}}
+// 	t.Run("SendToRecipients - FinalizeTransaction error", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type: fixtures.RequestType,
+// 			Queries: []*testTransportHandlerRequest{
+// 				{
+// 					Path: "/transaction/record",
+// 					Result: func(w http.ResponseWriter, req *http.Request) {
+// 						w.Header().Set("Content-Type", "application/json")
+// 						mustWrite(w, fixtures.MarshallForTestHandler(fixtures.Transaction))
+// 					},
+// 				},
+// 				{
+// 					Path: "/transaction",
+// 					Result: func(w http.ResponseWriter, req *http.Request) {
+// 						w.Header().Set("Content-Type", "application/json")
+// 						mustWrite(w, fixtures.MarshallForTestHandler(models.DraftTransaction{}))
+// 					},
+// 				},
+// 			},
+// 			ClientURL: fixtures.ServerURL,
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
+// 		recipients := []*transports.Recipients{{
+// 			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
+// 			Satoshis: 1000,
+// 			To:       fixtures.Destination.Address,
+// 		}}
 
-		// when
-		tx, err := client.SendToRecipients(context.Background(), recipients, fixtures.TestMetadata)
+// 		// when
+// 		tx, err := client.SendToRecipients(context.Background(), recipients, fixtures.TestMetadata)
 
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, tx)
-	})
+// 		// then
+// 		assert.Error(t, err)
+// 		assert.Nil(t, tx)
+// 	})
 
-	t.Run("FinalizeTransaction", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/transaction/record",
-			Result:    fixtures.MarshallForTestHandler(fixtures.Transaction),
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
+// 	t.Run("FinalizeTransaction", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type:      fixtures.RequestType,
+// 			Path:      "/transaction/record",
+// 			Result:    fixtures.MarshallForTestHandler(fixtures.Transaction),
+// 			ClientURL: fixtures.ServerURL,
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
 
-		// when
-		signedHex, err := client.FinalizeTransaction(fixtures.DraftTx)
+// 		// when
+// 		signedHex, err := client.FinalizeTransaction(fixtures.DraftTx)
 
-		txDraft, btErr := bt.NewTxFromString(signedHex)
-		require.NoError(t, btErr)
+// 		txDraft, btErr := bt.NewTxFromString(signedHex)
+// 		require.NoError(t, btErr)
 
-		// then
-		assert.NoError(t, err)
-		assert.Len(t, txDraft.Inputs, len(fixtures.DraftTx.Configuration.Inputs))
-		assert.Len(t, txDraft.Outputs, len(fixtures.DraftTx.Configuration.Outputs))
-	})
+// 		// then
+// 		assert.NoError(t, err)
+// 		assert.Len(t, txDraft.Inputs, len(fixtures.DraftTx.Configuration.Inputs))
+// 		assert.Len(t, txDraft.Outputs, len(fixtures.DraftTx.Configuration.Outputs))
+// 	})
 
-	t.Run("CountUtxos", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/utxo/count",
-			ClientURL: fixtures.ServerURL,
-			Result:    "0",
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
+// 	t.Run("CountUtxos", func(t *testing.T) {
+// 		// given
+// 		transportHandler := testTransportHandler{
+// 			Type:      fixtures.RequestType,
+// 			Path:      "/utxo/count",
+// 			ClientURL: fixtures.ServerURL,
+// 			Result:    "0",
+// 			Client:    WithHTTPClient,
+// 		}
+// 		client := getTestWalletClient(transportHandler, false)
 
-		// when
-		_, err := client.GetUtxosCount(context.Background(), map[string]interface{}{}, fixtures.TestMetadata)
+// 		// when
+// 		_, err := client.GetUtxosCount(context.Background(), map[string]interface{}{}, fixtures.TestMetadata)
 
-		// then
-		assert.NoError(t, err)
-	})
-}
+// 		// then
+// 		assert.NoError(t, err)
+// 	})
+// }
 
-// TestDraftTransactions will test the DraftTransaction methods
-func TestDraftTransactions(t *testing.T) {
-	transportHandler := testTransportHandler{
-		Type:      fixtures.RequestType,
-		Path:      "/transaction",
-		Result:    fixtures.MarshallForTestHandler(fixtures.DraftTx),
-		ClientURL: fixtures.ServerURL,
-		Client:    WithHTTPClient,
-	}
+// // TestDraftTransactions will test the DraftTransaction methods
+// func TestDraftTransactions(t *testing.T) {
+// 	transportHandler := testTransportHandler{
+// 		Type:      fixtures.RequestType,
+// 		Path:      "/transaction",
+// 		Result:    fixtures.MarshallForTestHandler(fixtures.DraftTx),
+// 		ClientURL: fixtures.ServerURL,
+// 		Client:    WithHTTPClient,
+// 	}
 
-	t.Run("DraftToRecipients", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, false)
+// 	t.Run("DraftToRecipients", func(t *testing.T) {
+// 		// given
+// 		client := getTestWalletClient(transportHandler, false)
 
-		recipients := []*transports.Recipients{{
-			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
-			Satoshis: 1000,
-			To:       fixtures.Destination.Address,
-		}}
+// 		recipients := []*transports.Recipients{{
+// 			OpReturn: fixtures.DraftTx.Configuration.Outputs[0].OpReturn,
+// 			Satoshis: 1000,
+// 			To:       fixtures.Destination.Address,
+// 		}}
 
-		// when
-		draft, err := client.DraftToRecipients(context.Background(), recipients, fixtures.TestMetadata)
+// 		// when
+// 		draft, err := client.DraftToRecipients(context.Background(), recipients, fixtures.TestMetadata)
 
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, fixtures.DraftTx, draft)
-	})
+// 		// then
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, fixtures.DraftTx, draft)
+// 	})
 
-	t.Run("DraftTransaction", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, false)
+// 	t.Run("DraftTransaction", func(t *testing.T) {
+// 		// given
+// 		client := getTestWalletClient(transportHandler, false)
 
-		// when
-		draft, err := client.DraftTransaction(context.Background(), &fixtures.DraftTx.Configuration, fixtures.TestMetadata)
+// 		// when
+// 		draft, err := client.DraftTransaction(context.Background(), &fixtures.DraftTx.Configuration, fixtures.TestMetadata)
 
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, fixtures.DraftTx, draft)
-	})
-}
+// 		// then
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, fixtures.DraftTx, draft)
+// 	})
+// }

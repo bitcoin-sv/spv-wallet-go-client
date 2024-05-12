@@ -13,20 +13,53 @@ import (
 
 // WalletClient is the spv wallet Go client representation.
 type WalletClient struct {
-	accessKeyString string
-	xPrivString     string
-	xPubString      string
+	accessKeyString *string
+	xPrivString     *string
+	xPubString      *string
 	accessKey       *bec.PrivateKey
 	adminXPriv      *bip32.ExtendedKey
 	httpClient      *http.Client
-	server          string
-	signRequest     bool
+	server          *string
+	signRequest     *bool
 	xPriv           *bip32.ExtendedKey
 	xPub            *bip32.ExtendedKey
 }
 
+func NewWalletClientWithXPrivate(xPriv, serverURL string, sign bool) (*WalletClient, error) {
+	return newWalletClient(
+		&WithXPriv{XPrivString: &xPriv},
+		&WithHTTP{ServerURL: &serverURL},
+		&WithSignRequest{Sign: &sign},
+	)
+}
+
+func NewWalletClientWithXPublic(xPub, serverURL string, sign bool) (*WalletClient, error) {
+	return newWalletClient(
+		&WithXPub{XPubString: &xPub},
+		&WithHTTP{ServerURL: &serverURL},
+		&WithSignRequest{Sign: &sign},
+	)
+}
+
+func NewWalletClientWithAdminKey(adminKey, serverURL string, sign bool) (*WalletClient, error) {
+	return newWalletClient(
+		&WithXPriv{XPrivString: &adminKey},
+		&WithAdminKey{AdminKeyString: &adminKey},
+		&WithHTTP{ServerURL: &serverURL},
+		&WithSignRequest{Sign: &sign},
+	)
+}
+
+func NewWalletClientWithAccessKey(accessKey, serverURL string, sign bool) (*WalletClient, error) {
+	return newWalletClient(
+		&WithAccessKey{AccessKeyString: &accessKey},
+		&WithHTTP{ServerURL: &serverURL},
+		&WithSignRequest{Sign: &sign},
+	)
+}
+
 // New creates a new WalletClient using the provided configuration options.
-func New(configurators ...WalletClientConfigurator) (*WalletClient, error) {
+func newWalletClient(configurators ...WalletClientConfigurator) (*WalletClient, error) {
 	client := &WalletClient{}
 
 	for _, configurator := range configurators {
@@ -45,18 +78,18 @@ func New(configurators ...WalletClientConfigurator) (*WalletClient, error) {
 func (c *WalletClient) initializeKeys() error {
 	var err error
 	switch {
-	case c.xPrivString != "":
-		if c.xPriv, err = bitcoin.GenerateHDKeyFromString(c.xPrivString); err != nil {
+	case c.xPrivString != nil:
+		if c.xPriv, err = bitcoin.GenerateHDKeyFromString(*c.xPrivString); err != nil {
 			return err
 		}
 		if c.xPub, err = c.xPriv.Neuter(); err != nil {
 			return err
 		}
-	case c.xPubString != "":
-		if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(c.xPubString); err != nil {
+	case c.xPubString != nil:
+		if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(*c.xPubString); err != nil {
 			return err
 		}
-	case c.accessKeyString != "":
+	case c.accessKeyString != nil:
 		return c.initializeAccessKey()
 	default:
 		return errors.New("no keys provided for initialization")
@@ -70,8 +103,8 @@ func (c *WalletClient) initializeAccessKey() error {
 	var privateKey *bec.PrivateKey
 	var decodedWIF *wif.WIF
 
-	if decodedWIF, err = wif.DecodeWIF(c.accessKeyString); err != nil {
-		if privateKey, err = bitcoin.PrivateKeyFromString(c.accessKeyString); err != nil {
+	if decodedWIF, err = wif.DecodeWIF(*c.accessKeyString); err != nil {
+		if privateKey, err = bitcoin.PrivateKeyFromString(*c.accessKeyString); err != nil {
 			return errors.Wrap(err, "failed to decode access key")
 		}
 	} else {
