@@ -1,30 +1,65 @@
 package walletclient
 
 import (
+	"net/http"
+
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/libsv/go-bk/wif"
 	"github.com/pkg/errors"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
 )
 
 // WalletClient is the spv wallet Go client representation.
 type WalletClient struct {
-	transports.TransportService
-	accessKey        *bec.PrivateKey
-	accessKeyString  string
-	transport        transports.TransportService
-	transportOptions []transports.ClientOps
-	xPriv            *bip32.ExtendedKey
-	xPrivString      string
-	xPub             *bip32.ExtendedKey
-	xPubString       string
+	accessKeyString *string
+	xPrivString     *string
+	xPubString      *string
+	accessKey       *bec.PrivateKey
+	adminXPriv      *bip32.ExtendedKey
+	httpClient      *http.Client
+	server          *string
+	signRequest     *bool
+	xPriv           *bip32.ExtendedKey
+	xPub            *bip32.ExtendedKey
+}
+
+func NewWalletClientWithXPrivate(xPriv, serverURL string, sign bool) (*WalletClient, error) {
+	return newWalletClient(
+		&WithXPriv{XPrivString: &xPriv},
+		&WithHTTP{ServerURL: &serverURL},
+		&WithSignRequest{Sign: &sign},
+	)
+}
+
+func NewWalletClientWithXPublic(xPub, serverURL string, sign bool) (*WalletClient, error) {
+	return newWalletClient(
+		&WithXPub{XPubString: &xPub},
+		&WithHTTP{ServerURL: &serverURL},
+		&WithSignRequest{Sign: &sign},
+	)
+}
+
+func NewWalletClientWithAdminKey(adminKey, serverURL string, sign bool) (*WalletClient, error) {
+	return newWalletClient(
+		&WithXPriv{XPrivString: &adminKey},
+		&WithAdminKey{AdminKeyString: &adminKey},
+		&WithHTTP{ServerURL: &serverURL},
+		&WithSignRequest{Sign: &sign},
+	)
+}
+
+func NewWalletClientWithAccessKey(accessKey, serverURL string, sign bool) (*WalletClient, error) {
+	return newWalletClient(
+		&WithAccessKey{AccessKeyString: &accessKey},
+		&WithHTTP{ServerURL: &serverURL},
+		&WithSignRequest{Sign: &sign},
+	)
 }
 
 // New creates a new WalletClient using the provided configuration options.
-func New(configurators ...WalletClientConfigurator) (*WalletClient, error) {
+func newWalletClient(configurators ...WalletClientConfigurator) (*WalletClient, error) {
 	client := &WalletClient{}
 
 	for _, configurator := range configurators {
@@ -36,13 +71,6 @@ func New(configurators ...WalletClientConfigurator) (*WalletClient, error) {
 		return nil, err
 	}
 
-	// Setup transport based on initialized keys
-	if err := client.setupTransport(); err != nil {
-		return nil, err
-	}
-
-	client.TransportService = client.transport
-
 	return client, nil
 }
 
@@ -50,18 +78,18 @@ func New(configurators ...WalletClientConfigurator) (*WalletClient, error) {
 func (c *WalletClient) initializeKeys() error {
 	var err error
 	switch {
-	case c.xPrivString != "":
-		if c.xPriv, err = bitcoin.GenerateHDKeyFromString(c.xPrivString); err != nil {
+	case c.xPrivString != nil:
+		if c.xPriv, err = bitcoin.GenerateHDKeyFromString(*c.xPrivString); err != nil {
 			return err
 		}
 		if c.xPub, err = c.xPriv.Neuter(); err != nil {
 			return err
 		}
-	case c.xPubString != "":
-		if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(c.xPubString); err != nil {
+	case c.xPubString != nil:
+		if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(*c.xPubString); err != nil {
 			return err
 		}
-	case c.accessKeyString != "":
+	case c.accessKeyString != nil:
 		return c.initializeAccessKey()
 	default:
 		return errors.New("no keys provided for initialization")
@@ -75,8 +103,8 @@ func (c *WalletClient) initializeAccessKey() error {
 	var privateKey *bec.PrivateKey
 	var decodedWIF *wif.WIF
 
-	if decodedWIF, err = wif.DecodeWIF(c.accessKeyString); err != nil {
-		if privateKey, err = bitcoin.PrivateKeyFromString(c.accessKeyString); err != nil {
+	if decodedWIF, err = wif.DecodeWIF(*c.accessKeyString); err != nil {
+		if privateKey, err = bitcoin.PrivateKeyFromString(*c.accessKeyString); err != nil {
 			return errors.Wrap(err, "failed to decode access key")
 		}
 	} else {
@@ -87,27 +115,17 @@ func (c *WalletClient) initializeAccessKey() error {
 	return nil
 }
 
-// setupTransport configures the transport service based on the available keys.
-func (c *WalletClient) setupTransport() error {
-	var err error
-	transportOptions := make([]transports.ClientOps, 0)
-
-	if c.xPriv != nil {
-		transportOptions = append(transportOptions, transports.WithXPriv(c.xPriv))
-		transportOptions = append(transportOptions, transports.WithXPub(c.xPub))
-	} else if c.xPub != nil {
-		transportOptions = append(transportOptions, transports.WithXPub(c.xPub))
-	} else if c.accessKey != nil {
-		transportOptions = append(transportOptions, transports.WithAccessKey(c.accessKey))
+// processMetadata will process the metadata
+func processMetadata(metadata *models.Metadata) *models.Metadata {
+	if metadata == nil {
+		m := make(models.Metadata)
+		metadata = &m
 	}
 
-	if len(c.transportOptions) > 0 {
-		transportOptions = append(transportOptions, c.transportOptions...)
-	}
+	return metadata
+}
 
-	if c.transport, err = transports.NewTransport(transportOptions...); err != nil {
-		return err
-	}
-
-	return nil
+// addSignature will add the signature to the request
+func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
+	return setSignature(header, xPriv, bodyString)
 }

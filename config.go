@@ -1,4 +1,4 @@
-package transports
+package walletclient
 
 import "github.com/bitcoin-sv/spv-wallet/models"
 
