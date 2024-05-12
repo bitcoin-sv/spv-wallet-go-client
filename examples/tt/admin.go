@@ -87,7 +87,7 @@ func handleUsers(ctx context.Context, clientAdmin *walletclient.WalletClient) {
 
 	fmt.Println()
 	log.Println(" **** Admin Accept Contact ****")
-	if _, err := aliceClient.UpsertContact(ctx, bobPaymail, bobName, nil, ""); err != nil {
+	if _, err := aliceClient.UpsertContact(ctx, bobPaymail, bobName, nil); err != nil {
 		panic(err)
 	}
 

@@ -1,11 +1,13 @@
 package walletclient
 
 import (
+	"encoding/hex"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/libsv/go-bk/bip32"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -77,16 +79,20 @@ func TestValidateTotpForContact(t *testing.T) {
 		clientBob, err := NewWalletClientWithXPrivate(bobKeys.XPriv(), server.URL, true)
 		require.NoError(t, err)
 
-		require.NoError(t, err)
+		aliceContact := &models.Contact{
+			PubKey:  makeMockPKI(aliceKeys.XPub().String()),
+			Paymail: "bob@example.com",
+		}
+
 		bobContact := &models.Contact{
-			PubKey:  bobKeys.XPub().String(),
+			PubKey:  makeMockPKI(bobKeys.XPub().String()),
 			Paymail: "bob@example.com",
 		}
 
 		// Generate and validate TOTP
 		passcode, err := clientAlice.GenerateTotpForContact(bobContact, 3600, 6)
 		require.NoError(t, err)
-		result, err := clientBob.ValidateTotpForContact(bobContact, passcode, "alice@example.com", 3600, 6)
+		result, err := clientBob.ValidateTotpForContact(aliceContact, passcode, bobContact.Paymail, 3600, 6)
 		require.NoError(t, err)
 		assert.True(t, result)
 	})
@@ -111,4 +117,22 @@ func TestValidateTotpForContact(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "contact's PubKey is invalid")
 	})
+}
+
+func makeMockPKI(xpub string) string {
+	xPub, _ := bip32.NewKeyFromString(xpub)
+	var err error
+	for i := 0; i < 3; i++ { //magicNumberOfInheritance is 3 -> 2+1; 2: because of the way spv-wallet stores xpubs in db; 1: to make a PKI
+		xPub, err = xPub.Child(0)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	pubKey, err := xPub.ECPubKey()
+	if err != nil {
+		panic(err)
+	}
+
+	return hex.EncodeToString(pubKey.SerialiseCompressed())
 }
