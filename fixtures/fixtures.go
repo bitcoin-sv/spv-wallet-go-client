@@ -190,3 +190,11 @@ var DraftTx = &models.DraftTransaction{
 	Status:    "draft",
 	FinalTxID: "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda",
 }
+
+var Contact = &models.Contact{
+	ID:       "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a",
+	FullName: "Test User",
+	Paymail:  "test@spv-wallet.com",
+	PubKey:   "xpub661MyMwAqRbcGpZVrSHU...",
+	Status:   models.ContactStatus("unconfirmed"),
+}

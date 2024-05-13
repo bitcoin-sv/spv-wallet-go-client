@@ -303,10 +303,18 @@ func (wc *WalletClient) UpdateDestinationMetadataByLockingScript(ctx context.Con
 	return &destination, nil
 }
 
+// GetTransaction will get a transaction by ID
+func (wc *WalletClient) GetTransaction(ctx context.Context, txID string) (*models.Transaction, ResponseError) {
+	var transaction models.Transaction
+	if err := wc.doHTTPRequest(ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, wc.xPriv, *wc.signRequest, &transaction); err != nil {
+		return nil, err
+	}
+
+	return &transaction, nil
+}
+
 // GetTransactions will get transactions by conditions
-func (wc *WalletClient) GetTransactions(ctx context.Context, conditions map[string]interface{},
-	metadataConditions *models.Metadata, queryParams *QueryParams,
-) ([]*models.Transaction, ResponseError) {
+func (wc *WalletClient) GetTransactions(ctx context.Context, conditions map[string]interface{}, metadataConditions *models.Metadata, queryParams *QueryParams) ([]*models.Transaction, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions:  conditions,
 		FieldMetadata:    processMetadata(metadataConditions),
@@ -1064,4 +1072,29 @@ func (wc *WalletClient) AdminRejectContact(ctx context.Context, id string) (*mod
 	var contact models.Contact
 	err := wc.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/rejected/%s", id), nil, wc.adminXPriv, true, &contact)
 	return &contact, WrapError(err)
+}
+
+// FinalizeTransaction will finalize the transaction
+func (wc *WalletClient) FinalizeTransaction(draft *models.DraftTransaction) (string, ResponseError) {
+	res, err := GetSignedHex(draft, wc.xPriv)
+	if err != nil {
+		return "", WrapError(err)
+	}
+
+	return res, nil
+}
+
+// SendToRecipients send to recipients
+func (wc *WalletClient) SendToRecipients(ctx context.Context, recipients []*Recipients, metadata *models.Metadata) (*models.Transaction, ResponseError) {
+	draft, err := wc.DraftToRecipients(ctx, recipients, metadata)
+	if err != nil {
+		return nil, err
+	}
+
+	var hex string
+	if hex, err = wc.FinalizeTransaction(draft); err != nil {
+		return nil, err
+	}
+
+	return wc.RecordTransaction(ctx, hex, draft.ID, metadata)
 }

@@ -8,7 +8,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/libsv/go-bk/bip32"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
@@ -94,18 +93,17 @@ func TestValidateTotpForContact(t *testing.T) {
 		require.NoError(t, err)
 		result, err := clientBob.ValidateTotpForContact(aliceContact, passcode, bobContact.Paymail, 3600, 6)
 		require.NoError(t, err)
-		assert.True(t, result)
+		require.True(t, result)
 	})
 
 	t.Run("WalletClient without xPriv - returns error", func(t *testing.T) {
 		client, err := NewWalletClientWithXPublic("invalid_xpub", server.URL, true)
-		assert.Error(t, err)
-		assert.Nil(t, client)
+		require.Error(t, err)
+		require.Nil(t, client)
 	})
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
-		xPrivString := "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
-		sut, err := NewWalletClientWithXPrivate(xPrivString, server.URL, true)
+		sut, err := NewWalletClientWithXPrivate(fixtures.XPrivString, server.URL, true)
 		require.NoError(t, err)
 
 		invalidContact := &models.Contact{
@@ -114,8 +112,8 @@ func TestValidateTotpForContact(t *testing.T) {
 		}
 
 		_, err = sut.ValidateTotpForContact(invalidContact, "123456", "someone@example.com", 3600, 6)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "contact's PubKey is invalid")
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "contact's PubKey is invalid")
 	})
 }
 
