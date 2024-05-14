@@ -541,7 +541,7 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models
 	}
 	publicKey := privateKey.PubKey()
 
-	// Get the xPub
+	// Get the AccessKey
 	payload = new(models.AuthPayload)
 	payload.AccessKey = hex.EncodeToString(publicKey.SerialiseCompressed())
 

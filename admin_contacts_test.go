@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
@@ -47,30 +46,30 @@ func TestAdminContactActions(t *testing.T) {
 
 	t.Run("AdminGetContacts", func(t *testing.T) {
 		contacts, err := client.AdminGetContacts(context.Background(), nil, nil, nil)
-		assert.NoError(t, err)
-		assert.Equal(t, "1", contacts[0].ID)
+		require.NoError(t, err)
+		require.Equal(t, "1", contacts[0].ID)
 	})
 
 	t.Run("AdminUpdateContact", func(t *testing.T) {
 		contact, err := client.AdminUpdateContact(context.Background(), "1", "Jane Doe", nil)
-		assert.NoError(t, err)
-		assert.Equal(t, "Test User", contact.FullName)
+		require.NoError(t, err)
+		require.Equal(t, "Test User", contact.FullName)
 	})
 
 	t.Run("AdminDeleteContact", func(t *testing.T) {
 		err := client.AdminDeleteContact(context.Background(), "1")
-		assert.NoError(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("AdminAcceptContact", func(t *testing.T) {
 		contact, err := client.AdminAcceptContact(context.Background(), "1")
-		assert.NoError(t, err)
-		assert.Equal(t, models.ContactStatus("accepted"), contact.Status)
+		require.NoError(t, err)
+		require.Equal(t, models.ContactStatus("accepted"), contact.Status)
 	})
 
 	t.Run("AdminRejectContact", func(t *testing.T) {
 		contact, err := client.AdminRejectContact(context.Background(), "1")
-		assert.NoError(t, err)
-		assert.Equal(t, models.ContactStatus("rejected"), contact.Status)
+		require.NoError(t, err)
+		require.Equal(t, models.ContactStatus("rejected"), contact.Status)
 	})
 }
