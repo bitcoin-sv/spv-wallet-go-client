@@ -12,11 +12,6 @@ func main() {
 	keys, _ := xpriv.Generate()
 
 	// Create a client
-	walletclient, _ := walletclient.New(
-		walletclient.WithXPriv(keys.XPriv()),
-		walletclient.WithHTTP("localhost:3001"),
-		walletclient.WithSignRequest(true),
-	)
-
-	walletclient.AdminCreatePaymail(context.Background(), keys.XPub().String(), "foo@domain.com", "", "Foo")
+	wc, _ := walletclient.NewWalletClientWithXPrivate(keys.XPriv(), "localhost:3001", true)
+	wc.AdminCreatePaymail(context.Background(), keys.XPub().String(), "foo@domain.com", "", "Foo")
 }
