@@ -10,8 +10,8 @@ import (
 
 // WalletClient is the spv wallet Go client representation.
 type WalletClient struct {
-	signRequest *bool
-	server      *string
+	signRequest bool
+	server      string
 	httpClient  *http.Client
 	accessKey   *bec.PrivateKey
 	adminXPriv  *bip32.ExtendedKey

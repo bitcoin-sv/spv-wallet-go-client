@@ -71,7 +71,7 @@ type HTTP struct {
 }
 
 func (w *HTTP) Configure(c *WalletClient) {
-	c.server = w.ServerURL
+	c.server = *w.ServerURL
 	c.httpClient = w.HTTPClient
 	if w.HTTPClient != nil {
 		c.httpClient = w.HTTPClient
@@ -86,7 +86,7 @@ type SignRequest struct {
 }
 
 func (w *SignRequest) Configure(c *WalletClient) {
-	c.signRequest = w.Sign
+	c.signRequest = *w.Sign
 }
 
 // initializeAccessKey handles the specific initialization of the access key.

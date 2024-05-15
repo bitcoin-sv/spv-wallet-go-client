@@ -21,12 +21,12 @@ import (
 
 // SetSignRequest turn the signing of the http request on or off
 func (wc *WalletClient) SetSignRequest(signRequest bool) {
-	wc.signRequest = &signRequest
+	wc.signRequest = signRequest
 }
 
 // IsSignRequest return whether to sign all requests
 func (wc *WalletClient) IsSignRequest() bool {
-	return *wc.signRequest
+	return wc.signRequest
 }
 
 // SetAdminKey set the admin key
@@ -306,7 +306,7 @@ func (wc *WalletClient) UpdateDestinationMetadataByLockingScript(ctx context.Con
 // GetTransaction will get a transaction by ID
 func (wc *WalletClient) GetTransaction(ctx context.Context, txID string) (*models.Transaction, ResponseError) {
 	var transaction models.Transaction
-	if err := wc.doHTTPRequest(ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, wc.getPrivKey(), *wc.signRequest, &transaction); err != nil {
+	if err := wc.doHTTPRequest(ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, wc.getPrivKey(), wc.signRequest, &transaction); err != nil {
 		return nil, err
 	}
 
@@ -326,7 +326,7 @@ func (wc *WalletClient) GetTransactions(ctx context.Context, conditions map[stri
 
 	var transactions []*models.Transaction
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/transaction/search", jsonStr, wc.getPrivKey(), *wc.signRequest, &transactions,
+		ctx, http.MethodPost, "/transaction/search", jsonStr, wc.getPrivKey(), wc.signRequest, &transactions,
 	); err != nil {
 		return nil, err
 	}
@@ -348,7 +348,7 @@ func (wc *WalletClient) GetTransactionsCount(ctx context.Context, conditions map
 
 	var count int64
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/transaction/count", jsonStr, wc.getPrivKey(), *wc.signRequest, &count,
+		ctx, http.MethodPost, "/transaction/count", jsonStr, wc.getPrivKey(), wc.signRequest, &count,
 	); err != nil {
 		return 0, err
 	}
@@ -424,7 +424,7 @@ func (wc *WalletClient) RecordTransaction(ctx context.Context, hex, referenceID 
 
 	var transaction models.Transaction
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/transaction/record", jsonStr, wc.getPrivKey(), *wc.signRequest, &transaction,
+		ctx, http.MethodPost, "/transaction/record", jsonStr, wc.getPrivKey(), wc.signRequest, &transaction,
 	); err != nil {
 		return nil, err
 	}
@@ -446,7 +446,7 @@ func (wc *WalletClient) UpdateTransactionMetadata(ctx context.Context, txID stri
 
 	var transaction models.Transaction
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/transaction", jsonStr, wc.getPrivKey(), *wc.signRequest, &transaction,
+		ctx, http.MethodPatch, "/transaction", jsonStr, wc.getPrivKey(), wc.signRequest, &transaction,
 	); err != nil {
 		return nil, err
 	}
@@ -497,7 +497,7 @@ func (wc *WalletClient) GetUtxos(ctx context.Context, conditions map[string]inte
 
 	var utxos []*models.Utxo
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/utxo/search", jsonStr, wc.getPrivKey(), *wc.signRequest, &utxos,
+		ctx, http.MethodPost, "/utxo/search", jsonStr, wc.getPrivKey(), wc.signRequest, &utxos,
 	); err != nil {
 		return nil, err
 	}
@@ -517,7 +517,7 @@ func (wc *WalletClient) GetUtxosCount(ctx context.Context, conditions map[string
 
 	var count int64
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/utxo/count", jsonStr, wc.getPrivKey(), *wc.signRequest, &count,
+		ctx, http.MethodPost, "/utxo/count", jsonStr, wc.getPrivKey(), wc.signRequest, &count,
 	); err != nil {
 		return 0, err
 	}
@@ -559,7 +559,7 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models
 func (wc *WalletClient) doHTTPRequest(ctx context.Context, method string, path string,
 	rawJSON []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{},
 ) ResponseError {
-	req, err := http.NewRequestWithContext(ctx, method, *wc.server+path, bytes.NewBuffer(rawJSON))
+	req, err := http.NewRequestWithContext(ctx, method, wc.server+path, bytes.NewBuffer(rawJSON))
 	if err != nil {
 		return WrapError(err)
 	}
@@ -625,7 +625,7 @@ func (wc *WalletClient) authenticateWithAccessKey(req *http.Request, rawJSON []b
 // AcceptContact will accept the contact associated with the paymail
 func (wc *WalletClient) AcceptContact(ctx context.Context, paymail string) ResponseError {
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/contact/accepted/"+paymail, nil, wc.getPrivKey(), *wc.signRequest, nil,
+		ctx, http.MethodPatch, "/contact/accepted/"+paymail, nil, wc.getPrivKey(), wc.signRequest, nil,
 	); err != nil {
 		return err
 	}
@@ -636,7 +636,7 @@ func (wc *WalletClient) AcceptContact(ctx context.Context, paymail string) Respo
 // RejectContact will reject the contact associated with the paymail
 func (wc *WalletClient) RejectContact(ctx context.Context, paymail string) ResponseError {
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/contact/rejected/"+paymail, nil, wc.getPrivKey(), *wc.signRequest, nil,
+		ctx, http.MethodPatch, "/contact/rejected/"+paymail, nil, wc.getPrivKey(), wc.signRequest, nil,
 	); err != nil {
 		return err
 	}
@@ -656,7 +656,7 @@ func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Cont
 	}
 
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/contact/confirmed/"+contact.Paymail, nil, wc.getPrivKey(), *wc.signRequest, nil,
+		ctx, http.MethodPatch, "/contact/confirmed/"+contact.Paymail, nil, wc.getPrivKey(), wc.signRequest, nil,
 	); err != nil {
 		return err
 	}
@@ -677,7 +677,7 @@ func (wc *WalletClient) GetContacts(ctx context.Context, conditions map[string]i
 
 	var result []*models.Contact
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/contact/search", jsonStr, wc.getPrivKey(), *wc.signRequest, &result,
+		ctx, http.MethodPost, "/contact/search", jsonStr, wc.getPrivKey(), wc.signRequest, &result,
 	); err != nil {
 		return nil, err
 	}
@@ -707,7 +707,7 @@ func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fu
 
 	var result models.Contact
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPut, "/contact/"+paymail, jsonStr, wc.getPrivKey(), *wc.signRequest, &result,
+		ctx, http.MethodPut, "/contact/"+paymail, jsonStr, wc.getPrivKey(), wc.signRequest, &result,
 	); err != nil {
 		return nil, err
 	}
@@ -1004,7 +1004,7 @@ func (wc *WalletClient) AdminRecordTransaction(ctx context.Context, hex string) 
 
 	var transaction models.Transaction
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/admin/transactions/record", jsonStr, wc.getPrivKey(), *wc.signRequest, &transaction,
+		ctx, http.MethodPost, "/admin/transactions/record", jsonStr, wc.getPrivKey(), wc.signRequest, &transaction,
 	); err != nil {
 		return nil, err
 	}

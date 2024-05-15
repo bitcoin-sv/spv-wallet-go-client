@@ -27,7 +27,7 @@ func TestNewWalletClient(t *testing.T) {
 		require.NotNil(t, client.xPriv)
 		require.Equal(t, keys.XPriv(), client.xPriv.String())
 		require.NotNil(t, client.httpClient)
-		require.True(t, *client.signRequest)
+		require.True(t, client.signRequest)
 
 		// Ensure HTTP calls can be made
 		resp, err := client.httpClient.Get(server.URL)
@@ -48,7 +48,7 @@ func TestNewWalletClient(t *testing.T) {
 		require.NotNil(t, client.xPub)
 		require.Equal(t, keys.XPub().String(), client.xPub.String())
 		require.NotNil(t, client.httpClient)
-		require.False(t, *client.signRequest)
+		require.False(t, client.signRequest)
 
 		// Ensure HTTP calls can be made
 		resp, err := client.httpClient.Get(server.URL)
@@ -67,9 +67,9 @@ func TestNewWalletClient(t *testing.T) {
 		require.NotNil(t, client.adminXPriv)
 		require.Nil(t, client.xPriv)
 		require.Equal(t, fixtures.XPrivString, client.adminXPriv.String())
-		require.Equal(t, server.URL, *client.server)
+		require.Equal(t, server.URL, client.server)
 		require.NotNil(t, client.httpClient)
-		require.True(t, *client.signRequest)
+		require.True(t, client.signRequest)
 
 		// Ensure HTTP calls can be made
 		resp, err := client.httpClient.Get(server.URL)
@@ -89,8 +89,8 @@ func TestNewWalletClient(t *testing.T) {
 		client := NewWithAccessKey(accessKey, server.URL)
 		require.NotNil(t, client.accessKey)
 
-		require.Equal(t, &server.URL, client.server)
-		require.True(t, *client.signRequest)
+		require.Equal(t, server.URL, client.server)
+		require.True(t, client.signRequest)
 		require.NotNil(t, client.httpClient)
 
 		// Ensure HTTP calls can be made
