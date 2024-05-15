@@ -4,25 +4,20 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bk/wif"
 	"github.com/pkg/errors"
 )
 
 // WalletClient is the spv wallet Go client representation.
 type WalletClient struct {
-	signRequest     *bool
-	server          *string
-	accessKeyString *string
-	xPrivString     *string
-	xPubString      *string
-	httpClient      *http.Client
-	accessKey       *bec.PrivateKey
-	adminXPriv      *bip32.ExtendedKey
-	xPriv           *bip32.ExtendedKey
-	xPub            *bip32.ExtendedKey
+	signRequest *bool
+	server      *string
+	httpClient  *http.Client
+	accessKey   *bec.PrivateKey
+	adminXPriv  *bip32.ExtendedKey
+	xPriv       *bip32.ExtendedKey
+	xPub        *bip32.ExtendedKey
 }
 
 // NewWalletClientWithXPrivate creates a new WalletClient instance using a private key (xPriv).
@@ -91,45 +86,18 @@ func newWalletClient(configurators ...WalletClientConfigurator) (*WalletClient, 
 
 // initializeKeys handles the initialization of keys based on the existing fields.
 func (c *WalletClient) initializeKeys() error {
-	var err error
 	switch {
-	case c.xPrivString != nil:
-		if c.xPriv, err = bitcoin.GenerateHDKeyFromString(*c.xPrivString); err != nil {
-			return err
-		}
-		if c.xPub, err = c.xPriv.Neuter(); err != nil {
-			return err
-		}
-	case c.xPubString != nil:
-		if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(*c.xPubString); err != nil {
-			return err
-		}
-	case c.accessKeyString != nil:
-		return c.initializeAccessKey()
+	case c.xPriv != nil:
+		return nil
+	case c.xPub != nil:
+		return nil
+	case c.accessKey != nil:
+		return nil
 	case c.adminXPriv != nil:
 		return nil
 	default:
 		return errors.New("no keys provided for initialization")
 	}
-	return nil
-}
-
-// initializeAccessKey handles the specific initialization of the access key.
-func (c *WalletClient) initializeAccessKey() error {
-	var err error
-	var privateKey *bec.PrivateKey
-	var decodedWIF *wif.WIF
-
-	if decodedWIF, err = wif.DecodeWIF(*c.accessKeyString); err != nil {
-		if privateKey, err = bitcoin.PrivateKeyFromString(*c.accessKeyString); err != nil {
-			return errors.Wrap(err, "failed to decode access key")
-		}
-	} else {
-		privateKey = decodedWIF.PrivKey
-	}
-
-	c.accessKey = privateKey
-	return nil
 }
 
 // processMetadata will process the metadata
