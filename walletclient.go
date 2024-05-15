@@ -25,9 +25,9 @@ type WalletClient struct {
 // - `serverURL`: The URL of the server the client will interact with.
 func NewWithXPriv(xPriv, serverURL string) *WalletClient {
 	return newWalletClient(
-		&WithXPriv{XPrivString: &xPriv},
-		&WithHTTP{ServerURL: &serverURL},
-		&WithSignRequest{Sign: Ptr(true)},
+		&XPriv{XPrivString: &xPriv},
+		&HTTP{ServerURL: &serverURL},
+		&SignRequest{Sign: Ptr(true)},
 	)
 }
 
@@ -37,9 +37,9 @@ func NewWithXPriv(xPriv, serverURL string) *WalletClient {
 // - `serverURL`: The URL of the server the client will interact with.
 func NewWithXPub(xPub, serverURL string) *WalletClient {
 	return newWalletClient(
-		&WithXPub{XPubString: &xPub},
-		&WithHTTP{ServerURL: &serverURL},
-		&WithSignRequest{Sign: Ptr(false)},
+		&XPub{XPubString: &xPub},
+		&HTTP{ServerURL: &serverURL},
+		&SignRequest{Sign: Ptr(false)},
 	)
 }
 
@@ -49,9 +49,9 @@ func NewWithXPub(xPub, serverURL string) *WalletClient {
 // - `serverURL`: The URL of the server the client will interact with.
 func NewWithAdminKey(adminKey, serverURL string) *WalletClient {
 	return newWalletClient(
-		&WithAdminKey{AdminKeyString: &adminKey},
-		&WithHTTP{ServerURL: &serverURL},
-		&WithSignRequest{Sign: Ptr(true)},
+		&AdminKey{AdminKeyString: &adminKey},
+		&HTTP{ServerURL: &serverURL},
+		&SignRequest{Sign: Ptr(true)},
 	)
 }
 
@@ -61,9 +61,9 @@ func NewWithAdminKey(adminKey, serverURL string) *WalletClient {
 // - `serverURL`: The URL of the server the client will interact with.
 func NewWithAccessKey(accessKey, serverURL string) *WalletClient {
 	return newWalletClient(
-		&WithAccessKey{AccessKeyString: &accessKey},
-		&WithHTTP{ServerURL: &serverURL},
-		&WithSignRequest{Sign: Ptr(true)},
+		&AccessKey{AccessKeyString: &accessKey},
+		&HTTP{ServerURL: &serverURL},
+		&SignRequest{Sign: Ptr(true)},
 	)
 }
 

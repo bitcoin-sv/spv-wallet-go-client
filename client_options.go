@@ -14,24 +14,24 @@ type WalletClientConfigurator interface {
 	Configure(c *WalletClient)
 }
 
-// WithXPriv sets the xPrivString field of a WalletClient
-type WithXPriv struct {
+// XPriv sets the xPrivString field of a WalletClient
+type XPriv struct {
 	XPrivString *string
 }
 
-func (w *WithXPriv) Configure(c *WalletClient) {
+func (w *XPriv) Configure(c *WalletClient) {
 	var err error
 	if c.xPriv, err = bitcoin.GenerateHDKeyFromString(*w.XPrivString); err != nil {
 		c.xPriv = nil
 	}
 }
 
-// WithXPub sets the xPubString on the client
-type WithXPub struct {
+// XPub sets the xPubString on the client
+type XPub struct {
 	XPubString *string
 }
 
-func (w *WithXPub) Configure(c *WalletClient) {
+func (w *XPub) Configure(c *WalletClient) {
 	var err error
 	if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(*w.XPubString); err != nil {
 		w.XPubString = nil
@@ -39,24 +39,24 @@ func (w *WithXPub) Configure(c *WalletClient) {
 
 }
 
-// WithAccessKey sets the accessKeyString on the client
-type WithAccessKey struct {
+// AccessKey sets the accessKeyString on the client
+type AccessKey struct {
 	AccessKeyString *string
 }
 
-func (w *WithAccessKey) Configure(c *WalletClient) {
+func (w *AccessKey) Configure(c *WalletClient) {
 	var err error
 	if c.accessKey, err = w.initializeAccessKey(); err != nil {
 		c.accessKey = nil
 	}
 }
 
-// WithAdminKey sets the admin key for creating new xpubs
-type WithAdminKey struct {
+// AdminKey sets the admin key for creating new xpubs
+type AdminKey struct {
 	AdminKeyString *string
 }
 
-func (w *WithAdminKey) Configure(c *WalletClient) {
+func (w *AdminKey) Configure(c *WalletClient) {
 	var err error
 	c.adminXPriv, err = bitcoin.GenerateHDKeyFromString(*w.AdminKeyString)
 	if err != nil {
@@ -64,13 +64,13 @@ func (w *WithAdminKey) Configure(c *WalletClient) {
 	}
 }
 
-// WithHTTP sets the URL and HTTP client of a WalletClient
-type WithHTTP struct {
+// HTTP sets the URL and HTTP client of a WalletClient
+type HTTP struct {
 	ServerURL  *string
 	HTTPClient *http.Client
 }
 
-func (w *WithHTTP) Configure(c *WalletClient) {
+func (w *HTTP) Configure(c *WalletClient) {
 	c.server = w.ServerURL
 	c.httpClient = w.HTTPClient
 	if w.HTTPClient != nil {
@@ -80,17 +80,17 @@ func (w *WithHTTP) Configure(c *WalletClient) {
 	}
 }
 
-// WithSignRequest configures whether to sign HTTP requests
-type WithSignRequest struct {
+// SignRequest configures whether to sign HTTP requests
+type SignRequest struct {
 	Sign *bool
 }
 
-func (w *WithSignRequest) Configure(c *WalletClient) {
+func (w *SignRequest) Configure(c *WalletClient) {
 	c.signRequest = w.Sign
 }
 
 // initializeAccessKey handles the specific initialization of the access key.
-func (c *WithAccessKey) initializeAccessKey() (*bec.PrivateKey, error) {
+func (c *AccessKey) initializeAccessKey() (*bec.PrivateKey, error) {
 	var err error
 	var privateKey *bec.PrivateKey
 	var decodedWIF *wif.WIF
