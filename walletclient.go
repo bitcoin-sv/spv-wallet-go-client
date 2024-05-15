@@ -1,7 +1,6 @@
 package walletclient
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -93,7 +92,6 @@ func newWalletClient(configurators ...WalletClientConfigurator) (*WalletClient, 
 // initializeKeys handles the initialization of keys based on the existing fields.
 func (c *WalletClient) initializeKeys() error {
 	var err error
-	fmt.Printf("===== %+v\n", c)
 	switch {
 	case c.xPrivString != nil:
 		if c.xPriv, err = bitcoin.GenerateHDKeyFromString(*c.xPrivString); err != nil {
