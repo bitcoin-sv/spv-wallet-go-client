@@ -17,7 +17,7 @@ import (
 func TestGenerateTotpForContact(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// given
-		sut, err := NewWalletClientWithXPrivate(fixtures.XPrivString, "localhost:3001", false)
+		sut, err := NewWithXPriv(fixtures.XPrivString, "localhost:3001")
 		require.NoError(t, err)
 
 		contact := models.Contact{PubKey: fixtures.PubKey}
@@ -32,7 +32,7 @@ func TestGenerateTotpForContact(t *testing.T) {
 
 	t.Run("WalletClient without xPriv - returns error", func(t *testing.T) {
 		// given
-		sut, err := NewWalletClientWithXPublic(fixtures.XPubString, "localhost:3001", false)
+		sut, err := NewWithXPub(fixtures.XPubString, "localhost:3001")
 		require.NoError(t, err)
 
 		// when
@@ -44,7 +44,7 @@ func TestGenerateTotpForContact(t *testing.T) {
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
 		// given
-		sut, err := NewWalletClientWithXPrivate(fixtures.XPrivString, "localhost:3001", false)
+		sut, err := NewWithXPriv(fixtures.XPrivString, "localhost:3001")
 		require.NoError(t, err)
 
 		contact := models.Contact{PubKey: "invalid-pk-format"}
@@ -73,9 +73,9 @@ func TestValidateTotpForContact(t *testing.T) {
 		require.NoError(t, err)
 
 		// Set up the WalletClient for Alice and Bob
-		clientAlice, err := NewWalletClientWithXPrivate(aliceKeys.XPriv(), server.URL, true)
+		clientAlice, err := NewWithXPriv(aliceKeys.XPriv(), server.URL)
 		require.NoError(t, err)
-		clientBob, err := NewWalletClientWithXPrivate(bobKeys.XPriv(), server.URL, true)
+		clientBob, err := NewWithXPriv(bobKeys.XPriv(), server.URL)
 		require.NoError(t, err)
 
 		aliceContact := &models.Contact{
@@ -97,13 +97,13 @@ func TestValidateTotpForContact(t *testing.T) {
 	})
 
 	t.Run("WalletClient without xPriv - returns error", func(t *testing.T) {
-		client, err := NewWalletClientWithXPublic("invalid_xpub", server.URL, true)
+		client, err := NewWithXPub("invalid_xpub", server.URL)
 		require.Error(t, err)
 		require.Nil(t, client)
 	})
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
-		sut, err := NewWalletClientWithXPrivate(fixtures.XPrivString, server.URL, true)
+		sut, err := NewWithXPriv(fixtures.XPrivString, server.URL)
 		require.NoError(t, err)
 
 		invalidContact := &models.Contact{

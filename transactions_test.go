@@ -53,7 +53,7 @@ func TestTransactions(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client, err := NewWalletClientWithXPrivate(fixtures.XPrivString, server.URL, true)
+	client, err := NewWithXPriv(fixtures.XPrivString, server.URL)
 	require.NoError(t, err)
 
 	t.Run("GetTransaction", func(t *testing.T) {

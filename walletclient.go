@@ -30,11 +30,11 @@ type WalletClient struct {
 // - `xPriv`: The extended private key used for cryptographic operations.
 // - `serverURL`: The URL of the server the client will interact with.
 // - `sign`: A boolean flag to determine if the outgoing requests should be signed.
-func NewWalletClientWithXPrivate(xPriv, serverURL string, sign bool) (*WalletClient, error) {
+func NewWithXPriv(xPriv, serverURL string) (*WalletClient, error) {
 	return newWalletClient(
 		&WithXPriv{XPrivString: &xPriv},
 		&WithHTTP{ServerURL: &serverURL},
-		&WithSignRequest{Sign: &sign},
+		&WithSignRequest{Sign: Ptr(true)},
 	)
 }
 
@@ -43,11 +43,11 @@ func NewWalletClientWithXPrivate(xPriv, serverURL string, sign bool) (*WalletCli
 // - `xPub`: The extended public key used for cryptographic verification and other public operations.
 // - `serverURL`: The URL of the server the client will interact with.
 // - `sign`: A boolean flag to determine if the outgoing requests should be signed.
-func NewWalletClientWithXPublic(xPub, serverURL string, sign bool) (*WalletClient, error) {
+func NewWithXPub(xPub, serverURL string) (*WalletClient, error) {
 	return newWalletClient(
 		&WithXPub{XPubString: &xPub},
 		&WithHTTP{ServerURL: &serverURL},
-		&WithSignRequest{Sign: &sign},
+		&WithSignRequest{Sign: Ptr(false)},
 	)
 }
 
@@ -56,12 +56,12 @@ func NewWalletClientWithXPublic(xPub, serverURL string, sign bool) (*WalletClien
 // - `adminKey`: The extended private key used for administrative operations.
 // - `serverURL`: The URL of the server the client will interact with.
 // - `sign`: A boolean flag to determine if the outgoing requests should be signed.
-func NewWalletClientWithAdminKey(adminKey, serverURL string, sign bool) (*WalletClient, error) {
+func NewWithAdminKey(adminKey, serverURL string) (*WalletClient, error) {
 	return newWalletClient(
-		&WithXPriv{XPrivString: &adminKey},
+		&WithXPriv{XPrivString: &adminKey}, // this need to be removed .. pls ignore for now
 		&WithAdminKey{AdminKeyString: &adminKey},
 		&WithHTTP{ServerURL: &serverURL},
-		&WithSignRequest{Sign: &sign},
+		&WithSignRequest{Sign: Ptr(true)},
 	)
 }
 
@@ -70,11 +70,11 @@ func NewWalletClientWithAdminKey(adminKey, serverURL string, sign bool) (*Wallet
 // - `accessKey`: The access key used for API authentication.
 // - `serverURL`: The URL of the server the client will interact with.
 // - `sign`: A boolean flag to determine if the outgoing requests should be signed.
-func NewWalletClientWithAccessKey(accessKey, serverURL string, sign bool) (*WalletClient, error) {
+func NewWithAccessKey(accessKey, serverURL string) (*WalletClient, error) {
 	return newWalletClient(
 		&WithAccessKey{AccessKeyString: &accessKey},
 		&WithHTTP{ServerURL: &serverURL},
-		&WithSignRequest{Sign: &sign},
+		&WithSignRequest{Sign: Ptr(true)},
 	)
 }
 
@@ -148,4 +148,8 @@ func processMetadata(metadata *models.Metadata) *models.Metadata {
 // addSignature will add the signature to the request
 func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
 	return setSignature(header, xPriv, bodyString)
+}
+
+func Ptr[T any](obj T) *T {
+	return &obj
 }

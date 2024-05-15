@@ -43,7 +43,7 @@ func TestXpub(t *testing.T) {
 	keys, err := xpriv.Generate()
 	require.NoError(t, err)
 
-	client, err := NewWalletClientWithXPrivate(keys.XPriv(), server.URL, true)
+	client, err := NewWithXPriv(keys.XPriv(), server.URL)
 	require.NoError(t, err)
 
 	t.Run("GetXPub", func(t *testing.T) {
