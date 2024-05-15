@@ -41,8 +41,8 @@ func TestDestinations(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client, err := NewWithAccessKey(fixtures.AccessKeyString, server.URL)
-	require.NoError(t, err)
+	client := NewWithAccessKey(fixtures.AccessKeyString, server.URL)
+	require.NotNil(t, client.accessKey)
 
 	t.Run("GetDestinationByID", func(t *testing.T) {
 		destination, err := client.GetDestinationByID(context.Background(), fixtures.Destination.ID)

@@ -33,8 +33,8 @@ func TestAccessKeys(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client, err := NewWithAccessKey(fixtures.AccessKeyString, server.URL)
-	require.NoError(t, err)
+	client := NewWithAccessKey(fixtures.AccessKeyString, server.URL)
+	require.NotNil(t, client.accessKey)
 
 	t.Run("GetAccessKey", func(t *testing.T) {
 		accessKey, err := client.GetAccessKey(context.Background(), fixtures.AccessKey.ID)

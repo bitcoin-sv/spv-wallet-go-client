@@ -23,7 +23,7 @@ type WalletClient struct {
 // It configures the client with a specific server URL and a flag indicating whether requests should be signed.
 // - `xPriv`: The extended private key used for cryptographic operations.
 // - `serverURL`: The URL of the server the client will interact with.
-func NewWithXPriv(xPriv, serverURL string) (*WalletClient, error) {
+func NewWithXPriv(xPriv, serverURL string) *WalletClient {
 	return newWalletClient(
 		&WithXPriv{XPrivString: &xPriv},
 		&WithHTTP{ServerURL: &serverURL},
@@ -35,7 +35,7 @@ func NewWithXPriv(xPriv, serverURL string) (*WalletClient, error) {
 // This client is configured for operations that require a public key, such as verifying signatures or receiving transactions.
 // - `xPub`: The extended public key used for cryptographic verification and other public operations.
 // - `serverURL`: The URL of the server the client will interact with.
-func NewWithXPub(xPub, serverURL string) (*WalletClient, error) {
+func NewWithXPub(xPub, serverURL string) *WalletClient {
 	return newWalletClient(
 		&WithXPub{XPubString: &xPub},
 		&WithHTTP{ServerURL: &serverURL},
@@ -47,7 +47,7 @@ func NewWithXPub(xPub, serverURL string) (*WalletClient, error) {
 // This configuration is typically used for administrative tasks such as managing sub-wallets or configuring system-wide settings.
 // - `adminKey`: The extended private key used for administrative operations.
 // - `serverURL`: The URL of the server the client will interact with.
-func NewWithAdminKey(adminKey, serverURL string) (*WalletClient, error) {
+func NewWithAdminKey(adminKey, serverURL string) *WalletClient {
 	return newWalletClient(
 		&WithAdminKey{AdminKeyString: &adminKey},
 		&WithHTTP{ServerURL: &serverURL},
@@ -59,7 +59,7 @@ func NewWithAdminKey(adminKey, serverURL string) (*WalletClient, error) {
 // This method is useful for scenarios where the client needs to authenticate using a less sensitive key than an xPriv.
 // - `accessKey`: The access key used for API authentication.
 // - `serverURL`: The URL of the server the client will interact with.
-func NewWithAccessKey(accessKey, serverURL string) (*WalletClient, error) {
+func NewWithAccessKey(accessKey, serverURL string) *WalletClient {
 	return newWalletClient(
 		&WithAccessKey{AccessKeyString: &accessKey},
 		&WithHTTP{ServerURL: &serverURL},
@@ -68,14 +68,14 @@ func NewWithAccessKey(accessKey, serverURL string) (*WalletClient, error) {
 }
 
 // newWalletClient creates a new WalletClient using the provided configuration options.
-func newWalletClient(configurators ...WalletClientConfigurator) (*WalletClient, error) {
+func newWalletClient(configurators ...WalletClientConfigurator) *WalletClient {
 	client := &WalletClient{}
 
 	for _, configurator := range configurators {
 		configurator.Configure(client)
 	}
 
-	return client, nil
+	return client
 }
 
 // processMetadata will process the metadata

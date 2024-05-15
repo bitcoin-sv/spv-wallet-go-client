@@ -15,7 +15,7 @@ func main() {
 	keys, _ := xpriv.Generate()
 
 	// Create a client
-	wc, _ := walletclient.NewWithXPriv(keys.XPriv(), "localhost:3003/v1")
+	wc := walletclient.NewWithXPriv(keys.XPriv(), "localhost:3003/v1")
 	ctx := context.Background()
 	_ = wc.AdminNewXpub(ctx, keys.XPub().String(), &models.Metadata{"example_field": "example_data"})
 

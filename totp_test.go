@@ -17,11 +17,10 @@ import (
 func TestGenerateTotpForContact(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// given
-		sut, err := NewWithXPriv(fixtures.XPrivString, "localhost:3001")
-		require.NoError(t, err)
+		sut := NewWithXPriv(fixtures.XPrivString, "localhost:3001")
+		require.NotNil(t, sut.xPriv)
 
 		contact := models.Contact{PubKey: fixtures.PubKey}
-
 		// when
 		pass, err := sut.GenerateTotpForContact(&contact, 30, 2)
 
@@ -32,11 +31,10 @@ func TestGenerateTotpForContact(t *testing.T) {
 
 	t.Run("WalletClient without xPriv - returns error", func(t *testing.T) {
 		// given
-		sut, err := NewWithXPub(fixtures.XPubString, "localhost:3001")
-		require.NoError(t, err)
-
+		sut := NewWithXPub(fixtures.XPubString, "localhost:3001")
+		require.NotNil(t, sut.xPub)
 		// when
-		_, err = sut.GenerateTotpForContact(nil, 30, 2)
+		_, err := sut.GenerateTotpForContact(nil, 30, 2)
 
 		// then
 		require.ErrorIs(t, err, ErrClientInitNoXpriv)
@@ -44,13 +42,12 @@ func TestGenerateTotpForContact(t *testing.T) {
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
 		// given
-		sut, err := NewWithXPriv(fixtures.XPrivString, "localhost:3001")
-		require.NoError(t, err)
+		sut := NewWithXPriv(fixtures.XPrivString, "localhost:3001")
+		require.NotNil(t, sut.xPriv)
 
 		contact := models.Contact{PubKey: "invalid-pk-format"}
-
 		// when
-		_, err = sut.GenerateTotpForContact(&contact, 30, 2)
+		_, err := sut.GenerateTotpForContact(&contact, 30, 2)
 
 		// then
 		require.ErrorContains(t, err, "contact's PubKey is invalid:")
@@ -73,10 +70,10 @@ func TestValidateTotpForContact(t *testing.T) {
 		require.NoError(t, err)
 
 		// Set up the WalletClient for Alice and Bob
-		clientAlice, err := NewWithXPriv(aliceKeys.XPriv(), server.URL)
-		require.NoError(t, err)
-		clientBob, err := NewWithXPriv(bobKeys.XPriv(), server.URL)
-		require.NoError(t, err)
+		clientAlice := NewWithXPriv(aliceKeys.XPriv(), server.URL)
+		require.NotNil(t, clientAlice.xPriv)
+		clientBob := NewWithXPriv(bobKeys.XPriv(), server.URL)
+		require.NotNil(t, clientBob.xPriv)
 
 		aliceContact := &models.Contact{
 			PubKey:  makeMockPKI(aliceKeys.XPub().String()),
@@ -97,21 +94,19 @@ func TestValidateTotpForContact(t *testing.T) {
 	})
 
 	t.Run("WalletClient without xPriv - returns error", func(t *testing.T) {
-		client, err := NewWithXPub("invalid_xpub", server.URL)
-		require.Error(t, err)
-		require.Nil(t, client)
+		client := NewWithXPub("invalid_xpub", server.URL)
+		require.Nil(t, client.xPub)
 	})
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
-		sut, err := NewWithXPriv(fixtures.XPrivString, server.URL)
-		require.NoError(t, err)
+		sut := NewWithXPriv(fixtures.XPrivString, server.URL)
 
 		invalidContact := &models.Contact{
 			PubKey:  "invalid_pub_key_format",
 			Paymail: "invalid@example.com",
 		}
 
-		_, err = sut.ValidateTotpForContact(invalidContact, "123456", "someone@example.com", 3600, 6)
+		_, err := sut.ValidateTotpForContact(invalidContact, "123456", "someone@example.com", 3600, 6)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "contact's PubKey is invalid")
 	})

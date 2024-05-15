@@ -9,6 +9,6 @@ func main() {
 	exampleAccessKey := "some_generated_access_key"
 
 	// Create a client
-	_, _ = walletclient.NewWithAccessKey(exampleAccessKey, "http://localhost:3003/v1")
+	_ = walletclient.NewWithAccessKey(exampleAccessKey, "http://localhost:3003/v1")
 
 }
