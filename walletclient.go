@@ -6,7 +6,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
-	"github.com/pkg/errors"
 )
 
 // WalletClient is the spv wallet Go client representation.
@@ -76,28 +75,7 @@ func newWalletClient(configurators ...WalletClientConfigurator) (*WalletClient, 
 		configurator.Configure(client)
 	}
 
-	// Initialize keys based on provided strings
-	if err := client.initializeKeys(); err != nil {
-		return nil, err
-	}
-
 	return client, nil
-}
-
-// initializeKeys handles the initialization of keys based on the existing fields.
-func (c *WalletClient) initializeKeys() error {
-	switch {
-	case c.xPriv != nil:
-		return nil
-	case c.xPub != nil:
-		return nil
-	case c.accessKey != nil:
-		return nil
-	case c.adminXPriv != nil:
-		return nil
-	default:
-		return errors.New("no keys provided for initialization")
-	}
 }
 
 // processMetadata will process the metadata
