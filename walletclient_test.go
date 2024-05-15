@@ -70,7 +70,7 @@ func TestNewWalletClient(t *testing.T) {
 		client, err := NewWithAdminKey(fixtures.XPrivString, server.URL)
 		require.NoError(t, err)
 		require.NotNil(t, client)
-		require.Equal(t, fixtures.XPrivString, *client.xPrivString)
+		require.Nil(t, client.xPrivString)
 		require.Equal(t, fixtures.XPrivString, client.adminXPriv.String())
 		require.Equal(t, server.URL, *client.server)
 		require.NotNil(t, client.httpClient)

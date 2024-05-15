@@ -1,6 +1,7 @@
 package walletclient
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -29,7 +30,6 @@ type WalletClient struct {
 // It configures the client with a specific server URL and a flag indicating whether requests should be signed.
 // - `xPriv`: The extended private key used for cryptographic operations.
 // - `serverURL`: The URL of the server the client will interact with.
-// - `sign`: A boolean flag to determine if the outgoing requests should be signed.
 func NewWithXPriv(xPriv, serverURL string) (*WalletClient, error) {
 	return newWalletClient(
 		&WithXPriv{XPrivString: &xPriv},
@@ -42,7 +42,6 @@ func NewWithXPriv(xPriv, serverURL string) (*WalletClient, error) {
 // This client is configured for operations that require a public key, such as verifying signatures or receiving transactions.
 // - `xPub`: The extended public key used for cryptographic verification and other public operations.
 // - `serverURL`: The URL of the server the client will interact with.
-// - `sign`: A boolean flag to determine if the outgoing requests should be signed.
 func NewWithXPub(xPub, serverURL string) (*WalletClient, error) {
 	return newWalletClient(
 		&WithXPub{XPubString: &xPub},
@@ -55,10 +54,8 @@ func NewWithXPub(xPub, serverURL string) (*WalletClient, error) {
 // This configuration is typically used for administrative tasks such as managing sub-wallets or configuring system-wide settings.
 // - `adminKey`: The extended private key used for administrative operations.
 // - `serverURL`: The URL of the server the client will interact with.
-// - `sign`: A boolean flag to determine if the outgoing requests should be signed.
 func NewWithAdminKey(adminKey, serverURL string) (*WalletClient, error) {
 	return newWalletClient(
-		&WithXPriv{XPrivString: &adminKey}, // this need to be removed .. pls ignore for now
 		&WithAdminKey{AdminKeyString: &adminKey},
 		&WithHTTP{ServerURL: &serverURL},
 		&WithSignRequest{Sign: Ptr(true)},
@@ -69,7 +66,6 @@ func NewWithAdminKey(adminKey, serverURL string) (*WalletClient, error) {
 // This method is useful for scenarios where the client needs to authenticate using a less sensitive key than an xPriv.
 // - `accessKey`: The access key used for API authentication.
 // - `serverURL`: The URL of the server the client will interact with.
-// - `sign`: A boolean flag to determine if the outgoing requests should be signed.
 func NewWithAccessKey(accessKey, serverURL string) (*WalletClient, error) {
 	return newWalletClient(
 		&WithAccessKey{AccessKeyString: &accessKey},
@@ -97,6 +93,7 @@ func newWalletClient(configurators ...WalletClientConfigurator) (*WalletClient, 
 // initializeKeys handles the initialization of keys based on the existing fields.
 func (c *WalletClient) initializeKeys() error {
 	var err error
+	fmt.Printf("===== %+v\n", c)
 	switch {
 	case c.xPrivString != nil:
 		if c.xPriv, err = bitcoin.GenerateHDKeyFromString(*c.xPrivString); err != nil {
@@ -111,6 +108,8 @@ func (c *WalletClient) initializeKeys() error {
 		}
 	case c.accessKeyString != nil:
 		return c.initializeAccessKey()
+	case c.adminXPriv != nil:
+		return nil
 	default:
 		return errors.New("no keys provided for initialization")
 	}
@@ -152,4 +151,12 @@ func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 
 func Ptr[T any](obj T) *T {
 	return &obj
+}
+
+// getPrivKey retrieves the client's private key. If the primary key is not set,
+func (wc *WalletClient) getPrivKey() *bip32.ExtendedKey {
+	if wc.adminXPriv != nil {
+		return wc.adminXPriv
+	}
+	return wc.xPriv
 }
