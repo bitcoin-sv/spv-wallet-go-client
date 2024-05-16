@@ -43,7 +43,7 @@ func TestContactActionsRouting(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewWithAccessKey(fixtures.AccessKeyString, server.URL)
+	client := NewWithAccessKey(server.URL, fixtures.AccessKeyString)
 	require.NotNil(t, client.accessKey)
 
 	t.Run("RejectContact", func(t *testing.T) {

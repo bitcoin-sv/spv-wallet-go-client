@@ -9,69 +9,69 @@ import (
 	"github.com/pkg/errors"
 )
 
-// WalletClientConfigurator is the interface for configuring WalletClient
-type WalletClientConfigurator interface {
+// Configurator is the interface for configuring WalletClient
+type Configurator interface {
 	Configure(c *WalletClient)
 }
 
-// XPriv sets the xPrivString field of a WalletClient
-type XPriv struct {
-	XPrivString *string
+// xPrivConf sets the xPrivString field of a WalletClient
+type xPrivConf struct {
+	XPrivString string
 }
 
-func (w *XPriv) Configure(c *WalletClient) {
+func (w *xPrivConf) Configure(c *WalletClient) {
 	var err error
-	if c.xPriv, err = bitcoin.GenerateHDKeyFromString(*w.XPrivString); err != nil {
+	if c.xPriv, err = bitcoin.GenerateHDKeyFromString(w.XPrivString); err != nil {
 		c.xPriv = nil
 	}
 }
 
-// XPub sets the xPubString on the client
-type XPub struct {
-	XPubString *string
+// xPubConf sets the xPubString on the client
+type xPubConf struct {
+	XPubString string
 }
 
-func (w *XPub) Configure(c *WalletClient) {
+func (w *xPubConf) Configure(c *WalletClient) {
 	var err error
-	if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(*w.XPubString); err != nil {
-		w.XPubString = nil
+	if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(w.XPubString); err != nil {
+		c.xPub = nil
 	}
 
 }
 
-// AccessKey sets the accessKeyString on the client
-type AccessKey struct {
-	AccessKeyString *string
+// accessKeyConf sets the accessKeyString on the client
+type accessKeyConf struct {
+	AccessKeyString string
 }
 
-func (w *AccessKey) Configure(c *WalletClient) {
+func (w *accessKeyConf) Configure(c *WalletClient) {
 	var err error
 	if c.accessKey, err = w.initializeAccessKey(); err != nil {
 		c.accessKey = nil
 	}
 }
 
-// AdminKey sets the admin key for creating new xpubs
-type AdminKey struct {
-	AdminKeyString *string
+// adminKeyConf sets the admin key for creating new xpubs
+type adminKeyConf struct {
+	AdminKeyString string
 }
 
-func (w *AdminKey) Configure(c *WalletClient) {
+func (w *adminKeyConf) Configure(c *WalletClient) {
 	var err error
-	c.adminXPriv, err = bitcoin.GenerateHDKeyFromString(*w.AdminKeyString)
+	c.adminXPriv, err = bitcoin.GenerateHDKeyFromString(w.AdminKeyString)
 	if err != nil {
 		c.adminXPriv = nil
 	}
 }
 
-// HTTP sets the URL and HTTP client of a WalletClient
-type HTTP struct {
-	ServerURL  *string
+// httpConf sets the URL and httpConf client of a WalletClient
+type httpConf struct {
+	ServerURL  string
 	HTTPClient *http.Client
 }
 
-func (w *HTTP) Configure(c *WalletClient) {
-	c.server = *w.ServerURL
+func (w *httpConf) Configure(c *WalletClient) {
+	c.server = w.ServerURL
 	c.httpClient = w.HTTPClient
 	if w.HTTPClient != nil {
 		c.httpClient = w.HTTPClient
@@ -80,23 +80,23 @@ func (w *HTTP) Configure(c *WalletClient) {
 	}
 }
 
-// SignRequest configures whether to sign HTTP requests
-type SignRequest struct {
-	Sign *bool
+// signRequest configures whether to sign HTTP requests
+type signRequest struct {
+	Sign bool
 }
 
-func (w *SignRequest) Configure(c *WalletClient) {
-	c.signRequest = *w.Sign
+func (w *signRequest) Configure(c *WalletClient) {
+	c.signRequest = w.Sign
 }
 
 // initializeAccessKey handles the specific initialization of the access key.
-func (c *AccessKey) initializeAccessKey() (*bec.PrivateKey, error) {
+func (c *accessKeyConf) initializeAccessKey() (*bec.PrivateKey, error) {
 	var err error
 	var privateKey *bec.PrivateKey
 	var decodedWIF *wif.WIF
 
-	if decodedWIF, err = wif.DecodeWIF(*c.AccessKeyString); err != nil {
-		if privateKey, err = bitcoin.PrivateKeyFromString(*c.AccessKeyString); err != nil {
+	if decodedWIF, err = wif.DecodeWIF(c.AccessKeyString); err != nil {
+		if privateKey, err = bitcoin.PrivateKeyFromString(c.AccessKeyString); err != nil {
 			return nil, errors.Wrap(err, "failed to decode access key")
 		}
 	} else {

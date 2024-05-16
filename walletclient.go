@@ -23,11 +23,11 @@ type WalletClient struct {
 // It configures the client with a specific server URL and a flag indicating whether requests should be signed.
 // - `xPriv`: The extended private key used for cryptographic operations.
 // - `serverURL`: The URL of the server the client will interact with.
-func NewWithXPriv(xPriv, serverURL string) *WalletClient {
-	return newWalletClient(
-		&XPriv{XPrivString: &xPriv},
-		&HTTP{ServerURL: &serverURL},
-		&SignRequest{Sign: Ptr(true)},
+func NewWithXPriv(serverURL, xPriv string) *WalletClient {
+	return makeClient(
+		&xPrivConf{XPrivString: xPriv},
+		&httpConf{ServerURL: serverURL},
+		&signRequest{Sign: true},
 	)
 }
 
@@ -35,11 +35,11 @@ func NewWithXPriv(xPriv, serverURL string) *WalletClient {
 // This client is configured for operations that require a public key, such as verifying signatures or receiving transactions.
 // - `xPub`: The extended public key used for cryptographic verification and other public operations.
 // - `serverURL`: The URL of the server the client will interact with.
-func NewWithXPub(xPub, serverURL string) *WalletClient {
-	return newWalletClient(
-		&XPub{XPubString: &xPub},
-		&HTTP{ServerURL: &serverURL},
-		&SignRequest{Sign: Ptr(false)},
+func NewWithXPub(serverURL, xPub string) *WalletClient {
+	return makeClient(
+		&xPubConf{XPubString: xPub},
+		&httpConf{ServerURL: serverURL},
+		&signRequest{Sign: false},
 	)
 }
 
@@ -47,11 +47,11 @@ func NewWithXPub(xPub, serverURL string) *WalletClient {
 // This configuration is typically used for administrative tasks such as managing sub-wallets or configuring system-wide settings.
 // - `adminKey`: The extended private key used for administrative operations.
 // - `serverURL`: The URL of the server the client will interact with.
-func NewWithAdminKey(adminKey, serverURL string) *WalletClient {
-	return newWalletClient(
-		&AdminKey{AdminKeyString: &adminKey},
-		&HTTP{ServerURL: &serverURL},
-		&SignRequest{Sign: Ptr(true)},
+func NewWithAdminKey(serverURL, adminKey string) *WalletClient {
+	return makeClient(
+		&adminKeyConf{AdminKeyString: adminKey},
+		&httpConf{ServerURL: serverURL},
+		&signRequest{Sign: true},
 	)
 }
 
@@ -59,16 +59,16 @@ func NewWithAdminKey(adminKey, serverURL string) *WalletClient {
 // This method is useful for scenarios where the client needs to authenticate using a less sensitive key than an xPriv.
 // - `accessKey`: The access key used for API authentication.
 // - `serverURL`: The URL of the server the client will interact with.
-func NewWithAccessKey(accessKey, serverURL string) *WalletClient {
-	return newWalletClient(
-		&AccessKey{AccessKeyString: &accessKey},
-		&HTTP{ServerURL: &serverURL},
-		&SignRequest{Sign: Ptr(true)},
+func NewWithAccessKey(serverURL, accessKey string) *WalletClient {
+	return makeClient(
+		&accessKeyConf{AccessKeyString: accessKey},
+		&httpConf{ServerURL: serverURL},
+		&signRequest{Sign: true},
 	)
 }
 
-// newWalletClient creates a new WalletClient using the provided configuration options.
-func newWalletClient(configurators ...WalletClientConfigurator) *WalletClient {
+// makeClient creates a new WalletClient using the provided configuration options.
+func makeClient(configurators ...Configurator) *WalletClient {
 	client := &WalletClient{}
 
 	for _, configurator := range configurators {

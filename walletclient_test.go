@@ -23,7 +23,7 @@ func TestNewWalletClient(t *testing.T) {
 	t.Run("NewWalletClientWithXPrivate success", func(t *testing.T) {
 		keys, err := xpriv.Generate()
 		require.NoError(t, err)
-		client := NewWithXPriv(keys.XPriv(), server.URL)
+		client := NewWithXPriv(server.URL, keys.XPriv())
 		require.NotNil(t, client.xPriv)
 		require.Equal(t, keys.XPriv(), client.xPriv.String())
 		require.NotNil(t, client.httpClient)
@@ -44,7 +44,7 @@ func TestNewWalletClient(t *testing.T) {
 	t.Run("NewWalletClientWithXPublic success", func(t *testing.T) {
 		keys, err := xpriv.Generate()
 		require.NoError(t, err)
-		client := NewWithXPub(keys.XPub().String(), server.URL)
+		client := NewWithXPub(server.URL, keys.XPub().String())
 		require.NotNil(t, client.xPub)
 		require.Equal(t, keys.XPub().String(), client.xPub.String())
 		require.NotNil(t, client.httpClient)
@@ -57,13 +57,12 @@ func TestNewWalletClient(t *testing.T) {
 	})
 
 	t.Run("NewWalletClientWithXPublic fail", func(t *testing.T) {
-		xpub := "invalid_key"
-		client := NewWithXPub(xpub, server.URL)
+		client := NewWithXPub(server.URL, "invalid_key")
 		require.Nil(t, client.xPub)
 	})
 
 	t.Run("NewWalletClientWithAdminKey success", func(t *testing.T) {
-		client := NewWithAdminKey(fixtures.XPrivString, server.URL)
+		client := NewWithAdminKey(server.URL, fixtures.XPrivString)
 		require.NotNil(t, client.adminXPriv)
 		require.Nil(t, client.xPriv)
 		require.Equal(t, fixtures.XPrivString, client.adminXPriv.String())
@@ -78,15 +77,13 @@ func TestNewWalletClient(t *testing.T) {
 	})
 
 	t.Run("NewWalletClientWithAdminKey fail", func(t *testing.T) {
-		adminKey := "invalid_key"
-		client := NewWithAdminKey(adminKey, server.URL)
+		client := NewWithAdminKey(server.URL, "invalid_key")
 		require.Nil(t, client.adminXPriv)
 	})
 
 	t.Run("NewWalletClientWithAccessKey success", func(t *testing.T) {
 		// Attempt to create a new WalletClient with an access key
-		accessKey := fixtures.AccessKeyString
-		client := NewWithAccessKey(accessKey, server.URL)
+		client := NewWithAccessKey(server.URL, fixtures.AccessKeyString)
 		require.NotNil(t, client.accessKey)
 
 		require.Equal(t, server.URL, client.server)
@@ -100,8 +97,7 @@ func TestNewWalletClient(t *testing.T) {
 	})
 
 	t.Run("NewWalletClientWithAccessKey fail", func(t *testing.T) {
-		accessKey := "invalid_key"
-		client := NewWithAccessKey(accessKey, server.URL)
+		client := NewWithAccessKey(server.URL, "invalid_key")
 		require.Nil(t, client.accessKey)
 	})
 }

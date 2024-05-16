@@ -17,7 +17,7 @@ import (
 func TestGenerateTotpForContact(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// given
-		sut := NewWithXPriv(fixtures.XPrivString, "localhost:3001")
+		sut := NewWithXPriv("localhost:3001", fixtures.XPrivString)
 		require.NotNil(t, sut.xPriv)
 
 		contact := models.Contact{PubKey: fixtures.PubKey}
@@ -31,7 +31,7 @@ func TestGenerateTotpForContact(t *testing.T) {
 
 	t.Run("WalletClient without xPriv - returns error", func(t *testing.T) {
 		// given
-		sut := NewWithXPub(fixtures.XPubString, "localhost:3001")
+		sut := NewWithXPub("localhost:3001", fixtures.XPubString)
 		require.NotNil(t, sut.xPub)
 		// when
 		_, err := sut.GenerateTotpForContact(nil, 30, 2)
@@ -42,7 +42,7 @@ func TestGenerateTotpForContact(t *testing.T) {
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
 		// given
-		sut := NewWithXPriv(fixtures.XPrivString, "localhost:3001")
+		sut := NewWithXPriv("localhost:3001", fixtures.XPrivString)
 		require.NotNil(t, sut.xPriv)
 
 		contact := models.Contact{PubKey: "invalid-pk-format"}
@@ -70,9 +70,9 @@ func TestValidateTotpForContact(t *testing.T) {
 		require.NoError(t, err)
 
 		// Set up the WalletClient for Alice and Bob
-		clientAlice := NewWithXPriv(aliceKeys.XPriv(), server.URL)
+		clientAlice := NewWithXPriv(server.URL, aliceKeys.XPriv())
 		require.NotNil(t, clientAlice.xPriv)
-		clientBob := NewWithXPriv(bobKeys.XPriv(), server.URL)
+		clientBob := NewWithXPriv(server.URL, bobKeys.XPriv())
 		require.NotNil(t, clientBob.xPriv)
 
 		aliceContact := &models.Contact{
@@ -94,12 +94,12 @@ func TestValidateTotpForContact(t *testing.T) {
 	})
 
 	t.Run("WalletClient without xPriv - returns error", func(t *testing.T) {
-		client := NewWithXPub("invalid_xpub", server.URL)
+		client := NewWithXPub(server.URL, "invalid_xpub")
 		require.Nil(t, client.xPub)
 	})
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
-		sut := NewWithXPriv(fixtures.XPrivString, server.URL)
+		sut := NewWithXPriv(server.URL, fixtures.XPrivString)
 
 		invalidContact := &models.Contact{
 			PubKey:  "invalid_pub_key_format",
