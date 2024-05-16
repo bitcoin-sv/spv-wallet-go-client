@@ -32,7 +32,6 @@ func TestNewWalletClient(t *testing.T) {
 		require.True(t, client.signRequest)
 
 		// Ensure HTTP calls can be made
-		c := client.httpClient
 		resp, err := client.httpClient.Get(serverURL)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.StatusCode)
