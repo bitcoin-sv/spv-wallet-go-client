@@ -7,16 +7,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 func TestTransactions(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/transaction":
+		case "/v1/transaction":
 			switch r.Method {
 			case http.MethodGet:
 				json.NewEncoder(w).Encode(fixtures.Transaction)
@@ -35,11 +34,11 @@ func TestTransactions(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				json.NewEncoder(w).Encode(response)
 			}
-		case "/transaction/search":
+		case "/v1/transaction/search":
 			json.NewEncoder(w).Encode([]*models.Transaction{fixtures.Transaction})
-		case "/transaction/count":
+		case "/v1/transaction/count":
 			json.NewEncoder(w).Encode(1)
-		case "/transaction/record":
+		case "/v1/transaction/record":
 			if r.Method == http.MethodPost {
 				w.Header().Set("Content-Type", "application/json")
 				response := fixtures.Transaction

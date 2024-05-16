@@ -19,10 +19,10 @@ type WalletClient struct {
 	xPub        *bip32.ExtendedKey
 }
 
-// NewWalletClientWithXPrivate creates a new WalletClient instance using a private key (xPriv).
+// NewWithXPrivate creates a new WalletClient instance using a private key (xPriv).
 // It configures the client with a specific server URL and a flag indicating whether requests should be signed.
 // - `xPriv`: The extended private key used for cryptographic operations.
-// - `serverURL`: The URL of the server the client will interact with.
+// - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
 func NewWithXPriv(serverURL, xPriv string) *WalletClient {
 	return makeClient(
 		&xPrivConf{XPrivString: xPriv},
@@ -31,10 +31,10 @@ func NewWithXPriv(serverURL, xPriv string) *WalletClient {
 	)
 }
 
-// NewWalletClientWithXPublic creates a new WalletClient instance using a public key (xPub).
+// NewWithXPublic creates a new WalletClient instance using a public key (xPub).
 // This client is configured for operations that require a public key, such as verifying signatures or receiving transactions.
 // - `xPub`: The extended public key used for cryptographic verification and other public operations.
-// - `serverURL`: The URL of the server the client will interact with.
+// - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
 func NewWithXPub(serverURL, xPub string) *WalletClient {
 	return makeClient(
 		&xPubConf{XPubString: xPub},
@@ -43,10 +43,10 @@ func NewWithXPub(serverURL, xPub string) *WalletClient {
 	)
 }
 
-// NewWalletClientWithAdminKey creates a new WalletClient using an administrative key for advanced operations.
+// NewWithAdminKey creates a new WalletClient using an administrative key for advanced operations.
 // This configuration is typically used for administrative tasks such as managing sub-wallets or configuring system-wide settings.
 // - `adminKey`: The extended private key used for administrative operations.
-// - `serverURL`: The URL of the server the client will interact with.
+// - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
 func NewWithAdminKey(serverURL, adminKey string) *WalletClient {
 	return makeClient(
 		&adminKeyConf{AdminKeyString: adminKey},
@@ -55,10 +55,10 @@ func NewWithAdminKey(serverURL, adminKey string) *WalletClient {
 	)
 }
 
-// NewWalletClientWithAccessKey creates a new WalletClient configured with an access key for API authentication.
+// NewWithAccessKey creates a new WalletClient configured with an access key for API authentication.
 // This method is useful for scenarios where the client needs to authenticate using a less sensitive key than an xPriv.
 // - `accessKey`: The access key used for API authentication.
-// - `serverURL`: The URL of the server the client will interact with.
+// - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
 func NewWithAccessKey(serverURL, accessKey string) *WalletClient {
 	return makeClient(
 		&accessKeyConf{AccessKeyString: accessKey},
@@ -68,7 +68,7 @@ func NewWithAccessKey(serverURL, accessKey string) *WalletClient {
 }
 
 // makeClient creates a new WalletClient using the provided configuration options.
-func makeClient(configurators ...Configurator) *WalletClient {
+func makeClient(configurators ...configurator) *WalletClient {
 	client := &WalletClient{}
 
 	for _, configurator := range configurators {
@@ -93,14 +93,7 @@ func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 	return setSignature(header, xPriv, bodyString)
 }
 
-func Ptr[T any](obj T) *T {
-	return &obj
-}
-
-// getPrivKey retrieves the client's private key. If the primary key is not set,
-func (wc *WalletClient) getPrivKey() *bip32.ExtendedKey {
-	if wc.adminXPriv != nil {
-		return wc.adminXPriv
-	}
-	return wc.xPriv
+func (wc *WalletClient) SetAdminKeyByString(adminKey string) {
+	keyConf := accessKeyConf{AccessKeyString: adminKey}
+	keyConf.Configure(wc)
 }

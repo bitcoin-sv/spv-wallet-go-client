@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 func TestDestinations(t *testing.T) {
@@ -23,24 +22,23 @@ func TestDestinations(t *testing.T) {
 		}
 
 		switch {
-		case r.URL.Path == "/destination/address/"+fixtures.Destination.Address && r.Method == http.MethodGet:
+		case r.URL.Path == "/v1/v1/destination/address/"+fixtures.Destination.Address && r.Method == http.MethodGet:
 			sendJSONResponse(fixtures.Destination)
-		case r.URL.Path == "/destination/lockingScript/"+fixtures.Destination.LockingScript && r.Method == http.MethodGet:
+		case r.URL.Path == "/v1/destination/lockingScript/"+fixtures.Destination.LockingScript && r.Method == http.MethodGet:
 			sendJSONResponse(fixtures.Destination)
-		case r.URL.Path == "/destination/search" && r.Method == http.MethodPost:
+		case r.URL.Path == "/v1/destination/search" && r.Method == http.MethodPost:
 			sendJSONResponse([]*models.Destination{fixtures.Destination})
-		case r.URL.Path == "/destination" && r.Method == http.MethodGet:
+		case r.URL.Path == "/v1/destination" && r.Method == http.MethodGet:
 			sendJSONResponse(fixtures.Destination)
-		case r.URL.Path == "/destination" && r.Method == http.MethodPatch:
+		case r.URL.Path == "/v1/destination" && r.Method == http.MethodPatch:
 			sendJSONResponse(fixtures.Destination)
-		case r.URL.Path == "/destination" && r.Method == http.MethodPost:
+		case r.URL.Path == "/v1/destination" && r.Method == http.MethodPost:
 			sendJSONResponse(fixtures.Destination)
 		default:
 			w.WriteHeader(http.StatusNotFound)
 		}
 	}))
 	defer server.Close()
-
 	client := NewWithAccessKey(server.URL, fixtures.AccessKeyString)
 	require.NotNil(t, client.accessKey)
 

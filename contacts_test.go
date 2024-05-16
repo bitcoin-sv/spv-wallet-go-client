@@ -3,37 +3,34 @@ package walletclient
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 // TestContactActionsRouting will test routing
 func TestContactActionsRouting(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("=== test", r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
 		switch {
-		case strings.HasPrefix(r.URL.Path, "/contact/rejected/"):
+		case strings.HasPrefix(r.URL.Path, "/v1/contact/rejected/"):
 			if r.Method == http.MethodPatch {
 				json.NewEncoder(w).Encode(map[string]string{"result": "rejected"})
 			}
-		case r.URL.Path == "/contact/accepted/":
+		case r.URL.Path == "/v1/contact/accepted/":
 			if r.Method == http.MethodPost {
 				json.NewEncoder(w).Encode(map[string]string{"result": "accepted"})
 			}
-		case r.URL.Path == "/contact/search":
+		case r.URL.Path == "/v1/contact/search":
 			if r.Method == http.MethodPost {
 				json.NewEncoder(w).Encode([]*models.Contact{fixtures.Contact})
 			}
-		case strings.HasPrefix(r.URL.Path, "/contact/"):
+		case strings.HasPrefix(r.URL.Path, "/v1/contact/"):
 			if r.Method == http.MethodPost || r.Method == http.MethodPut {
 				json.NewEncoder(w).Encode(map[string]string{"result": "upserted"})
 			}

@@ -7,17 +7,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 // TestAccessKeys will test the AccessKey methods
 func TestAccessKeys(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/access-key":
+		case "/v1/access-key":
 			if r.Method == http.MethodGet {
 				json.NewEncoder(w).Encode(fixtures.AccessKey)
 			} else if r.Method == http.MethodPost {
@@ -25,7 +24,7 @@ func TestAccessKeys(t *testing.T) {
 			} else if r.Method == http.MethodDelete {
 				json.NewEncoder(w).Encode(fixtures.AccessKey)
 			}
-		case "/access-key/search":
+		case "/v1/access-key/search":
 			json.NewEncoder(w).Encode([]*models.AccessKey{fixtures.AccessKey})
 		default:
 			w.WriteHeader(http.StatusNotFound)

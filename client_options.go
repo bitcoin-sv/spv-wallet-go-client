@@ -1,7 +1,9 @@
 package walletclient
 
 import (
+	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
@@ -9,8 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Configurator is the interface for configuring WalletClient
-type Configurator interface {
+// configurator is the interface for configuring WalletClient
+type configurator interface {
 	Configure(c *WalletClient)
 }
 
@@ -71,7 +73,17 @@ type httpConf struct {
 }
 
 func (w *httpConf) Configure(c *WalletClient) {
-	c.server = w.ServerURL
+	// Ensure the ServerURL ends with a clean base URL
+	baseURL, err := validateAndCleanURL(w.ServerURL)
+	if err != nil {
+		// Handle the error appropriately
+		fmt.Println("Invalid URL provided:", err)
+		return
+	}
+
+	const basePath = "/v1"
+	c.server = fmt.Sprintf("%s%s", baseURL, basePath)
+
 	c.httpClient = w.HTTPClient
 	if w.HTTPClient != nil {
 		c.httpClient = w.HTTPClient
@@ -104,4 +116,26 @@ func (c *accessKeyConf) initializeAccessKey() (*bec.PrivateKey, error) {
 	}
 
 	return privateKey, nil
+}
+
+// validateAndCleanURL ensures that the provided URL is valid, and strips it down to just the base URL.
+func validateAndCleanURL(rawURL string) (string, error) {
+	if rawURL == "" {
+		return "", fmt.Errorf("empty URL")
+	}
+
+	// Parse the URL to validate it
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return "", fmt.Errorf("parsing URL failed: %w", err)
+	}
+
+	// Rebuild the URL with only the scheme and host (and port if included)
+	cleanedURL := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
+
+	if parsedURL.Path == "" || parsedURL.Path == "/" {
+		return cleanedURL, nil
+	}
+
+	return cleanedURL, nil
 }

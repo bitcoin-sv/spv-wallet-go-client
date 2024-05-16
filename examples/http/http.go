@@ -12,6 +12,6 @@ func main() {
 	keys, _ := xpriv.Generate()
 
 	// Create a client
-	wc := walletclient.NewWithXPriv("localhost:3001", keys.XPriv())
+	wc := walletclient.NewWithXPriv("https://localhost:3001", keys.XPriv())
 	fmt.Println(wc.IsSignRequest())
 }

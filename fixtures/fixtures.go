@@ -8,13 +8,20 @@ import (
 )
 
 var (
-	RequestType     = "http"
-	ServerURL       = "https://example.com/"
-	XPubString      = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
-	XPrivString     = "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ"
+	// RequestType http or https
+	RequestType = "http"
+	// ServerURL ex. https://localhost
+	ServerURL = "https://example.com/"
+	// XPubString public key
+	XPubString = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
+	// XPrivString private key
+	XPrivString = "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ"
+	// AccessKeyString access key
 	AccessKeyString = "7779d24ca6f8821f225042bf55e8f80aa41b08b879b72827f51e41e6523b9cd0"
-	PaymailAddress  = "address@paymail.com"
-	PubKey          = "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
+	// PaymailAddress ex. "address@paymail.com"
+	PaymailAddress = "address@paymail.com"
+	// PubKey ex. "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
+	PubKey = "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
 )
 
 func MarshallForTestHandler(object any) string {

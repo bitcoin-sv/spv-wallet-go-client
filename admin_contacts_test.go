@@ -7,31 +7,30 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 // TestAdminContactActions testing Admin contacts methods
 func TestAdminContactActions(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
-		case r.URL.Path == "/admin/contact/search" && r.Method == http.MethodPost:
+		case r.URL.Path == "/v1/admin/contact/search" && r.Method == http.MethodPost:
 			c := fixtures.Contact
 			c.ID = "1"
 			contacts := []*models.Contact{c}
 			json.NewEncoder(w).Encode(contacts)
-		case r.URL.Path == "/admin/contact/1" && r.Method == http.MethodPatch:
+		case r.URL.Path == "/v1/admin/contact/1" && r.Method == http.MethodPatch:
 			contact := fixtures.Contact
 			json.NewEncoder(w).Encode(contact)
-		case r.URL.Path == "/admin/contact/1" && r.Method == http.MethodDelete:
+		case r.URL.Path == "/v1/admin/contact/1" && r.Method == http.MethodDelete:
 			w.WriteHeader(http.StatusOK)
-		case r.URL.Path == "/admin/contact/accepted/1" && r.Method == http.MethodPatch:
+		case r.URL.Path == "/v1/admin/contact/accepted/1" && r.Method == http.MethodPatch:
 			contact := fixtures.Contact
 			contact.Status = "accepted"
 			json.NewEncoder(w).Encode(contact)
-		case r.URL.Path == "/admin/contact/rejected/1" && r.Method == http.MethodPatch:
+		case r.URL.Path == "/v1/admin/contact/rejected/1" && r.Method == http.MethodPatch:
 			contact := fixtures.Contact
 			contact.Status = "rejected"
 			json.NewEncoder(w).Encode(contact)

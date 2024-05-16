@@ -2,16 +2,16 @@ package walletclient
 
 import (
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
+	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
-	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 )
 
 func TestGenerateTotpForContact(t *testing.T) {
@@ -63,6 +63,7 @@ func TestValidateTotpForContact(t *testing.T) {
 	}))
 	defer server.Close()
 
+	serverURL := fmt.Sprintf("%s/v1", server.URL)
 	t.Run("success", func(t *testing.T) {
 		aliceKeys, err := xpriv.Generate()
 		require.NoError(t, err)
@@ -70,9 +71,9 @@ func TestValidateTotpForContact(t *testing.T) {
 		require.NoError(t, err)
 
 		// Set up the WalletClient for Alice and Bob
-		clientAlice := NewWithXPriv(server.URL, aliceKeys.XPriv())
+		clientAlice := NewWithXPriv(serverURL, aliceKeys.XPriv())
 		require.NotNil(t, clientAlice.xPriv)
-		clientBob := NewWithXPriv(server.URL, bobKeys.XPriv())
+		clientBob := NewWithXPriv(serverURL, bobKeys.XPriv())
 		require.NotNil(t, clientBob.xPriv)
 
 		aliceContact := &models.Contact{
@@ -94,12 +95,12 @@ func TestValidateTotpForContact(t *testing.T) {
 	})
 
 	t.Run("WalletClient without xPriv - returns error", func(t *testing.T) {
-		client := NewWithXPub(server.URL, "invalid_xpub")
+		client := NewWithXPub(serverURL, "invalid_xpub")
 		require.Nil(t, client.xPub)
 	})
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
-		sut := NewWithXPriv(server.URL, fixtures.XPrivString)
+		sut := NewWithXPriv(serverURL, fixtures.XPrivString)
 
 		invalidContact := &models.Contact{
 			PubKey:  "invalid_pub_key_format",

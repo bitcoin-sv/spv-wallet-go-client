@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 )
 
 type xpub struct {
@@ -25,7 +24,7 @@ func TestXpub(t *testing.T) {
 		var response xpub
 		// Check path and method to customize the response
 		switch {
-		case r.URL.Path == "/xpub":
+		case r.URL.Path == "/v1/xpub":
 			metadata := &models.Metadata{"key": "value"}
 			if update {
 				metadata = &models.Metadata{"updated": "info"}
@@ -39,7 +38,6 @@ func TestXpub(t *testing.T) {
 		w.Write(respBytes)
 	}))
 	defer server.Close()
-
 	keys, err := xpriv.Generate()
 	require.NoError(t, err)
 
