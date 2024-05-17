@@ -8,10 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 // TestAccessKeys will test the AccessKey methods

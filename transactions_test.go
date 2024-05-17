@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 func TestTransactions(t *testing.T) {
@@ -87,12 +86,16 @@ func TestTransactions(t *testing.T) {
 func handleTransaction(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet, http.MethodPost:
-		json.NewEncoder(w).Encode(fixtures.Transaction)
+		if err := json.NewEncoder(w).Encode(fixtures.Transaction); err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		}
 	case http.MethodPatch:
 		var input map[string]interface{}
 		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{"error": "bad request"})
+			if err := json.NewEncoder(w).Encode(map[string]string{"error": "bad request"}); err != nil {
+				http.Error(w, "Failed to encode error response", http.StatusInternalServerError)
+			}
 			return
 		}
 		response := fixtures.Transaction
@@ -103,7 +106,9 @@ func handleTransaction(w http.ResponseWriter, r *http.Request) {
 			response.ID = id
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		}
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
