@@ -16,6 +16,7 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
+// ErrClientInitNoXpriv error per init client with first xpriv key
 var ErrClientInitNoXpriv = errors.New("init client with xPriv first")
 
 const (

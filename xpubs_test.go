@@ -2,44 +2,62 @@ package walletclient
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
+	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/stretchr/testify/require"
 )
 
-// TestXpub will test the Xpub methods
+type xpub struct {
+	CurrentBalance uint64           `json:"current_balance"`
+	Metadata       *models.Metadata `json:"metadata"`
+}
+
 func TestXpub(t *testing.T) {
-	transportHandler := testTransportHandler{
-		Type:      fixtures.RequestType,
-		Path:      "/xpub",
-		Result:    fixtures.MarshallForTestHandler(fixtures.Xpub),
-		ClientURL: fixtures.ServerURL,
-		Client:    WithHTTPClient,
-	}
+	var update bool
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var response xpub
+		// Check path and method to customize the response
+		switch {
+		case r.URL.Path == "/v1/xpub":
+			metadata := &models.Metadata{"key": "value"}
+			if update {
+				metadata = &models.Metadata{"updated": "info"}
+			}
+			response = xpub{
+				CurrentBalance: 1234,
+				Metadata:       metadata,
+			}
+		}
+		respBytes, _ := json.Marshal(response)
+		w.Write(respBytes)
+	}))
+	defer server.Close()
+	keys, err := xpriv.Generate()
+	require.NoError(t, err)
+
+	client := NewWithXPriv(server.URL, keys.XPriv())
+	require.NotNil(t, client.xPriv)
 
 	t.Run("GetXPub", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, true)
-
-		// when
 		xpub, err := client.GetXPub(context.Background())
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, fixtures.Xpub, xpub)
+		require.NoError(t, err)
+		require.NotNil(t, xpub)
+		require.Equal(t, uint64(1234), xpub.CurrentBalance)
+		require.Equal(t, "value", xpub.Metadata["key"])
 	})
 
 	t.Run("UpdateXPubMetadata", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, true)
-
-		// when
-		xpub, err := client.UpdateXPubMetadata(context.Background(), fixtures.TestMetadata)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, fixtures.Xpub, xpub)
+		update = true
+		metadata := &models.Metadata{"updated": "info"}
+		xpub, err := client.UpdateXPubMetadata(context.Background(), metadata)
+		require.NoError(t, err)
+		require.NotNil(t, xpub)
+		require.Equal(t, "info", xpub.Metadata["updated"])
 	})
 }

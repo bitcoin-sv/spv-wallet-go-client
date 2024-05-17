@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
+
+	"github.com/bitcoin-sv/spv-wallet/models"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
-	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 )
 
 func main() {
@@ -14,17 +15,11 @@ func main() {
 	keys, _ := xpriv.Generate()
 
 	// Create a client
-	walletClient, _ := walletclient.New(
-		walletclient.WithXPriv(keys.XPriv()),
-		walletclient.WithHTTP("localhost:3003/v1"),
-		walletclient.WithSignRequest(true),
-	)
-
+	wc := walletclient.NewWithXPriv("localhost:3003", keys.XPriv())
 	ctx := context.Background()
+	_ = wc.AdminNewXpub(ctx, keys.XPub().String(), &models.Metadata{"example_field": "example_data"})
 
-	_ = walletClient.AdminNewXpub(ctx, keys.XPub().String(), &models.Metadata{"example_field": "example_data"})
-
-	xpubKey, err := walletClient.GetXPub(ctx)
+	xpubKey, err := wc.GetXPub(ctx)
 	if err != nil {
 		fmt.Println(err)
 	}

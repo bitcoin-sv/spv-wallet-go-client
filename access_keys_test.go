@@ -1,77 +1,59 @@
+// Package walletclient here we are testing walletclient public methods
 package walletclient
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/stretchr/testify/require"
 )
 
 // TestAccessKeys will test the AccessKey methods
 func TestAccessKeys(t *testing.T) {
-	transportHandler := testTransportHandler{
-		Type:      fixtures.RequestType,
-		Path:      "/access-key",
-		Result:    fixtures.MarshallForTestHandler(fixtures.AccessKey),
-		ClientURL: fixtures.ServerURL,
-		Client:    WithHTTPClient,
-	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/v1/access-key":
+			switch r.Method {
+			case http.MethodGet, http.MethodPost, http.MethodDelete:
+				json.NewEncoder(w).Encode(fixtures.AccessKey)
+			}
+		case "/v1/access-key/search":
+			json.NewEncoder(w).Encode([]*models.AccessKey{fixtures.AccessKey})
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+
+	client := NewWithAccessKey(server.URL, fixtures.AccessKeyString)
+	require.NotNil(t, client.accessKey)
 
 	t.Run("GetAccessKey", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, true)
-
-		// when
 		accessKey, err := client.GetAccessKey(context.Background(), fixtures.AccessKey.ID)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, accessKey, fixtures.AccessKey)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.AccessKey, accessKey)
 	})
 
 	t.Run("GetAccessKeys", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/access-key/search",
-			Result:    fixtures.MarshallForTestHandler([]*models.AccessKey{fixtures.AccessKey}),
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, true)
-
-		// when
-		accessKeys, err := client.GetAccessKeys(context.Background(), fixtures.TestMetadata)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, accessKeys, []*models.AccessKey{fixtures.AccessKey})
+		accessKeys, err := client.GetAccessKeys(context.Background(), nil)
+		require.NoError(t, err)
+		require.Equal(t, []*models.AccessKey{fixtures.AccessKey}, accessKeys)
 	})
 
 	t.Run("CreateAccessKey", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, true)
-
-		// when
-		accessKey, err := client.CreateAccessKey(context.Background(), fixtures.TestMetadata)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, accessKey, fixtures.AccessKey)
+		accessKey, err := client.CreateAccessKey(context.Background(), nil)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.AccessKey, accessKey)
 	})
 
 	t.Run("RevokeAccessKey", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, true)
-
-		// when
 		accessKey, err := client.RevokeAccessKey(context.Background(), fixtures.AccessKey.ID)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, accessKey, fixtures.AccessKey)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.AccessKey, accessKey)
 	})
 }

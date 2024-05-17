@@ -1,4 +1,4 @@
-package transports
+package walletclient
 
 import (
 	"encoding/json"

@@ -1,4 +1,4 @@
-package transports
+package walletclient
 
 import (
 	"encoding/hex"
@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/apierrors"
 	"github.com/bitcoinschema/go-bitcoin/v2"
@@ -14,8 +15,6 @@ import (
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-bt/v2/bscript"
 	"github.com/libsv/go-bt/v2/sighash"
-
-	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 )
 
 // SetSignature will set the signature on the header for the request

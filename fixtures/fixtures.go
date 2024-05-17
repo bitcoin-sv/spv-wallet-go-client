@@ -1,3 +1,4 @@
+// Package fixtures contains fixtures for testing
 package fixtures
 
 import (
@@ -7,16 +8,24 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/common"
 )
 
-const (
-	RequestType     = "http"
-	ServerURL       = "https://example.com/"
-	XPubString      = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
-	XPrivString     = "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ"
+var (
+	// RequestType http or https
+	RequestType = "http"
+	// ServerURL ex. https://localhost
+	ServerURL = "https://example.com/"
+	// XPubString public key
+	XPubString = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
+	// XPrivString private key
+	XPrivString = "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ"
+	// AccessKeyString access key
 	AccessKeyString = "7779d24ca6f8821f225042bf55e8f80aa41b08b879b72827f51e41e6523b9cd0"
-	PaymailAddress  = "address@paymail.com"
-	PubKey          = "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
+	// PaymailAddress ex. "address@paymail.com"
+	PaymailAddress = "address@paymail.com"
+	// PubKey ex. "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
+	PubKey = "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
 )
 
+// MarshallForTestHandler its marshaling test handler
 func MarshallForTestHandler(object any) string {
 	json, err := json.Marshal(object)
 	if err != nil {
@@ -27,8 +36,10 @@ func MarshallForTestHandler(object any) string {
 	return string(json)
 }
 
+// TestMetadata model for metadata
 var TestMetadata = &models.Metadata{"test-key": "test-value"}
 
+// Xpub model for testing
 var Xpub = &models.Xpub{
 	Model:           common.Model{Metadata: *TestMetadata},
 	ID:              "cba0be1e753a7609e1a2f792d2e80ea6fce241be86f0690ec437377477809ccc",
@@ -37,6 +48,7 @@ var Xpub = &models.Xpub{
 	NextExternalNum: 1,
 }
 
+// AccessKey model for testing
 var AccessKey = &models.AccessKey{
 	Model:  common.Model{Metadata: *TestMetadata},
 	ID:     "access-key-id",
@@ -44,6 +56,7 @@ var AccessKey = &models.AccessKey{
 	Key:    AccessKeyString,
 }
 
+// Destination model for testing
 var Destination = &models.Destination{
 	Model:         common.Model{Metadata: *TestMetadata},
 	ID:            "90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce",
@@ -56,6 +69,7 @@ var Destination = &models.Destination{
 	DraftID:       "3a0e1fdd9ac6046c0c82aa36b462e477a455880ceeb08d3aabb1bf031553d1df",
 }
 
+// Transaction model for testing
 var Transaction = &models.Transaction{
 	Model:                common.Model{Metadata: *TestMetadata},
 	ID:                   "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda",
@@ -75,6 +89,7 @@ var Transaction = &models.Transaction{
 	TransactionDirection: "incoming",
 }
 
+// DraftTx model for testing
 var DraftTx = &models.DraftTransaction{
 	Model:  common.Model{Metadata: *TestMetadata},
 	ID:     "3a0e1fdd9ac6046c0c82aa36b462e477a455880ceeb08d3aabb1bf031553d1df",
@@ -189,4 +204,13 @@ var DraftTx = &models.DraftTransaction{
 	},
 	Status:    "draft",
 	FinalTxID: "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda",
+}
+
+// Contact model for testing
+var Contact = &models.Contact{
+	ID:       "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a",
+	FullName: "Test User",
+	Paymail:  "test@spv-wallet.com",
+	PubKey:   "xpub661MyMwAqRbcGpZVrSHU...",
+	Status:   models.ContactStatus("unconfirmed"),
 }

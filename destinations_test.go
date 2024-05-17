@@ -2,124 +2,93 @@ package walletclient
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/stretchr/testify/require"
 )
 
-// TestDestinations will test the Destinations methods
 func TestDestinations(t *testing.T) {
-	transportHandler := testTransportHandler{
-		Type:      fixtures.RequestType,
-		Path:      "/destination",
-		Result:    fixtures.MarshallForTestHandler(fixtures.Destination),
-		ClientURL: fixtures.ServerURL,
-		Client:    WithHTTPClient,
-	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sendJSONResponse := func(data interface{}) {
+			w.Header().Set("Content-Type", "application/json")
+			if err := json.NewEncoder(w).Encode(data); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+		}
+
+		const dest = "/v1/destination"
+
+		switch {
+		case r.URL.Path == "/v1/v1/destination/address/"+fixtures.Destination.Address && r.Method == http.MethodGet:
+			sendJSONResponse(fixtures.Destination)
+		case r.URL.Path == "/v1/destination/lockingScript/"+fixtures.Destination.LockingScript && r.Method == http.MethodGet:
+			sendJSONResponse(fixtures.Destination)
+		case r.URL.Path == "/v1/destination/search" && r.Method == http.MethodPost:
+			sendJSONResponse([]*models.Destination{fixtures.Destination})
+		case r.URL.Path == dest && r.Method == http.MethodGet:
+			sendJSONResponse(fixtures.Destination)
+		case r.URL.Path == dest && r.Method == http.MethodPatch:
+			sendJSONResponse(fixtures.Destination)
+		case r.URL.Path == dest && r.Method == http.MethodPost:
+			sendJSONResponse(fixtures.Destination)
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+	client := NewWithAccessKey(server.URL, fixtures.AccessKeyString)
+	require.NotNil(t, client.accessKey)
 
 	t.Run("GetDestinationByID", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, false)
-
-		// when
 		destination, err := client.GetDestinationByID(context.Background(), fixtures.Destination.ID)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, destination, fixtures.Destination)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.Destination, destination)
 	})
 
 	t.Run("GetDestinationByAddress", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, false)
-
-		// when
 		destination, err := client.GetDestinationByAddress(context.Background(), fixtures.Destination.Address)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, destination, fixtures.Destination)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.Destination, destination)
 	})
 
 	t.Run("GetDestinationByLockingScript", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, false)
-
-		// when
 		destination, err := client.GetDestinationByLockingScript(context.Background(), fixtures.Destination.LockingScript)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, destination, fixtures.Destination)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.Destination, destination)
 	})
 
 	t.Run("GetDestinations", func(t *testing.T) {
-		// given
-		transportHandler := testTransportHandler{
-			Type:      fixtures.RequestType,
-			Path:      "/destination/search",
-			Result:    fixtures.MarshallForTestHandler([]*models.Destination{fixtures.Destination}),
-			ClientURL: fixtures.ServerURL,
-			Client:    WithHTTPClient,
-		}
-		client := getTestWalletClient(transportHandler, false)
-
-		// when
 		destinations, err := client.GetDestinations(context.Background(), fixtures.TestMetadata)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, destinations, []*models.Destination{fixtures.Destination})
+		require.NoError(t, err)
+		require.Equal(t, []*models.Destination{fixtures.Destination}, destinations)
 	})
 
 	t.Run("NewDestination", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, false)
-
-		// when
 		destination, err := client.NewDestination(context.Background(), fixtures.TestMetadata)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, destination, fixtures.Destination)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.Destination, destination)
 	})
 
 	t.Run("UpdateDestinationMetadataByID", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, false)
-
-		// when
 		destination, err := client.UpdateDestinationMetadataByID(context.Background(), fixtures.Destination.ID, fixtures.TestMetadata)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, destination, fixtures.Destination)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.Destination, destination)
 	})
 
 	t.Run("UpdateDestinationMetadataByAddress", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, false)
-
-		// when
 		destination, err := client.UpdateDestinationMetadataByAddress(context.Background(), fixtures.Destination.Address, fixtures.TestMetadata)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, destination, fixtures.Destination)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.Destination, destination)
 	})
 
 	t.Run("UpdateDestinationMetadataByLockingScript", func(t *testing.T) {
-		// given
-		client := getTestWalletClient(transportHandler, false)
-
-		// when
 		destination, err := client.UpdateDestinationMetadataByLockingScript(context.Background(), fixtures.Destination.LockingScript, fixtures.TestMetadata)
-
-		// then
-		assert.NoError(t, err)
-		assert.Equal(t, destination, fixtures.Destination)
+		require.NoError(t, err)
+		require.Equal(t, fixtures.Destination, destination)
 	})
 }

@@ -1,117 +1,100 @@
-// Package walletclient is a Go client for interacting with Spv Wallet.
 package walletclient
 
 import (
-	"github.com/bitcoin-sv/spv-wallet-go-client/transports"
-	"github.com/bitcoinschema/go-bitcoin/v2"
+	"net/http"
+
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bk/wif"
-	"github.com/pkg/errors"
 )
 
-// ClientOps are used for client options
-type ClientOps func(c *WalletClient)
-
-// WalletClient is the spv wallet go client representation.
+// WalletClient is the spv wallet Go client representation.
 type WalletClient struct {
-	transports.TransportService
-	accessKey        *bec.PrivateKey
-	accessKeyString  string
-	transport        transports.TransportService
-	transportOptions []transports.ClientOps
-	xPriv            *bip32.ExtendedKey
-	xPrivString      string
-	xPub             *bip32.ExtendedKey
-	xPubString       string
+	signRequest bool
+	server      string
+	httpClient  *http.Client
+	accessKey   *bec.PrivateKey
+	adminXPriv  *bip32.ExtendedKey
+	xPriv       *bip32.ExtendedKey
+	xPub        *bip32.ExtendedKey
 }
 
-// New create a new wallet client
-func New(opts ...ClientOps) (*WalletClient, error) {
+// NewWithXPriv creates a new WalletClient instance using a private key (xPriv).
+// It configures the client with a specific server URL and a flag indicating whether requests should be signed.
+// - `xPriv`: The extended private key used for cryptographic operations.
+// - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
+func NewWithXPriv(serverURL, xPriv string) *WalletClient {
+	return makeClient(
+		&xPrivConf{XPrivString: xPriv},
+		&httpConf{ServerURL: serverURL},
+		&signRequest{Sign: true},
+	)
+}
+
+// NewWithXPub creates a new WalletClient instance using a public key (xPub).
+// This client is configured for operations that require a public key, such as verifying signatures or receiving transactions.
+// - `xPub`: The extended public key used for cryptographic verification and other public operations.
+// - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
+func NewWithXPub(serverURL, xPub string) *WalletClient {
+	return makeClient(
+		&xPubConf{XPubString: xPub},
+		&httpConf{ServerURL: serverURL},
+		&signRequest{Sign: false},
+	)
+}
+
+// NewWithAdminKey creates a new WalletClient using an administrative key for advanced operations.
+// This configuration is typically used for administrative tasks such as managing sub-wallets or configuring system-wide settings.
+// - `adminKey`: The extended private key used for administrative operations.
+// - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
+func NewWithAdminKey(serverURL, adminKey string) *WalletClient {
+	return makeClient(
+		&adminKeyConf{AdminKeyString: adminKey},
+		&httpConf{ServerURL: serverURL},
+		&signRequest{Sign: true},
+	)
+}
+
+// NewWithAccessKey creates a new WalletClient configured with an access key for API authentication.
+// This method is useful for scenarios where the client needs to authenticate using a less sensitive key than an xPriv.
+// - `accessKey`: The access key used for API authentication.
+// - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
+func NewWithAccessKey(serverURL, accessKey string) *WalletClient {
+	return makeClient(
+		&accessKeyConf{AccessKeyString: accessKey},
+		&httpConf{ServerURL: serverURL},
+		&signRequest{Sign: true},
+	)
+}
+
+// makeClient creates a new WalletClient using the provided configuration options.
+func makeClient(configurators ...configurator) *WalletClient {
 	client := &WalletClient{}
 
-	for _, opt := range opts {
-		opt(client)
+	for _, configurator := range configurators {
+		configurator.Configure(client)
 	}
 
-	var err error
-	if client.xPrivString != "" {
-		if client.xPriv, err = bitcoin.GenerateHDKeyFromString(client.xPrivString); err != nil {
-			return nil, err
-		}
-		if client.xPub, err = client.xPriv.Neuter(); err != nil {
-			return nil, err
-		}
-	} else if client.xPubString != "" {
-		client.xPriv = nil
-		if client.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(client.xPubString); err != nil {
-			return nil, err
-		}
-	} else if client.accessKeyString != "" {
-		client.xPriv = nil
-		client.xPub = nil
-
-		var privateKey *bec.PrivateKey
-		var decodedWIF *wif.WIF
-		if decodedWIF, err = wif.DecodeWIF(client.accessKeyString); err != nil {
-			// try as a hex string
-			var errHex error
-			if privateKey, errHex = bitcoin.PrivateKeyFromString(client.accessKeyString); errHex != nil {
-				return nil, errors.Wrap(err, errHex.Error())
-			}
-		} else {
-			privateKey = decodedWIF.PrivKey
-		}
-		client.accessKey = privateKey
-	} else {
-		return nil, errors.New("no keys available")
-	}
-
-	transportOptions := make([]transports.ClientOps, 0)
-	if client.xPriv != nil {
-		transportOptions = append(transportOptions, transports.WithXPriv(client.xPriv))
-		transportOptions = append(transportOptions, transports.WithXPub(client.xPub))
-	} else if client.xPub != nil {
-		transportOptions = append(transportOptions, transports.WithXPub(client.xPub))
-	} else if client.accessKey != nil {
-		transportOptions = append(transportOptions, transports.WithAccessKey(client.accessKey))
-	}
-	if len(client.transportOptions) > 0 {
-		transportOptions = append(transportOptions, client.transportOptions...)
-	}
-
-	if client.transport, err = transports.NewTransport(transportOptions...); err != nil {
-		return nil, err
-	}
-
-	client.TransportService = client.transport
-
-	return client, nil
+	return client
 }
 
-// SetAdminKey set the admin key to use to create new xpubs
-func (b *WalletClient) SetAdminKey(adminKeyString string) error {
-	adminKey, err := bip32.NewKeyFromString(adminKeyString)
-	if err != nil {
-		return err
+// processMetadata will process the metadata
+func processMetadata(metadata *models.Metadata) *models.Metadata {
+	if metadata == nil {
+		m := make(models.Metadata)
+		metadata = &m
 	}
 
-	b.transport.SetAdminKey(adminKey)
-
-	return nil
+	return metadata
 }
 
-// SetSignRequest turn the signing of the http request on or off
-func (b *WalletClient) SetSignRequest(signRequest bool) {
-	b.transport.SetSignRequest(signRequest)
+// addSignature will add the signature to the request
+func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
+	return setSignature(header, xPriv, bodyString)
 }
 
-// IsSignRequest return whether to sign all requests
-func (b *WalletClient) IsSignRequest() bool {
-	return b.transport.IsSignRequest()
-}
-
-// GetTransport returns the current transport service
-func (b *WalletClient) GetTransport() *transports.TransportService {
-	return &b.transport
+// SetAdminKeyByString will set aminXPriv key
+func (wc *WalletClient) SetAdminKeyByString(adminKey string) {
+	keyConf := accessKeyConf{AccessKeyString: adminKey}
+	keyConf.Configure(wc)
 }
