@@ -7,33 +7,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 )
 
 func TestTransactions(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/v1/transaction":
-			switch r.Method {
-			case http.MethodGet:
-				json.NewEncoder(w).Encode(fixtures.Transaction)
-			case http.MethodPost:
-				json.NewEncoder(w).Encode(fixtures.Transaction)
-			case http.MethodPatch:
-				var input map[string]interface{}
-				if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					json.NewEncoder(w).Encode(map[string]string{"error": "bad request"})
-					return
-				}
-				response := fixtures.Transaction
-				response.Metadata = input["metadata"].(map[string]interface{})
-				response.ID = input["id"].(string)
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
-			}
+			handleTransaction(w, r)
 		case "/v1/transaction/search":
 			json.NewEncoder(w).Encode([]*models.Transaction{fixtures.Transaction})
 		case "/v1/transaction/count":
@@ -41,8 +25,7 @@ func TestTransactions(t *testing.T) {
 		case "/v1/transaction/record":
 			if r.Method == http.MethodPost {
 				w.Header().Set("Content-Type", "application/json")
-				response := fixtures.Transaction
-				json.NewEncoder(w).Encode(response)
+				json.NewEncoder(w).Encode(fixtures.Transaction)
 			} else {
 				w.WriteHeader(http.StatusMethodNotAllowed)
 			}
@@ -99,4 +82,29 @@ func TestTransactions(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, fixtures.Transaction, tx)
 	})
+}
+
+func handleTransaction(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet, http.MethodPost:
+		json.NewEncoder(w).Encode(fixtures.Transaction)
+	case http.MethodPatch:
+		var input map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "bad request"})
+			return
+		}
+		response := fixtures.Transaction
+		if metadata, ok := input["metadata"].(map[string]interface{}); ok {
+			response.Metadata = metadata
+		}
+		if id, ok := input["id"].(string); ok {
+			response.ID = id
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
