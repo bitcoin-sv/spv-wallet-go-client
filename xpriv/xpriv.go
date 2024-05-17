@@ -1,3 +1,4 @@
+// Package xpriv manges keys
 package xpriv
 
 import (

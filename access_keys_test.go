@@ -1,3 +1,4 @@
+// Package walletclient here we are testing walletclient public methods
 package walletclient
 
 import (

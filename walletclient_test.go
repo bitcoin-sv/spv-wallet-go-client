@@ -1,15 +1,16 @@
 package walletclient
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/stretchr/testify/require"
+	"time"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewWalletClient(t *testing.T) {
@@ -31,8 +32,21 @@ func TestNewWalletClient(t *testing.T) {
 		require.NotNil(t, client.httpClient)
 		require.True(t, client.signRequest)
 
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		req, err := http.NewRequestWithContext(ctx, "GET", serverURL, nil)
+		if err != nil {
+			t.Fatalf("Failed to create HTTP request: %v", err)
+		}
+
 		// Ensure HTTP calls can be made
-		resp, err := client.httpClient.Get(serverURL)
+		resp, err := client.httpClient.Do(req)
+		if err != nil {
+			t.Fatalf("Failed to make HTTP request: %v", err)
+		}
+		defer resp.Body.Close()
+
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 	})
@@ -51,9 +65,20 @@ func TestNewWalletClient(t *testing.T) {
 		require.Equal(t, keys.XPub().String(), client.xPub.String())
 		require.NotNil(t, client.httpClient)
 		require.False(t, client.signRequest)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		req, err := http.NewRequestWithContext(ctx, "GET", serverURL, nil)
+		if err != nil {
+			t.Fatalf("Failed to create HTTP request: %v", err)
+		}
 
 		// Ensure HTTP calls can be made
-		resp, err := client.httpClient.Get(serverURL)
+		resp, err := client.httpClient.Do(req)
+		if err != nil {
+			t.Fatalf("Failed to make HTTP request: %v", err)
+		}
+		defer resp.Body.Close()
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 	})
@@ -72,8 +97,21 @@ func TestNewWalletClient(t *testing.T) {
 		require.NotNil(t, client.httpClient)
 		require.True(t, client.signRequest)
 
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		req, err := http.NewRequestWithContext(ctx, "GET", serverURL, nil)
+		if err != nil {
+			t.Fatalf("Failed to create HTTP request: %v", err)
+		}
+
 		// Ensure HTTP calls can be made
-		resp, err := client.httpClient.Get(serverURL)
+		resp, err := client.httpClient.Do(req)
+		if err != nil {
+			t.Fatalf("Failed to make HTTP request: %v", err)
+		}
+		defer resp.Body.Close()
+
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 	})
@@ -92,8 +130,21 @@ func TestNewWalletClient(t *testing.T) {
 		require.True(t, client.signRequest)
 		require.NotNil(t, client.httpClient)
 
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		req, err := http.NewRequestWithContext(ctx, "GET", serverURL, nil)
+		if err != nil {
+			t.Fatalf("Failed to create HTTP request: %v", err)
+		}
+
 		// Ensure HTTP calls can be made
-		resp, err := client.httpClient.Get(serverURL)
+		resp, err := client.httpClient.Do(req)
+		if err != nil {
+			t.Fatalf("Failed to make HTTP request: %v", err)
+		}
+		defer resp.Body.Close()
+
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 	})

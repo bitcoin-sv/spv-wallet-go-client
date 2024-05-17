@@ -19,7 +19,7 @@ type WalletClient struct {
 	xPub        *bip32.ExtendedKey
 }
 
-// NewWithXPrivate creates a new WalletClient instance using a private key (xPriv).
+// NewWithXPriv creates a new WalletClient instance using a private key (xPriv).
 // It configures the client with a specific server URL and a flag indicating whether requests should be signed.
 // - `xPriv`: The extended private key used for cryptographic operations.
 // - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
@@ -31,7 +31,7 @@ func NewWithXPriv(serverURL, xPriv string) *WalletClient {
 	)
 }
 
-// NewWithXPublic creates a new WalletClient instance using a public key (xPub).
+// NewWithXPub creates a new WalletClient instance using a public key (xPub).
 // This client is configured for operations that require a public key, such as verifying signatures or receiving transactions.
 // - `xPub`: The extended public key used for cryptographic verification and other public operations.
 // - `serverURL`: The URL of the server the client will interact with. ex. https://hostname:3003
@@ -93,6 +93,7 @@ func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 	return setSignature(header, xPriv, bodyString)
 }
 
+// SetAdminKeyByString will set aminXPriv key
 func (wc *WalletClient) SetAdminKeyByString(adminKey string) {
 	keyConf := accessKeyConf{AccessKeyString: adminKey}
 	keyConf.Configure(wc)

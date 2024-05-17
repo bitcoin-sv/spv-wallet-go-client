@@ -1,3 +1,4 @@
+// Package fixtures contains fixtures for testing
 package fixtures
 
 import (
@@ -24,6 +25,7 @@ var (
 	PubKey = "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
 )
 
+// MarshallForTestHandler its marshaling test handler
 func MarshallForTestHandler(object any) string {
 	json, err := json.Marshal(object)
 	if err != nil {
@@ -34,8 +36,10 @@ func MarshallForTestHandler(object any) string {
 	return string(json)
 }
 
+// TestMetadata model for metadata
 var TestMetadata = &models.Metadata{"test-key": "test-value"}
 
+// Xpub model for testing
 var Xpub = &models.Xpub{
 	Model:           common.Model{Metadata: *TestMetadata},
 	ID:              "cba0be1e753a7609e1a2f792d2e80ea6fce241be86f0690ec437377477809ccc",
@@ -44,6 +48,7 @@ var Xpub = &models.Xpub{
 	NextExternalNum: 1,
 }
 
+// AccessKey model for testing
 var AccessKey = &models.AccessKey{
 	Model:  common.Model{Metadata: *TestMetadata},
 	ID:     "access-key-id",
@@ -51,6 +56,7 @@ var AccessKey = &models.AccessKey{
 	Key:    AccessKeyString,
 }
 
+// Destination model for testing
 var Destination = &models.Destination{
 	Model:         common.Model{Metadata: *TestMetadata},
 	ID:            "90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce",
@@ -63,6 +69,7 @@ var Destination = &models.Destination{
 	DraftID:       "3a0e1fdd9ac6046c0c82aa36b462e477a455880ceeb08d3aabb1bf031553d1df",
 }
 
+// Transaction model for testing
 var Transaction = &models.Transaction{
 	Model:                common.Model{Metadata: *TestMetadata},
 	ID:                   "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda",
@@ -82,6 +89,7 @@ var Transaction = &models.Transaction{
 	TransactionDirection: "incoming",
 }
 
+// DraftTx model for testing
 var DraftTx = &models.DraftTransaction{
 	Model:  common.Model{Metadata: *TestMetadata},
 	ID:     "3a0e1fdd9ac6046c0c82aa36b462e477a455880ceeb08d3aabb1bf031553d1df",
@@ -198,6 +206,7 @@ var DraftTx = &models.DraftTransaction{
 	FinalTxID: "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda",
 }
 
+// Contact model for testing
 var Contact = &models.Contact{
 	ID:       "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a",
 	FullName: "Test User",

@@ -148,7 +148,7 @@ func (wc *WalletClient) CreateAccessKey(ctx context.Context, metadata *models.Me
 func (wc *WalletClient) GetDestinationByID(ctx context.Context, id string) (*models.Destination, ResponseError) {
 	var destination models.Destination
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/destination?"+FieldID+"="+id, nil, wc.xPriv, true, &destination,
+		ctx, http.MethodGet, fmt.Sprintf("/destination?%s=%s", FieldID, id), nil, wc.xPriv, true, &destination,
 	); err != nil {
 		return nil, err
 	}
@@ -689,6 +689,7 @@ func (wc *WalletClient) UpsertContact(ctx context.Context, paymail, fullName str
 	return wc.UpsertContactForPaymail(ctx, paymail, fullName, metadata, "")
 }
 
+// UpsertContactForPaymail add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
 func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fullName string, metadata *models.Metadata, requesterPaymail string) (*models.Contact, ResponseError) {
 	payload := map[string]interface{}{
 		"fullName":    fullName,

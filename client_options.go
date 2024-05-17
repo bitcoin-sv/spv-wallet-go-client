@@ -102,13 +102,13 @@ func (w *signRequest) Configure(c *WalletClient) {
 }
 
 // initializeAccessKey handles the specific initialization of the access key.
-func (c *accessKeyConf) initializeAccessKey() (*bec.PrivateKey, error) {
+func (w *accessKeyConf) initializeAccessKey() (*bec.PrivateKey, error) {
 	var err error
 	var privateKey *bec.PrivateKey
 	var decodedWIF *wif.WIF
 
-	if decodedWIF, err = wif.DecodeWIF(c.AccessKeyString); err != nil {
-		if privateKey, err = bitcoin.PrivateKeyFromString(c.AccessKeyString); err != nil {
+	if decodedWIF, err = wif.DecodeWIF(w.AccessKeyString); err != nil {
+		if privateKey, err = bitcoin.PrivateKeyFromString(w.AccessKeyString); err != nil {
 			return nil, errors.Wrap(err, "failed to decode access key")
 		}
 	} else {

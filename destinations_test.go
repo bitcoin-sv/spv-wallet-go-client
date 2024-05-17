@@ -21,6 +21,8 @@ func TestDestinations(t *testing.T) {
 			}
 		}
 
+		const dest = "/v1/destination"
+
 		switch {
 		case r.URL.Path == "/v1/v1/destination/address/"+fixtures.Destination.Address && r.Method == http.MethodGet:
 			sendJSONResponse(fixtures.Destination)
@@ -28,11 +30,11 @@ func TestDestinations(t *testing.T) {
 			sendJSONResponse(fixtures.Destination)
 		case r.URL.Path == "/v1/destination/search" && r.Method == http.MethodPost:
 			sendJSONResponse([]*models.Destination{fixtures.Destination})
-		case r.URL.Path == "/v1/destination" && r.Method == http.MethodGet:
+		case r.URL.Path == dest && r.Method == http.MethodGet:
 			sendJSONResponse(fixtures.Destination)
-		case r.URL.Path == "/v1/destination" && r.Method == http.MethodPatch:
+		case r.URL.Path == dest && r.Method == http.MethodPatch:
 			sendJSONResponse(fixtures.Destination)
-		case r.URL.Path == "/v1/destination" && r.Method == http.MethodPost:
+		case r.URL.Path == dest && r.Method == http.MethodPost:
 			sendJSONResponse(fixtures.Destination)
 		default:
 			w.WriteHeader(http.StatusNotFound)
