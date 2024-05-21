@@ -664,7 +664,7 @@ func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Cont
 }
 
 // GetContacts will get contacts by conditions
-func (wc *WalletClient) GetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Contact, ResponseError) {
+func (wc *WalletClient) GetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) (*models.SearchContactsResponse, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions:  conditions,
 		FieldMetadata:    processMetadata(metadata),
@@ -674,7 +674,7 @@ func (wc *WalletClient) GetContacts(ctx context.Context, conditions map[string]i
 		return nil, WrapError(err)
 	}
 
-	var result []*models.Contact
+	var result *models.SearchContactsResponse
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodPost, "/contact/search", jsonStr, wc.xPriv, wc.signRequest, &result,
 	); err != nil {
@@ -1025,7 +1025,7 @@ func (wc *WalletClient) AdminGetSharedConfig(ctx context.Context) (*models.Share
 }
 
 // AdminGetContacts executes an HTTP POST request to search for contacts based on specified conditions, metadata, and query parameters.
-func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) ([]*models.Contact, ResponseError) {
+func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) (*models.SearchContactsResponse, ResponseError) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions:  conditions,
 		FieldMetadata:    processMetadata(metadata),
@@ -1035,7 +1035,7 @@ func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions map[str
 		return nil, WrapError(err)
 	}
 
-	var contacts []*models.Contact
+	var contacts *models.SearchContactsResponse
 	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/contact/search", jsonStr, wc.adminXPriv, true, &contacts)
 	return contacts, WrapError(err)
 }
