@@ -19,8 +19,10 @@ func TestAdminContactActions(t *testing.T) {
 		case r.URL.Path == "/v1/admin/contact/search" && r.Method == http.MethodPost:
 			c := fixtures.Contact
 			c.ID = "1"
-			contacts := []*models.Contact{c}
-			json.NewEncoder(w).Encode(contacts)
+			content := models.PagedResponse[*models.Contact]{
+				Content: []*models.Contact{c},
+			}
+			json.NewEncoder(w).Encode(content)
 		case r.URL.Path == "/v1/admin/contact/1" && r.Method == http.MethodPatch:
 			contact := fixtures.Contact
 			json.NewEncoder(w).Encode(contact)
@@ -46,7 +48,7 @@ func TestAdminContactActions(t *testing.T) {
 	t.Run("AdminGetContacts", func(t *testing.T) {
 		contacts, err := client.AdminGetContacts(context.Background(), nil, nil, nil)
 		require.NoError(t, err)
-		require.Equal(t, "1", contacts[0].ID)
+		require.Equal(t, "1", contacts.Content[0].ID)
 	})
 
 	t.Run("AdminUpdateContact", func(t *testing.T) {
