@@ -28,7 +28,10 @@ func TestContactActionsRouting(t *testing.T) {
 			}
 		case r.URL.Path == "/v1/contact/search":
 			if r.Method == http.MethodPost {
-				json.NewEncoder(w).Encode([]*models.Contact{fixtures.Contact})
+				content := models.PagedResponse[*models.Contact]{
+					Content: []*models.Contact{fixtures.Contact},
+				}
+				json.NewEncoder(w).Encode(content)
 			}
 		case strings.HasPrefix(r.URL.Path, "/v1/contact/"):
 			if r.Method == http.MethodPost || r.Method == http.MethodPut {
