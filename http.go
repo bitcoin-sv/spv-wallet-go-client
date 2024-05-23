@@ -715,6 +715,18 @@ func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fu
 	return &result, nil
 }
 
+// GetSharedConfig gets the shared config
+func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConfig, ResponseError) {
+	var model *models.SharedConfig
+	if err := wc.doHTTPRequest(
+		ctx, http.MethodGet, "/shared-config", nil, wc.xPriv, true, &model,
+	); err != nil {
+		return nil, err
+	}
+
+	return model, nil
+}
+
 // AdminNewXpub will register an xPub
 func (wc *WalletClient) AdminNewXpub(ctx context.Context, rawXPub string, metadata *models.Metadata) ResponseError {
 	// Adding a xpub needs to be signed by an admin key
@@ -1010,18 +1022,6 @@ func (wc *WalletClient) AdminRecordTransaction(ctx context.Context, hex string) 
 	}
 
 	return &transaction, nil
-}
-
-// AdminGetSharedConfig gets the shared config
-func (wc *WalletClient) AdminGetSharedConfig(ctx context.Context) (*models.SharedConfig, ResponseError) {
-	var model *models.SharedConfig
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/admin/shared-config", nil, wc.adminXPriv, true, &model,
-	); err != nil {
-		return nil, err
-	}
-
-	return model, nil
 }
 
 // AdminGetContacts executes an HTTP POST request to search for contacts based on specified conditions, metadata, and query parameters.
