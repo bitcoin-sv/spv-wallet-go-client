@@ -718,8 +718,16 @@ func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fu
 // GetSharedConfig gets the shared config
 func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConfig, ResponseError) {
 	var model *models.SharedConfig
+
+	key := wc.xPriv
+	if wc.adminXPriv != nil {
+		key = wc.adminXPriv
+	}
+	if key == nil {
+		return nil, WrapError(errors.New("neither xPriv nor adminXPriv is provided"))
+	}
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/shared-config", nil, wc.xPriv, true, &model,
+		ctx, http.MethodGet, "/shared-config", nil, key, true, &model,
 	); err != nil {
 		return nil, err
 	}
