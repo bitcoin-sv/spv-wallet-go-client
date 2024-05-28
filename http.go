@@ -182,20 +182,20 @@ func (wc *WalletClient) GetDestinationByLockingScript(ctx context.Context, locki
 }
 
 // GetDestinations will get all destinations matching the metadata filter
-func (wc *WalletClient) GetDestinations(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]interface{}) ([]*models.Destination, ResponseError) {
+func (wc *WalletClient) GetDestinations(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]any, queryParams *filter.QueryParams) ([]*models.Destination, ResponseError) {
 	return Search[filter.DestinationFilter, models.Destination](
 		ctx, http.MethodPost,
 		"/destination/search",
 		wc.xPriv,
 		conditions,
 		metadata,
-		nil, // TODO: For now, we don't support pagination
+		queryParams,
 		wc.doHTTPRequest,
 	)
 }
 
 // GetDestinationsCount will get the count of destinations matching the metadata filter
-func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]interface{}) (int64, ResponseError) {
+func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]any) (int64, ResponseError) {
 	return Count(
 		ctx,
 		http.MethodPost,
@@ -809,22 +809,31 @@ func (wc *WalletClient) AdminGetBlockHeadersCount(ctx context.Context, condition
 }
 
 // AdminGetDestinations get all block destinations filtered by conditions
-func (wc *WalletClient) AdminGetDestinations(ctx context.Context, conditions map[string]interface{},
-	metadata *models.Metadata, queryParams *QueryParams,
+func (wc *WalletClient) AdminGetDestinations(ctx context.Context, conditions filter.DestinationFilter,
+	metadata map[string]any, queryParams *filter.QueryParams,
 ) ([]*models.Destination, ResponseError) {
-	var models []*models.Destination
-	if err := wc.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/destinations/search", &models); err != nil {
-		return nil, err
-	}
-
-	return models, nil
+	return Search[filter.DestinationFilter, models.Destination](
+		ctx, http.MethodPost,
+		"/admin/destinations/search",
+		wc.adminXPriv,
+		conditions,
+		metadata,
+		queryParams,
+		wc.doHTTPRequest,
+	)
 }
 
 // AdminGetDestinationsCount get a count of all the destinations filtered by conditions
-func (wc *WalletClient) AdminGetDestinationsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *models.Metadata,
-) (int64, ResponseError) {
-	return wc.adminCount(ctx, conditions, metadata, "/admin/destinations/count")
+func (wc *WalletClient) AdminGetDestinationsCount(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]any) (int64, ResponseError) {
+	return Count(
+		ctx,
+		http.MethodPost,
+		"/admin/destinations/count",
+		wc.adminXPriv,
+		conditions,
+		metadata,
+		wc.doHTTPRequest,
+	)
 }
 
 // AdminGetPaymail get a paymail by address

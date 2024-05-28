@@ -64,7 +64,7 @@ func TestDestinations(t *testing.T) {
 	})
 
 	t.Run("GetDestinations", func(t *testing.T) {
-		destinations, err := client.GetDestinations(context.Background(), filter.DestinationFilter{}, nil)
+		destinations, err := client.GetDestinations(context.Background(), filter.DestinationFilter{}, nil, nil)
 		require.NoError(t, err)
 		require.Equal(t, []*models.Destination{fixtures.Destination}, destinations)
 	})

@@ -18,7 +18,7 @@ func Search[TFilter any, TItem any](
 	path string,
 	xPriv *bip32.ExtendedKey,
 	f TFilter,
-	metadata map[string]interface{},
+	metadata map[string]any,
 	queryParams *filter.QueryParams,
 	requester SearchRequester,
 ) ([]*TItem, ResponseError) {
@@ -47,7 +47,7 @@ func Count[TFilter any](
 	path string,
 	xPriv *bip32.ExtendedKey,
 	f TFilter,
-	metadata map[string]interface{},
+	metadata map[string]any,
 	requester SearchRequester,
 ) (int64, ResponseError) {
 	jsonStr, err := json.Marshal(filter.ConditionsModel[TFilter]{
@@ -65,7 +65,7 @@ func Count[TFilter any](
 	return count, nil
 }
 
-func toMapPtr(m map[string]interface{}) *map[string]interface{} {
+func toMapPtr(m map[string]any) *map[string]any {
 	if m == nil {
 		return nil
 	}
