@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/libsv/go-bk/bip32"
 )
 
+// SearchRequester is a function that sends a request to the server and returns the response.
 type SearchRequester func(ctx context.Context, method string, path string, rawJSON []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) ResponseError
 
+// Search prepares and sends a search request to the server.
 func Search[TFilter any, TItem any](
 	ctx context.Context,
 	method string,
@@ -24,7 +25,7 @@ func Search[TFilter any, TItem any](
 	jsonStr, err := json.Marshal(filter.SearchModel[TFilter]{
 		ConditionsModel: filter.ConditionsModel[TFilter]{
 			Conditions: f,
-			Metadata:   utils.SafePtrOfMap(metadata),
+			Metadata:   toMapPtr(metadata),
 		},
 		QueryParams: queryParams,
 	})
@@ -39,6 +40,7 @@ func Search[TFilter any, TItem any](
 	return items, nil
 }
 
+// Count prepares and sends a count request to the server.
 func Count[TFilter any](
 	ctx context.Context,
 	method string,
@@ -50,7 +52,7 @@ func Count[TFilter any](
 ) (int64, ResponseError) {
 	jsonStr, err := json.Marshal(filter.ConditionsModel[TFilter]{
 		Conditions: f,
-		Metadata:   utils.SafePtrOfMap(metadata),
+		Metadata:   toMapPtr(metadata),
 	})
 	if err != nil {
 		return 0, WrapError(err)
@@ -61,4 +63,11 @@ func Count[TFilter any](
 	}
 
 	return count, nil
+}
+
+func toMapPtr(m map[string]interface{}) *map[string]interface{} {
+	if m == nil {
+		return nil
+	}
+	return &m
 }
