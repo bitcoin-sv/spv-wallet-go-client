@@ -9,6 +9,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
 )
 
@@ -63,7 +64,7 @@ func TestDestinations(t *testing.T) {
 	})
 
 	t.Run("GetDestinations", func(t *testing.T) {
-		destinations, err := client.GetDestinations(context.Background(), fixtures.TestMetadata)
+		destinations, err := client.GetDestinations(context.Background(), filter.DestinationFilter{}, nil)
 		require.NoError(t, err)
 		require.Equal(t, []*models.Destination{fixtures.Destination}, destinations)
 	})

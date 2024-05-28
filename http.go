@@ -13,6 +13,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/apierrors"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
@@ -181,41 +182,29 @@ func (wc *WalletClient) GetDestinationByLockingScript(ctx context.Context, locki
 }
 
 // GetDestinations will get all destinations matching the metadata filter
-func (wc *WalletClient) GetDestinations(ctx context.Context, metadataConditions *models.Metadata) ([]*models.Destination, ResponseError) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldMetadata: processMetadata(metadataConditions),
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-	var destinations []*models.Destination
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/destination/search", jsonStr, wc.xPriv, true, &destinations,
-	); err != nil {
-		return nil, err
-	}
-
-	return destinations, nil
+func (wc *WalletClient) GetDestinations(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]interface{}) ([]*models.Destination, ResponseError) {
+	return Search[filter.DestinationFilter, models.Destination](
+		ctx, http.MethodPost,
+		"/destination/search",
+		wc.xPriv,
+		conditions,
+		metadata,
+		nil, // TODO: For now, we don't support pagination
+		wc.doHTTPRequest,
+	)
 }
 
 // GetDestinationsCount will get the count of destinations matching the metadata filter
-func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata) (int64, ResponseError) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldConditions: conditions,
-		FieldMetadata:   processMetadata(metadata),
-	})
-	if err != nil {
-		return 0, WrapError(err)
-	}
-
-	var count int64
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/destination/count", jsonStr, wc.xPriv, true, &count,
-	); err != nil {
-		return 0, err
-	}
-
-	return count, nil
+func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]interface{}) (int64, ResponseError) {
+	return Count(
+		ctx,
+		http.MethodPost,
+		"/destination/count",
+		wc.xPriv,
+		conditions,
+		metadata,
+		wc.doHTTPRequest,
+	)
 }
 
 // NewDestination will create a new destination and return it

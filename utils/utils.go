@@ -83,3 +83,10 @@ func GetChildNumsFromHex(hexHash string) ([]uint32, error) {
 
 	return childNums, nil
 }
+
+func SafePtrOfMap[K comparable, V any](m map[K]V) *map[K]V {
+	if m == nil {
+		return nil
+	}
+	return &m
+}
