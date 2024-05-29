@@ -25,7 +25,7 @@ func Search[TFilter any, TResp any](
 	jsonStr, err := json.Marshal(filter.SearchModel[TFilter]{
 		ConditionsModel: filter.ConditionsModel[TFilter]{
 			Conditions: f,
-			Metadata:   toMapPtr(metadata),
+			Metadata:   metadata,
 		},
 		QueryParams: queryParams,
 	})
@@ -53,7 +53,7 @@ func Count[TFilter any](
 ) (int64, ResponseError) {
 	jsonStr, err := json.Marshal(filter.ConditionsModel[TFilter]{
 		Conditions: f,
-		Metadata:   toMapPtr(metadata),
+		Metadata:   metadata,
 	})
 	if err != nil {
 		return 0, WrapError(err)
@@ -69,11 +69,4 @@ func Count[TFilter any](
 // Optional returns a pointer to provided value, it's necessary to define "optional" fields in filters
 func Optional[T any](val T) *T {
 	return &val
-}
-
-func toMapPtr(m map[string]any) *map[string]any {
-	if m == nil {
-		return nil
-	}
-	return &m
 }
