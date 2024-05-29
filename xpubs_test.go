@@ -54,7 +54,7 @@ func TestXpub(t *testing.T) {
 
 	t.Run("UpdateXPubMetadata", func(t *testing.T) {
 		update = true
-		metadata := &models.Metadata{"updated": "info"}
+		metadata := map[string]any{"updated": "info"}
 		xpub, err := client.UpdateXPubMetadata(context.Background(), metadata)
 		require.NoError(t, err)
 		require.NotNil(t, xpub)

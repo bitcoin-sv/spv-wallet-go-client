@@ -66,6 +66,11 @@ func Count[TFilter any](
 	return count, nil
 }
 
+// Optional returns a pointer to provided value, it's necessary to define "optional" fields in filters
+func Optional[T any](val T) *T {
+	return &val
+}
+
 func toMapPtr(m map[string]any) *map[string]any {
 	if m == nil {
 		return nil

@@ -37,11 +37,11 @@ func MarshallForTestHandler(object any) string {
 }
 
 // TestMetadata model for metadata
-var TestMetadata = &models.Metadata{"test-key": "test-value"}
+var TestMetadata = map[string]any{"test-key": "test-value"}
 
 // Xpub model for testing
 var Xpub = &models.Xpub{
-	Model:           common.Model{Metadata: *TestMetadata},
+	Model:           common.Model{Metadata: TestMetadata},
 	ID:              "cba0be1e753a7609e1a2f792d2e80ea6fce241be86f0690ec437377477809ccc",
 	CurrentBalance:  16680,
 	NextInternalNum: 2,
@@ -50,7 +50,7 @@ var Xpub = &models.Xpub{
 
 // AccessKey model for testing
 var AccessKey = &models.AccessKey{
-	Model:  common.Model{Metadata: *TestMetadata},
+	Model:  common.Model{Metadata: TestMetadata},
 	ID:     "access-key-id",
 	XpubID: Xpub.ID,
 	Key:    AccessKeyString,
@@ -58,7 +58,7 @@ var AccessKey = &models.AccessKey{
 
 // Destination model for testing
 var Destination = &models.Destination{
-	Model:         common.Model{Metadata: *TestMetadata},
+	Model:         common.Model{Metadata: TestMetadata},
 	ID:            "90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce",
 	XpubID:        Xpub.ID,
 	LockingScript: "76a9140e0eb4911d79e9b7683f268964f595b66fa3604588ac",
@@ -71,7 +71,7 @@ var Destination = &models.Destination{
 
 // Transaction model for testing
 var Transaction = &models.Transaction{
-	Model:                common.Model{Metadata: *TestMetadata},
+	Model:                common.Model{Metadata: TestMetadata},
 	ID:                   "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda",
 	Hex:                  "0100000001cf4faa628ce1abdd2cfc641c948898bb7a3dbe043999236c3ea4436a0c79f5dc000000006a47304402206aeca14175e4477031970c1cda0af4d9d1206289212019b54f8e1c9272b5bac2022067c4d32086146ca77640f02a989f51b3c6738ebfa24683c4a923f647cf7f1c624121036295a81525ba33e22c6497c0b758e6a84b60d97c2d8905aa603dd364915c3a0effffffff023e030000000000001976a914f7fc6e0b05e91c3610efd0ce3f04f6502e2ed93d88ac99030000000000001976a914550e06a3aa71ba7414b53922c13f96a882bf027988ac00000000",
 	XpubInIDs:            []string{Xpub.ID},
@@ -91,7 +91,7 @@ var Transaction = &models.Transaction{
 
 // DraftTx model for testing
 var DraftTx = &models.DraftTransaction{
-	Model:  common.Model{Metadata: *TestMetadata},
+	Model:  common.Model{Metadata: TestMetadata},
 	ID:     "3a0e1fdd9ac6046c0c82aa36b462e477a455880ceeb08d3aabb1bf031553d1df",
 	Hex:    "010000000123462f14e60556718916a8cff9dbf2258195a928777c0373200dba1cee105bdb0100000000ffffffff020c000000000000001976a914c4b15e7f65e3e6a062c1d21b7f1d7d2cd3b18e8188ac0b000000000000001976a91455873fd2baa7b51a624f6416b1d824939d99151a88ac00000000",
 	XpubID: Xpub.ID,

@@ -9,6 +9,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
 )
 
@@ -44,9 +45,9 @@ func TestTransactions(t *testing.T) {
 	})
 
 	t.Run("GetTransactions", func(t *testing.T) {
-		conditions := map[string]interface{}{
-			"fee":         map[string]interface{}{"$lt": 100},
-			"total_value": map[string]interface{}{"$lt": 740},
+		conditions := &filter.TransactionFilter{
+			Fee:        Optional(uint64(97)),
+			TotalValue: Optional(uint64(6955)),
 		}
 		txs, err := client.GetTransactions(context.Background(), conditions, fixtures.TestMetadata, nil)
 		require.NoError(t, err)

@@ -40,7 +40,7 @@ func TestAccessKeys(t *testing.T) {
 	})
 
 	t.Run("GetAccessKeys", func(t *testing.T) {
-		accessKeys, err := client.GetAccessKeys(context.Background(), nil)
+		accessKeys, err := client.GetAccessKeys(context.Background(), nil, nil, nil)
 		require.NoError(t, err)
 		require.Equal(t, []*models.AccessKey{fixtures.AccessKey}, accessKeys)
 	})
