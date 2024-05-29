@@ -848,22 +848,33 @@ func (wc *WalletClient) AdminGetPaymail(ctx context.Context, address string) (*m
 }
 
 // AdminGetPaymails get all block paymails filtered by conditions
-func (wc *WalletClient) AdminGetPaymails(ctx context.Context, conditions map[string]interface{},
-	metadata *models.Metadata, queryParams *QueryParams,
+func (wc *WalletClient) AdminGetPaymails(
+	ctx context.Context,
+	conditions *filter.AdminPaymailFilter,
+	metadata map[string]any,
+	queryParams *filter.QueryParams,
 ) ([]*models.PaymailAddress, ResponseError) {
-	var models []*models.PaymailAddress
-	if err := wc.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/paymails/search", &models); err != nil {
-		return nil, err
-	}
-
-	return models, nil
+	return Search[filter.AdminPaymailFilter, []*models.PaymailAddress](
+		ctx, http.MethodPost,
+		"/admin/paymails/search",
+		wc.adminXPriv,
+		conditions,
+		metadata,
+		queryParams,
+		wc.doHTTPRequest,
+	)
 }
 
 // AdminGetPaymailsCount get a count of all the paymails filtered by conditions
-func (wc *WalletClient) AdminGetPaymailsCount(ctx context.Context, conditions map[string]interface{},
-	metadata *models.Metadata,
-) (int64, ResponseError) {
-	return wc.adminCount(ctx, conditions, metadata, "/admin/paymails/count")
+func (wc *WalletClient) AdminGetPaymailsCount(ctx context.Context, conditions *filter.AdminPaymailFilter, metadata map[string]any) (int64, ResponseError) {
+	return Count(
+		ctx, http.MethodPost,
+		"/admin/paymails/count",
+		wc.adminXPriv,
+		conditions,
+		metadata,
+		wc.doHTTPRequest,
+	)
 }
 
 // AdminCreatePaymail create a new paymail for a xpub
