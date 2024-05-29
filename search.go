@@ -12,7 +12,7 @@ import (
 type SearchRequester func(ctx context.Context, method string, path string, rawJSON []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) ResponseError
 
 // Search prepares and sends a search request to the server.
-func Search[TFilter any, TItem any](
+func Search[TFilter any, TResp any](
 	ctx context.Context,
 	method string,
 	path string,
@@ -21,7 +21,7 @@ func Search[TFilter any, TItem any](
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
 	requester SearchRequester,
-) (TItem, ResponseError) {
+) (TResp, ResponseError) {
 	jsonStr, err := json.Marshal(filter.SearchModel[TFilter]{
 		ConditionsModel: filter.ConditionsModel[TFilter]{
 			Conditions: f,
@@ -29,16 +29,16 @@ func Search[TFilter any, TItem any](
 		},
 		QueryParams: queryParams,
 	})
-	var items TItem // before initialization, this var is empty slice or nil so it can be returned in case of error
+	var resp TResp // before initialization, this var is empty slice or nil so it can be returned in case of error
 	if err != nil {
-		return items, WrapError(err)
+		return resp, WrapError(err)
 	}
 
-	if err := requester(ctx, method, path, jsonStr, xPriv, true, &items); err != nil {
-		return items, err
+	if err := requester(ctx, method, path, jsonStr, xPriv, true, &resp); err != nil {
+		return resp, err
 	}
 
-	return items, nil
+	return resp, nil
 }
 
 // Count prepares and sends a count request to the server.
