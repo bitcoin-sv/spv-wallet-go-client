@@ -182,8 +182,8 @@ func (wc *WalletClient) GetDestinationByLockingScript(ctx context.Context, locki
 }
 
 // GetDestinations will get all destinations matching the metadata filter
-func (wc *WalletClient) GetDestinations(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]any, queryParams *filter.QueryParams) ([]*models.Destination, ResponseError) {
-	return Search[filter.DestinationFilter, models.Destination](
+func (wc *WalletClient) GetDestinations(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any, queryParams *filter.QueryParams) ([]*models.Destination, ResponseError) {
+	return Search[filter.DestinationFilter, []*models.Destination](
 		ctx, http.MethodPost,
 		"/destination/search",
 		wc.xPriv,
@@ -195,7 +195,7 @@ func (wc *WalletClient) GetDestinations(ctx context.Context, conditions filter.D
 }
 
 // GetDestinationsCount will get the count of destinations matching the metadata filter
-func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]any) (int64, ResponseError) {
+func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any) (int64, ResponseError) {
 	return Count(
 		ctx,
 		http.MethodPost,
@@ -653,24 +653,16 @@ func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Cont
 }
 
 // GetContacts will get contacts by conditions
-func (wc *WalletClient) GetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) (*models.SearchContactsResponse, ResponseError) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldConditions:  conditions,
-		FieldMetadata:    processMetadata(metadata),
-		FieldQueryParams: queryParams,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-
-	var result *models.SearchContactsResponse
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/contact/search", jsonStr, wc.xPriv, wc.signRequest, &result,
-	); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+func (wc *WalletClient) GetContacts(ctx context.Context, conditions *filter.ContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, ResponseError) {
+	return Search[filter.ContactFilter, *models.SearchContactsResponse](
+		ctx, http.MethodPost,
+		"/contact/search",
+		wc.xPriv,
+		conditions,
+		metadata,
+		queryParams,
+		wc.doHTTPRequest,
+	)
 }
 
 // UpsertContact add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
@@ -809,10 +801,10 @@ func (wc *WalletClient) AdminGetBlockHeadersCount(ctx context.Context, condition
 }
 
 // AdminGetDestinations get all block destinations filtered by conditions
-func (wc *WalletClient) AdminGetDestinations(ctx context.Context, conditions filter.DestinationFilter,
+func (wc *WalletClient) AdminGetDestinations(ctx context.Context, conditions *filter.DestinationFilter,
 	metadata map[string]any, queryParams *filter.QueryParams,
 ) ([]*models.Destination, ResponseError) {
-	return Search[filter.DestinationFilter, models.Destination](
+	return Search[filter.DestinationFilter, []*models.Destination](
 		ctx, http.MethodPost,
 		"/admin/destinations/search",
 		wc.adminXPriv,
@@ -824,7 +816,7 @@ func (wc *WalletClient) AdminGetDestinations(ctx context.Context, conditions fil
 }
 
 // AdminGetDestinationsCount get a count of all the destinations filtered by conditions
-func (wc *WalletClient) AdminGetDestinationsCount(ctx context.Context, conditions filter.DestinationFilter, metadata map[string]any) (int64, ResponseError) {
+func (wc *WalletClient) AdminGetDestinationsCount(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any) (int64, ResponseError) {
 	return Count(
 		ctx,
 		http.MethodPost,
@@ -1031,19 +1023,16 @@ func (wc *WalletClient) AdminRecordTransaction(ctx context.Context, hex string) 
 }
 
 // AdminGetContacts executes an HTTP POST request to search for contacts based on specified conditions, metadata, and query parameters.
-func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions map[string]interface{}, metadata *models.Metadata, queryParams *QueryParams) (*models.SearchContactsResponse, ResponseError) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldConditions:  conditions,
-		FieldMetadata:    processMetadata(metadata),
-		FieldQueryParams: queryParams,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-
-	var contacts *models.SearchContactsResponse
-	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/contact/search", jsonStr, wc.adminXPriv, true, &contacts)
-	return contacts, WrapError(err)
+func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions *filter.ContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, ResponseError) {
+	return Search[filter.ContactFilter, *models.SearchContactsResponse](
+		ctx, http.MethodPost,
+		"/admin/contact/search",
+		wc.adminXPriv,
+		conditions,
+		metadata,
+		queryParams,
+		wc.doHTTPRequest,
+	)
 }
 
 // AdminUpdateContact executes an HTTP PATCH request to update a specific contact's full name using their ID.

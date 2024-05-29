@@ -17,11 +17,11 @@ func Search[TFilter any, TItem any](
 	method string,
 	path string,
 	xPriv *bip32.ExtendedKey,
-	f TFilter,
+	f *TFilter,
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
 	requester SearchRequester,
-) ([]*TItem, ResponseError) {
+) (TItem, ResponseError) {
 	jsonStr, err := json.Marshal(filter.SearchModel[TFilter]{
 		ConditionsModel: filter.ConditionsModel[TFilter]{
 			Conditions: f,
@@ -29,12 +29,13 @@ func Search[TFilter any, TItem any](
 		},
 		QueryParams: queryParams,
 	})
+	var items TItem // before initialization, this var is empty slice or nil so it can be returned in case of error
 	if err != nil {
-		return nil, WrapError(err)
+		return items, WrapError(err)
 	}
-	var items []*TItem
+
 	if err := requester(ctx, method, path, jsonStr, xPriv, true, &items); err != nil {
-		return nil, err
+		return items, err
 	}
 
 	return items, nil
@@ -46,7 +47,7 @@ func Count[TFilter any](
 	method string,
 	path string,
 	xPriv *bip32.ExtendedKey,
-	f TFilter,
+	f *TFilter,
 	metadata map[string]any,
 	requester SearchRequester,
 ) (int64, ResponseError) {
