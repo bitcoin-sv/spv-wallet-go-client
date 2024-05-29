@@ -3,7 +3,7 @@ module github.com/bitcoin-sv/spv-wallet-go-client
 go 1.21
 
 require (
-	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.6
+	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.8.0.20240529103221-d834f280b14c
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.5
