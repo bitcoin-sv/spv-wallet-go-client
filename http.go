@@ -758,7 +758,7 @@ func (wc *WalletClient) AdminGetBlockHeaders(
 	ctx context.Context,
 	conditions map[string]interface{},
 	metadata map[string]any,
-	queryParams *QueryParams,
+	queryParams *filter.QueryParams,
 ) ([]*models.BlockHeader, ResponseError) {
 	var models []*models.BlockHeader
 	if err := wc.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/block-headers/search", &models); err != nil {
@@ -997,7 +997,7 @@ func (wc *WalletClient) adminGetModels(
 	ctx context.Context,
 	conditions map[string]interface{},
 	metadata map[string]any,
-	queryParams *QueryParams,
+	queryParams *filter.QueryParams,
 	path string,
 	models interface{},
 ) ResponseError {
