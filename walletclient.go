@@ -3,7 +3,6 @@ package walletclient
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 )
@@ -76,16 +75,6 @@ func makeClient(configurators ...configurator) *WalletClient {
 	}
 
 	return client
-}
-
-// processMetadata will process the metadata
-func processMetadata(metadata *models.Metadata) *models.Metadata {
-	if metadata == nil {
-		m := make(models.Metadata)
-		metadata = &m
-	}
-
-	return metadata
 }
 
 // addSignature will add the signature to the request
