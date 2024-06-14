@@ -1,8 +1,12 @@
+/*
+Package main - generate_keys example
+*/
 package main
 
 import (
-	"examples"
 	"fmt"
+
+	"examples"
 )
 
 func main() {

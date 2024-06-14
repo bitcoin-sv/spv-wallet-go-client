@@ -1,3 +1,6 @@
+/*
+Package main - xpriv_from_mnemonic example
+*/
 package main
 
 import (

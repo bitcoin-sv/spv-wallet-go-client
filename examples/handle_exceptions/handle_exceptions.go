@@ -1,3 +1,6 @@
+/*
+Package main - handle_exceptions example
+*/
 package main
 
 import (
@@ -5,20 +8,16 @@ import (
 	"fmt"
 	"os"
 
-	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
-
 	"examples"
+	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 )
 
 func main() {
 	defer examples.HandlePanic()
 
-	const server = "http://localhost:3003/v1"
+	examples.CheckIfXPubExists()
 
-	if examples.ExampleXPub == "" {
-		fmt.Println(examples.ErrMessage("xPub"))
-		os.Exit(1)
-	}
+	const server = "http://localhost:3003/v1"
 
 	client := walletclient.NewWithXPub(server, examples.ExampleXPub)
 	ctx := context.Background()

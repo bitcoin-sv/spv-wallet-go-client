@@ -1,3 +1,6 @@
+/*
+Package main - xpub_from_xpriv example
+*/
 package main
 
 import (

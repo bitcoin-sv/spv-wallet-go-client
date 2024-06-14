@@ -11,22 +11,22 @@ In this directory you can find examples of how to use the `spv-wallet-go-client`
 
 ### Concerning the keys
 
--   The `adminKey` defined in `example_keys.go` is the default one from [spv-wallet-web-backend repository](https://github.com/bitcoin-sv/spv-wallet-web-backend/blob/main/config/viper.go#L56)
+-   The `ExampleAdminKey` defined in `example_keys.go` is the default one from [spv-wallet-web-backend repository](https://github.com/bitcoin-sv/spv-wallet-web-backend/blob/main/config/viper.go#L56)
     -   If in your current `spv-wallet` instance you have a different `adminKey`, you should replace the one in `example_keys` with the one you have.
--   The `exampleXPub` and `exampleXPriv` are just placeholders, which won't work.
-    -   You should replace them by newly generated ones using `make generate_keys`,
+-   The `ExampleXPub` and `ExampleXPriv` are just placeholders, which won't work.
+    -   You should replace them by newly generated ones using `task generate_keys`,
     -   ... or use your actual keys if you have them (don't use the keys which are already added to another wallet).
 
-> Additionally, to make it work properly, you should adjust the `examplePaymail` to align with your `domains` configuration in the `spv-wallet` instance.
+> Additionally, to make it work properly, you should adjust the `ExamplePaymail` to align with your `domains` configuration in the `spv-wallet` instance.
 
 ## Proposed order of executing examples
 
 1. `generate_keys` - generates new keys (you can copy them to `example_keys` if you want to use them in next examples)
-2. `admin_add_user` - adds a new user (more precisely adds `exampleXPub` and then `examplePaymail` to the wallet)
+2. `admin_add_user` - adds a new user (more precisely adds `ExampleXPub` and then `ExamplePaymail` to the wallet)
 
-> To fully experience the next steps, it would be beneficial to transfer some funds to your `examplePaymail`. This ensures the examples run smoothly by demonstrating the creation of a transaction with an actual balance. You can transfer funds to your `examplePaymail` using a Bitcoin SV wallet application such as HandCash or any other that supports Paymail.
+> To fully experience the next steps, it would be beneficial to transfer some funds to your `ExamplePaymail`. This ensures the examples run smoothly by demonstrating the creation of a transaction with an actual balance. You can transfer funds to your `ExamplePaymail` using a Bitcoin SV wallet application such as HandCash or any other that supports Paymail.
 
-3. `get_balance` - checks the balance - if you've transferred funds to your `examplePaymail`, you should see them here
+3. `get_balance` - checks the balance - if you've transferred funds to your `ExamplePaymail`, you should see them here
 4. `create_transaction` - creates a transaction (you can adjust the `outputs` to your needs)
 5. `list_transactions` - lists all transactions and with example filtering
 6. `send_op_return` - sends an OP_RETURN transaction
@@ -48,7 +48,7 @@ The examples are written in Go and can be run by:
 
 ```bash
 cd examples
-make name_of_the_example
+task name_of_the_example
 ```
 
-> See the `examples/Makefile` for the list of available examples and scripts
+> See the `examples/Taskfile.yml` for the list of available examples and scripts

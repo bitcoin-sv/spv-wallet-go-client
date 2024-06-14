@@ -1,11 +1,14 @@
+/*
+Package main - send_op_return example
+*/
 package main
 
 import (
 	"context"
-	"examples"
 	"fmt"
 	"os"
 
+	"examples"
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
@@ -13,12 +16,9 @@ import (
 func main() {
 	defer examples.HandlePanic()
 
-	const server = "http://localhost:3003/v1"
+	examples.CheckIfXPrivExists()
 
-	if examples.ExampleXPriv == "" {
-		fmt.Println(examples.ErrMessage("xPriv"))
-		os.Exit(1)
-	}
+	const server = "http://localhost:3003/v1"
 
 	client := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
 	ctx := context.Background()

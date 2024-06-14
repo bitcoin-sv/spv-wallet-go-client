@@ -1,23 +1,23 @@
+/*
+Package main - admin_add_user example
+*/
 package main
 
 import (
 	"context"
-	"examples"
 	"fmt"
 	"os"
 
+	"examples"
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 )
 
 func main() {
 	defer examples.HandlePanic()
 
-	server := "http://localhost:3003/v1"
+	examples.CheckIfAdminKeyExists()
 
-	if examples.ExampleAdminKey == "" {
-		fmt.Println(examples.ErrMessage("adminKey"))
-		os.Exit(1)
-	}
+	server := "http://localhost:3003/v1"
 
 	adminClient := walletclient.NewWithAdminKey(server, examples.ExampleAdminKey)
 	ctx := context.Background()
