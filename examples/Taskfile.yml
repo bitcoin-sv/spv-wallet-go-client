@@ -1,4 +1,5 @@
-version: '3'
+---
+version: "3"
 
 tasks:
   admin_add_user:
@@ -18,7 +19,7 @@ tasks:
     cmds:
       - echo "running create_transaction..."
       - go run ./create_transaction/create_transaction.go
-  
+
   generate_keys:
     desc: "running generate_keys..."
     cmds:
