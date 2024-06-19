@@ -29,7 +29,7 @@ func CheckIfXPrivExists() {
 	}
 }
 
-// CheckIfXPubExists - checks if ExampleXPub is not
+// CheckIfXPubExists - checks if ExampleXPub is not empty
 func CheckIfXPubExists() {
 	if ExampleXPub == "" {
 		printMissingKeyError("xPub")
