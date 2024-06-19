@@ -8,12 +8,8 @@ import (
 	"os"
 )
 
-// 'xPriv' | 'xPub' | 'adminKey' | 'Paymail'
-type keyType string
-
-// ErrMessage - function for displaying errors about missing keys (see CheckIfAdminKeyExists, CheckIfXPrivExists)
-func ErrMessage(key keyType) string {
-	return fmt.Sprintf("Please provide a valid %s.", key)
+func printMissingKeyError(key string) {
+	fmt.Printf("Please provide a valid %s. ", key)
 }
 
 // HandlePanic - function used to handle a recovery after a panic - use with defer
@@ -28,7 +24,7 @@ func HandlePanic() {
 // CheckIfXPrivExists - checks if ExampleXPriv is not empty
 func CheckIfXPrivExists() {
 	if ExampleXPriv == "" {
-		fmt.Println(ErrMessage("xPriv"))
+		printMissingKeyError("xPriv")
 		os.Exit(1)
 	}
 }
@@ -36,7 +32,7 @@ func CheckIfXPrivExists() {
 // CheckIfXPubExists - checks if ExampleXPub is not empty
 func CheckIfXPubExists() {
 	if ExampleXPub == "" {
-		fmt.Println(ErrMessage("xPub"))
+		printMissingKeyError("xPub")
 		os.Exit(1)
 	}
 }
@@ -44,7 +40,7 @@ func CheckIfXPubExists() {
 // CheckIfAdminKeyExists - checks if ExampleAdminKey is not empty
 func CheckIfAdminKeyExists() {
 	if ExampleAdminKey == "" {
-		fmt.Println(ErrMessage("adminKey"))
+		printMissingKeyError("adminKey")
 		os.Exit(1)
 	}
 }

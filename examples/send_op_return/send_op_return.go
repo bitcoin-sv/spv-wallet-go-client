@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"os"
 
-	"examples"
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 

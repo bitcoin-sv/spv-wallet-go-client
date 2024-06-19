@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"os"
 
-	"examples"
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 )
 
 func main() {
@@ -23,7 +23,6 @@ func main() {
 	ctx := context.Background()
 
 	status, err := client.AdminGetStatus(ctx)
-
 	if err != nil {
 		fmt.Println("Response status: ", err.GetStatusCode())
 		fmt.Println("Content: ", err.Error())

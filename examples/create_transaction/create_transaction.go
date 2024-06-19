@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"os"
 
-	"examples"
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 )
 
 func main() {
@@ -39,5 +39,4 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("GetTransaction response: ", tx)
-
 }

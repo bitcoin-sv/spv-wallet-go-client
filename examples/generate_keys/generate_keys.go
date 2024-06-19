@@ -5,12 +5,18 @@ package main
 
 import (
 	"fmt"
+	"os"
 
-	"examples"
+	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 )
 
 func main() {
-	keys := examples.GenerateKeys()
+	keys, err := xpriv.Generate()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	exampleXPriv := keys.XPriv()
 	exampleXPub := keys.XPub().String()
 

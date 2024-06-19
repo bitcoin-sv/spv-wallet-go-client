@@ -61,3 +61,8 @@ tasks:
     cmds:
       - echo "running xpub_from_xpriv..."
       - go run ./xpub_from_xpriv/xpub_from_xpriv.go
+  generate_totp:
+    desc: "running generate_totp..."
+    cmds:
+      - echo "running generate_totp..."
+      - go run ./generate_totp/generate_totp.go
