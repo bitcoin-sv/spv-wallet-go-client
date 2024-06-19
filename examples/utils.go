@@ -11,16 +11,12 @@ import (
 // 'xPriv' | 'xPub' | 'adminKey' | 'Paymail'
 type keyType string
 
-/*
-ErrMessage - function for displaying errors about missing keys (see CheckIfAdminKeyExists, CheckIfXPrivExists)
-*/
+// ErrMessage - function for displaying errors about missing keys (see CheckIfAdminKeyExists, CheckIfXPrivExists)
 func ErrMessage(key keyType) string {
 	return fmt.Sprintf("Please provide a valid %s.", key)
 }
 
-/*
-HandlePanic - function used to handle a recovery after a panic - use with defer
-*/
+// HandlePanic - function used to handle a recovery after a panic - use with defer
 func HandlePanic() {
 	r := recover()
 
@@ -29,9 +25,7 @@ func HandlePanic() {
 	}
 }
 
-/*
-CheckIfXPrivExists - checks if ExampleXPriv is not empty
-*/
+// CheckIfXPrivExists - checks if ExampleXPriv is not empty
 func CheckIfXPrivExists() {
 	if ExampleXPriv == "" {
 		fmt.Println(ErrMessage("xPriv"))
@@ -39,9 +33,7 @@ func CheckIfXPrivExists() {
 	}
 }
 
-/*
-CheckIfXPubExists - checks if ExampleXPub is not empty
-*/
+// CheckIfXPubExists - checks if ExampleXPub is not empty
 func CheckIfXPubExists() {
 	if ExampleXPub == "" {
 		fmt.Println(ErrMessage("xPub"))
@@ -49,9 +41,7 @@ func CheckIfXPubExists() {
 	}
 }
 
-/*
-CheckIfAdminKeyExists - checks if ExampleAdminKey is not empty
-*/
+// CheckIfAdminKeyExists - checks if ExampleAdminKey is not empty
 func CheckIfAdminKeyExists() {
 	if ExampleAdminKey == "" {
 		fmt.Println(ErrMessage("adminKey"))

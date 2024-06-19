@@ -25,9 +25,7 @@ const (
 	ExamplePaymail string = ""
 )
 
-/*
-GenerateKeys - function for generating keys (private and public)
-*/
+// GenerateKeys - function for generating keys (private and public)
 func GenerateKeys() xpriv.KeyWithMnemonic {
 	keys, err := xpriv.Generate()
 	if err != nil {
