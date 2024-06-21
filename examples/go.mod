@@ -1,6 +1,8 @@
 module github.com/bitcoin-sv/spv-wallet-go-client/examples
 
-go 1.21
+go 1.22.3
+
+toolchain go1.22.4
 
 replace github.com/bitcoin-sv/spv-wallet-go-client => ../
 

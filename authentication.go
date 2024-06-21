@@ -3,6 +3,7 @@ package walletclient
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 	"time"
 
@@ -18,7 +19,7 @@ import (
 )
 
 // SetSignature will set the signature on the header for the request
-func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
+func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) *spverrors.SPVError {
 	// Create the signature
 	authData, err := createSignature(xPriv, bodyString)
 	if err != nil {
@@ -199,7 +200,7 @@ func getSigningMessage(xPub string, auth *models.AuthPayload) string {
 	return fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
 }
 
-func setSignatureHeaders(header *http.Header, authData *models.AuthPayload) ResponseError {
+func setSignatureHeaders(header *http.Header, authData *models.AuthPayload) *spverrors.SPVError {
 	// Create the auth header hash
 	header.Set(models.AuthHeaderHash, authData.AuthHash)
 
