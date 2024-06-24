@@ -623,8 +623,8 @@ func (wc *WalletClient) GetContacts(ctx context.Context, conditions *filter.Cont
 }
 
 // UpsertContact add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
-func (wc *WalletClient) UpsertContact(ctx context.Context, paymail, fullName string, metadata map[string]any) (*models.Contact, ResponseError) {
-	return wc.UpsertContactForPaymail(ctx, paymail, fullName, metadata, "")
+func (wc *WalletClient) UpsertContact(ctx context.Context, paymail, fullName, requesterPaymail string, metadata map[string]any) (*models.Contact, ResponseError) {
+	return wc.UpsertContactForPaymail(ctx, paymail, fullName, metadata, requesterPaymail)
 }
 
 // UpsertContactForPaymail add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
