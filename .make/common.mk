@@ -48,15 +48,15 @@ install-releaser: ## Install the GoReleaser application
 release:: ## Full production release (creates release in Github)
 	@echo "releasing..."
 	@test $(github_token)
-	@export GITHUB_TOKEN=$(github_token) && goreleaser --rm-dist
+	@export GITHUB_TOKEN=$(github_token) && goreleaser --clean
 
 release-test: ## Full production test release (everything except deploy)
 	@echo "creating a release test..."
-	@goreleaser --skip-publish --rm-dist
+	@goreleaser --skip-publish --clean
 
 release-snap: ## Test the full release (build binaries)
 	@echo "creating a release snapshot..."
-	@goreleaser --snapshot --skip-publish --rm-dist
+	@goreleaser --snapshot --skip-publish --clean
 
 replace-version: ## Replaces the version in HTML/JS (pre-deploy)
 	@echo "replacing version..."
