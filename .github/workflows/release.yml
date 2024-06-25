@@ -28,8 +28,8 @@ jobs:
         uses: goreleaser/goreleaser-action@v6.0.0
         with:
           distribution: goreleaser
-          version: latest
-          args: release --rm-dist --debug
+          version: v1
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
