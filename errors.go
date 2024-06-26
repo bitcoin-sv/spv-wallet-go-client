@@ -3,7 +3,7 @@ package walletclient
 import (
 	"encoding/json"
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"net/http"
 )
 
@@ -14,34 +14,42 @@ var ErrAdminKey = errors.New("an admin key must be set to be able to create an x
 var ErrNoClientSet = errors.New("no transport client set")
 
 // WrapError wraps an error into SPVError
-func WrapError(err error) *spverrors.SPVError {
+func WrapError(err error) *models.SPVError {
 	if err == nil {
 		return nil
 	}
 
-	return &spverrors.SPVError{
+	return &models.SPVError{
 		StatusCode: http.StatusInternalServerError,
 		Message:    err.Error(),
-		Code:       spverrors.UnknownErrorCode,
+		Code:       models.UnknownErrorCode,
 	}
 }
 
 // WrapResponseError wraps a http response into SPVError
-func WrapResponseError(res *http.Response) *spverrors.SPVError {
+func WrapResponseError(res *http.Response) *models.SPVError {
 	if res == nil {
 		return nil
 	}
 
-	var resError *spverrors.ResponseError
+	var resError *models.ResponseError
 
 	err := json.NewDecoder(res.Body).Decode(&resError)
 	if err != nil {
 		return WrapError(err)
 	}
 
-	return &spverrors.SPVError{
+	return &models.SPVError{
 		StatusCode: res.StatusCode,
 		Code:       resError.Code,
 		Message:    resError.Message,
+	}
+}
+
+func CreateErrorResponse(code string, message string) *models.SPVError {
+	return &models.SPVError{
+		StatusCode: http.StatusInternalServerError,
+		Code:       code,
+		Message:    message,
 	}
 }

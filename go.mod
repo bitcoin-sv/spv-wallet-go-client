@@ -1,11 +1,9 @@
 module github.com/bitcoin-sv/spv-wallet-go-client
 
-go 1.22.3
-
-toolchain go1.22.4
+go 1.22.4
 
 require (
-	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.13
+	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.14.0.20240626082725-2c073c5330a6
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt/v2 v2.2.5
@@ -15,7 +13,6 @@ require (
 )
 
 require (
-	github.com/bitcoin-sv/spv-wallet/spverrors v0.0.0-00010101000000-000000000000 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
@@ -51,4 +48,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/bitcoin-sv/spv-wallet/spverrors => ../spv-wallet/spverrors
+replace github.com/bitcoin-sv/spv-wallet/models => ../spv-wallet/models
