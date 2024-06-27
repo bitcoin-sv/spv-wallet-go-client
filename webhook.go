@@ -12,13 +12,11 @@ const (
 	eventBufferLength = 100
 )
 
-type Event any
-
 type Webhook struct {
 	URL         string
 	TokenHeader string
 	TokenValue  string
-	Channel     chan Event
+	Channel     chan *RawEvent
 
 	client *WalletClient
 }
@@ -28,7 +26,7 @@ func NewWebhook(client *WalletClient, url, tokenHeader, tokenValue string) *Webh
 		URL:         url,
 		TokenHeader: tokenHeader,
 		TokenValue:  tokenValue,
-		Channel:     make(chan Event, eventBufferLength),
+		Channel:     make(chan *RawEvent, eventBufferLength),
 		client:      client,
 	}
 }
@@ -47,7 +45,7 @@ func (w *Webhook) HTTPHandler() http.Handler {
 			http.Error(rw, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		var events []Event
+		var events []*RawEvent
 		if err := json.NewDecoder(r.Body).Decode(&events); err != nil {
 			http.Error(rw, err.Error(), http.StatusBadRequest)
 			return
