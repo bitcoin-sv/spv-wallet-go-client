@@ -1146,3 +1146,17 @@ func (wc *WalletClient) AdminSubscribeWebhook(ctx context.Context, webhookURL, t
 	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/webhooks/subscribe", rawJSON, wc.adminXPriv, true, nil)
 	return WrapError(err)
 }
+
+func (wc *WalletClient) AdminUnsubscribeWebhook(ctx context.Context, webhookURL string) ResponseError {
+	requestModel := struct {
+		URL string `json:"url"`
+	}{
+		URL: webhookURL,
+	}
+	rawJSON, err := json.Marshal(requestModel)
+	if err != nil {
+		return WrapError(nil)
+	}
+	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/webhooks/unsubscribe", rawJSON, wc.adminXPriv, true, nil)
+	return WrapError(err)
+}

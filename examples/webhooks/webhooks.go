@@ -16,8 +16,8 @@ import (
 func main() {
 	defer examples.HandlePanic()
 
-	client := walletclient.NewWithAdminKey("http://localhost:3003/v1", examples.ExampleAdminKey)
-	wh := walletclient.NewWebhook(client, "http://localhost:5005/notification", "", "")
+	client := walletclient.NewWithAdminKey("http://localhost:3003/v1", "xprv9s21ZrQH143K2pmNeAHBzU4JHNDaFaPTbzKbBCw55ErhMDLsxDwKqcaDVV3PwmEmRZa9qUaU261iJaUx8eBiBF77zrPxTH8JGXC7LZQnsgA")
+	wh := walletclient.NewWebhook(client, "http://localhost:5005/notification", "Authorization", "this-is-the-token")
 	err := wh.Subscribe(context.Background())
 	if err != nil {
 		panic(err)
@@ -29,13 +29,25 @@ func main() {
 		for {
 			select {
 			case event := <-wh.Channel:
-				time.Sleep(100 * time.Millisecond) // simulate processing time
-				fmt.Println(event)
+				time.Sleep(50 * time.Millisecond) // simulate processing time
+				fmt.Println("Processing event:", event)
 			case <-context.Background().Done():
 				return
 			}
 		}
 	}()
 
-	http.ListenAndServe(":5005", nil)
+	go func() {
+		_ = http.ListenAndServe(":5005", nil)
+	}()
+
+	<-time.After(30 * time.Second)
+
+	fmt.Printf("Unsubscribing...\n")
+	err = wh.Unsubscribe(context.Background())
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Shutting down...\n")
 }

@@ -37,8 +37,16 @@ func (w *Webhook) Subscribe(ctx context.Context) ResponseError {
 	return w.client.AdminSubscribeWebhook(ctx, w.URL, w.TokenHeader, w.TokenValue)
 }
 
+func (w *Webhook) Unsubscribe(ctx context.Context) ResponseError {
+	return w.client.AdminUnsubscribeWebhook(ctx, w.URL)
+}
+
 func (w *Webhook) HTTPHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		if w.TokenHeader != "" && r.Header.Get(w.TokenHeader) != w.TokenValue {
+			http.Error(rw, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 		var events []Event
 		if err := json.NewDecoder(r.Body).Decode(&events); err != nil {
 			http.Error(rw, err.Error(), http.StatusBadRequest)
