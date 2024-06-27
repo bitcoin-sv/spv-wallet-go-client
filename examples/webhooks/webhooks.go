@@ -25,17 +25,24 @@ func main() {
 
 	http.Handle("/notification", wh.HTTPHandler())
 
-	go func() {
-		for {
-			select {
-			case event := <-wh.Channel:
-				time.Sleep(50 * time.Millisecond) // simulate processing time
-				fmt.Println("Processing event:", event)
-			case <-context.Background().Done():
-				return
-			}
-		}
-	}()
+	_ = walletclient.NewNotificationsDispatcher(context.Background(), wh.Channel, []walletclient.Handler{
+		{Model: &walletclient.GeneralPurposeEvent{}, HandlerFunc: func(gpe *walletclient.GeneralPurposeEvent) {
+			time.Sleep(50 * time.Millisecond) // simulate processing time
+			fmt.Printf("Processing event: %s\n", gpe.Value)
+		}},
+	})
+
+	// go func() {
+	// 	for {
+	// 		select {
+	// 		case event := <-wh.Channel:
+	// 			time.Sleep(50 * time.Millisecond) // simulate processing time
+	// 			fmt.Println("Processing event:", event)
+	// 		case <-context.Background().Done():
+	// 			return
+	// 		}
+	// 	}
+	// }()
 
 	go func() {
 		_ = http.ListenAndServe(":5005", nil)
