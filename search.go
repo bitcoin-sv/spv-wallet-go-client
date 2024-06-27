@@ -3,13 +3,12 @@ package walletclient
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/libsv/go-bk/bip32"
 )
 
 // SearchRequester is a function that sends a request to the server and returns the response.
-type SearchRequester func(ctx context.Context, method string, path string, rawJSON []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) ResponseError
+type SearchRequester func(ctx context.Context, method string, path string, rawJSON []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) error
 
 // Search prepares and sends a search request to the server.
 func Search[TFilter any, TResp any](
@@ -21,7 +20,7 @@ func Search[TFilter any, TResp any](
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
 	requester SearchRequester,
-) (TResp, ResponseError) {
+) (TResp, error) {
 	jsonStr, err := json.Marshal(filter.SearchModel[TFilter]{
 		ConditionsModel: filter.ConditionsModel[TFilter]{
 			Conditions: f,
@@ -50,7 +49,7 @@ func Count[TFilter any](
 	f *TFilter,
 	metadata map[string]any,
 	requester SearchRequester,
-) (int64, ResponseError) {
+) (int64, error) {
 	jsonStr, err := json.Marshal(filter.ConditionsModel[TFilter]{
 		Conditions: f,
 		Metadata:   metadata,
