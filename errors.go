@@ -2,16 +2,18 @@ package walletclient
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"net/http"
 )
 
 // ErrAdminKey admin key not set
-var ErrAdminKey = errors.New("an admin key must be set to be able to create an xpub")
+var ErrAdminKey = models.SPVError{Message: "an admin key must be set to be able to create an xpub", StatusCode: 401, Code: "error-unauthorized-admin-key-not-set"}
 
-// ErrNoClientSet is when no client is set
-var ErrNoClientSet = errors.New("no transport client set")
+// ErrMissingXpriv is when xpriv is missing
+var ErrMissingXpriv = models.SPVError{Message: "xpriv missing", StatusCode: 401, Code: "error-unauthorized-xpriv-missing"}
+
+// ErrCouldNotFindDraftTransaction is when draft transaction is not found
+var ErrCouldNotFindDraftTransaction = models.SPVError{Message: "could not find draft transaction", StatusCode: 404, Code: "error-draft-transaction-not-found"}
 
 // WrapError wraps an error into SPVError
 func WrapError(err error) *models.SPVError {

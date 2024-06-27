@@ -1,7 +1,6 @@
 package walletclient
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/libsv/go-bk/bec"
@@ -79,7 +78,7 @@ func makeClient(configurators ...configurator) *WalletClient {
 }
 
 // addSignature will add the signature to the request
-func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) *spverrors.SPVError {
+func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
 	return setSignature(header, xPriv, bodyString)
 }
 

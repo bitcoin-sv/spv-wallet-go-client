@@ -17,7 +17,7 @@ import (
 )
 
 // SetSignature will set the signature on the header for the request
-func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) *models.SPVError {
+func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
 	// Create the signature
 	authData, err := createSignature(xPriv, bodyString)
 	if err != nil {
@@ -135,7 +135,7 @@ func getUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey
 func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *models.AuthPayload, err error) {
 	// No key?
 	if xPriv == nil {
-		err = CreateErrorResponse("error-unauthorized-missing-xpriv", "missing xpriv")
+		err = ErrMissingXpriv
 		return
 	}
 
