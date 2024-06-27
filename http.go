@@ -1128,3 +1128,21 @@ func (wc *WalletClient) SendToRecipients(ctx context.Context, recipients []*Reci
 
 	return wc.RecordTransaction(ctx, hex, draft.ID, metadata)
 }
+
+func (wc *WalletClient) AdminSubscribeWebhook(ctx context.Context, webhookURL, tokenHeader, tokenValue string) ResponseError {
+	requestModel := struct {
+		URL         string `json:"url"`
+		TokenHeader string `json:"tokenHeader"`
+		TokenValue  string `json:"tokenValue"`
+	}{
+		URL:         webhookURL,
+		TokenHeader: tokenHeader,
+		TokenValue:  tokenValue,
+	}
+	rawJSON, err := json.Marshal(requestModel)
+	if err != nil {
+		return WrapError(nil)
+	}
+	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/webhooks/subscribe", rawJSON, wc.adminXPriv, true, nil)
+	return WrapError(err)
+}
