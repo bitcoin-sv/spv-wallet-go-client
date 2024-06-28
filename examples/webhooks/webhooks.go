@@ -17,7 +17,7 @@ func main() {
 	defer examples.HandlePanic()
 
 	client := walletclient.NewWithAdminKey("http://localhost:3003/v1", "xprv9s21ZrQH143K2pmNeAHBzU4JHNDaFaPTbzKbBCw55ErhMDLsxDwKqcaDVV3PwmEmRZa9qUaU261iJaUx8eBiBF77zrPxTH8JGXC7LZQnsgA")
-	wh := walletclient.NewWebhook(client, "http://localhost:5005/notification", "Authorization", "this-is-the-token")
+	wh := walletclient.NewWebhook(context.Background(), client, "http://localhost:5005/notification", "Authorization", "this-is-the-token", 3)
 	err := wh.Subscribe(context.Background())
 	if err != nil {
 		panic(err)
@@ -25,33 +25,19 @@ func main() {
 
 	http.Handle("/notification", wh.HTTPHandler())
 
-	d := walletclient.NewNotificationsDispatcher(context.Background(), wh.Channel)
-
-	if err := walletclient.RegisterHandler(d, func(gpe *walletclient.NumericEvent) {
+	if err := walletclient.RegisterHandler(wh, func(gpe *walletclient.NumericEvent) {
 		time.Sleep(50 * time.Millisecond) // simulate processing time
 		fmt.Printf("Processing event-numeric: %d\n", gpe.Numeric)
 	}); err != nil {
 		panic(err)
 	}
 
-	if err := walletclient.RegisterHandler(d, func(gpe *walletclient.StringEvent) {
+	if err := walletclient.RegisterHandler(wh, func(gpe *walletclient.StringEvent) {
 		time.Sleep(50 * time.Millisecond) // simulate processing time
 		fmt.Printf("Processing event-string: %s\n", gpe.Value)
 	}); err != nil {
 		panic(err)
 	}
-
-	// go func() {
-	// 	for {
-	// 		select {
-	// 		case event := <-wh.Channel:
-	// 			time.Sleep(50 * time.Millisecond) // simulate processing time
-	// 			fmt.Println("Processing event:", event)
-	// 		case <-context.Background().Done():
-	// 			return
-	// 		}
-	// 	}
-	// }()
 
 	go func() {
 		_ = http.ListenAndServe(":5005", nil)

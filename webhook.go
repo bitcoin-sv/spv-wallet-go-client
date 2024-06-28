@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
+	"sync"
 	"time"
 )
 
@@ -16,19 +18,27 @@ type Webhook struct {
 	URL         string
 	TokenHeader string
 	TokenValue  string
-	Channel     chan *RawEvent
+	buffer      chan *RawEvent
 
-	client *WalletClient
+	client   *WalletClient
+	rootCtx  context.Context
+	handlers *eventsMap
 }
 
-func NewWebhook(client *WalletClient, url, tokenHeader, tokenValue string) *Webhook {
-	return &Webhook{
+func NewWebhook(ctx context.Context, client *WalletClient, url, tokenHeader, tokenValue string, processors int) *Webhook {
+	wh := &Webhook{
 		URL:         url,
 		TokenHeader: tokenHeader,
 		TokenValue:  tokenValue,
-		Channel:     make(chan *RawEvent, eventBufferLength),
+		buffer:      make(chan *RawEvent, eventBufferLength),
 		client:      client,
+		rootCtx:     ctx,
+		handlers:    newEventsMap(),
 	}
+	for i := 0; i < processors; i++ {
+		go wh.process()
+	}
+	return wh
 }
 
 func (w *Webhook) Subscribe(ctx context.Context) ResponseError {
@@ -53,10 +63,13 @@ func (w *Webhook) HTTPHandler() http.Handler {
 		fmt.Printf("Received: %v\n", events)
 		for _, event := range events {
 			select {
-			case w.Channel <- event:
+			case w.buffer <- event:
 				// event sent
 			case <-r.Context().Done():
-				// context cancelled
+				// request context cancelled
+				return
+			case <-w.rootCtx.Done():
+				// root context cancelled - the whole event processing has been stopped
 				return
 			case <-time.After(1 * time.Second):
 				// timeout, most probably the channel is full
@@ -65,4 +78,91 @@ func (w *Webhook) HTTPHandler() http.Handler {
 		}
 		rw.WriteHeader(http.StatusOK)
 	})
+}
+
+func RegisterHandler[EventType Events](nd *Webhook, handlerFunction func(event *EventType)) error {
+	handlerValue := reflect.ValueOf(handlerFunction)
+	if handlerValue.Kind() != reflect.Func {
+		return fmt.Errorf("Not a function")
+	}
+
+	modelType := handlerValue.Type().In(0)
+	if modelType.Kind() == reflect.Ptr {
+		modelType = modelType.Elem()
+	}
+	name := modelType.Name()
+
+	nd.handlers.store(name, &eventHandler{
+		Caller:    handlerValue,
+		ModelType: modelType,
+	})
+
+	return nil
+}
+
+type eventHandler struct {
+	Caller    reflect.Value
+	ModelType reflect.Type
+}
+
+type eventsMap struct {
+	registered *sync.Map
+}
+
+func newEventsMap() *eventsMap {
+	return &eventsMap{
+		registered: &sync.Map{},
+	}
+}
+
+func (em *eventsMap) store(name string, handler *eventHandler) {
+	em.registered.Store(name, handler)
+}
+
+func (em *eventsMap) load(name string) (*eventHandler, bool) {
+	h, ok := em.registered.Load(name)
+	if !ok {
+		return nil, false
+	}
+	return h.(*eventHandler), true
+}
+
+func (nd *Webhook) process() {
+	for {
+		select {
+		case event := <-nd.buffer:
+			handler, ok := nd.handlers.load(event.Type)
+			if !ok {
+				fmt.Printf("No handlers for %s event type", event.Type)
+				continue
+			}
+			model := reflect.New(handler.ModelType).Interface()
+			if err := json.Unmarshal(event.Content, model); err != nil {
+				fmt.Println("Cannot unmarshall the content json")
+				continue
+			}
+			handler.Caller.Call([]reflect.Value{reflect.ValueOf(model)})
+		case <-nd.rootCtx.Done():
+			return
+		}
+	}
+}
+
+////////////////////// BELOW it should be imported from spv-wallet models
+
+type RawEvent struct {
+	Type    string          `json:"type"`
+	Content json.RawMessage `json:"content"`
+}
+
+type StringEvent struct {
+	Value string
+}
+
+type NumericEvent struct {
+	Numeric int
+}
+
+type Events interface {
+	StringEvent | NumericEvent
 }
