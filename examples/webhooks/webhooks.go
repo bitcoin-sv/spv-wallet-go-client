@@ -25,12 +25,21 @@ func main() {
 
 	http.Handle("/notification", wh.HTTPHandler())
 
-	_ = walletclient.NewNotificationsDispatcher(context.Background(), wh.Channel, []walletclient.Handler{
-		{Model: &walletclient.GeneralPurposeEvent{}, HandlerFunc: func(gpe *walletclient.GeneralPurposeEvent) {
-			time.Sleep(50 * time.Millisecond) // simulate processing time
-			fmt.Printf("Processing event: %s\n", gpe.Value)
-		}},
-	})
+	d := walletclient.NewNotificationsDispatcher(context.Background(), wh.Channel)
+
+	if err := walletclient.RegisterHandler(d, func(gpe *walletclient.NumericEvent) {
+		time.Sleep(50 * time.Millisecond) // simulate processing time
+		fmt.Printf("Processing event-numeric: %d\n", gpe.Numeric)
+	}); err != nil {
+		panic(err)
+	}
+
+	if err := walletclient.RegisterHandler(d, func(gpe *walletclient.StringEvent) {
+		time.Sleep(50 * time.Millisecond) // simulate processing time
+		fmt.Printf("Processing event-string: %s\n", gpe.Value)
+	}); err != nil {
+		panic(err)
+	}
 
 	// go func() {
 	// 	for {
