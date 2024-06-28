@@ -17,7 +17,7 @@ import (
 func main() {
 	defer examples.HandlePanic()
 
-	client := walletclient.NewWithAdminKey("http://localhost:3003/v1", examples.ExampleAdminKey)
+	client := walletclient.NewWithAdminKey("http://localhost:3003/v1", "xprv9s21ZrQH143K2pmNeAHBzU4JHNDaFaPTbzKbBCw55ErhMDLsxDwKqcaDVV3PwmEmRZa9qUaU261iJaUx8eBiBF77zrPxTH8JGXC7LZQnsgA")
 	//"Authorization", "this-is-the-token", 3
 	wh := notifications.NewWebhook(
 		context.Background(),
@@ -33,16 +33,16 @@ func main() {
 
 	http.Handle("/notification", wh.HTTPHandler())
 
-	if err = notifications.RegisterHandler(wh, func(gpe *notifications.NumericEvent) {
+	if err = notifications.RegisterHandler(wh, func(gpe *notifications.StringEvent) {
 		time.Sleep(50 * time.Millisecond) // simulate processing time
-		fmt.Printf("Processing event-numeric: %d\n", gpe.Numeric)
+		fmt.Printf("Processing event-string: %s\n", gpe.Value)
 	}); err != nil {
 		panic(err)
 	}
 
-	if err = notifications.RegisterHandler(wh, func(gpe *notifications.StringEvent) {
+	if err = notifications.RegisterHandler(wh, func(gpe *notifications.TransactionEvent) {
 		time.Sleep(50 * time.Millisecond) // simulate processing time
-		fmt.Printf("Processing event-string: %s\n", gpe.Value)
+		fmt.Printf("Processing event-transaction: XPubID: %s, TxID: %s\n", gpe.XPubID, gpe.TransactionID)
 	}); err != nil {
 		panic(err)
 	}
