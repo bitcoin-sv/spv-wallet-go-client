@@ -61,13 +61,33 @@ tasks:
     cmds:
       - echo "running xpub_from_xpriv..."
       - go run ./xpub_from_xpriv/xpub_from_xpriv.go
+
   generate_totp:
     desc: "running generate_totp..."
     cmds:
       - echo "running generate_totp..."
       - go run ./generate_totp/generate_totp.go
+
   webhooks:
     desc: "running webhooks..."
     cmds:
       - echo "running webhooks..."
       - go run ./webhooks/webhooks.go || true
+
+  access_key:
+    desc: "running access_key..."
+    cmds:
+      - echo "running access_key..."
+      - go run ./access_key/access_key.go
+
+  get_shared_config:
+    desc: "running get_shared_config..."
+    cmds:
+      - echo "running get_shared_config..."
+      - go run ./get_shared_config/get_shared_config.go
+
+  update_xpub_metadata:
+    desc: "running update_xpub_metadata..."
+    cmds:
+      - echo "running update_xpub_metadata..."
+      - go run ./update_xpub_metadata/update_xpub_metadata.go

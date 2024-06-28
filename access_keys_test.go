@@ -17,7 +17,12 @@ import (
 func TestAccessKeys(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/v1/access-key":
+		case "/v1/users/current/keys/" + fixtures.AccessKey.ID:
+			switch r.Method {
+			case http.MethodGet, http.MethodDelete:
+				json.NewEncoder(w).Encode(fixtures.AccessKey)
+			}
+		case "/v1/users/current/keys":
 			switch r.Method {
 			case http.MethodGet, http.MethodPost, http.MethodDelete:
 				json.NewEncoder(w).Encode(fixtures.AccessKey)
