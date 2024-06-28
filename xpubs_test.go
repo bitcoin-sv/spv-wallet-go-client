@@ -24,7 +24,7 @@ func TestXpub(t *testing.T) {
 		var response xpub
 		// Check path and method to customize the response
 		switch {
-		case r.URL.Path == "/v1/xpub":
+		case r.URL.Path == "/v1/users/current":
 			metadata := &models.Metadata{"key": "value"}
 			if update {
 				metadata = &models.Metadata{"updated": "info"}

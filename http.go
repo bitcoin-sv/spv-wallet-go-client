@@ -38,7 +38,7 @@ func (wc *WalletClient) SetAdminKey(adminKey *bip32.ExtendedKey) {
 func (wc *WalletClient) GetXPub(ctx context.Context) (*models.Xpub, ResponseError) {
 	var xPub models.Xpub
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/xpub", nil, wc.xPriv, true, &xPub,
+		ctx, http.MethodGet, "/users/current", nil, wc.xPriv, true, &xPub,
 	); err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (wc *WalletClient) UpdateXPubMetadata(ctx context.Context, metadata map[str
 
 	var xPub models.Xpub
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/xpub", jsonStr, wc.xPriv, true, &xPub,
+		ctx, http.MethodPatch, "/users/current", jsonStr, wc.xPriv, true, &xPub,
 	); err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (wc *WalletClient) UpdateXPubMetadata(ctx context.Context, metadata map[str
 func (wc *WalletClient) GetAccessKey(ctx context.Context, id string) (*models.AccessKey, ResponseError) {
 	var accessKey models.AccessKey
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/access-key?"+FieldID+"="+id, nil, wc.xPriv, true, &accessKey,
+		ctx, http.MethodGet, "/users/current/keys/"+id, nil, wc.xPriv, true, &accessKey,
 	); err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (wc *WalletClient) GetAccessKeysCount(
 func (wc *WalletClient) RevokeAccessKey(ctx context.Context, id string) (*models.AccessKey, ResponseError) {
 	var accessKey models.AccessKey
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodDelete, "/access-key?"+FieldID+"="+id, nil, wc.xPriv, true, &accessKey,
+		ctx, http.MethodDelete, "/users/current/keys/"+id, nil, wc.xPriv, true, &accessKey,
 	); err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (wc *WalletClient) CreateAccessKey(ctx context.Context, metadata map[string
 	}
 	var accessKey models.AccessKey
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/access-key", jsonStr, wc.xPriv, true, &accessKey,
+		ctx, http.MethodPost, "/users/current/keys", jsonStr, wc.xPriv, true, &accessKey,
 	); err != nil {
 		return nil, err
 	}
@@ -665,7 +665,7 @@ func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConf
 		return nil, WrapError(errors.New("neither xPriv nor adminXPriv is provided"))
 	}
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/shared-config", nil, key, true, &model,
+		ctx, http.MethodGet, "/configs/shared", nil, key, true, &model,
 	); err != nil {
 		return nil, err
 	}
