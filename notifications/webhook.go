@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"reflect"
 	"time"
+
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 func NewWebhook(ctx context.Context, subscriber WebhookSubscriber, url string, opts ...WebhookOpts) *Webhook {
@@ -18,7 +20,7 @@ func NewWebhook(ctx context.Context, subscriber WebhookSubscriber, url string, o
 	wh := &Webhook{
 		URL:        url,
 		options:    options,
-		buffer:     make(chan *RawEvent, options.BufferSize),
+		buffer:     make(chan *models.RawEvent, options.BufferSize),
 		subscriber: subscriber,
 		handlers:   newEventsMap(),
 	}
@@ -42,7 +44,7 @@ func (w *Webhook) HTTPHandler() http.Handler {
 			http.Error(rw, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		var events []*RawEvent
+		var events []*models.RawEvent
 		if err := json.NewDecoder(r.Body).Decode(&events); err != nil {
 			http.Error(rw, err.Error(), http.StatusBadRequest)
 			return
@@ -86,32 +88,4 @@ func (nd *Webhook) process() {
 			return
 		}
 	}
-}
-
-////////////////////// BELOW it should be imported from spv-wallet models
-
-// RawEvent - the base event type
-type RawEvent struct {
-	Type    string          `json:"type"`
-	Content json.RawMessage `json:"content"`
-}
-
-// StringEvent - event with string value; can be used for generic messages and it's used for testing
-type StringEvent struct {
-	Value string `json:"value"`
-}
-
-type UserEvent struct {
-	XPubID string `json:"xpubId"`
-}
-
-type TransactionEvent struct {
-	UserEvent `json:",inline"`
-
-	TransactionID string `json:"transactionId"`
-}
-
-// Events - interface for all supported events
-type Events interface {
-	StringEvent | TransactionEvent
 }

@@ -1,6 +1,10 @@
 package notifications
 
-import "context"
+import (
+	"context"
+
+	"github.com/bitcoin-sv/spv-wallet/models"
+)
 
 type WebhookOptions struct {
 	TokenHeader string
@@ -50,7 +54,7 @@ func WithProcessors(count int) WebhookOpts {
 type Webhook struct {
 	URL        string
 	options    *WebhookOptions
-	buffer     chan *RawEvent
+	buffer     chan *models.RawEvent
 	subscriber WebhookSubscriber
 	handlers   *eventsMap
 }
