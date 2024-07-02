@@ -3,7 +3,6 @@ package notifications
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"reflect"
 	"time"
@@ -11,7 +10,17 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-func NewWebhook(ctx context.Context, subscriber WebhookSubscriber, url string, opts ...WebhookOpts) *Webhook {
+// Webhook - the webhook event receiver
+type Webhook struct {
+	URL        string
+	options    *WebhookOptions
+	buffer     chan *models.RawEvent
+	subscriber WebhookSubscriber
+	handlers   *eventsMap
+}
+
+// NewWebhook - creates a new webhook
+func NewWebhook(subscriber WebhookSubscriber, url string, opts ...WebhookOpts) *Webhook {
 	options := NewWebhookOptions()
 	for _, opt := range opts {
 		opt(options)
@@ -30,14 +39,17 @@ func NewWebhook(ctx context.Context, subscriber WebhookSubscriber, url string, o
 	return wh
 }
 
+// Subscribe - sends a subscription request to the spv-wallet
 func (w *Webhook) Subscribe(ctx context.Context) error {
 	return w.subscriber.AdminSubscribeWebhook(ctx, w.URL, w.options.TokenHeader, w.options.TokenValue)
 }
 
+// Unsubscribe - sends an unsubscription request to the spv-wallet
 func (w *Webhook) Unsubscribe(ctx context.Context) error {
 	return w.subscriber.AdminUnsubscribeWebhook(ctx, w.URL)
 }
 
+// HTTPHandler - returns an http handler for the webhook; it should be registered with the http server
 func (w *Webhook) HTTPHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		if w.options.TokenHeader != "" && r.Header.Get(w.options.TokenHeader) != w.options.TokenValue {
@@ -49,42 +61,39 @@ func (w *Webhook) HTTPHandler() http.Handler {
 			http.Error(rw, err.Error(), http.StatusBadRequest)
 			return
 		}
-		fmt.Printf("Received: %v\n", events)
+
 		for _, event := range events {
 			select {
 			case w.buffer <- event:
 				// event sent
 			case <-r.Context().Done():
-				// request context cancelled
+				// request context canceled
 				return
 			case <-w.options.RootContext.Done():
-				// root context cancelled - the whole event processing has been stopped
+				// root context canceled - the whole event processing has been stopped
 				return
 			case <-time.After(1 * time.Second):
 				// timeout, most probably the channel is full
-				// TODO: log this
 			}
 		}
 		rw.WriteHeader(http.StatusOK)
 	})
 }
 
-func (nd *Webhook) process() {
+func (w *Webhook) process() {
 	for {
 		select {
-		case event := <-nd.buffer:
-			handler, ok := nd.handlers.load(event.Type)
+		case event := <-w.buffer:
+			handler, ok := w.handlers.load(event.Type)
 			if !ok {
-				fmt.Printf("No handlers for %s event type", event.Type)
 				continue
 			}
 			model := reflect.New(handler.ModelType).Interface()
 			if err := json.Unmarshal(event.Content, model); err != nil {
-				fmt.Println("Cannot unmarshall the content json")
 				continue
 			}
 			handler.Caller.Call([]reflect.Value{reflect.ValueOf(model)})
-		case <-nd.options.RootContext.Done():
+		case <-w.options.RootContext.Done():
 			return
 		}
 	}

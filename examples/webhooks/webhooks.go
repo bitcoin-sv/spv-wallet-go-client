@@ -22,7 +22,6 @@ func main() {
 
 	client := walletclient.NewWithAdminKey("http://localhost:3003/v1", examples.ExampleAdminKey)
 	wh := notifications.NewWebhook(
-		context.Background(),
 		client,
 		"http://localhost:5005/notification",
 		notifications.WithToken("Authorization", "this-is-the-token"),

@@ -1,7 +1,7 @@
 package notifications
 
 import (
-	"fmt"
+	"errors"
 	"reflect"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -12,10 +12,11 @@ type eventHandler struct {
 	ModelType reflect.Type
 }
 
+// RegisterHandler - registers a handler for a specific event type
 func RegisterHandler[EventType models.Events](nd *Webhook, handlerFunction func(event *EventType)) error {
 	handlerValue := reflect.ValueOf(handlerFunction)
 	if handlerValue.Kind() != reflect.Func {
-		return fmt.Errorf("Not a function")
+		return errors.New("handlerFunction must be a function")
 	}
 
 	modelType := handlerValue.Type().In(0)
