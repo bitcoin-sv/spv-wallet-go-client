@@ -63,7 +63,7 @@ func TestContactActionsRouting(t *testing.T) {
 	})
 
 	t.Run("UpsertContact", func(t *testing.T) {
-		contact, err := client.UpsertContact(context.Background(), "test-id", "test@paymail.com", nil)
+		contact, err := client.UpsertContact(context.Background(), "test-id", "test@paymail.com", "", nil)
 		require.NoError(t, err)
 		require.NotNil(t, contact)
 	})
