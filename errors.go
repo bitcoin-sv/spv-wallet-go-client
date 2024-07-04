@@ -16,7 +16,7 @@ var ErrMissingXpriv = models.SPVError{Message: "xpriv missing", StatusCode: 401,
 var ErrCouldNotFindDraftTransaction = models.SPVError{Message: "could not find draft transaction", StatusCode: 404, Code: "error-draft-transaction-not-found"}
 
 // WrapError wraps an error into SPVError
-func WrapError(err error) *models.SPVError {
+func WrapError(err error) error {
 	if err == nil {
 		return nil
 	}
@@ -29,7 +29,7 @@ func WrapError(err error) *models.SPVError {
 }
 
 // WrapResponseError wraps a http response into SPVError
-func WrapResponseError(res *http.Response) *models.SPVError {
+func WrapResponseError(res *http.Response) error {
 	if res == nil {
 		return nil
 	}
@@ -48,7 +48,7 @@ func WrapResponseError(res *http.Response) *models.SPVError {
 	}
 }
 
-func CreateErrorResponse(code string, message string) *models.SPVError {
+func CreateErrorResponse(code string, message string) error {
 	return &models.SPVError{
 		StatusCode: http.StatusInternalServerError,
 		Code:       code,

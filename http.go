@@ -7,13 +7,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 	"net/http"
 	"strconv"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 )
@@ -565,6 +565,9 @@ func (wc *WalletClient) authenticateWithXpriv(sign bool, req *http.Request, xPri
 }
 
 func (wc *WalletClient) authenticateWithAccessKey(req *http.Request, rawJSON []byte) error {
+	if wc.accessKey == nil {
+		return WrapError(errors.New("access key is missing"))
+	}
 	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(wc.accessKey.Serialise()), string(rawJSON))
 }
 
