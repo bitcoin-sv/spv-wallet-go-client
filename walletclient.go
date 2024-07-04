@@ -78,7 +78,7 @@ func makeClient(configurators ...configurator) *WalletClient {
 }
 
 // addSignature will add the signature to the request
-func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
+func addSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
 	return setSignature(header, xPriv, bodyString)
 }
 

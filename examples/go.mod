@@ -1,12 +1,12 @@
 module github.com/bitcoin-sv/spv-wallet-go-client/examples
 
-go 1.21
+go 1.22.4
 
 replace github.com/bitcoin-sv/spv-wallet-go-client => ../
 
 require (
 	github.com/bitcoin-sv/spv-wallet-go-client v0.0.0-00010101000000-000000000000
-	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.13
+	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.15
 )
 
 require (

@@ -5,11 +5,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 func main() {
@@ -24,8 +26,12 @@ func main() {
 
 	status, err := client.AdminGetStatus(ctx)
 	if err != nil {
-		fmt.Println("Response status: ", err.GetStatusCode())
-		fmt.Println("Content: ", err.Error())
+		var extendedErr models.ExtendedError
+		if errors.As(err, &extendedErr) {
+			fmt.Printf("Extended error: [%d] '%s': %s\n", extendedErr.GetStatusCode(), extendedErr.GetCode(), extendedErr.GetMessage())
+		} else {
+			fmt.Println("Error: ", err.Error())
+		}
 
 		os.Exit(1)
 	}
