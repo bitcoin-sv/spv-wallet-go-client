@@ -7,6 +7,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
@@ -48,17 +51,27 @@ func main() {
 		panic(err)
 	}
 
+	server := http.Server{
+		Addr:              ":5005",
+		Handler:           nil,
+		ReadHeaderTimeout: time.Second * 10,
+	}
 	go func() {
-		_ = http.ListenAndServe(":5005", nil)
+		_ = server.ListenAndServe()
 	}()
 
-	<-time.After(30 * time.Second)
+	// wait for signal to shutdown
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
 
 	fmt.Printf("Unsubscribing...\n")
-	err = wh.Unsubscribe(context.Background())
-	if err != nil {
+	if err = wh.Unsubscribe(context.Background()); err != nil {
 		panic(err)
 	}
 
 	fmt.Printf("Shutting down...\n")
+	if err = server.Shutdown(context.Background()); err != nil {
+		panic(err)
+	}
 }
