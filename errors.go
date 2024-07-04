@@ -2,71 +2,56 @@ package walletclient
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"net/http"
 )
 
 // ErrAdminKey admin key not set
-var ErrAdminKey = errors.New("an admin key must be set to be able to create an xpub")
+var ErrAdminKey = models.SPVError{Message: "an admin key must be set to be able to create an xpub", StatusCode: 401, Code: "error-unauthorized-admin-key-not-set"}
 
-// ErrNoClientSet is when no client is set
-var ErrNoClientSet = errors.New("no transport client set")
+// ErrMissingXpriv is when xpriv is missing
+var ErrMissingXpriv = models.SPVError{Message: "xpriv missing", StatusCode: 401, Code: "error-unauthorized-xpriv-missing"}
 
-// ResError is a struct which contain information about error
-type ResError struct {
-	StatusCode int
-	Message    string
-}
+// ErrCouldNotFindDraftTransaction is when draft transaction is not found
+var ErrCouldNotFindDraftTransaction = models.SPVError{Message: "could not find draft transaction", StatusCode: 404, Code: "error-draft-transaction-not-found"}
 
-// ResponseError is an interface for error
-type ResponseError interface {
-	Error() string
-	GetStatusCode() int
-}
-
-// WrapError wraps an error into ResponseError
-func WrapError(err error) ResponseError {
+// WrapError wraps an error into SPVError
+func WrapError(err error) error {
 	if err == nil {
 		return nil
 	}
 
-	return &ResError{
+	return &models.SPVError{
 		StatusCode: http.StatusInternalServerError,
 		Message:    err.Error(),
+		Code:       models.UnknownErrorCode,
 	}
 }
 
-// WrapResponseError wraps a http response into ResponseError
-func WrapResponseError(res *http.Response) ResponseError {
+// WrapResponseError wraps a http response into SPVError
+func WrapResponseError(res *http.Response) error {
 	if res == nil {
 		return nil
 	}
 
-	var errorMsg string
+	var resError *models.ResponseError
 
-	err := json.NewDecoder(res.Body).Decode(&errorMsg)
+	err := json.NewDecoder(res.Body).Decode(&resError)
 	if err != nil {
-		// if EOF, then body is empty and we return response status as error message
-		if !errors.Is(err, io.EOF) {
-			errorMsg = fmt.Sprintf("spv-wallet error message can't be decoded. Reason: %s", err.Error())
-		}
-		errorMsg = res.Status
+		return WrapError(err)
 	}
 
-	return &ResError{
+	return &models.SPVError{
 		StatusCode: res.StatusCode,
-		Message:    errorMsg,
+		Code:       resError.Code,
+		Message:    resError.Message,
 	}
 }
 
-// Error returns the error message
-func (e *ResError) Error() string {
-	return e.Message
-}
-
-// GetStatusCode returns the status code of error
-func (e *ResError) GetStatusCode() int {
-	return e.StatusCode
+func CreateErrorResponse(code string, message string) error {
+	return &models.SPVError{
+		StatusCode: http.StatusInternalServerError,
+		Code:       code,
+		Message:    message,
+	}
 }

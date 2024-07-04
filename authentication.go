@@ -8,7 +8,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/apierrors"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
@@ -18,7 +17,7 @@ import (
 )
 
 // SetSignature will set the signature on the header for the request
-func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) ResponseError {
+func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
 	// Create the signature
 	authData, err := createSignature(xPriv, bodyString)
 	if err != nil {
@@ -28,7 +27,9 @@ func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 	// Set the auth header
 	header.Set(models.AuthHeader, authData.XPub)
 
-	return setSignatureHeaders(header, authData)
+	setSignatureHeaders(header, authData)
+
+	return nil
 }
 
 // GetSignedHex will sign all the inputs using the given xPriv key
@@ -134,7 +135,7 @@ func getUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey
 func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *models.AuthPayload, err error) {
 	// No key?
 	if xPriv == nil {
-		err = apierrors.ErrMissingXPriv
+		err = ErrMissingXpriv
 		return
 	}
 
@@ -199,7 +200,7 @@ func getSigningMessage(xPub string, auth *models.AuthPayload) string {
 	return fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
 }
 
-func setSignatureHeaders(header *http.Header, authData *models.AuthPayload) ResponseError {
+func setSignatureHeaders(header *http.Header, authData *models.AuthPayload) {
 	// Create the auth header hash
 	header.Set(models.AuthHeaderHash, authData.AuthHash)
 
@@ -211,6 +212,4 @@ func setSignatureHeaders(header *http.Header, authData *models.AuthPayload) Resp
 
 	// Set the signature
 	header.Set(models.AuthSignature, authData.Signature)
-
-	return nil
 }

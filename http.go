@@ -12,7 +12,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/apierrors"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
@@ -35,7 +34,7 @@ func (wc *WalletClient) SetAdminKey(adminKey *bip32.ExtendedKey) {
 }
 
 // GetXPub will get the xpub of the current xpub
-func (wc *WalletClient) GetXPub(ctx context.Context) (*models.Xpub, ResponseError) {
+func (wc *WalletClient) GetXPub(ctx context.Context) (*models.Xpub, error) {
 	var xPub models.Xpub
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, "/xpub", nil, wc.xPriv, true, &xPub,
@@ -47,7 +46,7 @@ func (wc *WalletClient) GetXPub(ctx context.Context) (*models.Xpub, ResponseErro
 }
 
 // UpdateXPubMetadata update the metadata of the logged in xpub
-func (wc *WalletClient) UpdateXPubMetadata(ctx context.Context, metadata map[string]any) (*models.Xpub, ResponseError) {
+func (wc *WalletClient) UpdateXPubMetadata(ctx context.Context, metadata map[string]any) (*models.Xpub, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldMetadata: metadata,
 	})
@@ -66,7 +65,7 @@ func (wc *WalletClient) UpdateXPubMetadata(ctx context.Context, metadata map[str
 }
 
 // GetAccessKey will get an access key by id
-func (wc *WalletClient) GetAccessKey(ctx context.Context, id string) (*models.AccessKey, ResponseError) {
+func (wc *WalletClient) GetAccessKey(ctx context.Context, id string) (*models.AccessKey, error) {
 	var accessKey models.AccessKey
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, "/access-key?"+FieldID+"="+id, nil, wc.xPriv, true, &accessKey,
@@ -83,7 +82,7 @@ func (wc *WalletClient) GetAccessKeys(
 	conditions *filter.AccessKeyFilter,
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
-) ([]*models.AccessKey, ResponseError) {
+) ([]*models.AccessKey, error) {
 	return Search[filter.AccessKeyFilter, []*models.AccessKey](
 		ctx, http.MethodPost,
 		"/access-key/search",
@@ -100,7 +99,7 @@ func (wc *WalletClient) GetAccessKeysCount(
 	ctx context.Context,
 	conditions *filter.AccessKeyFilter,
 	metadata map[string]any,
-) (int64, ResponseError) {
+) (int64, error) {
 	return Count[filter.AccessKeyFilter](
 		ctx, http.MethodPost,
 		"/access-key/count",
@@ -112,7 +111,7 @@ func (wc *WalletClient) GetAccessKeysCount(
 }
 
 // RevokeAccessKey will revoke an access key by id
-func (wc *WalletClient) RevokeAccessKey(ctx context.Context, id string) (*models.AccessKey, ResponseError) {
+func (wc *WalletClient) RevokeAccessKey(ctx context.Context, id string) (*models.AccessKey, error) {
 	var accessKey models.AccessKey
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodDelete, "/access-key?"+FieldID+"="+id, nil, wc.xPriv, true, &accessKey,
@@ -124,7 +123,7 @@ func (wc *WalletClient) RevokeAccessKey(ctx context.Context, id string) (*models
 }
 
 // CreateAccessKey will create new access key
-func (wc *WalletClient) CreateAccessKey(ctx context.Context, metadata map[string]any) (*models.AccessKey, ResponseError) {
+func (wc *WalletClient) CreateAccessKey(ctx context.Context, metadata map[string]any) (*models.AccessKey, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldMetadata: metadata,
 	})
@@ -142,7 +141,7 @@ func (wc *WalletClient) CreateAccessKey(ctx context.Context, metadata map[string
 }
 
 // GetDestinationByID will get a destination by id
-func (wc *WalletClient) GetDestinationByID(ctx context.Context, id string) (*models.Destination, ResponseError) {
+func (wc *WalletClient) GetDestinationByID(ctx context.Context, id string) (*models.Destination, error) {
 	var destination models.Destination
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, fmt.Sprintf("/destination?%s=%s", FieldID, id), nil, wc.xPriv, true, &destination,
@@ -154,7 +153,7 @@ func (wc *WalletClient) GetDestinationByID(ctx context.Context, id string) (*mod
 }
 
 // GetDestinationByAddress will get a destination by address
-func (wc *WalletClient) GetDestinationByAddress(ctx context.Context, address string) (*models.Destination, ResponseError) {
+func (wc *WalletClient) GetDestinationByAddress(ctx context.Context, address string) (*models.Destination, error) {
 	var destination models.Destination
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, "/destination?"+FieldAddress+"="+address, nil, wc.xPriv, true, &destination,
@@ -166,7 +165,7 @@ func (wc *WalletClient) GetDestinationByAddress(ctx context.Context, address str
 }
 
 // GetDestinationByLockingScript will get a destination by locking script
-func (wc *WalletClient) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*models.Destination, ResponseError) {
+func (wc *WalletClient) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*models.Destination, error) {
 	var destination models.Destination
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, "/destination?"+FieldLockingScript+"="+lockingScript, nil, wc.xPriv, true, &destination,
@@ -178,7 +177,7 @@ func (wc *WalletClient) GetDestinationByLockingScript(ctx context.Context, locki
 }
 
 // GetDestinations will get all destinations matching the metadata filter
-func (wc *WalletClient) GetDestinations(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any, queryParams *filter.QueryParams) ([]*models.Destination, ResponseError) {
+func (wc *WalletClient) GetDestinations(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any, queryParams *filter.QueryParams) ([]*models.Destination, error) {
 	return Search[filter.DestinationFilter, []*models.Destination](
 		ctx, http.MethodPost,
 		"/destination/search",
@@ -191,7 +190,7 @@ func (wc *WalletClient) GetDestinations(ctx context.Context, conditions *filter.
 }
 
 // GetDestinationsCount will get the count of destinations matching the metadata filter
-func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any) (int64, ResponseError) {
+func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any) (int64, error) {
 	return Count(
 		ctx,
 		http.MethodPost,
@@ -204,7 +203,7 @@ func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions *fi
 }
 
 // NewDestination will create a new destination and return it
-func (wc *WalletClient) NewDestination(ctx context.Context, metadata map[string]any) (*models.Destination, ResponseError) {
+func (wc *WalletClient) NewDestination(ctx context.Context, metadata map[string]any) (*models.Destination, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldMetadata: metadata,
 	})
@@ -222,7 +221,7 @@ func (wc *WalletClient) NewDestination(ctx context.Context, metadata map[string]
 }
 
 // UpdateDestinationMetadataByID updates the destination metadata by id
-func (wc *WalletClient) UpdateDestinationMetadataByID(ctx context.Context, id string, metadata map[string]any) (*models.Destination, ResponseError) {
+func (wc *WalletClient) UpdateDestinationMetadataByID(ctx context.Context, id string, metadata map[string]any) (*models.Destination, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldID:       id,
 		FieldMetadata: metadata,
@@ -242,7 +241,7 @@ func (wc *WalletClient) UpdateDestinationMetadataByID(ctx context.Context, id st
 }
 
 // UpdateDestinationMetadataByAddress updates the destination metadata by address
-func (wc *WalletClient) UpdateDestinationMetadataByAddress(ctx context.Context, address string, metadata map[string]any) (*models.Destination, ResponseError) {
+func (wc *WalletClient) UpdateDestinationMetadataByAddress(ctx context.Context, address string, metadata map[string]any) (*models.Destination, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldAddress:  address,
 		FieldMetadata: metadata,
@@ -262,7 +261,7 @@ func (wc *WalletClient) UpdateDestinationMetadataByAddress(ctx context.Context, 
 }
 
 // UpdateDestinationMetadataByLockingScript updates the destination metadata by locking script
-func (wc *WalletClient) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string, metadata map[string]any) (*models.Destination, ResponseError) {
+func (wc *WalletClient) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string, metadata map[string]any) (*models.Destination, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldLockingScript: lockingScript,
 		FieldMetadata:      metadata,
@@ -282,7 +281,7 @@ func (wc *WalletClient) UpdateDestinationMetadataByLockingScript(ctx context.Con
 }
 
 // GetTransaction will get a transaction by ID
-func (wc *WalletClient) GetTransaction(ctx context.Context, txID string) (*models.Transaction, ResponseError) {
+func (wc *WalletClient) GetTransaction(ctx context.Context, txID string) (*models.Transaction, error) {
 	var transaction models.Transaction
 	if err := wc.doHTTPRequest(ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, wc.xPriv, wc.signRequest, &transaction); err != nil {
 		return nil, err
@@ -297,7 +296,7 @@ func (wc *WalletClient) GetTransactions(
 	conditions *filter.TransactionFilter,
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
-) ([]*models.Transaction, ResponseError) {
+) ([]*models.Transaction, error) {
 	return Search[filter.TransactionFilter, []*models.Transaction](
 		ctx, http.MethodPost,
 		"/transaction/search",
@@ -314,7 +313,7 @@ func (wc *WalletClient) GetTransactionsCount(
 	ctx context.Context,
 	conditions *filter.TransactionFilter,
 	metadata map[string]any,
-) (int64, ResponseError) {
+) (int64, error) {
 	return Count[filter.TransactionFilter](
 		ctx, http.MethodPost,
 		"/transaction/count",
@@ -326,7 +325,7 @@ func (wc *WalletClient) GetTransactionsCount(
 }
 
 // DraftToRecipients is a draft transaction to a slice of recipients
-func (wc *WalletClient) DraftToRecipients(ctx context.Context, recipients []*Recipients, metadata map[string]any) (*models.DraftTransaction, ResponseError) {
+func (wc *WalletClient) DraftToRecipients(ctx context.Context, recipients []*Recipients, metadata map[string]any) (*models.DraftTransaction, error) {
 	outputs := make([]map[string]interface{}, 0)
 	for _, recipient := range recipients {
 		outputs = append(outputs, map[string]interface{}{
@@ -345,7 +344,7 @@ func (wc *WalletClient) DraftToRecipients(ctx context.Context, recipients []*Rec
 }
 
 // DraftTransaction is a draft transaction
-func (wc *WalletClient) DraftTransaction(ctx context.Context, transactionConfig *models.TransactionConfig, metadata map[string]any) (*models.DraftTransaction, ResponseError) {
+func (wc *WalletClient) DraftTransaction(ctx context.Context, transactionConfig *models.TransactionConfig, metadata map[string]any) (*models.DraftTransaction, error) {
 	return wc.createDraftTransaction(ctx, map[string]interface{}{
 		FieldConfig:   transactionConfig,
 		FieldMetadata: metadata,
@@ -355,7 +354,7 @@ func (wc *WalletClient) DraftTransaction(ctx context.Context, transactionConfig 
 // createDraftTransaction will create a draft transaction
 func (wc *WalletClient) createDraftTransaction(ctx context.Context,
 	jsonData map[string]interface{},
-) (*models.DraftTransaction, ResponseError) {
+) (*models.DraftTransaction, error) {
 	jsonStr, err := json.Marshal(jsonData)
 	if err != nil {
 		return nil, WrapError(err)
@@ -368,14 +367,14 @@ func (wc *WalletClient) createDraftTransaction(ctx context.Context,
 		return nil, err
 	}
 	if draftTransaction == nil {
-		return nil, WrapError(apierrors.ErrDraftNotFound)
+		return nil, ErrCouldNotFindDraftTransaction
 	}
 
 	return draftTransaction, nil
 }
 
 // RecordTransaction will record a transaction
-func (wc *WalletClient) RecordTransaction(ctx context.Context, hex, referenceID string, metadata map[string]any) (*models.Transaction, ResponseError) {
+func (wc *WalletClient) RecordTransaction(ctx context.Context, hex, referenceID string, metadata map[string]any) (*models.Transaction, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldHex:         hex,
 		FieldReferenceID: referenceID,
@@ -396,7 +395,7 @@ func (wc *WalletClient) RecordTransaction(ctx context.Context, hex, referenceID 
 }
 
 // UpdateTransactionMetadata update the metadata of a transaction
-func (wc *WalletClient) UpdateTransactionMetadata(ctx context.Context, txID string, metadata map[string]any) (*models.Transaction, ResponseError) {
+func (wc *WalletClient) UpdateTransactionMetadata(ctx context.Context, txID string, metadata map[string]any) (*models.Transaction, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldID:       txID,
 		FieldMetadata: metadata,
@@ -416,7 +415,7 @@ func (wc *WalletClient) UpdateTransactionMetadata(ctx context.Context, txID stri
 }
 
 // SetSignatureFromAccessKey will set the signature on the header for the request from an access key
-func SetSignatureFromAccessKey(header *http.Header, privateKeyHex, bodyString string) ResponseError {
+func SetSignatureFromAccessKey(header *http.Header, privateKeyHex, bodyString string) error {
 	// Create the signature
 	authData, err := createSignatureAccessKey(privateKeyHex, bodyString)
 	if err != nil {
@@ -426,11 +425,13 @@ func SetSignatureFromAccessKey(header *http.Header, privateKeyHex, bodyString st
 	// Set the auth header
 	header.Set(models.AuthAccessKey, authData.AccessKey)
 
-	return setSignatureHeaders(header, authData)
+	setSignatureHeaders(header, authData)
+
+	return nil
 }
 
 // GetUtxo will get a utxo by transaction ID
-func (wc *WalletClient) GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*models.Utxo, ResponseError) {
+func (wc *WalletClient) GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*models.Utxo, error) {
 	outputIndexStr := strconv.FormatUint(uint64(outputIndex), 10)
 
 	url := fmt.Sprintf("/utxo?%s=%s&%s=%s", FieldTransactionID, txID, FieldOutputIndex, outputIndexStr)
@@ -446,7 +447,7 @@ func (wc *WalletClient) GetUtxo(ctx context.Context, txID string, outputIndex ui
 }
 
 // GetUtxos will get a list of utxos filtered by conditions and metadata
-func (wc *WalletClient) GetUtxos(ctx context.Context, conditions *filter.UtxoFilter, metadata map[string]any, queryParams *filter.QueryParams) ([]*models.Utxo, ResponseError) {
+func (wc *WalletClient) GetUtxos(ctx context.Context, conditions *filter.UtxoFilter, metadata map[string]any, queryParams *filter.QueryParams) ([]*models.Utxo, error) {
 	return Search[filter.UtxoFilter, []*models.Utxo](
 		ctx, http.MethodPost,
 		"/utxo/search",
@@ -459,7 +460,7 @@ func (wc *WalletClient) GetUtxos(ctx context.Context, conditions *filter.UtxoFil
 }
 
 // GetUtxosCount will get the count of utxos filtered by conditions and metadata
-func (wc *WalletClient) GetUtxosCount(ctx context.Context, conditions *filter.UtxoFilter, metadata map[string]any) (int64, ResponseError) {
+func (wc *WalletClient) GetUtxosCount(ctx context.Context, conditions *filter.UtxoFilter, metadata map[string]any) (int64, error) {
 	return Count[filter.UtxoFilter](
 		ctx, http.MethodPost,
 		"/utxo/count",
@@ -474,7 +475,7 @@ func (wc *WalletClient) GetUtxosCount(ctx context.Context, conditions *filter.Ut
 func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models.AuthPayload, err error) {
 	// No key?
 	if privateKeyHex == "" {
-		err = apierrors.ErrMissingAccessKey
+		err = CreateErrorResponse("error-unauthorized-missing-access-key", "missing access key")
 		return
 	}
 
@@ -503,7 +504,7 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models
 // doHTTPRequest will create and submit the HTTP request
 func (wc *WalletClient) doHTTPRequest(ctx context.Context, method string, path string,
 	rawJSON []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{},
-) ResponseError {
+) error {
 	req, err := http.NewRequestWithContext(ctx, method, wc.server+path, bytes.NewBuffer(rawJSON))
 	if err != nil {
 		return WrapError(err)
@@ -546,7 +547,7 @@ func (wc *WalletClient) doHTTPRequest(ctx context.Context, method string, path s
 	return nil
 }
 
-func (wc *WalletClient) authenticateWithXpriv(sign bool, req *http.Request, xPriv *bip32.ExtendedKey, rawJSON []byte) ResponseError {
+func (wc *WalletClient) authenticateWithXpriv(sign bool, req *http.Request, xPriv *bip32.ExtendedKey, rawJSON []byte) error {
 	if sign {
 		if err := addSignature(&req.Header, xPriv, string(rawJSON)); err != nil {
 			return err
@@ -563,12 +564,15 @@ func (wc *WalletClient) authenticateWithXpriv(sign bool, req *http.Request, xPri
 	return nil
 }
 
-func (wc *WalletClient) authenticateWithAccessKey(req *http.Request, rawJSON []byte) ResponseError {
+func (wc *WalletClient) authenticateWithAccessKey(req *http.Request, rawJSON []byte) error {
+	if wc.accessKey == nil {
+		return WrapError(errors.New("access key is missing"))
+	}
 	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(wc.accessKey.Serialise()), string(rawJSON))
 }
 
 // AcceptContact will accept the contact associated with the paymail
-func (wc *WalletClient) AcceptContact(ctx context.Context, paymail string) ResponseError {
+func (wc *WalletClient) AcceptContact(ctx context.Context, paymail string) error {
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodPatch, "/contact/accepted/"+paymail, nil, wc.xPriv, wc.signRequest, nil,
 	); err != nil {
@@ -579,7 +583,7 @@ func (wc *WalletClient) AcceptContact(ctx context.Context, paymail string) Respo
 }
 
 // RejectContact will reject the contact associated with the paymail
-func (wc *WalletClient) RejectContact(ctx context.Context, paymail string) ResponseError {
+func (wc *WalletClient) RejectContact(ctx context.Context, paymail string) error {
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodPatch, "/contact/rejected/"+paymail, nil, wc.xPriv, wc.signRequest, nil,
 	); err != nil {
@@ -590,7 +594,7 @@ func (wc *WalletClient) RejectContact(ctx context.Context, paymail string) Respo
 }
 
 // ConfirmContact will confirm the contact associated with the paymail
-func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Contact, passcode, requesterPaymail string, period, digits uint) ResponseError {
+func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
 	isTotpValid, err := wc.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits)
 	if err != nil {
 		return WrapError(fmt.Errorf("totp validation failed: %w", err))
@@ -610,7 +614,7 @@ func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Cont
 }
 
 // GetContacts will get contacts by conditions
-func (wc *WalletClient) GetContacts(ctx context.Context, conditions *filter.ContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, ResponseError) {
+func (wc *WalletClient) GetContacts(ctx context.Context, conditions *filter.ContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, error) {
 	return Search[filter.ContactFilter, *models.SearchContactsResponse](
 		ctx, http.MethodPost,
 		"/contact/search",
@@ -623,12 +627,12 @@ func (wc *WalletClient) GetContacts(ctx context.Context, conditions *filter.Cont
 }
 
 // UpsertContact add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
-func (wc *WalletClient) UpsertContact(ctx context.Context, paymail, fullName, requesterPaymail string, metadata map[string]any) (*models.Contact, ResponseError) {
+func (wc *WalletClient) UpsertContact(ctx context.Context, paymail, fullName, requesterPaymail string, metadata map[string]any) (*models.Contact, error) {
 	return wc.UpsertContactForPaymail(ctx, paymail, fullName, metadata, requesterPaymail)
 }
 
 // UpsertContactForPaymail add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
-func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fullName string, metadata map[string]any, requesterPaymail string) (*models.Contact, ResponseError) {
+func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fullName string, metadata map[string]any, requesterPaymail string) (*models.Contact, error) {
 	payload := map[string]interface{}{
 		"fullName":    fullName,
 		FieldMetadata: metadata,
@@ -654,7 +658,7 @@ func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fu
 }
 
 // GetSharedConfig gets the shared config
-func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConfig, ResponseError) {
+func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConfig, error) {
 	var model *models.SharedConfig
 
 	key := wc.xPriv
@@ -674,7 +678,7 @@ func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConf
 }
 
 // AdminNewXpub will register an xPub
-func (wc *WalletClient) AdminNewXpub(ctx context.Context, rawXPub string, metadata map[string]any) ResponseError {
+func (wc *WalletClient) AdminNewXpub(ctx context.Context, rawXPub string, metadata map[string]any) error {
 	// Adding a xpub needs to be signed by an admin key
 	if wc.adminXPriv == nil {
 		return WrapError(ErrAdminKey)
@@ -696,7 +700,7 @@ func (wc *WalletClient) AdminNewXpub(ctx context.Context, rawXPub string, metada
 }
 
 // AdminGetStatus get whether admin key is valid
-func (wc *WalletClient) AdminGetStatus(ctx context.Context) (bool, ResponseError) {
+func (wc *WalletClient) AdminGetStatus(ctx context.Context) (bool, error) {
 	var status bool
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, "/admin/status", nil, wc.adminXPriv, true, &status,
@@ -708,7 +712,7 @@ func (wc *WalletClient) AdminGetStatus(ctx context.Context) (bool, ResponseError
 }
 
 // AdminGetStats get admin stats
-func (wc *WalletClient) AdminGetStats(ctx context.Context) (*models.AdminStats, ResponseError) {
+func (wc *WalletClient) AdminGetStats(ctx context.Context) (*models.AdminStats, error) {
 	var stats *models.AdminStats
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, "/admin/stats", nil, wc.adminXPriv, true, &stats,
@@ -725,7 +729,7 @@ func (wc *WalletClient) AdminGetAccessKeys(
 	conditions *filter.AdminAccessKeyFilter,
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
-) ([]*models.AccessKey, ResponseError) {
+) ([]*models.AccessKey, error) {
 	return Search[filter.AdminAccessKeyFilter, []*models.AccessKey](
 		ctx, http.MethodPost,
 		"/admin/access-keys/search",
@@ -742,7 +746,7 @@ func (wc *WalletClient) AdminGetAccessKeysCount(
 	ctx context.Context,
 	conditions *filter.AdminAccessKeyFilter,
 	metadata map[string]any,
-) (int64, ResponseError) {
+) (int64, error) {
 	return Count[filter.AdminAccessKeyFilter](
 		ctx, http.MethodPost,
 		"/admin/access-keys/count",
@@ -759,7 +763,7 @@ func (wc *WalletClient) AdminGetBlockHeaders(
 	conditions map[string]interface{},
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
-) ([]*models.BlockHeader, ResponseError) {
+) ([]*models.BlockHeader, error) {
 	var models []*models.BlockHeader
 	if err := wc.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/block-headers/search", &models); err != nil {
 		return nil, err
@@ -773,14 +777,14 @@ func (wc *WalletClient) AdminGetBlockHeadersCount(
 	ctx context.Context,
 	conditions map[string]interface{},
 	metadata map[string]any,
-) (int64, ResponseError) {
+) (int64, error) {
 	return wc.adminCount(ctx, conditions, metadata, "/admin/block-headers/count")
 }
 
 // AdminGetDestinations get all block destinations filtered by conditions
 func (wc *WalletClient) AdminGetDestinations(ctx context.Context, conditions *filter.DestinationFilter,
 	metadata map[string]any, queryParams *filter.QueryParams,
-) ([]*models.Destination, ResponseError) {
+) ([]*models.Destination, error) {
 	return Search[filter.DestinationFilter, []*models.Destination](
 		ctx, http.MethodPost,
 		"/admin/destinations/search",
@@ -793,7 +797,7 @@ func (wc *WalletClient) AdminGetDestinations(ctx context.Context, conditions *fi
 }
 
 // AdminGetDestinationsCount get a count of all the destinations filtered by conditions
-func (wc *WalletClient) AdminGetDestinationsCount(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any) (int64, ResponseError) {
+func (wc *WalletClient) AdminGetDestinationsCount(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any) (int64, error) {
 	return Count(
 		ctx,
 		http.MethodPost,
@@ -806,7 +810,7 @@ func (wc *WalletClient) AdminGetDestinationsCount(ctx context.Context, condition
 }
 
 // AdminGetPaymail get a paymail by address
-func (wc *WalletClient) AdminGetPaymail(ctx context.Context, address string) (*models.PaymailAddress, ResponseError) {
+func (wc *WalletClient) AdminGetPaymail(ctx context.Context, address string) (*models.PaymailAddress, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldAddress: address,
 	})
@@ -830,7 +834,7 @@ func (wc *WalletClient) AdminGetPaymails(
 	conditions *filter.AdminPaymailFilter,
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
-) ([]*models.PaymailAddress, ResponseError) {
+) ([]*models.PaymailAddress, error) {
 	return Search[filter.AdminPaymailFilter, []*models.PaymailAddress](
 		ctx, http.MethodPost,
 		"/admin/paymails/search",
@@ -843,7 +847,7 @@ func (wc *WalletClient) AdminGetPaymails(
 }
 
 // AdminGetPaymailsCount get a count of all the paymails filtered by conditions
-func (wc *WalletClient) AdminGetPaymailsCount(ctx context.Context, conditions *filter.AdminPaymailFilter, metadata map[string]any) (int64, ResponseError) {
+func (wc *WalletClient) AdminGetPaymailsCount(ctx context.Context, conditions *filter.AdminPaymailFilter, metadata map[string]any) (int64, error) {
 	return Count(
 		ctx, http.MethodPost,
 		"/admin/paymails/count",
@@ -855,7 +859,7 @@ func (wc *WalletClient) AdminGetPaymailsCount(ctx context.Context, conditions *f
 }
 
 // AdminCreatePaymail create a new paymail for a xpub
-func (wc *WalletClient) AdminCreatePaymail(ctx context.Context, rawXPub string, address string, publicName string, avatar string) (*models.PaymailAddress, ResponseError) {
+func (wc *WalletClient) AdminCreatePaymail(ctx context.Context, rawXPub string, address string, publicName string, avatar string) (*models.PaymailAddress, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldXpubKey:    rawXPub,
 		FieldAddress:    address,
@@ -877,7 +881,7 @@ func (wc *WalletClient) AdminCreatePaymail(ctx context.Context, rawXPub string, 
 }
 
 // AdminDeletePaymail delete a paymail address from the database
-func (wc *WalletClient) AdminDeletePaymail(ctx context.Context, address string) ResponseError {
+func (wc *WalletClient) AdminDeletePaymail(ctx context.Context, address string) error {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldAddress: address,
 	})
@@ -900,7 +904,7 @@ func (wc *WalletClient) AdminGetTransactions(
 	conditions *filter.TransactionFilter,
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
-) ([]*models.Transaction, ResponseError) {
+) ([]*models.Transaction, error) {
 	return Search[filter.TransactionFilter, []*models.Transaction](
 		ctx, http.MethodPost,
 		"/admin/transactions/search",
@@ -917,7 +921,7 @@ func (wc *WalletClient) AdminGetTransactionsCount(
 	ctx context.Context,
 	conditions *filter.TransactionFilter,
 	metadata map[string]any,
-) (int64, ResponseError) {
+) (int64, error) {
 	return Count[filter.TransactionFilter](
 		ctx, http.MethodPost,
 		"/admin/transactions/count",
@@ -934,7 +938,7 @@ func (wc *WalletClient) AdminGetUtxos(
 	conditions *filter.AdminUtxoFilter,
 	metadata map[string]any,
 	queryParams *filter.QueryParams,
-) ([]*models.Utxo, ResponseError) {
+) ([]*models.Utxo, error) {
 	return Search[filter.AdminUtxoFilter, []*models.Utxo](
 		ctx, http.MethodPost,
 		"/admin/utxos/search",
@@ -951,7 +955,7 @@ func (wc *WalletClient) AdminGetUtxosCount(
 	ctx context.Context,
 	conditions *filter.AdminUtxoFilter,
 	metadata map[string]any,
-) (int64, ResponseError) {
+) (int64, error) {
 	return Count[filter.AdminUtxoFilter](
 		ctx, http.MethodPost,
 		"/admin/utxos/count",
@@ -965,7 +969,7 @@ func (wc *WalletClient) AdminGetUtxosCount(
 // AdminGetXPubs get all block xpubs filtered by conditions
 func (wc *WalletClient) AdminGetXPubs(ctx context.Context, conditions *filter.XpubFilter,
 	metadata map[string]any, queryParams *filter.QueryParams,
-) ([]*models.Xpub, ResponseError) {
+) ([]*models.Xpub, error) {
 	return Search[filter.XpubFilter, []*models.Xpub](
 		ctx, http.MethodPost,
 		"/admin/xpubs/search",
@@ -982,7 +986,7 @@ func (wc *WalletClient) AdminGetXPubsCount(
 	ctx context.Context,
 	conditions *filter.XpubFilter,
 	metadata map[string]any,
-) (int64, ResponseError) {
+) (int64, error) {
 	return Count[filter.XpubFilter](
 		ctx, http.MethodPost,
 		"/admin/xpubs/count",
@@ -1000,7 +1004,7 @@ func (wc *WalletClient) adminGetModels(
 	queryParams *filter.QueryParams,
 	path string,
 	models interface{},
-) ResponseError {
+) error {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions:  conditions,
 		FieldMetadata:    metadata,
@@ -1019,7 +1023,7 @@ func (wc *WalletClient) adminGetModels(
 	return nil
 }
 
-func (wc *WalletClient) adminCount(ctx context.Context, conditions map[string]interface{}, metadata map[string]any, path string) (int64, ResponseError) {
+func (wc *WalletClient) adminCount(ctx context.Context, conditions map[string]interface{}, metadata map[string]any, path string) (int64, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldConditions: conditions,
 		FieldMetadata:   metadata,
@@ -1039,7 +1043,7 @@ func (wc *WalletClient) adminCount(ctx context.Context, conditions map[string]in
 }
 
 // AdminRecordTransaction will record a transaction as an admin
-func (wc *WalletClient) AdminRecordTransaction(ctx context.Context, hex string) (*models.Transaction, ResponseError) {
+func (wc *WalletClient) AdminRecordTransaction(ctx context.Context, hex string) (*models.Transaction, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		FieldHex: hex,
 	})
@@ -1058,7 +1062,7 @@ func (wc *WalletClient) AdminRecordTransaction(ctx context.Context, hex string) 
 }
 
 // AdminGetContacts executes an HTTP POST request to search for contacts based on specified conditions, metadata, and query parameters.
-func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions *filter.ContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, ResponseError) {
+func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions *filter.ContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, error) {
 	return Search[filter.ContactFilter, *models.SearchContactsResponse](
 		ctx, http.MethodPost,
 		"/admin/contact/search",
@@ -1071,7 +1075,7 @@ func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions *filter
 }
 
 // AdminUpdateContact executes an HTTP PATCH request to update a specific contact's full name using their ID.
-func (wc *WalletClient) AdminUpdateContact(ctx context.Context, id, fullName string, metadata map[string]any) (*models.Contact, ResponseError) {
+func (wc *WalletClient) AdminUpdateContact(ctx context.Context, id, fullName string, metadata map[string]any) (*models.Contact, error) {
 	jsonStr, err := json.Marshal(map[string]interface{}{
 		"fullName":    fullName,
 		FieldMetadata: metadata,
@@ -1085,27 +1089,27 @@ func (wc *WalletClient) AdminUpdateContact(ctx context.Context, id, fullName str
 }
 
 // AdminDeleteContact executes an HTTP DELETE request to remove a contact using their ID.
-func (wc *WalletClient) AdminDeleteContact(ctx context.Context, id string) ResponseError {
+func (wc *WalletClient) AdminDeleteContact(ctx context.Context, id string) error {
 	err := wc.doHTTPRequest(ctx, http.MethodDelete, fmt.Sprintf("/admin/contact/%s", id), nil, wc.adminXPriv, true, nil)
 	return WrapError(err)
 }
 
 // AdminAcceptContact executes an HTTP PATCH request to mark a contact as accepted using their ID.
-func (wc *WalletClient) AdminAcceptContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
+func (wc *WalletClient) AdminAcceptContact(ctx context.Context, id string) (*models.Contact, error) {
 	var contact models.Contact
 	err := wc.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/accepted/%s", id), nil, wc.adminXPriv, true, &contact)
 	return &contact, WrapError(err)
 }
 
 // AdminRejectContact executes an HTTP PATCH request to mark a contact as rejected using their ID.
-func (wc *WalletClient) AdminRejectContact(ctx context.Context, id string) (*models.Contact, ResponseError) {
+func (wc *WalletClient) AdminRejectContact(ctx context.Context, id string) (*models.Contact, error) {
 	var contact models.Contact
 	err := wc.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/rejected/%s", id), nil, wc.adminXPriv, true, &contact)
 	return &contact, WrapError(err)
 }
 
 // FinalizeTransaction will finalize the transaction
-func (wc *WalletClient) FinalizeTransaction(draft *models.DraftTransaction) (string, ResponseError) {
+func (wc *WalletClient) FinalizeTransaction(draft *models.DraftTransaction) (string, error) {
 	res, err := GetSignedHex(draft, wc.xPriv)
 	if err != nil {
 		return "", WrapError(err)
@@ -1115,7 +1119,7 @@ func (wc *WalletClient) FinalizeTransaction(draft *models.DraftTransaction) (str
 }
 
 // SendToRecipients send to recipients
-func (wc *WalletClient) SendToRecipients(ctx context.Context, recipients []*Recipients, metadata map[string]any) (*models.Transaction, ResponseError) {
+func (wc *WalletClient) SendToRecipients(ctx context.Context, recipients []*Recipients, metadata map[string]any) (*models.Transaction, error) {
 	draft, err := wc.DraftToRecipients(ctx, recipients, metadata)
 	if err != nil {
 		return nil, err
