@@ -6,7 +6,7 @@ replace github.com/bitcoin-sv/spv-wallet-go-client => ../
 
 require (
 	github.com/bitcoin-sv/spv-wallet-go-client v0.0.0-00010101000000-000000000000
-	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.15
+	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.15.0.20240704130751-f3156fd52a0e
 )
 
 require (
