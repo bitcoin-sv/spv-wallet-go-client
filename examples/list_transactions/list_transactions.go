@@ -23,9 +23,7 @@ func main() {
 	client := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
 	ctx := context.Background()
 
-	metadata := map[string]any{
-		"note": "user-id-123",
-	}
+	metadata := map[string]any{}
 
 	conditions := filter.TransactionFilter{}
 	queryParams := filter.QueryParams{}
