@@ -50,7 +50,7 @@ func TestGenerateTotpForContact(t *testing.T) {
 		_, err := sut.GenerateTotpForContact(&contact, 30, 2)
 
 		// then
-		require.ErrorContains(t, err, "contact's PubKey is invalid:")
+		require.ErrorIs(t, err, ErrContactPubKeyInvalid)
 
 	})
 }
