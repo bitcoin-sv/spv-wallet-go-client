@@ -1144,7 +1144,7 @@ func (wc *WalletClient) AdminSubscribeWebhook(ctx context.Context, webhookURL, t
 	if err != nil {
 		return WrapError(err)
 	}
-	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/webhooks/subscribtion", rawJSON, wc.adminXPriv, true, nil)
+	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/webhooks/subscription", rawJSON, wc.adminXPriv, true, nil)
 	return WrapError(err)
 }
 
@@ -1157,6 +1157,6 @@ func (wc *WalletClient) AdminUnsubscribeWebhook(ctx context.Context, webhookURL 
 	if err != nil {
 		return WrapError(err)
 	}
-	err = wc.doHTTPRequest(ctx, http.MethodDelete, "/admin/webhooks/subscribtion", rawJSON, wc.adminXPriv, true, nil)
+	err = wc.doHTTPRequest(ctx, http.MethodDelete, "/admin/webhooks/subscription", rawJSON, wc.adminXPriv, true, nil)
 	return err
 }
