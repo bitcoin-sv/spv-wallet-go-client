@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -566,7 +565,7 @@ func (wc *WalletClient) authenticateWithXpriv(sign bool, req *http.Request, xPri
 
 func (wc *WalletClient) authenticateWithAccessKey(req *http.Request, rawJSON []byte) error {
 	if wc.accessKey == nil {
-		return WrapError(errors.New("access key is missing"))
+		return ErrMissingAccessKey
 	}
 	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(wc.accessKey.Serialise()), string(rawJSON))
 }
@@ -597,11 +596,11 @@ func (wc *WalletClient) RejectContact(ctx context.Context, paymail string) error
 func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
 	isTotpValid, err := wc.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits)
 	if err != nil {
-		return WrapError(fmt.Errorf("totp validation failed: %w", err))
+		return WrapError(ErrTotpInvalid)
 	}
 
 	if !isTotpValid {
-		return WrapError(errors.New("totp is invalid"))
+		return WrapError(ErrTotpInvalid)
 	}
 
 	if err := wc.doHTTPRequest(
@@ -666,7 +665,7 @@ func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConf
 		key = wc.adminXPriv
 	}
 	if key == nil {
-		return nil, WrapError(errors.New("neither xPriv nor adminXPriv is provided"))
+		return nil, WrapError(ErrMissingXprivAndXpub)
 	}
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, "/shared-config", nil, key, true, &model,

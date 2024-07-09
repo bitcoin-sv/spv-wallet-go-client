@@ -30,7 +30,7 @@ func main() {
 
 	txs, err := client.GetTransactions(ctx, &conditions, metadata, &queryParams)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 	fmt.Println("GetTransactions response: ", txs)
@@ -40,7 +40,7 @@ func main() {
 
 	txsFiltered, err := client.GetTransactions(ctx, &conditions, metadata, &queryParams)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 	fmt.Println("Filtered GetTransactions response: ", txsFiltered)

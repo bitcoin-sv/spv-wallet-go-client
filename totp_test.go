@@ -37,7 +37,7 @@ func TestGenerateTotpForContact(t *testing.T) {
 		_, err := sut.GenerateTotpForContact(nil, 30, 2)
 
 		// then
-		require.ErrorIs(t, err, ErrClientInitNoXpriv)
+		require.ErrorIs(t, err, ErrMissingXpriv)
 	})
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
