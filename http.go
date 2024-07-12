@@ -1132,3 +1132,31 @@ func (wc *WalletClient) SendToRecipients(ctx context.Context, recipients []*Reci
 
 	return wc.RecordTransaction(ctx, hex, draft.ID, metadata)
 }
+
+// AdminSubscribeWebhook subscribes to a webhook to receive notifications from spv-wallet
+func (wc *WalletClient) AdminSubscribeWebhook(ctx context.Context, webhookURL, tokenHeader, tokenValue string) error {
+	requestModel := models.SubscribeRequestBody{
+		URL:         webhookURL,
+		TokenHeader: tokenHeader,
+		TokenValue:  tokenValue,
+	}
+	rawJSON, err := json.Marshal(requestModel)
+	if err != nil {
+		return WrapError(err)
+	}
+	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/webhooks/subscriptions", rawJSON, wc.adminXPriv, true, nil)
+	return WrapError(err)
+}
+
+// AdminUnsubscribeWebhook unsubscribes from a webhook
+func (wc *WalletClient) AdminUnsubscribeWebhook(ctx context.Context, webhookURL string) error {
+	requestModel := models.UnsubscribeRequestBody{
+		URL: webhookURL,
+	}
+	rawJSON, err := json.Marshal(requestModel)
+	if err != nil {
+		return WrapError(err)
+	}
+	err = wc.doHTTPRequest(ctx, http.MethodDelete, "/admin/webhooks/subscriptions", rawJSON, wc.adminXPriv, true, nil)
+	return err
+}
