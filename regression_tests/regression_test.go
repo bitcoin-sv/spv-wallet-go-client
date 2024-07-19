@@ -28,5 +28,15 @@ func TestRegression(t *testing.T) {
 	if err != nil {
 		t.Errorf(errorWhileGettingEnvVariables, err)
 	}
+
+	sharedConfigInstanceOne, err := getSharedConfig(adminXPub, rtConfig.ClientOneURL)
+	if err != nil {
+		t.Errorf(errorWhileGettingSharedConfig, err)
+	}
+	sharedConfigInstanceTwo, err := getSharedConfig(adminXPub, rtConfig.ClientTwoURL)
+	if err != nil {
+		t.Errorf(errorWhileGettingSharedConfig, err)
+	}
+
 	t.Run("TestInitialBalancesAndTransactionsBeforeAndAfterFundTransfers", func(t *testing.T) {})
 }
