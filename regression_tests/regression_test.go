@@ -2,6 +2,8 @@ package regressiontests
 
 import (
 	"testing"
+
+	"gotest.tools/v3/assert"
 )
 
 const (
@@ -52,5 +54,20 @@ func TestRegression(t *testing.T) {
 	}
 	defer deleteUser(userTwo.Paymail, rtConfig.ClientTwoURL, adminXPriv)
 
-	t.Run("TestInitialBalancesAndTransactionsBeforeAndAfterFundTransfers", func(t *testing.T) {})
+	t.Run("TestInitialBalancesAndTransactionsBeforeAndAfterFundTransfers", func(t *testing.T) {
+		// Given
+		balance, err := getBalance(rtConfig.ClientOneURL, userOne.XPriv)
+		if err != nil {
+			t.Errorf(errorWhileGettingBalance, err)
+		}
+		assert.Equal(t, 0, balance)
+
+		balance, err = getBalance(rtConfig.ClientTwoURL, userTwo.XPriv)
+		if err != nil {
+			t.Errorf(errorWhileGettingBalance, err)
+		}
+		assert.Equal(t, 0, balance)
+		// When
+		// Then
+	})
 }

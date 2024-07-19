@@ -138,6 +138,18 @@ func deleteUser(paymail string, instanceURL string, adminXPriv string) error {
 	return nil
 }
 
+// getBalance retrieves the balance from the SPV Wallet.
+func getBalance(fromInstance string, fromXPriv string) (int, error) {
+	client := walletclient.NewWithXPriv(addPrefixIfNeeded(fromInstance), fromXPriv)
+	ctx := context.Background()
+
+	xpubInfo, err := client.GetXPub(ctx)
+	if err != nil {
+		return -1, err
+	}
+	return int(xpubInfo.CurrentBalance), nil
+}
+
 // preparePaymail prepares the paymail address by combining the alias and domain.
 func preparePaymail(paymailAlias string, domain string) string {
 	if isValidURL(domain) {
