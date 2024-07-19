@@ -10,19 +10,19 @@ import (
 var ErrAdminKey = models.SPVError{Message: "an admin key must be set to be able to create an xpub", StatusCode: 401, Code: "error-unauthorized-admin-key-not-set"}
 
 // ErrMissingXpriv is when xpriv is missing
-var ErrMissingXpriv = models.SPVError{Message: "xpriv missing", StatusCode: 401, Code: "error-unauthorized-xpriv-missing"}
+var ErrMissingXpriv = models.SPVError{Message: "xpriv is missing", StatusCode: 401, Code: "error-unauthorized-xpriv-missing"}
 
-// ErrMissingXprivAndXpub is when xpriv and xpub are missing
-var ErrMissingXprivAndXpub = models.SPVError{Message: "xpriv and xpub missing", StatusCode: 404, Code: "error-shared-config-xpriv-and-xpub-missing"}
+// ErrMissingKey is when neither xPriv nor adminXPriv is provided
+var ErrMissingKey = models.SPVError{Message: "neither xPriv nor adminXPriv is provided", StatusCode: 404, Code: "error-shared-config-key-missing"}
 
 // ErrMissingAccessKey is when access key is missing
-var ErrMissingAccessKey = models.SPVError{Message: "access key missing", StatusCode: 401, Code: "error-unauthorized-access-key-missing"}
+var ErrMissingAccessKey = models.SPVError{Message: "access key is missing", StatusCode: 401, Code: "error-unauthorized-access-key-missing"}
 
 // ErrCouldNotFindDraftTransaction is when draft transaction is not found
 var ErrCouldNotFindDraftTransaction = models.SPVError{Message: "could not find draft transaction", StatusCode: 404, Code: "error-draft-transaction-not-found"}
 
 // ErrTotpInvalid is when totp is invalid
-var ErrTotpInvalid = models.SPVError{Message: "totp invalid", StatusCode: 400, Code: "error-totp-invalid"}
+var ErrTotpInvalid = models.SPVError{Message: "totp is invalid", StatusCode: 400, Code: "error-totp-invalid"}
 
 // ErrContactPubKeyInvalid is when contact's PubKey is invalid
 var ErrContactPubKeyInvalid = models.SPVError{Message: "contact's PubKey is invalid", StatusCode: 400, Code: "error-contact-pubkey-invalid"}

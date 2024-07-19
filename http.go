@@ -665,7 +665,7 @@ func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConf
 		key = wc.adminXPriv
 	}
 	if key == nil {
-		return nil, WrapError(ErrMissingXprivAndXpub)
+		return nil, WrapError(ErrMissingKey)
 	}
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, "/shared-config", nil, key, true, &model,
