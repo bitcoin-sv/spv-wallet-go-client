@@ -10,13 +10,15 @@ import (
 	"net/http"
 	"strconv"
 
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	bec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
 )
+
+// TODO: Issues with "github.com/bitcoinschema/go-bitcoin/v2"
 
 // SetSignRequest turn the signing of the http request on or off
 func (wc *WalletClient) SetSignRequest(signRequest bool) {

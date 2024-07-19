@@ -1,13 +1,18 @@
 // Package xpriv manges keys
 package xpriv
 
+// "github.com/libsv/go-bk/bip39" - no replacements
+
 import (
 	"fmt"
 
-	"github.com/libsv/go-bk/bip32"
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	chaincfg "github.com/bitcoin-sv/go-sdk/transaction/chaincfg"
+
 	"github.com/libsv/go-bk/bip39"
-	"github.com/libsv/go-bk/chaincfg"
 )
+
+// TODO: "github.com/libsv/go-bk/bip39" - no replacement (GenerateEntropy, Mnemonic, MnemonicToSeed)
 
 // Keys is a struct containing the xpriv, xpub and mnemonic
 type Keys struct {

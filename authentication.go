@@ -6,15 +6,23 @@ import (
 	"net/http"
 	"time"
 
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	bec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	bscript "github.com/bitcoin-sv/go-sdk/script"
+	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
+
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
 	"github.com/libsv/go-bt/v2"
-	"github.com/libsv/go-bt/v2/bscript"
-	"github.com/libsv/go-bt/v2/sighash"
 )
+
+// TODO: Issues with "github.com/bitcoinschema/go-bitcoin/v2"
+
+// TODO: Tx - go-sdk txJSON ?
+// TODO: NewTxFromString - no replacement in v2
+// TODO: NewFromHexString - no replacement in v2
+// TODO: NewP2PKHUnlockingScript - not found
 
 // SetSignature will set the signature on the header for the request
 func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {

@@ -5,11 +5,16 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
+	bec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/libsv/go-bk/wif"
+
+	"github.com/bitcoinschema/go-bitcoin/v2"
+
 	"github.com/pkg/errors"
 )
+
+// TODO: Issues with "github.com/bitcoinschema/go-bitcoin/v2"
+// TODO: wif "github.com/bitcoin-sv/go-sdk/compat/wif" - is not found although used in the go-sdk repo?
 
 // configurator is the interface for configuring WalletClient
 type configurator interface {
