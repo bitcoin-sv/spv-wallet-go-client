@@ -10,6 +10,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
@@ -26,6 +27,8 @@ const (
 	ClientTwoURLEnvVar         = "CLIENT_TWO_URL"
 	ClientOneLeaderXPrivEnvVar = "CLIENT_ONE_LEADER_XPRIV"
 	ClientTwoLeaderXPrivEnvVar = "CLIENT_TWO_LEADER_XPRIV"
+
+	timeoutDuration = 30 * time.Second
 )
 
 var (
@@ -73,7 +76,9 @@ func getSharedConfig(xpub string, clientUrl string) (*models.SharedConfig, error
 	}
 
 	req.Header.Set(models.AuthHeader, xpub)
-	client := &http.Client{}
+	client := http.Client{
+		Timeout: timeoutDuration,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
