@@ -77,7 +77,20 @@ func TestRegression(t *testing.T) {
 		}
 		assert.Equal(t, 0, balance)
 		assert.Equal(t, 0, len(transactions))
+
 		// When
+		transactionOne, err := sendFunds(rtConfig.ClientOneURL, rtConfig.ClientOneLeaderXPriv, userTwo.Paymail, 2)
+		if err != nil {
+			t.Errorf(errorWhileSendingFunds, err)
+		}
+		assert.GreaterOrEqual(t, int64(-1), transactionOne.OutputValue)
+
+		transactionTwo, err := sendFunds(rtConfig.ClientTwoURL, rtConfig.ClientTwoLeaderXPriv, userOne.Paymail, 2)
+		if err != nil {
+			t.Errorf(errorWhileSendingFunds, err)
+		}
+		assert.GreaterOrEqual(t, int64(-1), transactionTwo.OutputValue)
+
 		// Then
 	})
 }

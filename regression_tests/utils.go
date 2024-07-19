@@ -167,6 +167,32 @@ func getTransactions(fromInstance string, fromXPriv string) ([]*models.Transacti
 	return txs, nil
 }
 
+// sendFunds sends funds from one paymail to another.
+func sendFunds(fromInstance string, fromXPriv string, toPamail string, howMuch int) (*models.Transaction, error) {
+	client := walletclient.NewWithXPriv(fromInstance, fromXPriv)
+	ctx := context.Background()
+
+	balance, err := getBalance(fromInstance, fromXPriv)
+	if err != nil {
+		return nil, err
+	}
+	if balance < howMuch {
+		return nil, fmt.Errorf("insufficient funds: %d", balance)
+	}
+
+	recipient := walletclient.Recipients{To: toPamail, Satoshis: uint64(howMuch)}
+	recipients := []*walletclient.Recipients{&recipient}
+	metadata := map[string]any{
+		"description": "regression-test",
+	}
+
+	transaction, err := client.SendToRecipients(ctx, recipients, metadata)
+	if err != nil {
+		return nil, err
+	}
+	return transaction, nil
+}
+
 // preparePaymail prepares the paymail address by combining the alias and domain.
 func preparePaymail(paymailAlias string, domain string) string {
 	if isValidURL(domain) {
