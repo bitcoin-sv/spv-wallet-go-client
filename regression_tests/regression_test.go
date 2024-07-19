@@ -92,5 +92,26 @@ func TestRegression(t *testing.T) {
 		assert.GreaterOrEqual(t, int64(-1), transactionTwo.OutputValue)
 
 		// Then
+		balance, err = getBalance(rtConfig.ClientOneURL, userOne.XPriv)
+		if err != nil {
+			t.Errorf(errorWhileGettingBalance, err)
+		}
+		transactions, err = getTransactions(rtConfig.ClientOneURL, userOne.XPriv)
+		if err != nil {
+			t.Errorf(errorWhileGettingTransaction, err)
+		}
+		assert.GreaterOrEqual(t, balance, 1)
+		assert.GreaterOrEqual(t, len(transactions), 1)
+
+		balance, err = getBalance(rtConfig.ClientTwoURL, userTwo.XPriv)
+		if err != nil {
+			t.Errorf(errorWhileGettingBalance, err)
+		}
+		transactions, err = getTransactions(rtConfig.ClientTwoURL, userTwo.XPriv)
+		if err != nil {
+			t.Errorf(errorWhileGettingTransaction, err)
+		}
+		assert.GreaterOrEqual(t, balance, 1)
+		assert.GreaterOrEqual(t, len(transactions), 1)
 	})
 }
