@@ -7,14 +7,16 @@ import (
 	"fmt"
 	"time"
 
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	bec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 )
+
+// TODO: Issues with "github.com/bitcoinschema/go-bitcoin/v2"
 
 // ErrClientInitNoXpriv error per init client with first xpriv key
 var ErrClientInitNoXpriv = errors.New("init client with xPriv first")
@@ -123,7 +125,7 @@ func convertPubKey(pubKey string) (*bec.PublicKey, error) {
 		return nil, err
 	}
 
-	return bec.ParsePubKey(hex, bec.S256())
+	return bec.ParsePubKey(hex)
 }
 
 // directedSecret appends a paymail to the secret and encodes it into base32 string

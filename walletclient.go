@@ -3,8 +3,8 @@ package walletclient
 import (
 	"net/http"
 
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	bec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 )
 
 // WalletClient is the spv wallet Go client representation.
