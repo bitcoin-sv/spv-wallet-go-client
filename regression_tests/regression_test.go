@@ -38,5 +38,17 @@ func TestRegression(t *testing.T) {
 		t.Errorf(errorWhileGettingSharedConfig, err)
 	}
 
+	userName := "instanceOneUser1"
+	userOne, err := createUser(userName, sharedConfigInstanceOne.PaymailDomains[0], rtConfig.ClientOneURL, adminXPriv)
+	if err != nil {
+		t.Errorf(errorWhileCreatingUser, err)
+	}
+
+	userName = "instanceTwoUser1"
+	userTwo, err := createUser(userName, sharedConfigInstanceTwo.PaymailDomains[0], rtConfig.ClientTwoURL, adminXPriv)
+	if err != nil {
+		t.Errorf(errorWhileCreatingUser, err)
+	}
+
 	t.Run("TestInitialBalancesAndTransactionsBeforeAndAfterFundTransfers", func(t *testing.T) {})
 }
