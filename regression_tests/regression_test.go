@@ -43,12 +43,14 @@ func TestRegression(t *testing.T) {
 	if err != nil {
 		t.Errorf(errorWhileCreatingUser, err)
 	}
+	defer deleteUser(userOne.Paymail, rtConfig.ClientOneURL, adminXPriv)
 
 	userName = "instanceTwoUser1"
 	userTwo, err := createUser(userName, sharedConfigInstanceTwo.PaymailDomains[0], rtConfig.ClientTwoURL, adminXPriv)
 	if err != nil {
 		t.Errorf(errorWhileCreatingUser, err)
 	}
+	defer deleteUser(userTwo.Paymail, rtConfig.ClientTwoURL, adminXPriv)
 
 	t.Run("TestInitialBalancesAndTransactionsBeforeAndAfterFundTransfers", func(t *testing.T) {})
 }

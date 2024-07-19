@@ -127,6 +127,17 @@ func createUser(paymail string, paymailDomain string, instanceUrl string, adminX
 	return user, nil
 }
 
+// deleteUser soft deletes paymail from the SPV Wallet.
+func deleteUser(paymail string, instanceURL string, adminXPriv string) error {
+	adminClient := walletclient.NewWithAdminKey(addPrefixIfNeeded(instanceURL), adminXPriv)
+	ctx := context.Background()
+	err := adminClient.AdminDeletePaymail(ctx, paymail)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // preparePaymail prepares the paymail address by combining the alias and domain.
 func preparePaymail(paymailAlias string, domain string) string {
 	if isValidURL(domain) {
