@@ -14,6 +14,7 @@ import (
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
 const (
@@ -148,6 +149,22 @@ func getBalance(fromInstance string, fromXPriv string) (int, error) {
 		return -1, err
 	}
 	return int(xpubInfo.CurrentBalance), nil
+}
+
+// getTransactions retrieves the transactions from the SPV Wallet.
+func getTransactions(fromInstance string, fromXPriv string) ([]*models.Transaction, error) {
+	client := walletclient.NewWithXPriv(addPrefixIfNeeded(fromInstance), fromXPriv)
+	ctx := context.Background()
+
+	metadata := map[string]any{}
+	conditions := filter.TransactionFilter{}
+	queryParams := filter.QueryParams{}
+
+	txs, err := client.GetTransactions(ctx, &conditions, metadata, &queryParams)
+	if err != nil {
+		return nil, err
+	}
+	return txs, nil
 }
 
 // preparePaymail prepares the paymail address by combining the alias and domain.

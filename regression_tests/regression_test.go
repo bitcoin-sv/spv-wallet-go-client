@@ -3,7 +3,7 @@ package regressiontests
 import (
 	"testing"
 
-	"gotest.tools/v3/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -60,13 +60,23 @@ func TestRegression(t *testing.T) {
 		if err != nil {
 			t.Errorf(errorWhileGettingBalance, err)
 		}
+		transactions, err := getTransactions(rtConfig.ClientOneURL, userOne.XPriv)
+		if err != nil {
+			t.Errorf(errorWhileGettingTransaction, err)
+		}
 		assert.Equal(t, 0, balance)
+		assert.Equal(t, 0, len(transactions))
 
 		balance, err = getBalance(rtConfig.ClientTwoURL, userTwo.XPriv)
 		if err != nil {
 			t.Errorf(errorWhileGettingBalance, err)
 		}
+		transactions, err = getTransactions(rtConfig.ClientTwoURL, userTwo.XPriv)
+		if err != nil {
+			t.Errorf(errorWhileGettingTransaction, err)
+		}
 		assert.Equal(t, 0, balance)
+		assert.Equal(t, 0, len(transactions))
 		// When
 		// Then
 	})
