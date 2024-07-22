@@ -4,6 +4,7 @@
 package regressiontests
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,6 +30,7 @@ var (
 )
 
 func TestRegression(t *testing.T) {
+	ctx := context.Background()
 	rtConfig, err := getEnvVariables()
 	if err != nil {
 		t.Errorf(errorWhileGettingEnvVariables, err)
@@ -44,37 +46,37 @@ func TestRegression(t *testing.T) {
 	}
 
 	userName := "instanceOneUser1"
-	userOne, err := createUser(userName, sharedConfigInstanceOne.PaymailDomains[0], rtConfig.ClientOneURL, adminXPriv)
+	userOne, err := createUser(ctx, userName, sharedConfigInstanceOne.PaymailDomains[0], rtConfig.ClientOneURL, adminXPriv)
 	if err != nil {
 		t.Errorf(errorWhileCreatingUser, err)
 	}
-	defer deleteUser(userOne.Paymail, rtConfig.ClientOneURL, adminXPriv)
+	defer deleteUser(ctx, userOne.Paymail, rtConfig.ClientOneURL, adminXPriv)
 
 	userName = "instanceTwoUser1"
-	userTwo, err := createUser(userName, sharedConfigInstanceTwo.PaymailDomains[0], rtConfig.ClientTwoURL, adminXPriv)
+	userTwo, err := createUser(ctx, userName, sharedConfigInstanceTwo.PaymailDomains[0], rtConfig.ClientTwoURL, adminXPriv)
 	if err != nil {
 		t.Errorf(errorWhileCreatingUser, err)
 	}
-	defer deleteUser(userTwo.Paymail, rtConfig.ClientTwoURL, adminXPriv)
+	defer deleteUser(ctx, userTwo.Paymail, rtConfig.ClientTwoURL, adminXPriv)
 
 	t.Run("TestInitialBalancesAndTransactionsBeforeAndAfterFundTransfers", func(t *testing.T) {
 		// Given
-		balance, err := getBalance(rtConfig.ClientOneURL, userOne.XPriv)
+		balance, err := getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
 		if err != nil {
 			t.Errorf(errorWhileGettingBalance, err)
 		}
-		transactions, err := getTransactions(rtConfig.ClientOneURL, userOne.XPriv)
+		transactions, err := getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
 		if err != nil {
 			t.Errorf(errorWhileGettingTransaction, err)
 		}
 		assert.Equal(t, 0, balance)
 		assert.Equal(t, 0, len(transactions))
 
-		balance, err = getBalance(rtConfig.ClientTwoURL, userTwo.XPriv)
+		balance, err = getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 		if err != nil {
 			t.Errorf(errorWhileGettingBalance, err)
 		}
-		transactions, err = getTransactions(rtConfig.ClientTwoURL, userTwo.XPriv)
+		transactions, err = getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 		if err != nil {
 			t.Errorf(errorWhileGettingTransaction, err)
 		}
@@ -82,35 +84,35 @@ func TestRegression(t *testing.T) {
 		assert.Equal(t, 0, len(transactions))
 
 		// When
-		transactionOne, err := sendFunds(rtConfig.ClientOneURL, rtConfig.ClientOneLeaderXPriv, userTwo.Paymail, 2)
+		transactionOne, err := sendFunds(ctx, rtConfig.ClientOneURL, rtConfig.ClientOneLeaderXPriv, userTwo.Paymail, 2)
 		if err != nil {
 			t.Errorf(errorWhileSendingFunds, err)
 		}
 		assert.GreaterOrEqual(t, int64(-1), transactionOne.OutputValue)
 
-		transactionTwo, err := sendFunds(rtConfig.ClientTwoURL, rtConfig.ClientTwoLeaderXPriv, userOne.Paymail, 2)
+		transactionTwo, err := sendFunds(ctx, rtConfig.ClientTwoURL, rtConfig.ClientTwoLeaderXPriv, userOne.Paymail, 2)
 		if err != nil {
 			t.Errorf(errorWhileSendingFunds, err)
 		}
 		assert.GreaterOrEqual(t, int64(-1), transactionTwo.OutputValue)
 
 		// Then
-		balance, err = getBalance(rtConfig.ClientOneURL, userOne.XPriv)
+		balance, err = getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
 		if err != nil {
 			t.Errorf(errorWhileGettingBalance, err)
 		}
-		transactions, err = getTransactions(rtConfig.ClientOneURL, userOne.XPriv)
+		transactions, err = getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
 		if err != nil {
 			t.Errorf(errorWhileGettingTransaction, err)
 		}
 		assert.GreaterOrEqual(t, balance, 1)
 		assert.GreaterOrEqual(t, len(transactions), 1)
 
-		balance, err = getBalance(rtConfig.ClientTwoURL, userTwo.XPriv)
+		balance, err = getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 		if err != nil {
 			t.Errorf(errorWhileGettingBalance, err)
 		}
-		transactions, err = getTransactions(rtConfig.ClientTwoURL, userTwo.XPriv)
+		transactions, err = getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 		if err != nil {
 			t.Errorf(errorWhileGettingTransaction, err)
 		}
