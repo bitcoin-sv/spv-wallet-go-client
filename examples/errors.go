@@ -3,9 +3,11 @@ package examples
 import (
 	"errors"
 	"fmt"
+
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
+// GetFullErrorMessage prints detailed info about the error
 func GetFullErrorMessage(err error) {
 	var errMsg string
 

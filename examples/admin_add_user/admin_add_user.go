@@ -24,8 +24,11 @@ func main() {
 
 	metadata := map[string]any{"some_metadata": "example"}
 
-	newXPubRes := adminClient.AdminNewXpub(ctx, examples.ExampleXPub, metadata)
-	examples.GetFullErrorMessage(newXPubRes)
+	err := adminClient.AdminNewXpub(ctx, examples.ExampleXPub, metadata)
+	if err != nil {
+		examples.GetFullErrorMessage(err)
+		os.Exit(1)
+	}
 
 	createPaymailRes, err := adminClient.AdminCreatePaymail(ctx, examples.ExampleXPub, examples.ExamplePaymail, "Some public name", "")
 	if err != nil {

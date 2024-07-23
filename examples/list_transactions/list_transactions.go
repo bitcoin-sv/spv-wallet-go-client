@@ -35,7 +35,8 @@ func main() {
 	}
 	fmt.Println("GetTransactions response: ", txs)
 
-	conditions = filter.TransactionFilter{BlockHeight: func(i uint64) *uint64 { return &i }(839228)}
+	targetBlockHeight := uint64(839228)
+	conditions = filter.TransactionFilter{BlockHeight: &targetBlockHeight}
 	queryParams = filter.QueryParams{PageSize: 100, Page: 1}
 
 	txsFiltered, err := client.GetTransactions(ctx, &conditions, metadata, &queryParams)
