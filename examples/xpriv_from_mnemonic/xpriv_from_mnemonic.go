@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 	"os"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
@@ -16,7 +17,7 @@ func main() {
 
 	keys, err := xpriv.FromMnemonic(mnemonicPhrase)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 
