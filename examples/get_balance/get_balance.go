@@ -24,7 +24,7 @@ func main() {
 
 	xpubInfo, err := client.GetXPub(ctx)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 	fmt.Println("Current balance: ", xpubInfo.CurrentBalance)
