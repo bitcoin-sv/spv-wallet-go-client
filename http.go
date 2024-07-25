@@ -488,7 +488,7 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models
 
 	// Get the AccessKey
 	payload = new(models.AuthPayload)
-	payload.AccessKey = hex.EncodeToString(publicKey.SerialiseCompressed())
+	payload.AccessKey = hex.EncodeToString(publicKey.SerializeCompressed())
 
 	// auth_nonce is a random unique string to seed the signing message
 	// this can be checked server side to make sure the request is not being replayed
@@ -567,7 +567,7 @@ func (wc *WalletClient) authenticateWithAccessKey(req *http.Request, rawJSON []b
 	if wc.accessKey == nil {
 		return WrapError(errors.New("access key is missing"))
 	}
-	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(wc.accessKey.Serialise()), string(rawJSON))
+	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(wc.accessKey.Serialize()), string(rawJSON))
 }
 
 // AcceptContact will accept the contact associated with the paymail

@@ -124,8 +124,8 @@ func getUnlockingScript(tx *trx.Transaction, inputIndex uint32, privateKey *ec.P
 		return nil, err
 	}
 
-	pubKey := privateKey.PubKey().SerialiseCompressed()
-	signature := sig.Serialise()
+	pubKey := privateKey.PubKey().SerializeCompressed()
+	signature := sig.Serialize()
 
 	var script *script.Script
 	if script, err = script.NewP2PKHUnlockingScript(pubKey, signature, sigHashFlags); err != nil {
