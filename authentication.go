@@ -7,19 +7,16 @@ import (
 	"time"
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
-	bec "github.com/bitcoin-sv/go-sdk/primitives/ec"
-	bscript "github.com/bitcoin-sv/go-sdk/script"
+	bsm "github.com/bitcoin-sv/go-sdk/compat/bsm"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	script "github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bt/v2"
 )
 
-// TODO: Issues with "github.com/bitcoinschema/go-bitcoin/v2"
-
-// TODO: Tx - go-sdk txJSON ?
 // TODO: NewTxFromString - no replacement in v2
 // TODO: NewFromHexString - no replacement in v2
 // TODO: NewP2PKHUnlockingScript - not found
@@ -42,8 +39,8 @@ func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 
 // GetSignedHex will sign all the inputs using the given xPriv key
 func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, err error) {
-	var tx *bt.Tx
-	if tx, err = bt.NewTxFromString(dt.Hex); err != nil {
+	var tx *trx.Transaction
+	if tx, err = trx.NewTransactionFromHex(dt.Hex); err != nil {
 		return
 	}
 
@@ -66,9 +63,9 @@ func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signed
 	return
 }
 
-func setPreviousTxScript(tx *bt.Tx, inputIndex uint32, dst *models.Destination) (err error) {
-	var ls *bscript.Script
-	if ls, err = bscript.NewFromHexString(dst.LockingScript); err != nil {
+func setPreviousTxScript(tx *trx.Transaction, inputIndex uint32, dst *models.Destination) (err error) {
+	var ls *script.Script
+	if ls, err = script.NewFromHexString(dst.LockingScript); err != nil {
 		return
 	}
 
@@ -76,13 +73,13 @@ func setPreviousTxScript(tx *bt.Tx, inputIndex uint32, dst *models.Destination) 
 	return
 }
 
-func setUnlockingScript(tx *bt.Tx, inputIndex uint32, xPriv *bip32.ExtendedKey, dst *models.Destination) (err error) {
-	var key *bec.PrivateKey
+func setUnlockingScript(tx *trx.Transaction, inputIndex uint32, xPriv *bip32.ExtendedKey, dst *models.Destination) (err error) {
+	var key *ec.PrivateKey
 	if key, err = getDerivedKeyForDestination(xPriv, dst); err != nil {
 		return
 	}
 
-	var s *bscript.Script
+	var s *script.Script
 	if s, err = getUnlockingScript(tx, inputIndex, key); err != nil {
 		return
 	}
@@ -91,10 +88,10 @@ func setUnlockingScript(tx *bt.Tx, inputIndex uint32, xPriv *bip32.ExtendedKey, 
 	return
 }
 
-func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destination) (key *bec.PrivateKey, err error) {
+func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destination) (key *ec.PrivateKey, err error) {
 	// Derive the child key (m/chain/num)
 	var derivedKey *bip32.ExtendedKey
-	if derivedKey, err = bitcoin.GetHDKeyByPath(xPriv, dst.Chain, dst.Num); err != nil {
+	if derivedKey, err = bip32.GetHDKeyByPath(xPriv, dst.Chain, dst.Num); err != nil {
 		return
 	}
 
@@ -107,7 +104,7 @@ func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destinati
 		}
 	}
 
-	if key, err = bitcoin.GetPrivateKeyFromHDKey(derivedKey); err != nil {
+	if key, err = bip32.GetPrivateKeyFromHDKey(derivedKey); err != nil {
 		return
 	}
 
@@ -115,7 +112,7 @@ func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destinati
 }
 
 // GetUnlockingScript will generate an unlocking script
-func getUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey) (*bscript.Script, error) {
+func getUnlockingScript(tx *trx.Transaction, inputIndex uint32, privateKey *ec.PrivateKey) (*script.Script, error) {
 	sigHashFlags := sighash.AllForkID
 
 	sigHash, err := tx.CalcInputSignatureHash(inputIndex, sigHashFlags)
@@ -123,7 +120,7 @@ func getUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey
 		return nil, err
 	}
 
-	var sig *bec.Signature
+	var sig *ec.Signature
 	if sig, err = privateKey.Sign(sigHash); err != nil {
 		return nil, err
 	}
@@ -131,8 +128,8 @@ func getUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey
 	pubKey := privateKey.PubKey().SerialiseCompressed()
 	signature := sig.Serialise()
 
-	var script *bscript.Script
-	if script, err = bscript.NewP2PKHUnlockingScript(pubKey, signature, sigHashFlags); err != nil {
+	var script *script.Script
+	if script, err = script.NewP2PKHUnlockingScript(pubKey, signature, sigHashFlags); err != nil {
 		return nil, err
 	}
 
@@ -149,7 +146,7 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *mode
 
 	// Get the xPub
 	payload = new(models.AuthPayload)
-	if payload.XPub, err = bitcoin.GetExtendedPublicKey(
+	if payload.XPub, err = bip32.GetExtendedPublicKey(
 		xPriv,
 	); err != nil { // Should never error if key is correct
 		return
@@ -169,8 +166,8 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *mode
 		return
 	}
 
-	var privateKey *bec.PrivateKey
-	if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(key); err != nil {
+	var privateKey *ec.PrivateKey
+	if privateKey, err = bip32.GetPrivateKeyFromHDKey(key); err != nil {
 		return // Should never error if key is correct
 	}
 
@@ -178,7 +175,7 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *mode
 }
 
 // createSignatureCommon will create a signature
-func createSignatureCommon(payload *models.AuthPayload, bodyString string, privateKey *bec.PrivateKey) (*models.AuthPayload, error) {
+func createSignatureCommon(payload *models.AuthPayload, bodyString string, privateKey *ec.PrivateKey) (*models.AuthPayload, error) {
 	// Create the auth header hash
 	payload.AuthHash = utils.Hash(bodyString)
 
@@ -192,7 +189,7 @@ func createSignatureCommon(payload *models.AuthPayload, bodyString string, priva
 
 	// Signature, using bitcoin signMessage
 	var err error
-	if payload.Signature, err = bitcoin.SignMessage(
+	if payload.Signature, err = bsm.SignMessage(
 		hex.EncodeToString(privateKey.Serialise()),
 		getSigningMessage(key, payload),
 		true,

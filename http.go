@@ -11,14 +11,11 @@ import (
 	"strconv"
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
-	bec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 )
-
-// TODO: Issues with "github.com/bitcoinschema/go-bitcoin/v2"
 
 // SetSignRequest turn the signing of the http request on or off
 func (wc *WalletClient) SetSignRequest(signRequest bool) {
@@ -481,8 +478,8 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models
 		return
 	}
 
-	var privateKey *bec.PrivateKey
-	if privateKey, err = bitcoin.PrivateKeyFromString(
+	var privateKey *ec.PrivateKey
+	if privateKey, err = ec.PrivateKeyFromHex(
 		privateKeyHex,
 	); err != nil {
 		return
@@ -556,7 +553,7 @@ func (wc *WalletClient) authenticateWithXpriv(sign bool, req *http.Request, xPri
 		}
 	} else {
 		var xPub string
-		xPub, err := bitcoin.GetExtendedPublicKey(xPriv)
+		xPub, err := bip32.GetExtendedPublicKey(xPriv)
 		if err != nil {
 			return WrapError(err)
 		}

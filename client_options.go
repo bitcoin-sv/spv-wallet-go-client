@@ -5,15 +5,13 @@ import (
 	"net/http"
 	"net/url"
 
-	bec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/libsv/go-bk/wif"
-
-	"github.com/bitcoinschema/go-bitcoin/v2"
 
 	"github.com/pkg/errors"
 )
 
-// TODO: Issues with "github.com/bitcoinschema/go-bitcoin/v2"
 // TODO: wif "github.com/bitcoin-sv/go-sdk/compat/wif" - is not found although used in the go-sdk repo?
 
 // configurator is the interface for configuring WalletClient
@@ -28,7 +26,7 @@ type xPrivConf struct {
 
 func (w *xPrivConf) Configure(c *WalletClient) {
 	var err error
-	if c.xPriv, err = bitcoin.GenerateHDKeyFromString(w.XPrivString); err != nil {
+	if c.xPriv, err = bip32.GenerateHDKeyFromString(w.XPrivString); err != nil {
 		c.xPriv = nil
 	}
 }
@@ -40,7 +38,7 @@ type xPubConf struct {
 
 func (w *xPubConf) Configure(c *WalletClient) {
 	var err error
-	if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(w.XPubString); err != nil {
+	if c.xPub, err = bip32.GetHDKeyFromExtendedPublicKey(w.XPubString); err != nil {
 		c.xPub = nil
 	}
 
@@ -65,7 +63,7 @@ type adminKeyConf struct {
 
 func (w *adminKeyConf) Configure(c *WalletClient) {
 	var err error
-	c.adminXPriv, err = bitcoin.GenerateHDKeyFromString(w.AdminKeyString)
+	c.adminXPriv, err = bip32.GenerateHDKeyFromString(w.AdminKeyString)
 	if err != nil {
 		c.adminXPriv = nil
 	}
@@ -107,13 +105,13 @@ func (w *signRequest) Configure(c *WalletClient) {
 }
 
 // initializeAccessKey handles the specific initialization of the access key.
-func (w *accessKeyConf) initializeAccessKey() (*bec.PrivateKey, error) {
+func (w *accessKeyConf) initializeAccessKey() (*ec.PrivateKey, error) {
 	var err error
-	var privateKey *bec.PrivateKey
+	var privateKey *ec.PrivateKey
 	var decodedWIF *wif.WIF
 
 	if decodedWIF, err = wif.DecodeWIF(w.AccessKeyString); err != nil {
-		if privateKey, err = bitcoin.PrivateKeyFromString(w.AccessKeyString); err != nil {
+		if privateKey, err = ec.PrivateKeyFromHex(w.AccessKeyString); err != nil {
 			return nil, errors.Wrap(err, "failed to decode access key")
 		}
 	} else {

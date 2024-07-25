@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
-	bec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 )
 
 // WalletClient is the spv wallet Go client representation.
@@ -12,7 +12,7 @@ type WalletClient struct {
 	signRequest bool
 	server      string
 	httpClient  *http.Client
-	accessKey   *bec.PrivateKey
+	accessKey   *ec.PrivateKey
 	adminXPriv  *bip32.ExtendedKey
 	xPriv       *bip32.ExtendedKey
 	xPub        *bip32.ExtendedKey
