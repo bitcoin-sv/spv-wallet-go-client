@@ -1,7 +1,6 @@
 package walletclient
 
 import (
-	"encoding/hex"
 	"fmt"
 	"net/http"
 	"time"
@@ -17,7 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// TODO: NewTxFromString - no replacement in v2
+// TODO: NewTxFromString - NewTransactionFromHex ?
 // TODO: NewFromHexString - no replacement in v2
 // TODO: NewP2PKHUnlockingScript - not found
 
@@ -190,7 +189,7 @@ func createSignatureCommon(payload *models.AuthPayload, bodyString string, priva
 	// Signature, using bitcoin signMessage
 	var err error
 	if payload.Signature, err = bsm.SignMessage(
-		hex.EncodeToString(privateKey.Serialise()),
+		privateKey,
 		getSigningMessage(key, payload),
 		true,
 	); err != nil {

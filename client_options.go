@@ -7,12 +7,9 @@ import (
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
-	"github.com/libsv/go-bk/wif"
 
 	"github.com/pkg/errors"
 )
-
-// TODO: wif "github.com/bitcoin-sv/go-sdk/compat/wif" - is not found although used in the go-sdk repo?
 
 // configurator is the interface for configuring WalletClient
 type configurator interface {
@@ -108,14 +105,10 @@ func (w *signRequest) Configure(c *WalletClient) {
 func (w *accessKeyConf) initializeAccessKey() (*ec.PrivateKey, error) {
 	var err error
 	var privateKey *ec.PrivateKey
-	var decodedWIF *wif.WIF
 
-	if decodedWIF, err = wif.DecodeWIF(w.AccessKeyString); err != nil {
-		if privateKey, err = ec.PrivateKeyFromHex(w.AccessKeyString); err != nil {
-			return nil, errors.Wrap(err, "failed to decode access key")
-		}
-	} else {
-		privateKey = decodedWIF.PrivKey
+	privateKey, err = ec.PrivateKeyFromWif(w.AccessKeyString)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to decode access key")
 	}
 
 	return privateKey, nil
