@@ -17,7 +17,7 @@ func main() {
 
 	examples.CheckIfXPrivExists()
 
-	const server = "http://localhost:3003/v1"
+	const server = "http://localhost:3003/api/v1"
 
 	client := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
 	ctx := context.Background()
