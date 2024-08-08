@@ -1,5 +1,5 @@
-github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.17 h1:WPCOogz2nQhSxOf8PvDqCU2QzWo4jvw31dmmOAz5MQE=
-github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.17/go.mod h1:DEeKPtcJqjuXIi8qQSHNSS1/t2tEMskJnnWvdlybzmA=
+github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.22 h1:iMVrWwiUBNLLZFhulUHZtwM1aW4usnguP4XQbtnK9Ws=
+github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.22/go.mod h1:PEJdH9ZWKOiKHyOZkzYsRbKuZjzlRaEJy3GsM75Icdo=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 h1:Sgh5Eb746Zck/46rFDrZZEXZWyO53fMuWYhNoZa1tck=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5/go.mod h1:JjO1ivfZv6vhK0uAXzyH08AAHlzNMAfnyK1Fiv9r4ZA=
 github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 h1:2yTIV9u7H0BhRDGXH5xrAwAz7XibWJtX2dNezMeNsUo=
