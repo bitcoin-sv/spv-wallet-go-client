@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,17 +31,17 @@ func TestRegression(t *testing.T) {
 	rtConfig, err := getEnvVariables()
 	require.NoError(t, err, fmt.Sprintf(errGettingEnvVariables, err))
 
-	var sharedConfigInstanceOne, sharedConfigInstanceTwo *models.SharedConfig
+	var paymailDomainInstanceOne, paymailDomainInstanceTwo string
 	var userOne, userTwo *regressionTestUser
 
 	t.Run("Initialize Shared Configurations", func(t *testing.T) {
 		t.Run("Should get sharedConfig for instance one", func(t *testing.T) {
-			sharedConfigInstanceOne, err = getSharedConfig(adminXPub, rtConfig.ClientOneURL)
+			paymailDomainInstanceOne, err = getPaymailDomain(adminXPub, rtConfig.ClientOneURL)
 			require.NoError(t, err, fmt.Sprintf(errGettingSharedConfig, err))
 		})
 
 		t.Run("Should get shared config for instance two", func(t *testing.T) {
-			sharedConfigInstanceTwo, err = getSharedConfig(adminXPub, rtConfig.ClientTwoURL)
+			paymailDomainInstanceTwo, err = getPaymailDomain(adminXPub, rtConfig.ClientTwoURL)
 			require.NoError(t, err, fmt.Sprintf(errGettingSharedConfig, err))
 		})
 	})
@@ -50,13 +49,13 @@ func TestRegression(t *testing.T) {
 	t.Run("Create Users", func(t *testing.T) {
 		t.Run("Should create user for instance one", func(t *testing.T) {
 			userName := "instanceOneUser1"
-			userOne, err = createUser(ctx, userName, sharedConfigInstanceOne.PaymailDomains[0], rtConfig.ClientOneURL, adminXPriv)
+			userOne, err = createUser(ctx, userName, paymailDomainInstanceOne, rtConfig.ClientOneURL, adminXPriv)
 			require.NoError(t, err, fmt.Sprintf(errCreatingUser, err))
 		})
 
 		t.Run("Should create user for instance two", func(t *testing.T) {
 			userName := "instanceTwoUser1"
-			userTwo, err = createUser(ctx, userName, sharedConfigInstanceTwo.PaymailDomains[0], rtConfig.ClientTwoURL, adminXPriv)
+			userTwo, err = createUser(ctx, userName, paymailDomainInstanceTwo, rtConfig.ClientTwoURL, adminXPriv)
 			require.NoError(t, err, fmt.Sprintf(errCreatingUser, err))
 		})
 	})

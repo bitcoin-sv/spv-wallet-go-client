@@ -65,14 +65,18 @@ func getEnvVariables() (*regressionTestConfig, error) {
 		rtConfig.ClientOneURL = "http://localhost:3003"
 		rtConfig.ClientTwoURL = "http://localhost:3003"
 	}
+
+	rtConfig.ClientOneURL = addPrefixIfNeeded(rtConfig.ClientOneURL)
+	rtConfig.ClientTwoURL = addPrefixIfNeeded(rtConfig.ClientTwoURL)
+
 	return &rtConfig, nil
 }
 
-// getSharedConfig retrieves the shared configuration from the SPV Wallet.
-func getSharedConfig(xpub string, clientUrl string) (*models.SharedConfig, error) {
+// getPaymailDomain retrieves the shared configuration from the SPV Wallet.
+func getPaymailDomain(xpub string, clientUrl string) (string, error) {
 	req, err := http.NewRequest(http.MethodGet, clientUrl+domainSuffixSharedConfig, nil)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	req.Header.Set(models.AuthHeader, xpub)
@@ -81,28 +85,29 @@ func getSharedConfig(xpub string, clientUrl string) (*models.SharedConfig, error
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get shared config: %s", resp.Status)
+		return "", fmt.Errorf("failed to get shared config: %s", resp.Status)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	var configResponse models.SharedConfig
 	if err := json.Unmarshal(body, &configResponse); err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if len(configResponse.PaymailDomains) != 1 {
-		return nil, fmt.Errorf("expected 1 paymail domain, got %d", len(configResponse.PaymailDomains))
+		return "", fmt.Errorf("expected 1 paymail domain, got %d", len(configResponse.PaymailDomains))
 	}
-	return &configResponse, nil
+
+	return configResponse.PaymailDomains[0], nil
 }
 
 // createUser creates a set of keys and new paymail in the SPV Wallet.
@@ -118,7 +123,7 @@ func createUser(ctx context.Context, paymail string, paymailDomain string, insta
 		Paymail: preparePaymail(paymail, paymailDomain),
 	}
 
-	adminClient := walletclient.NewWithAdminKey(addPrefixIfNeeded(instanceUrl), adminXPriv)
+	adminClient := walletclient.NewWithAdminKey(instanceUrl, adminXPriv)
 
 	if err := adminClient.AdminNewXpub(ctx, user.XPub, map[string]any{"some_metadata": "remove"}); err != nil {
 		return nil, err
@@ -134,7 +139,7 @@ func createUser(ctx context.Context, paymail string, paymailDomain string, insta
 
 // removeRegisteredPaymail soft deletes paymail from the SPV Wallet.
 func removeRegisteredPaymail(ctx context.Context, paymail string, instanceURL string, adminXPriv string) error {
-	adminClient := walletclient.NewWithAdminKey(addPrefixIfNeeded(instanceURL), adminXPriv)
+	adminClient := walletclient.NewWithAdminKey(instanceURL, adminXPriv)
 	err := adminClient.AdminDeletePaymail(ctx, paymail)
 	if err != nil {
 		return err
@@ -144,7 +149,7 @@ func removeRegisteredPaymail(ctx context.Context, paymail string, instanceURL st
 
 // getBalance retrieves the balance from the SPV Wallet.
 func getBalance(ctx context.Context, fromInstance string, fromXPriv string) (int, error) {
-	client := walletclient.NewWithXPriv(addPrefixIfNeeded(fromInstance), fromXPriv)
+	client := walletclient.NewWithXPriv(fromInstance, fromXPriv)
 
 	xpubInfo, err := client.GetXPub(ctx)
 	if err != nil {
@@ -155,7 +160,7 @@ func getBalance(ctx context.Context, fromInstance string, fromXPriv string) (int
 
 // getTransactions retrieves the transactions from the SPV Wallet.
 func getTransactions(ctx context.Context, fromInstance string, fromXPriv string) ([]*models.Transaction, error) {
-	client := walletclient.NewWithXPriv(addPrefixIfNeeded(fromInstance), fromXPriv)
+	client := walletclient.NewWithXPriv(fromInstance, fromXPriv)
 
 	metadata := map[string]any{}
 	conditions := filter.TransactionFilter{}
