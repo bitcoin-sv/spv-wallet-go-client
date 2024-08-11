@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -62,8 +61,8 @@ func TestRegression(t *testing.T) {
 		transactions, err := getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
 		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
 
-		assert.Equal(t, 0, balance)
-		assert.Equal(t, 0, len(transactions))
+		require.Equal(t, 0, balance)
+		require.Equal(t, 0, len(transactions))
 
 		balance, err = getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
@@ -71,17 +70,17 @@ func TestRegression(t *testing.T) {
 		transactions, err = getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
 
-		assert.Equal(t, 0, balance)
-		assert.Equal(t, 0, len(transactions))
+		require.Equal(t, 0, balance)
+		require.Equal(t, 0, len(transactions))
 
 		// when
 		transactionOne, err := sendFunds(ctx, rtConfig.ClientOneURL, rtConfig.ClientOneLeaderXPriv, userTwo.Paymail, 2)
 		require.NoError(t, err, fmt.Sprintf(errorWhileSendingFunds, err))
-		assert.GreaterOrEqual(t, int64(-1), transactionOne.OutputValue)
+		require.GreaterOrEqual(t, int64(-1), transactionOne.OutputValue)
 
 		transactionTwo, err := sendFunds(ctx, rtConfig.ClientTwoURL, rtConfig.ClientTwoLeaderXPriv, userOne.Paymail, 2)
 		require.NoError(t, err, fmt.Sprintf(errorWhileSendingFunds, err))
-		assert.GreaterOrEqual(t, int64(-1), transactionTwo.OutputValue)
+		require.GreaterOrEqual(t, int64(-1), transactionTwo.OutputValue)
 
 		// then
 		balance, err = getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
@@ -90,15 +89,15 @@ func TestRegression(t *testing.T) {
 		transactions, err = getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
 		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
 
-		assert.GreaterOrEqual(t, balance, 1)
-		assert.GreaterOrEqual(t, len(transactions), 1)
+		require.GreaterOrEqual(t, balance, 1)
+		require.GreaterOrEqual(t, len(transactions), 1)
 
 		balance, err = getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
 
 		transactions, err = getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
-		assert.GreaterOrEqual(t, balance, 1)
-		assert.GreaterOrEqual(t, len(transactions), 1)
+		require.GreaterOrEqual(t, balance, 1)
+		require.GreaterOrEqual(t, len(transactions), 1)
 	})
 }
