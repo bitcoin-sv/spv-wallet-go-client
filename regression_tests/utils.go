@@ -132,8 +132,8 @@ func createUser(ctx context.Context, paymail string, paymailDomain string, insta
 	return user, nil
 }
 
-// deleteUser soft deletes paymail from the SPV Wallet.
-func deleteUser(ctx context.Context, paymail string, instanceURL string, adminXPriv string) error {
+// removeRegisteredPaymail soft deletes paymail from the SPV Wallet.
+func removeRegisteredPaymail(ctx context.Context, paymail string, instanceURL string, adminXPriv string) error {
 	adminClient := walletclient.NewWithAdminKey(addPrefixIfNeeded(instanceURL), adminXPriv)
 	err := adminClient.AdminDeletePaymail(ctx, paymail)
 	if err != nil {

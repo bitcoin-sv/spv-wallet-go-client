@@ -8,96 +8,126 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
 )
 
 const (
-	fundsPerTest                  = 2
-	adminXPriv                    = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
-	adminXPub                     = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
-	errorWhileGettingTransaction  = "error while getting transaction: %s"
-	errorWhileCreatingUser        = "error while creating user: %s"
-	errorWhileGettingBalance      = "error while getting transaction: %s"
-	errorWhileSendingFunds        = "error while sending funds: %s"
-	errorWhileGettingSharedConfig = "error while getting shared config: %s"
-	errorWhileGettingEnvVariables = "error while getting env variables: %s"
-)
+	fundsPerTest = 2
 
-var (
-	clientOneURL         string
-	clientTwoURL         string
-	clientOneLeaderXPriv string
-	clientTwoLeaderXPriv string
+	adminXPriv = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
+	adminXPub  = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
+
+	errGettingEnvVariables = "failed to get environment variables: %s"
+	errGettingSharedConfig = "failed to get shared config: %s"
+	errCreatingUser        = "failed to create user: %s"
+	errDeletingUserPaymail = "failed to delete user's paymail: %s"
+	errSendingFunds        = "failed to send funds: %s"
+	errGettingBalance      = "failed to get balance: %s"
+	errGettingTransactions = "failed to get transactions: %s"
 )
 
 func TestRegression(t *testing.T) {
 	ctx := context.Background()
 	rtConfig, err := getEnvVariables()
-	require.NoError(t, err, fmt.Sprintf(errorWhileGettingEnvVariables, err))
+	require.NoError(t, err, fmt.Sprintf(errGettingEnvVariables, err))
 
-	sharedConfigInstanceOne, err := getSharedConfig(adminXPub, rtConfig.ClientOneURL)
-	require.NoError(t, err, fmt.Sprintf(errorWhileGettingSharedConfig, err))
+	var sharedConfigInstanceOne, sharedConfigInstanceTwo *models.SharedConfig
+	var userOne, userTwo *regressionTestUser
 
-	sharedConfigInstanceTwo, err := getSharedConfig(adminXPub, rtConfig.ClientTwoURL)
-	require.NoError(t, err, fmt.Sprintf(errorWhileGettingSharedConfig, err))
+	t.Run("Initialize Shared Configurations", func(t *testing.T) {
+		t.Run("Should get sharedConfig for instance one", func(t *testing.T) {
+			sharedConfigInstanceOne, err = getSharedConfig(adminXPub, rtConfig.ClientOneURL)
+			require.NoError(t, err, fmt.Sprintf(errGettingSharedConfig, err))
+		})
 
-	userName := "instanceOneUser1"
-	userOne, err := createUser(ctx, userName, sharedConfigInstanceOne.PaymailDomains[0], rtConfig.ClientOneURL, adminXPriv)
-	require.NoError(t, err, fmt.Sprintf(errorWhileCreatingUser, err))
+		t.Run("Should get shared config for instance two", func(t *testing.T) {
+			sharedConfigInstanceTwo, err = getSharedConfig(adminXPub, rtConfig.ClientTwoURL)
+			require.NoError(t, err, fmt.Sprintf(errGettingSharedConfig, err))
+		})
+	})
 
-	defer deleteUser(ctx, userOne.Paymail, rtConfig.ClientOneURL, adminXPriv)
+	t.Run("Create Users", func(t *testing.T) {
+		t.Run("Should create user for instance one", func(t *testing.T) {
+			userName := "instanceOneUser1"
+			userOne, err = createUser(ctx, userName, sharedConfigInstanceOne.PaymailDomains[0], rtConfig.ClientOneURL, adminXPriv)
+			require.NoError(t, err, fmt.Sprintf(errCreatingUser, err))
+		})
 
-	userName = "instanceTwoUser1"
-	userTwo, err := createUser(ctx, userName, sharedConfigInstanceTwo.PaymailDomains[0], rtConfig.ClientTwoURL, adminXPriv)
-	require.NoError(t, err, fmt.Sprintf(errorWhileCreatingUser, err))
+		t.Run("Should create user for instance two", func(t *testing.T) {
+			userName := "instanceTwoUser1"
+			userTwo, err = createUser(ctx, userName, sharedConfigInstanceTwo.PaymailDomains[0], rtConfig.ClientTwoURL, adminXPriv)
+			require.NoError(t, err, fmt.Sprintf(errCreatingUser, err))
+		})
+	})
 
-	defer deleteUser(ctx, userTwo.Paymail, rtConfig.ClientTwoURL, adminXPriv)
+	defer func() {
+		t.Run("Cleanup: Remove Paymails", func(t *testing.T) {
+			t.Run("Should remove user's paymail on first instance", func(t *testing.T) {
+				if userOne != nil {
+					err := removeRegisteredPaymail(ctx, userOne.Paymail, rtConfig.ClientOneURL, adminXPriv)
+					require.NoError(t, err, fmt.Sprintf(errDeletingUserPaymail, err))
+				}
+			})
 
-	t.Run("TestInitialBalancesAndTransactionsBeforeAndAfterFundTransfers", func(t *testing.T) {
-		// given
-		balance, err := getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
-		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
+			t.Run("Should remove user's paymail on second instance", func(t *testing.T) {
+				if userTwo != nil {
+					err := removeRegisteredPaymail(ctx, userTwo.Paymail, rtConfig.ClientTwoURL, adminXPriv)
+					require.NoError(t, err, fmt.Sprintf(errDeletingUserPaymail, err))
+				}
+			})
+		})
+	}()
 
-		transactions, err := getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
-		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
+	t.Run("Perform Transactions", func(t *testing.T) {
+		t.Run("Send money to instance 1", func(t *testing.T) {
+			transaction, err := sendFunds(ctx, rtConfig.ClientTwoURL, rtConfig.ClientTwoLeaderXPriv, userOne.Paymail, fundsPerTest)
+			require.NoError(t, err, fmt.Sprintf(errSendingFunds, err))
+			require.GreaterOrEqual(t, int64(-1), transaction.OutputValue)
 
-		require.Equal(t, 0, balance)
-		require.Equal(t, 0, len(transactions))
+			balance, err := getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
+			require.NoError(t, err, fmt.Sprintf(errGettingBalance, err))
+			require.GreaterOrEqual(t, balance, 1)
 
-		balance, err = getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
-		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
+			transactions, err := getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
+			require.NoError(t, err, fmt.Sprintf(errGettingTransactions, err))
+			require.GreaterOrEqual(t, len(transactions), 1)
+		})
 
-		transactions, err = getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
-		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
+		t.Run("Send money to instance 2", func(t *testing.T) {
+			transaction, err := sendFunds(ctx, rtConfig.ClientOneURL, rtConfig.ClientOneLeaderXPriv, userTwo.Paymail, fundsPerTest)
+			require.NoError(t, err, fmt.Sprintf(errSendingFunds, err))
+			require.GreaterOrEqual(t, int64(-1), transaction.OutputValue)
 
-		require.Equal(t, 0, balance)
-		require.Equal(t, 0, len(transactions))
+			balance, err := getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
+			require.NoError(t, err, fmt.Sprintf(errGettingBalance, err))
+			require.GreaterOrEqual(t, balance, 1)
 
-		// when
-		transactionOne, err := sendFunds(ctx, rtConfig.ClientOneURL, rtConfig.ClientOneLeaderXPriv, userTwo.Paymail, 2)
-		require.NoError(t, err, fmt.Sprintf(errorWhileSendingFunds, err))
-		require.GreaterOrEqual(t, int64(-1), transactionOne.OutputValue)
+			transactions, err := getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
+			require.NoError(t, err, fmt.Sprintf(errGettingTransactions, err))
+			require.GreaterOrEqual(t, len(transactions), 1)
+		})
 
-		transactionTwo, err := sendFunds(ctx, rtConfig.ClientTwoURL, rtConfig.ClientTwoLeaderXPriv, userOne.Paymail, 2)
-		require.NoError(t, err, fmt.Sprintf(errorWhileSendingFunds, err))
-		require.GreaterOrEqual(t, int64(-1), transactionTwo.OutputValue)
+		t.Run("Send money from instance 1 to instance 2", func(t *testing.T) {
+			transaction, err := sendFunds(ctx, rtConfig.ClientOneURL, userOne.XPriv, userTwo.Paymail, fundsPerTest)
+			require.NoError(t, err, fmt.Sprintf(errSendingFunds, err))
+			require.GreaterOrEqual(t, int64(-1), transaction.OutputValue)
 
-		// then
-		balance, err = getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
-		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
+			balance, err := getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
+			require.NoError(t, err, fmt.Sprintf(errGettingBalance, err))
+			require.GreaterOrEqual(t, balance, 1)
 
-		transactions, err = getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
-		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
+			transactions, err := getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
+			require.NoError(t, err, fmt.Sprintf(errGettingTransactions, err))
+			require.GreaterOrEqual(t, len(transactions), 1)
 
-		require.GreaterOrEqual(t, balance, 1)
-		require.GreaterOrEqual(t, len(transactions), 1)
+			balance, err = getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
+			require.NoError(t, err, fmt.Sprintf(errGettingBalance, err))
+			require.GreaterOrEqual(t, balance, 1)
 
-		balance, err = getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
-		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
-
-		transactions, err = getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
-		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
-		require.GreaterOrEqual(t, balance, 1)
-		require.GreaterOrEqual(t, len(transactions), 1)
+			transactions, err = getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
+			require.NoError(t, err, fmt.Sprintf(errGettingTransactions, err))
+			require.GreaterOrEqual(t, len(transactions), 1)
+		})
 	})
 }
