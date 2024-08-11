@@ -5,9 +5,11 @@ package regressiontests
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -32,90 +34,70 @@ var (
 func TestRegression(t *testing.T) {
 	ctx := context.Background()
 	rtConfig, err := getEnvVariables()
-	if err != nil {
-		t.Errorf(errorWhileGettingEnvVariables, err)
-	}
+	require.NoError(t, err, fmt.Sprintf(errorWhileGettingEnvVariables, err))
 
 	sharedConfigInstanceOne, err := getSharedConfig(adminXPub, rtConfig.ClientOneURL)
-	if err != nil {
-		t.Errorf(errorWhileGettingSharedConfig, err)
-	}
+	require.NoError(t, err, fmt.Sprintf(errorWhileGettingSharedConfig, err))
+
 	sharedConfigInstanceTwo, err := getSharedConfig(adminXPub, rtConfig.ClientTwoURL)
-	if err != nil {
-		t.Errorf(errorWhileGettingSharedConfig, err)
-	}
+	require.NoError(t, err, fmt.Sprintf(errorWhileGettingSharedConfig, err))
 
 	userName := "instanceOneUser1"
 	userOne, err := createUser(ctx, userName, sharedConfigInstanceOne.PaymailDomains[0], rtConfig.ClientOneURL, adminXPriv)
-	if err != nil {
-		t.Errorf(errorWhileCreatingUser, err)
-	}
+	require.NoError(t, err, fmt.Sprintf(errorWhileCreatingUser, err))
+
 	defer deleteUser(ctx, userOne.Paymail, rtConfig.ClientOneURL, adminXPriv)
 
 	userName = "instanceTwoUser1"
 	userTwo, err := createUser(ctx, userName, sharedConfigInstanceTwo.PaymailDomains[0], rtConfig.ClientTwoURL, adminXPriv)
-	if err != nil {
-		t.Errorf(errorWhileCreatingUser, err)
-	}
+	require.NoError(t, err, fmt.Sprintf(errorWhileCreatingUser, err))
+
 	defer deleteUser(ctx, userTwo.Paymail, rtConfig.ClientTwoURL, adminXPriv)
 
 	t.Run("TestInitialBalancesAndTransactionsBeforeAndAfterFundTransfers", func(t *testing.T) {
-		// Given
+		// given
 		balance, err := getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
-		if err != nil {
-			t.Errorf(errorWhileGettingBalance, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
+
 		transactions, err := getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
-		if err != nil {
-			t.Errorf(errorWhileGettingTransaction, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
+
 		assert.Equal(t, 0, balance)
 		assert.Equal(t, 0, len(transactions))
 
 		balance, err = getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
-		if err != nil {
-			t.Errorf(errorWhileGettingBalance, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
+
 		transactions, err = getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
-		if err != nil {
-			t.Errorf(errorWhileGettingTransaction, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
+
 		assert.Equal(t, 0, balance)
 		assert.Equal(t, 0, len(transactions))
 
-		// When
+		// when
 		transactionOne, err := sendFunds(ctx, rtConfig.ClientOneURL, rtConfig.ClientOneLeaderXPriv, userTwo.Paymail, 2)
-		if err != nil {
-			t.Errorf(errorWhileSendingFunds, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileSendingFunds, err))
 		assert.GreaterOrEqual(t, int64(-1), transactionOne.OutputValue)
 
 		transactionTwo, err := sendFunds(ctx, rtConfig.ClientTwoURL, rtConfig.ClientTwoLeaderXPriv, userOne.Paymail, 2)
-		if err != nil {
-			t.Errorf(errorWhileSendingFunds, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileSendingFunds, err))
 		assert.GreaterOrEqual(t, int64(-1), transactionTwo.OutputValue)
 
-		// Then
+		// then
 		balance, err = getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
-		if err != nil {
-			t.Errorf(errorWhileGettingBalance, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
+
 		transactions, err = getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
-		if err != nil {
-			t.Errorf(errorWhileGettingTransaction, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
+
 		assert.GreaterOrEqual(t, balance, 1)
 		assert.GreaterOrEqual(t, len(transactions), 1)
 
 		balance, err = getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
-		if err != nil {
-			t.Errorf(errorWhileGettingBalance, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileGettingBalance, err))
+
 		transactions, err = getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
-		if err != nil {
-			t.Errorf(errorWhileGettingTransaction, err)
-		}
+		require.NoError(t, err, fmt.Sprintf(errorWhileGettingTransaction, err))
 		assert.GreaterOrEqual(t, balance, 1)
 		assert.GreaterOrEqual(t, len(transactions), 1)
 	})
