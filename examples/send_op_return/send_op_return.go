@@ -30,19 +30,19 @@ func main() {
 
 	draftTransaction, err := client.DraftTransaction(ctx, &transactionConfig, metadata)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 	fmt.Println("DraftTransaction response: ", draftTransaction)
 
 	finalized, err := client.FinalizeTransaction(draftTransaction)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 	transaction, err := client.RecordTransaction(ctx, finalized, draftTransaction.ID, metadata)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 	fmt.Println("Transaction with OP_RETURN: ", transaction)

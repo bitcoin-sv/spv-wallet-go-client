@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
@@ -24,7 +23,7 @@ func main() {
 
 	err := adminClient.AdminDeletePaymail(ctx, examples.ExamplePaymail)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 }
