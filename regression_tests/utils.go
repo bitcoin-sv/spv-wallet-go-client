@@ -2,15 +2,11 @@ package regressiontests
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"regexp"
 	"strings"
-	"time"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
@@ -27,13 +23,11 @@ const (
 	ClientTwoURLEnvVar         = "CLIENT_TWO_URL"
 	ClientOneLeaderXPrivEnvVar = "CLIENT_ONE_LEADER_XPRIV"
 	ClientTwoLeaderXPrivEnvVar = "CLIENT_TWO_LEADER_XPRIV"
-
-	timeoutDuration = 30 * time.Second
 )
 
 var (
-	explicitHTTPURLRegex = regexp.MustCompile(`^https?://`)
-	envVariableError     = errors.New("missing xpriv variables")
+	explicitHTTPURLRegex      = regexp.MustCompile(`^https?://`)
+	errEmptyXPrivEnvVariables = errors.New("missing xpriv variables")
 )
 
 type regressionTestUser struct {
@@ -59,7 +53,7 @@ func getEnvVariables() (*regressionTestConfig, error) {
 	}
 
 	if rtConfig.ClientOneLeaderXPriv == "" || rtConfig.ClientTwoLeaderXPriv == "" {
-		return nil, envVariableError
+		return nil, errEmptyXPrivEnvVariables
 	}
 	if rtConfig.ClientOneURL == "" || rtConfig.ClientTwoURL == "" {
 		rtConfig.ClientOneURL = "http://localhost:3003"
@@ -73,41 +67,16 @@ func getEnvVariables() (*regressionTestConfig, error) {
 }
 
 // getPaymailDomain retrieves the shared configuration from the SPV Wallet.
-func getPaymailDomain(xpub string, clientUrl string) (string, error) {
-	req, err := http.NewRequest(http.MethodGet, clientUrl+domainSuffixSharedConfig, nil)
+func getPaymailDomain(ctx context.Context, xpub string, clientUrl string) (string, error) {
+	wc := walletclient.NewWithXPub(clientUrl, xpub)
+	sharedConfig, err := wc.GetSharedConfig(ctx)
 	if err != nil {
 		return "", err
 	}
-
-	req.Header.Set(models.AuthHeader, xpub)
-	client := http.Client{
-		Timeout: timeoutDuration,
+	if len(sharedConfig.PaymailDomains) != 1 {
+		return "", fmt.Errorf("expected 1 paymail domain, got %d", len(sharedConfig.PaymailDomains))
 	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to get shared config: %s", resp.Status)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	var configResponse models.SharedConfig
-	if err := json.Unmarshal(body, &configResponse); err != nil {
-		return "", err
-	}
-
-	if len(configResponse.PaymailDomains) != 1 {
-		return "", fmt.Errorf("expected 1 paymail domain, got %d", len(configResponse.PaymailDomains))
-	}
-
-	return configResponse.PaymailDomains[0], nil
+	return sharedConfig.PaymailDomains[0], nil
 }
 
 // createUser creates a set of keys and new paymail in the SPV Wallet.

@@ -36,12 +36,12 @@ func TestRegression(t *testing.T) {
 
 	t.Run("Initialize Shared Configurations", func(t *testing.T) {
 		t.Run("Should get sharedConfig for instance one", func(t *testing.T) {
-			paymailDomainInstanceOne, err = getPaymailDomain(adminXPub, rtConfig.ClientOneURL)
+			paymailDomainInstanceOne, err = getPaymailDomain(ctx, adminXPub, rtConfig.ClientOneURL)
 			require.NoError(t, err, fmt.Sprintf(errGettingSharedConfig, err))
 		})
 
 		t.Run("Should get shared config for instance two", func(t *testing.T) {
-			paymailDomainInstanceTwo, err = getPaymailDomain(adminXPub, rtConfig.ClientTwoURL)
+			paymailDomainInstanceTwo, err = getPaymailDomain(ctx, adminXPub, rtConfig.ClientTwoURL)
 			require.NoError(t, err, fmt.Sprintf(errGettingSharedConfig, err))
 		})
 	})
