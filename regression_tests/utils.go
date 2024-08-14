@@ -15,9 +15,8 @@ import (
 )
 
 const (
-	atSign                   = "@"
-	domainPrefix             = "https://"
-	domainSuffixSharedConfig = "/v1/shared-config"
+	atSign       = "@"
+	domainPrefix = "https://"
 
 	ClientOneURLEnvVar         = "CLIENT_ONE_URL"
 	ClientTwoURLEnvVar         = "CLIENT_TWO_URL"
@@ -67,8 +66,8 @@ func getEnvVariables() (*regressionTestConfig, error) {
 }
 
 // getPaymailDomain retrieves the shared configuration from the SPV Wallet.
-func getPaymailDomain(ctx context.Context, xpub string, clientUrl string) (string, error) {
-	wc := walletclient.NewWithXPub(clientUrl, xpub)
+func getPaymailDomain(ctx context.Context, xpriv string, clientUrl string) (string, error) {
+	wc := walletclient.NewWithXPriv(clientUrl, xpriv)
 	sharedConfig, err := wc.GetSharedConfig(ctx)
 	if err != nil {
 		return "", err

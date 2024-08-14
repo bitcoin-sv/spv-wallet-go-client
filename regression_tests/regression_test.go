@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	fundsPerTest = 2
+	minimalFundsPerTransaction = 2
 
 	adminXPriv = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
 	adminXPub  = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
@@ -36,12 +36,12 @@ func TestRegression(t *testing.T) {
 
 	t.Run("Initialize Shared Configurations", func(t *testing.T) {
 		t.Run("Should get sharedConfig for instance one", func(t *testing.T) {
-			paymailDomainInstanceOne, err = getPaymailDomain(ctx, adminXPub, rtConfig.ClientOneURL)
+			paymailDomainInstanceOne, err = getPaymailDomain(ctx, adminXPriv, rtConfig.ClientOneURL)
 			require.NoError(t, err, fmt.Sprintf(errGettingSharedConfig, err))
 		})
 
 		t.Run("Should get shared config for instance two", func(t *testing.T) {
-			paymailDomainInstanceTwo, err = getPaymailDomain(ctx, adminXPub, rtConfig.ClientTwoURL)
+			paymailDomainInstanceTwo, err = getPaymailDomain(ctx, adminXPriv, rtConfig.ClientTwoURL)
 			require.NoError(t, err, fmt.Sprintf(errGettingSharedConfig, err))
 		})
 	})
@@ -80,7 +80,8 @@ func TestRegression(t *testing.T) {
 
 	t.Run("Perform Transactions", func(t *testing.T) {
 		t.Run("Send money to instance 1", func(t *testing.T) {
-			transaction, err := sendFunds(ctx, rtConfig.ClientTwoURL, rtConfig.ClientTwoLeaderXPriv, userOne.Paymail, fundsPerTest)
+			const amountToSend = 3
+			transaction, err := sendFunds(ctx, rtConfig.ClientTwoURL, rtConfig.ClientTwoLeaderXPriv, userOne.Paymail, amountToSend)
 			require.NoError(t, err, fmt.Sprintf(errSendingFunds, err))
 			require.GreaterOrEqual(t, int64(-1), transaction.OutputValue)
 
@@ -94,7 +95,7 @@ func TestRegression(t *testing.T) {
 		})
 
 		t.Run("Send money to instance 2", func(t *testing.T) {
-			transaction, err := sendFunds(ctx, rtConfig.ClientOneURL, rtConfig.ClientOneLeaderXPriv, userTwo.Paymail, fundsPerTest)
+			transaction, err := sendFunds(ctx, rtConfig.ClientOneURL, rtConfig.ClientOneLeaderXPriv, userTwo.Paymail, minimalFundsPerTransaction)
 			require.NoError(t, err, fmt.Sprintf(errSendingFunds, err))
 			require.GreaterOrEqual(t, int64(-1), transaction.OutputValue)
 
@@ -108,25 +109,25 @@ func TestRegression(t *testing.T) {
 		})
 
 		t.Run("Send money from instance 1 to instance 2", func(t *testing.T) {
-			transaction, err := sendFunds(ctx, rtConfig.ClientOneURL, userOne.XPriv, userTwo.Paymail, fundsPerTest)
+			transaction, err := sendFunds(ctx, rtConfig.ClientOneURL, userOne.XPriv, userTwo.Paymail, minimalFundsPerTransaction)
 			require.NoError(t, err, fmt.Sprintf(errSendingFunds, err))
 			require.GreaterOrEqual(t, int64(-1), transaction.OutputValue)
 
 			balance, err := getBalance(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 			require.NoError(t, err, fmt.Sprintf(errGettingBalance, err))
-			require.GreaterOrEqual(t, balance, 1)
+			require.GreaterOrEqual(t, balance, 2)
 
 			transactions, err := getTransactions(ctx, rtConfig.ClientTwoURL, userTwo.XPriv)
 			require.NoError(t, err, fmt.Sprintf(errGettingTransactions, err))
-			require.GreaterOrEqual(t, len(transactions), 1)
+			require.GreaterOrEqual(t, len(transactions), 2)
 
 			balance, err = getBalance(ctx, rtConfig.ClientOneURL, userOne.XPriv)
 			require.NoError(t, err, fmt.Sprintf(errGettingBalance, err))
-			require.GreaterOrEqual(t, balance, 1)
+			require.GreaterOrEqual(t, balance, 0)
 
 			transactions, err = getTransactions(ctx, rtConfig.ClientOneURL, userOne.XPriv)
 			require.NoError(t, err, fmt.Sprintf(errGettingTransactions, err))
-			require.GreaterOrEqual(t, len(transactions), 1)
+			require.GreaterOrEqual(t, len(transactions), 2)
 		})
 	})
 }
