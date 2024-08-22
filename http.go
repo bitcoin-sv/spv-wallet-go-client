@@ -1159,3 +1159,13 @@ func (wc *WalletClient) AdminUnsubscribeWebhook(ctx context.Context, webhookURL 
 	err = wc.doHTTPRequest(ctx, http.MethodDelete, "/admin/webhooks/subscriptions", rawJSON, wc.adminXPriv, true, nil)
 	return err
 }
+
+// AdminGetWebhooks gets all webhooks
+func (wc *WalletClient) AdminGetWebhooks(ctx context.Context) ([]*models.Webhook, error) {
+	var webhooks []*models.Webhook
+	err := wc.doHTTPRequest(ctx, http.MethodGet, "/admin/webhooks/subscriptions", nil, wc.adminXPriv, true, &webhooks)
+	if err != nil {
+		return nil, WrapError(err)
+	}
+	return webhooks, nil
+}
