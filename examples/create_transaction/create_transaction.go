@@ -22,7 +22,7 @@ func main() {
 	client := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
 	ctx := context.Background()
 
-	recipient := walletclient.Recipients{To: "test-multiple1@pawel.test.4chain.space", Satoshis: 1}
+	recipient := walletclient.Recipients{To: "alice@example.com", Satoshis: 1}
 	recipients := []*walletclient.Recipients{&recipient}
 	metadata := map[string]any{"some_metadata": "example"}
 
