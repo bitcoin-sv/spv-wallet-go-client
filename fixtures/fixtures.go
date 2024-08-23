@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/common"
+	responsemodels "github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 var (
@@ -212,5 +213,5 @@ var Contact = &models.Contact{
 	FullName: "Test User",
 	Paymail:  "test@spv-wallet.com",
 	PubKey:   "xpub661MyMwAqRbcGpZVrSHU...",
-	Status:   models.ContactStatus("unconfirmed"),
+	Status:   responsemodels.ContactNotConfirmed,
 }

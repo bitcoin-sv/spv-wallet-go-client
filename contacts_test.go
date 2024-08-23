@@ -10,6 +10,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	responsemodels "github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,7 +25,7 @@ func TestContactActionsRouting(t *testing.T) {
 			}
 		case r.URL.Path == "/v1/contact/accepted/":
 			if r.Method == http.MethodPost {
-				json.NewEncoder(w).Encode(map[string]string{"result": "accepted"})
+				json.NewEncoder(w).Encode(map[string]string{"result": string(responsemodels.ContactNotConfirmed)})
 			}
 		case r.URL.Path == "/v1/contact/search":
 			if r.Method == http.MethodPost {
