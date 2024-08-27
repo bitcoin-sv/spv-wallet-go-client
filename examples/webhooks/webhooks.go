@@ -37,6 +37,16 @@ func main() {
 
 	http.Handle("/notification", wh.HTTPHandler())
 
+	// show all subscribed webhooks (including the current one)
+	allWebhooks, err := client.AdminGetWebhooks(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Subscribed webhooks list")
+	for _, item := range allWebhooks {
+		fmt.Printf("URL: %s, banned: %v\n", item.URL, item.Banned)
+	}
+
 	if err = notifications.RegisterHandler(wh, func(gpe *models.StringEvent) {
 		time.Sleep(50 * time.Millisecond) // simulate processing time
 		fmt.Printf("Processing event-string: %s\n", gpe.Value)
