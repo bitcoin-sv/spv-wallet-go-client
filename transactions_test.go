@@ -8,26 +8,30 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/stretchr/testify/require"
 )
 
 func TestTransactions(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/v1/transaction":
-			handleTransaction(w, r)
-		case "/v1/transaction/search":
-			json.NewEncoder(w).Encode([]*models.Transaction{fixtures.Transaction})
-		case "/v1/transaction/count":
-			json.NewEncoder(w).Encode(1)
-		case "/v1/transaction/record":
-			if r.Method == http.MethodPost {
+		case "/v1/transactions":
+			switch r.Method {
+			case http.MethodGet:
+				json.NewEncoder(w).Encode([]*response.Transaction{fixtures.Transaction})
+			case http.MethodPost:
 				w.Header().Set("Content-Type", "application/json")
 				json.NewEncoder(w).Encode(fixtures.Transaction)
-			} else {
-				w.WriteHeader(http.StatusMethodNotAllowed)
+			}
+		case "/v1/transactions/" + fixtures.Transaction.ID:
+			switch r.Method {
+			case http.MethodGet, http.MethodPatch:
+				handleTransaction(w, r)
+			}
+		case "/v1/transactions/drafts":
+			if r.Method == http.MethodPost {
+				handleTransaction(w, r)
 			}
 		default:
 			w.WriteHeader(http.StatusNotFound)
@@ -51,7 +55,7 @@ func TestTransactions(t *testing.T) {
 		}
 		txs, err := client.GetTransactions(context.Background(), conditions, fixtures.TestMetadata, nil)
 		require.NoError(t, err)
-		require.Equal(t, []*models.Transaction{fixtures.Transaction}, txs)
+		require.Equal(t, []*response.Transaction{fixtures.Transaction}, txs)
 	})
 
 	t.Run("GetTransactionsCount", func(t *testing.T) {
