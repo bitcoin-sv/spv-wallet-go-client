@@ -2,47 +2,14 @@
 package fixtures
 
 import (
-	"encoding/json"
-
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/common"
-	responsemodels "github.com/bitcoin-sv/spv-wallet/models/response"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
-
-var (
-	// RequestType http or https
-	RequestType = "http"
-	// ServerURL ex. https://localhost
-	ServerURL = "https://example.com/"
-	// XPubString public key
-	XPubString = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
-	// XPrivString private key
-	XPrivString = "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ"
-	// AccessKeyString access key
-	AccessKeyString = "7779d24ca6f8821f225042bf55e8f80aa41b08b879b72827f51e41e6523b9cd0"
-	// PaymailAddress ex. "address@paymail.com"
-	PaymailAddress = "address@paymail.com"
-	// PubKey ex. "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
-	PubKey = "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
-)
-
-// MarshallForTestHandler its marshaling test handler
-func MarshallForTestHandler(object any) string {
-	json, err := json.Marshal(object)
-	if err != nil {
-		// as this is just for tests, empty string will make the tests fail,
-		// so it's acceptable as an "error" here, in case there's a problem with marshall
-		return ""
-	}
-	return string(json)
-}
-
-// TestMetadata model for metadata
-var TestMetadata = map[string]any{"test-key": "test-value"}
 
 // Xpub model for testing
-var Xpub = &response.Xpub{
-	Model:           response.Model{Metadata: TestMetadata},
+var OldXpub = &models.Xpub{
+	Model:           common.Model{Metadata: TestMetadata},
 	ID:              "cba0be1e753a7609e1a2f792d2e80ea6fce241be86f0690ec437377477809ccc",
 	CurrentBalance:  16680,
 	NextInternalNum: 2,
@@ -50,16 +17,16 @@ var Xpub = &response.Xpub{
 }
 
 // AccessKey model for testing
-var AccessKey = &response.AccessKey{
-	Model:  response.Model{Metadata: TestMetadata},
+var OldAccessKey = &models.AccessKey{
+	Model:  common.Model{Metadata: TestMetadata},
 	ID:     "access-key-id",
 	XpubID: Xpub.ID,
 	Key:    AccessKeyString,
 }
 
 // Destination model for testing
-var Destination = &response.Destination{
-	Model:         response.Model{Metadata: TestMetadata},
+var OldDestination = &models.Destination{
+	Model:         common.Model{Metadata: TestMetadata},
 	ID:            "90d10acb85f37dd009238fe7ec61a1411725825c82099bd8432fcb47ad8326ce",
 	XpubID:        Xpub.ID,
 	LockingScript: "76a9140e0eb4911d79e9b7683f268964f595b66fa3604588ac",
@@ -71,8 +38,8 @@ var Destination = &response.Destination{
 }
 
 // Transaction model for testing
-var Transaction = &response.Transaction{
-	Model:                response.Model{Metadata: TestMetadata},
+var OldTransaction = &models.Transaction{
+	Model:                common.Model{Metadata: TestMetadata},
 	ID:                   "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda",
 	Hex:                  "0100000001cf4faa628ce1abdd2cfc641c948898bb7a3dbe043999236c3ea4436a0c79f5dc000000006a47304402206aeca14175e4477031970c1cda0af4d9d1206289212019b54f8e1c9272b5bac2022067c4d32086146ca77640f02a989f51b3c6738ebfa24683c4a923f647cf7f1c624121036295a81525ba33e22c6497c0b758e6a84b60d97c2d8905aa603dd364915c3a0effffffff023e030000000000001976a914f7fc6e0b05e91c3610efd0ce3f04f6502e2ed93d88ac99030000000000001976a914550e06a3aa71ba7414b53922c13f96a882bf027988ac00000000",
 	XpubInIDs:            []string{Xpub.ID},
@@ -91,33 +58,33 @@ var Transaction = &response.Transaction{
 }
 
 // DraftTx model for testing
-var DraftTx = &response.DraftTransaction{
-	Model:  response.Model{Metadata: TestMetadata},
+var OldDraftTx = &models.DraftTransaction{
+	Model:  common.Model{Metadata: TestMetadata},
 	ID:     "3a0e1fdd9ac6046c0c82aa36b462e477a455880ceeb08d3aabb1bf031553d1df",
 	Hex:    "010000000123462f14e60556718916a8cff9dbf2258195a928777c0373200dba1cee105bdb0100000000ffffffff020c000000000000001976a914c4b15e7f65e3e6a062c1d21b7f1d7d2cd3b18e8188ac0b000000000000001976a91455873fd2baa7b51a624f6416b1d824939d99151a88ac00000000",
 	XpubID: Xpub.ID,
-	Configuration: response.TransactionConfig{
-		ChangeDestinations:         []*response.Destination{Destination},
+	Configuration: models.TransactionConfig{
+		ChangeDestinations:         []*models.Destination{OldDestination},
 		ChangeStrategy:             "",
 		ChangeMinimumSatoshis:      0,
 		ChangeNumberOfDestinations: 0,
 		ChangeSatoshis:             11,
 		Fee:                        1,
-		FeeUnit: &response.FeeUnit{
+		FeeUnit: &models.FeeUnit{
 			Satoshis: 1,
 			Bytes:    1000,
 		},
-		FromUtxos: []*response.UtxoPointer{{
+		FromUtxos: []*models.UtxoPointer{{
 			TransactionID: "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda",
 			OutputIndex:   1,
 		}},
-		IncludeUtxos: []*response.UtxoPointer{{
+		IncludeUtxos: []*models.UtxoPointer{{
 			TransactionID: "caae6e799210dfea7591e3d55455437eb7e1091bb01463ae1e7ddf9e29c75eda",
 			OutputIndex:   1,
 		}},
-		Inputs: []*response.TransactionInput{{
-			Utxo: response.Utxo{
-				UtxoPointer: response.UtxoPointer{
+		Inputs: []*models.TransactionInput{{
+			Utxo: models.Utxo{
+				UtxoPointer: models.UtxoPointer{
 					TransactionID: "db5b10ee1cba0d2073037c7728a9958125f2dbf9cfa81689715605e6142f4623",
 					OutputIndex:   1,
 				},
@@ -129,11 +96,11 @@ var DraftTx = &response.DraftTransaction{
 				DraftID:      "3a0e1fdd9ac6046c0c82aa36b462e477a455880ceeb08d3aabb1bf031553d1df",
 				SpendingTxID: "",
 			},
-			Destination: *Destination,
+			Destination: *OldDestination,
 		}},
-		Outputs: []*response.TransactionOutput{
+		Outputs: []*models.TransactionOutput{
 			{
-				PaymailP4: &response.PaymailP4{
+				PaymailP4: &models.PaymailP4{
 					Alias:           "dorzepowski",
 					Domain:          "damiano.4chain.space",
 					FromPaymail:     "test3@kuba.4chain.space",
@@ -144,7 +111,7 @@ var DraftTx = &response.DraftTransaction{
 					ResolutionType:  "p2p",
 				},
 				Satoshis: 12,
-				Scripts: []*response.ScriptOutput{{
+				Scripts: []*models.ScriptOutput{{
 					Address:    "1Jw1vRUq6pYqiMBAT6x3wBfebXCrXv6Qbr",
 					Satoshis:   12,
 					Script:     "76a914c4b15e7f65e3e6a062c1d21b7f1d7d2cd3b18e8188ac",
@@ -155,7 +122,7 @@ var DraftTx = &response.DraftTransaction{
 			},
 			{
 				Satoshis: 11,
-				Scripts: []*response.ScriptOutput{{
+				Scripts: []*models.ScriptOutput{{
 					Address:    "18oETbMcqRB9S7NEGZgwsHKpoTpB3nKBMa",
 					Satoshis:   11,
 					Script:     "76a91455873fd2baa7b51a624f6416b1d824939d99151a88ac",
@@ -164,30 +131,30 @@ var DraftTx = &response.DraftTransaction{
 				To: "18oETbMcqRB9S7NEGZgwsHKpoTpB3nKBMa",
 			},
 		},
-		SendAllTo: &response.TransactionOutput{
-			OpReturn: &response.OpReturn{
+		SendAllTo: &models.TransactionOutput{
+			OpReturn: &models.OpReturn{
 				Hex:      "0100000001cf4faa628ce1abdd2cfc641c948898bb7a3dbe043999236c3ea4436a0c79f5dc000000006a47304402206aeca14175e4477031970c1cda0af4d9d1206289212019b54f8e1c9272b5bac2022067c4d32086146ca77640f02a989f51b3c6738ebfa24683c4a923f647cf7f1c624121036295a81525ba33e22c6497c0b758e6a84b60d97c2d8905aa603dd364915c3a0effffffff023e030000000000001976a914f7fc6e0b05e91c3610efd0ce3f04f6502e2ed93d88ac99030000000000001976a914550e06a3aa71ba7414b53922c13f96a882bf027988ac00000000",
 				HexParts: []string{"0100000001cf4faa628ce1abdd2cfc641c948898bb7a3dbe043999236c3ea4436a0c79f5dc000000006a47304402206aeca14175e4477031970c1cda0af4d9d1206289212019b54f8e1c9272b5bac2022067c4d32086146ca77640f02a989f51b3c6738ebfa24683c4a923f647cf7f1c624121036295a81525ba33e22c6497c0b758e6a84b60d97c2d8905aa603dd364915c3a0effffffff023e030000000000001976a914f7fc6e0b05e91c3610efd0ce3f04f6502e2ed93d88ac99030000000000001976a914550e06a3aa71ba7414b53922c13f96a882bf027988ac00000000"},
-				Map: &response.MapProtocol{
+				Map: &models.MapProtocol{
 					App:  "app_protocol",
 					Keys: map[string]interface{}{"test-key": "test-value"},
 					Type: "app_protocol_type",
 				},
 				StringParts: []string{"string", "parts"},
 			},
-			PaymailP4: &response.PaymailP4{
+			PaymailP4: &models.PaymailP4{
 				Alias:           "alias",
 				Domain:          "domain.tld",
 				FromPaymail:     "alias@paymail.com",
 				Note:            "paymail_note",
 				PubKey:          "1DSsgJdB2AnWaFNgSbv4MZC2m71116JafG",
-				ReceiveEndpoint: "https://bsvalias.example.org/alias@domain.tld/payment-destination-response",
+				ReceiveEndpoint: "https://bsvalias.example.org/alias@domain.tld/payment-destination-models",
 				ReferenceID:     "3d7c2ca83a46",
 				ResolutionType:  "resolution_type",
 			},
 			Satoshis: 1220,
 			Script:   "script",
-			Scripts: []*response.ScriptOutput{{
+			Scripts: []*models.ScriptOutput{{
 				Address:    "12HL5RyEy3Rt6SCwxgpiFSTigem1Pzbq22",
 				Satoshis:   1220,
 				Script:     "script",
@@ -196,7 +163,7 @@ var DraftTx = &response.DraftTransaction{
 			To:           "1DSsgJdB2AnWaFNgSbv4MZC2m71116JafG",
 			UseForChange: false,
 		},
-		Sync: &response.SyncConfig{
+		Sync: &models.SyncConfig{
 			Broadcast:        true,
 			BroadcastInstant: true,
 			PaymailP2P:       true,
@@ -208,10 +175,10 @@ var DraftTx = &response.DraftTransaction{
 }
 
 // Contact model for testing
-var Contact = &response.Contact{
+var OldContact = &models.Contact{
 	ID:       "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a",
 	FullName: "Test User",
 	Paymail:  "test@spv-wallet.com",
 	PubKey:   "xpub661MyMwAqRbcGpZVrSHU...",
-	Status:   responsemodels.ContactNotConfirmed,
+	Status:   response.ContactStatus("unconfirmed"),
 }
