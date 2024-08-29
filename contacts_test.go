@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
@@ -18,25 +17,39 @@ import (
 func TestContactActionsRouting(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		switch {
-		case strings.HasPrefix(r.URL.Path, "/v1/contact/rejected/"):
-			if r.Method == http.MethodPatch {
-				json.NewEncoder(w).Encode(map[string]string{"result": "rejected"})
+		switch r.URL.Path {
+		case "/api/v1/contacts/" + fixtures.PaymailAddress:
+			switch r.Method {
+			case http.MethodPut:
+				content := response.CreateContactResponse{
+					Contact:        fixtures.Contact,
+					AdditionalInfo: map[string]string{},
+				}
+				json.NewEncoder(w).Encode(content)
+			case http.MethodDelete:
+				json.NewEncoder(w).Encode(map[string]any{})
+			case http.MethodGet:
+				json.NewEncoder(w).Encode(fixtures.Contact)
 			}
-		case r.URL.Path == "/v1/contact/accepted/":
-			if r.Method == http.MethodPost {
+		case "/api/v1/contacts/" + fixtures.PaymailAddress + "/confirmation":
+			switch r.Method {
+			case http.MethodPost, http.MethodDelete:
 				json.NewEncoder(w).Encode(map[string]string{"result": string(responsemodels.ContactNotConfirmed)})
 			}
-		case r.URL.Path == "/v1/contact/search":
-			if r.Method == http.MethodPost {
-				content := models.PagedResponse[*models.Contact]{
-					Content: []*models.Contact{fixtures.Contact},
+		case "/api/v1/contacts/":
+			if r.Method == http.MethodGet {
+				content := response.PageModel[response.Contact]{
+					Content: []*response.Contact{fixtures.Contact},
 				}
 				json.NewEncoder(w).Encode(content)
 			}
-		case strings.HasPrefix(r.URL.Path, "/v1/contact/"):
-			if r.Method == http.MethodPost || r.Method == http.MethodPut {
-				json.NewEncoder(w).Encode(map[string]string{"result": "upserted"})
+		case "/api/v1/invitations/" + fixtures.PaymailAddress + "/contacts":
+			if r.Method == http.MethodPost {
+				json.NewEncoder(w).Encode(map[string]any{})
+			}
+		case "/api/v1/invitations/" + fixtures.PaymailAddress:
+			if r.Method == http.MethodDelete {
+				json.NewEncoder(w).Encode(map[string]any{})
 			}
 		default:
 			w.WriteHeader(http.StatusNotFound)
