@@ -18,7 +18,7 @@ func TestAdminContactActions(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case r.URL.Path == "/v1/admin/contact/search" && r.Method == http.MethodPost:
-			c := fixtures.Contact
+			c := fixtures.OldContact
 			c.ID = "1"
 			content := models.PagedResponse[*models.Contact]{
 				Content: []*models.Contact{c},
