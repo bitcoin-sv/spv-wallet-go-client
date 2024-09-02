@@ -142,7 +142,7 @@ func getTransactions(ctx context.Context, fromInstance string, fromXPriv string)
 }
 
 // sendFunds sends funds from one paymail to another.
-func sendFunds(ctx context.Context, fromInstance string, fromXPriv string, toPamail string, howMuch int) (*models.Transaction, error) {
+func sendFunds(ctx context.Context, fromInstance string, fromXPriv string, toPaymail string, howMuch int) (*models.Transaction, error) {
 	client := walletclient.NewWithXPriv(fromInstance, fromXPriv)
 
 	balance, err := getBalance(ctx, fromInstance, fromXPriv)
@@ -153,7 +153,7 @@ func sendFunds(ctx context.Context, fromInstance string, fromXPriv string, toPam
 		return nil, fmt.Errorf("insufficient funds: %d", balance)
 	}
 
-	recipient := walletclient.Recipients{To: toPamail, Satoshis: uint64(howMuch)}
+	recipient := walletclient.Recipients{To: toPaymail, Satoshis: uint64(howMuch)}
 	recipients := []*walletclient.Recipients{&recipient}
 	metadata := map[string]any{
 		"description": "regression-test",
