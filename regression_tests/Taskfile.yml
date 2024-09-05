@@ -6,9 +6,9 @@ tasks:
       - task -l
 
   run_regression_tests:
-    desc: "running regression tests"
+    desc: "running go regression tests"
     cmds:
-      - echo "running regression tests..."
+      - echo "running go regression tests..."
       - go test -tags=regression ./...
     dir: .
     env:
