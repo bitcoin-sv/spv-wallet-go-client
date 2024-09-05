@@ -35,7 +35,6 @@ In this directory you can find examples of how to use the `spv-wallet-go-client`
 In addition to the above, there are additional examples showing how to use the client from a developer perspective:
 
 -   `handle_exceptions` - presents how to "catch" exceptions which the client can throw
--   `custom_logger` - shows different ways you can configure (or disable) internal logger
 
 ## Util examples
 

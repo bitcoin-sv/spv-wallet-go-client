@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -565,7 +564,7 @@ func (wc *WalletClient) authenticateWithXpriv(sign bool, req *http.Request, xPri
 
 func (wc *WalletClient) authenticateWithAccessKey(req *http.Request, rawJSON []byte) error {
 	if wc.accessKey == nil {
-		return WrapError(errors.New("access key is missing"))
+		return ErrMissingAccessKey
 	}
 	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(wc.accessKey.Serialize()), string(rawJSON))
 }
@@ -596,11 +595,11 @@ func (wc *WalletClient) RejectContact(ctx context.Context, paymail string) error
 func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
 	isTotpValid, err := wc.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits)
 	if err != nil {
-		return WrapError(fmt.Errorf("totp validation failed: %w", err))
+		return WrapError(ErrTotpInvalid)
 	}
 
 	if !isTotpValid {
-		return WrapError(errors.New("totp is invalid"))
+		return WrapError(ErrTotpInvalid)
 	}
 
 	if err := wc.doHTTPRequest(
@@ -665,7 +664,7 @@ func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConf
 		key = wc.adminXPriv
 	}
 	if key == nil {
-		return nil, WrapError(errors.New("neither xPriv nor adminXPriv is provided"))
+		return nil, WrapError(ErrMissingKey)
 	}
 	if err := wc.doHTTPRequest(
 		ctx, http.MethodGet, "/shared-config", nil, key, true, &model,
@@ -1158,4 +1157,14 @@ func (wc *WalletClient) AdminUnsubscribeWebhook(ctx context.Context, webhookURL 
 	}
 	err = wc.doHTTPRequest(ctx, http.MethodDelete, "/admin/webhooks/subscriptions", rawJSON, wc.adminXPriv, true, nil)
 	return err
+}
+
+// AdminGetWebhooks gets all webhooks
+func (wc *WalletClient) AdminGetWebhooks(ctx context.Context) ([]*models.Webhook, error) {
+	var webhooks []*models.Webhook
+	err := wc.doHTTPRequest(ctx, http.MethodGet, "/admin/webhooks/subscriptions", nil, wc.adminXPriv, true, &webhooks)
+	if err != nil {
+		return nil, WrapError(err)
+	}
+	return webhooks, nil
 }

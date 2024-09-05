@@ -3,8 +3,6 @@ package walletclient
 import (
 	"encoding/base32"
 	"encoding/hex"
-	"errors"
-	"fmt"
 	"time"
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
@@ -14,9 +12,6 @@ import (
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 )
-
-// ErrClientInitNoXpriv error per init client with first xpriv key
-var ErrClientInitNoXpriv = errors.New("init client with xPriv first")
 
 const (
 	// TotpDefaultPeriod - Default number of seconds a TOTP is valid for.
@@ -83,7 +78,7 @@ func getTotpOpts(period, digits uint) *totp.ValidateOpts {
 
 func getSharedSecretFactors(b *WalletClient, c *models.Contact) (*ec.PrivateKey, *ec.PublicKey, error) {
 	if b.xPriv == nil {
-		return nil, nil, ErrClientInitNoXpriv
+		return nil, nil, ErrMissingXpriv
 	}
 
 	xpriv, err := deriveXprivForPki(b.xPriv)
@@ -98,7 +93,7 @@ func getSharedSecretFactors(b *WalletClient, c *models.Contact) (*ec.PrivateKey,
 
 	pubKey, err := convertPubKey(c.PubKey)
 	if err != nil {
-		return nil, nil, fmt.Errorf("contact's PubKey is invalid: %w", err)
+		return nil, nil, ErrContactPubKeyInvalid
 	}
 
 	return privKey, pubKey, nil

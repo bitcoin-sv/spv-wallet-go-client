@@ -9,6 +9,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	responsemodels "github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,11 +31,11 @@ func TestAdminContactActions(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		case r.URL.Path == "/v1/admin/contact/accepted/1" && r.Method == http.MethodPatch:
 			contact := fixtures.Contact
-			contact.Status = "accepted"
+			contact.Status = responsemodels.ContactNotConfirmed
 			json.NewEncoder(w).Encode(contact)
 		case r.URL.Path == "/v1/admin/contact/rejected/1" && r.Method == http.MethodPatch:
 			contact := fixtures.Contact
-			contact.Status = "rejected"
+			contact.Status = responsemodels.ContactRejected
 			json.NewEncoder(w).Encode(contact)
 		default:
 			w.WriteHeader(http.StatusNotFound)
@@ -65,12 +66,12 @@ func TestAdminContactActions(t *testing.T) {
 	t.Run("AdminAcceptContact", func(t *testing.T) {
 		contact, err := client.AdminAcceptContact(context.Background(), "1")
 		require.NoError(t, err)
-		require.Equal(t, models.ContactStatus("accepted"), contact.Status)
+		require.Equal(t, responsemodels.ContactNotConfirmed, contact.Status)
 	})
 
 	t.Run("AdminRejectContact", func(t *testing.T) {
 		contact, err := client.AdminRejectContact(context.Background(), "1")
 		require.NoError(t, err)
-		require.Equal(t, models.ContactStatus("rejected"), contact.Status)
+		require.Equal(t, responsemodels.ContactRejected, contact.Status)
 	})
 }

@@ -5,34 +5,33 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
-	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 func main() {
 	defer examples.HandlePanic()
 
+	fmt.Println("Handle exceptions example")
+
 	examples.CheckIfXPubExists()
+
+	fmt.Println("XPub exists")
 
 	const server = "http://localhost:3003/v1"
 
 	client := walletclient.NewWithXPub(server, examples.ExampleXPub)
 	ctx := context.Background()
 
+	fmt.Println("Client created")
+
 	status, err := client.AdminGetStatus(ctx)
 	if err != nil {
-		var extendedErr models.ExtendedError
-		if errors.As(err, &extendedErr) {
-			fmt.Printf("Extended error: [%d] '%s': %s\n", extendedErr.GetStatusCode(), extendedErr.GetCode(), extendedErr.GetMessage())
-		} else {
-			fmt.Println("Error: ", err.Error())
-		}
-
+		fmt.Println("Error: ", err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 

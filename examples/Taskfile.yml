@@ -70,4 +70,4 @@ tasks:
     desc: "running webhooks..."
     cmds:
       - echo "running webhooks..."
-      - go run ./webhooks/webhooks.go
+      - go run ./webhooks/webhooks.go || true
