@@ -1,6 +1,7 @@
 package walletclient
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"time"
@@ -159,7 +160,7 @@ func createSignatureCommon(payload *models.AuthPayload, bodyString string, priva
 		return nil, err
 	}
 
-	payload.Signature = string(sigBytes)
+	payload.Signature = base64.StdEncoding.EncodeToString(sigBytes)
 
 	return payload, nil
 }
