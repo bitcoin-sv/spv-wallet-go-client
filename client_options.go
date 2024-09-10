@@ -1,7 +1,6 @@
 package walletclient
 
 import (
-	"encoding/hex"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -105,12 +104,7 @@ func (w *signRequest) Configure(c *WalletClient) {
 func (w *accessKeyConf) initializeAccessKey() (*ec.PrivateKey, error) {
 	privateKey, err := ec.PrivateKeyFromWif(w.AccessKeyString)
 	if err != nil {
-		keyBytes, err := hex.DecodeString(w.AccessKeyString)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to decode access key")
-		}
-
-		privateKey, _ = ec.PrivateKeyFromBytes(keyBytes)
+		privateKey, _ = ec.PrivateKeyFromHex(w.AccessKeyString)
 		if privateKey == nil {
 			return nil, errors.New("failed to decode access key")
 		}
