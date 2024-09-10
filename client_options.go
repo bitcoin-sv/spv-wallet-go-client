@@ -103,10 +103,7 @@ func (w *signRequest) Configure(c *WalletClient) {
 
 // initializeAccessKey handles the specific initialization of the access key.
 func (w *accessKeyConf) initializeAccessKey() (*ec.PrivateKey, error) {
-	var err error
-	var privateKey *ec.PrivateKey
-
-	privateKey, err = ec.PrivateKeyFromWif(w.AccessKeyString)
+	privateKey, err := ec.PrivateKeyFromWif(w.AccessKeyString)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode access key")
 	}
