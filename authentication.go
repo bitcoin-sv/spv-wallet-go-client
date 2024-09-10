@@ -38,6 +38,9 @@ func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (string, error) {
 	// Create transaction from hex
 	tx, err := trx.NewTransactionFromHex(dt.Hex)
+
+	// we need to reset the inputs as we are going to add them via tx.AddInputFrom (ts-sdk method) and then sign
+	tx.Inputs = make([]*trx.TransactionInput, 0)
 	if err != nil {
 		return "", err
 	}
