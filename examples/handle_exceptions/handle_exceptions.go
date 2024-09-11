@@ -23,7 +23,7 @@ func main() {
 
 	const server = "http://localhost:3003/v1"
 
-	client := walletclient.NewWithXPub(server, examples.ExampleXPub)
+	client := walletclient.NewWithXPub(server, examples.ExampleAdminKey)
 	ctx := context.Background()
 
 	fmt.Println("Client created")
