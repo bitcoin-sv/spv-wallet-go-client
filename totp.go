@@ -5,11 +5,10 @@ import (
 	"encoding/hex"
 	"time"
 
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 )
@@ -58,7 +57,7 @@ func makeSharedSecret(b *WalletClient, c *models.Contact) ([]byte, error) {
 		return nil, err
 	}
 
-	x, _ := bec.S256().ScalarMult(pubKey.X, pubKey.Y, privKey.D.Bytes())
+	x, _ := ec.S256().ScalarMult(pubKey.X, pubKey.Y, privKey.D.Bytes())
 	return x.Bytes(), nil
 }
 
@@ -77,7 +76,7 @@ func getTotpOpts(period, digits uint) *totp.ValidateOpts {
 	}
 }
 
-func getSharedSecretFactors(b *WalletClient, c *models.Contact) (*bec.PrivateKey, *bec.PublicKey, error) {
+func getSharedSecretFactors(b *WalletClient, c *models.Contact) (*ec.PrivateKey, *ec.PublicKey, error) {
 	if b.xPriv == nil {
 		return nil, nil, ErrMissingXpriv
 	}
@@ -104,7 +103,7 @@ func deriveXprivForPki(xpriv *bip32.ExtendedKey) (*bip32.ExtendedKey, error) {
 	// PKI derivation path: m/0/0/0
 	// NOTICE: we currently do not support PKI rotation; however, adjustments will be made if and when we decide to implement it
 
-	pkiXpriv, err := bitcoin.GetHDKeyByPath(xpriv, utils.ChainExternal, 0)
+	pkiXpriv, err := bip32.GetHDKeyByPath(xpriv, utils.ChainExternal, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -112,13 +111,13 @@ func deriveXprivForPki(xpriv *bip32.ExtendedKey) (*bip32.ExtendedKey, error) {
 	return pkiXpriv.Child(0)
 }
 
-func convertPubKey(pubKey string) (*bec.PublicKey, error) {
+func convertPubKey(pubKey string) (*ec.PublicKey, error) {
 	hex, err := hex.DecodeString(pubKey)
 	if err != nil {
 		return nil, err
 	}
 
-	return bec.ParsePubKey(hex, bec.S256())
+	return ec.ParsePubKey(hex)
 }
 
 // directedSecret appends a paymail to the secret and encodes it into base32 string

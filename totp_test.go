@@ -7,10 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/libsv/go-bk/bip32"
 	"github.com/stretchr/testify/require"
 )
 
@@ -128,5 +128,5 @@ func makeMockPKI(xpub string) string {
 		panic(err)
 	}
 
-	return hex.EncodeToString(pubKey.SerialiseCompressed())
+	return hex.EncodeToString(pubKey.SerializeCompressed())
 }

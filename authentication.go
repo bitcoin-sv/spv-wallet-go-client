@@ -1,19 +1,21 @@
 package walletclient
 
 import (
-	"encoding/hex"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"time"
 
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	bsm "github.com/bitcoin-sv/go-sdk/compat/bsm"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	script "github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
+	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
+
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bt/v2"
-	"github.com/libsv/go-bt/v2/bscript"
-	"github.com/libsv/go-bt/v2/sighash"
 )
 
 // SetSignature will set the signature on the header for the request
@@ -33,102 +35,77 @@ func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 }
 
 // GetSignedHex will sign all the inputs using the given xPriv key
-func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (signedHex string, err error) {
-	var tx *bt.Tx
-	if tx, err = bt.NewTxFromString(dt.Hex); err != nil {
-		return
+func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (string, error) {
+	// Create transaction from hex
+	tx, err := trx.NewTransactionFromHex(dt.Hex)
+
+	// we need to reset the inputs as we are going to add them via tx.AddInputFrom (ts-sdk method) and then sign
+	tx.Inputs = make([]*trx.TransactionInput, 0)
+	if err != nil {
+		return "", err
 	}
 
 	// Enrich inputs
-	for index, draftInput := range dt.Configuration.Inputs {
-		tx.Inputs[index].PreviousTxSatoshis = draftInput.Satoshis
-
-		dst := draftInput.Destination
-		if err = setPreviousTxScript(tx, uint32(index), &dst); err != nil {
-			return
+	for _, draftInput := range dt.Configuration.Inputs {
+		lockingScript, err := prepareLockingScript(&draftInput.Destination)
+		if err != nil {
+			return "", err
 		}
 
-		if err = setUnlockingScript(tx, uint32(index), xPriv, &dst); err != nil {
-			return
+		unlockScript, err := prepareUnlockingScript(xPriv, &draftInput.Destination)
+		if err != nil {
+			return "", err
 		}
+
+		tx.AddInputFrom(draftInput.TransactionID, draftInput.OutputIndex, lockingScript.String(), draftInput.Satoshis, unlockScript)
 	}
 
-	// Return the signed hex
-	signedHex = tx.String()
-	return
+	tx.Sign()
+
+	return tx.String(), nil
 }
 
-func setPreviousTxScript(tx *bt.Tx, inputIndex uint32, dst *models.Destination) (err error) {
-	var ls *bscript.Script
-	if ls, err = bscript.NewFromHexString(dst.LockingScript); err != nil {
-		return
+func prepareLockingScript(dst *models.Destination) (*script.Script, error) {
+	lockingScript, err := script.NewFromHex(dst.LockingScript)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create locking script from hex for destination: %w", err)
 	}
 
-	tx.Inputs[inputIndex].PreviousTxScript = ls
-	return
+	return lockingScript, nil
 }
 
-func setUnlockingScript(tx *bt.Tx, inputIndex uint32, xPriv *bip32.ExtendedKey, dst *models.Destination) (err error) {
-	var key *bec.PrivateKey
-	if key, err = getDerivedKeyForDestination(xPriv, dst); err != nil {
-		return
-	}
-
-	var s *bscript.Script
-	if s, err = getUnlockingScript(tx, inputIndex, key); err != nil {
-		return
-	}
-
-	tx.Inputs[inputIndex].UnlockingScript = s
-	return
-}
-
-func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destination) (key *bec.PrivateKey, err error) {
-	// Derive the child key (m/chain/num)
-	var derivedKey *bip32.ExtendedKey
-	if derivedKey, err = bitcoin.GetHDKeyByPath(xPriv, dst.Chain, dst.Num); err != nil {
-		return
-	}
-
-	// Derive key for paymail destination (m/chain/num/paymailNum)
-	if dst.PaymailExternalDerivationNum != nil {
-		if derivedKey, err = derivedKey.Child(
-			*dst.PaymailExternalDerivationNum,
-		); err != nil {
-			return
-		}
-	}
-
-	if key, err = bitcoin.GetPrivateKeyFromHDKey(derivedKey); err != nil {
-		return
-	}
-
-	return
-}
-
-// GetUnlockingScript will generate an unlocking script
-func getUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey) (*bscript.Script, error) {
-	sigHashFlags := sighash.AllForkID
-
-	sigHash, err := tx.CalcInputSignatureHash(inputIndex, sigHashFlags)
+func prepareUnlockingScript(xPriv *bip32.ExtendedKey, dst *models.Destination) (*p2pkh.P2PKH, error) {
+	key, err := getDerivedKeyForDestination(xPriv, dst)
 	if err != nil {
 		return nil, err
 	}
 
-	var sig *bec.Signature
-	if sig, err = privateKey.Sign(sigHash); err != nil {
+	return getUnlockingScript(key)
+}
+
+func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destination) (*ec.PrivateKey, error) {
+	// Derive the child key (m/chain/num)
+	derivedKey, err := bip32.GetHDKeyByPath(xPriv, dst.Chain, dst.Num)
+	if err != nil {
 		return nil, err
 	}
 
-	pubKey := privateKey.PubKey().SerialiseCompressed()
-	signature := sig.Serialise()
-
-	var script *bscript.Script
-	if script, err = bscript.NewP2PKHUnlockingScript(pubKey, signature, sigHashFlags); err != nil {
-		return nil, err
+	// Handle paymail destination derivation if applicable
+	if dst.PaymailExternalDerivationNum != nil {
+		derivedKey, err = derivedKey.Child(*dst.PaymailExternalDerivationNum)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return script, nil
+	// Get the private key from the derived key
+	return bip32.GetPrivateKeyFromHDKey(derivedKey)
+}
+
+// Generate unlocking script using private key
+func getUnlockingScript(privateKey *ec.PrivateKey) (*p2pkh.P2PKH, error) {
+	sigHashFlags := sighash.AllForkID
+	return p2pkh.Unlock(privateKey, &sigHashFlags)
 }
 
 // createSignature will create a signature for the given key & body contents
@@ -141,7 +118,7 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *mode
 
 	// Get the xPub
 	payload = new(models.AuthPayload)
-	if payload.XPub, err = bitcoin.GetExtendedPublicKey(
+	if payload.XPub, err = bip32.GetExtendedPublicKey(
 		xPriv,
 	); err != nil { // Should never error if key is correct
 		return
@@ -161,8 +138,8 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *mode
 		return
 	}
 
-	var privateKey *bec.PrivateKey
-	if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(key); err != nil {
+	var privateKey *ec.PrivateKey
+	if privateKey, err = bip32.GetPrivateKeyFromHDKey(key); err != nil {
 		return // Should never error if key is correct
 	}
 
@@ -170,7 +147,7 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *mode
 }
 
 // createSignatureCommon will create a signature
-func createSignatureCommon(payload *models.AuthPayload, bodyString string, privateKey *bec.PrivateKey) (*models.AuthPayload, error) {
+func createSignatureCommon(payload *models.AuthPayload, bodyString string, privateKey *ec.PrivateKey) (*models.AuthPayload, error) {
 	// Create the auth header hash
 	payload.AuthHash = utils.Hash(bodyString)
 
@@ -183,21 +160,23 @@ func createSignatureCommon(payload *models.AuthPayload, bodyString string, priva
 	}
 
 	// Signature, using bitcoin signMessage
-	var err error
-	if payload.Signature, err = bitcoin.SignMessage(
-		hex.EncodeToString(privateKey.Serialise()),
+	sigBytes, err := bsm.SignMessage(
+		privateKey,
 		getSigningMessage(key, payload),
-		true,
-	); err != nil {
+	)
+	if err != nil {
 		return nil, err
 	}
+
+	payload.Signature = base64.StdEncoding.EncodeToString(sigBytes)
 
 	return payload, nil
 }
 
-// getSigningMessage will build the signing message string
-func getSigningMessage(xPub string, auth *models.AuthPayload) string {
-	return fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
+// getSigningMessage will build the signing message byte array
+func getSigningMessage(xPub string, auth *models.AuthPayload) []byte {
+	message := fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
+	return []byte(message)
 }
 
 func setSignatureHeaders(header *http.Header, authData *models.AuthPayload) {

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/wif"
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+
 	"github.com/pkg/errors"
 )
 
@@ -23,7 +23,7 @@ type xPrivConf struct {
 
 func (w *xPrivConf) Configure(c *WalletClient) {
 	var err error
-	if c.xPriv, err = bitcoin.GenerateHDKeyFromString(w.XPrivString); err != nil {
+	if c.xPriv, err = bip32.GenerateHDKeyFromString(w.XPrivString); err != nil {
 		c.xPriv = nil
 	}
 }
@@ -35,7 +35,7 @@ type xPubConf struct {
 
 func (w *xPubConf) Configure(c *WalletClient) {
 	var err error
-	if c.xPub, err = bitcoin.GetHDKeyFromExtendedPublicKey(w.XPubString); err != nil {
+	if c.xPub, err = bip32.GetHDKeyFromExtendedPublicKey(w.XPubString); err != nil {
 		c.xPub = nil
 	}
 
@@ -60,7 +60,7 @@ type adminKeyConf struct {
 
 func (w *adminKeyConf) Configure(c *WalletClient) {
 	var err error
-	c.adminXPriv, err = bitcoin.GenerateHDKeyFromString(w.AdminKeyString)
+	c.adminXPriv, err = bip32.GenerateHDKeyFromString(w.AdminKeyString)
 	if err != nil {
 		c.adminXPriv = nil
 	}
@@ -101,18 +101,13 @@ func (w *signRequest) Configure(c *WalletClient) {
 	c.signRequest = w.Sign
 }
 
-// initializeAccessKey handles the specific initialization of the access key.
-func (w *accessKeyConf) initializeAccessKey() (*bec.PrivateKey, error) {
-	var err error
-	var privateKey *bec.PrivateKey
-	var decodedWIF *wif.WIF
-
-	if decodedWIF, err = wif.DecodeWIF(w.AccessKeyString); err != nil {
-		if privateKey, err = bitcoin.PrivateKeyFromString(w.AccessKeyString); err != nil {
-			return nil, errors.Wrap(err, "failed to decode access key")
+func (w *accessKeyConf) initializeAccessKey() (*ec.PrivateKey, error) {
+	privateKey, err := ec.PrivateKeyFromWif(w.AccessKeyString)
+	if err != nil {
+		privateKey, _ = ec.PrivateKeyFromHex(w.AccessKeyString)
+		if privateKey == nil {
+			return nil, errors.New("failed to decode access key")
 		}
-	} else {
-		privateKey = decodedWIF.PrivKey
 	}
 
 	return privateKey, nil

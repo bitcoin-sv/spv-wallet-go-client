@@ -1,12 +1,14 @@
 // Package xpriv manges keys
 package xpriv
 
+// "github.com/libsv/go-bk/bip39" - no replacements
+
 import (
 	"fmt"
 
-	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bk/bip39"
-	"github.com/libsv/go-bk/chaincfg"
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	bip39 "github.com/bitcoin-sv/go-sdk/compat/bip39"
+	chaincfg "github.com/bitcoin-sv/go-sdk/transaction/chaincfg"
 )
 
 // Keys is a struct containing the xpriv, xpub and mnemonic
@@ -58,25 +60,31 @@ func (k PublicKey) String() string {
 
 // Generate generates a random set of keys - xpriv, xpb and mnemonic
 func Generate() (KeyWithMnemonic, error) {
-	entropy, err := bip39.GenerateEntropy(160)
+	entropy, err := bip39.NewEntropy(160)
 	if err != nil {
 		return nil, fmt.Errorf("generate method: key generation error when creating entropy: %w", err)
 	}
 
-	mnemonic, seed, err := bip39.Mnemonic(entropy, "")
+	mnemonic, err := bip39.NewMnemonic(entropy)
 
 	if err != nil {
 		return nil, fmt.Errorf("generate method: key generation error when creating mnemonic: %w", err)
 	}
 
-	hdXpriv, hdXpub, err := createXPrivAndXPub(seed)
+	hdKey, err := bip32.GenerateHDKeyFromMnemonic(mnemonic, "", &chaincfg.MainNet)
+	if err != nil {
+		return nil, err
+	}
+
+	hdXpriv := hdKey.String()
+	hdXpub, err := bip32.GetExtendedPublicKey(hdKey)
 	if err != nil {
 		return nil, err
 	}
 
 	keys := &Keys{
-		xpriv:    hdXpriv.String(),
-		xpub:     PublicKey(hdXpub.String()),
+		xpriv:    hdXpriv,
+		xpub:     PublicKey(hdXpub),
 		mnemonic: mnemonic,
 	}
 
@@ -85,7 +93,7 @@ func Generate() (KeyWithMnemonic, error) {
 
 // FromMnemonic generates Keys based on given mnemonic
 func FromMnemonic(mnemonic string) (KeyWithMnemonic, error) {
-	seed, err := bip39.MnemonicToSeed(mnemonic, "")
+	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, "")
 	if err != nil {
 		return nil, fmt.Errorf("FromMnemonic method: error when creating seed: %w", err)
 	}

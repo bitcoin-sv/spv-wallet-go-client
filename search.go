@@ -3,8 +3,9 @@ package walletclient
 import (
 	"context"
 	"encoding/json"
+
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/libsv/go-bk/bip32"
 )
 
 // SearchRequester is a function that sends a request to the server and returns the response.

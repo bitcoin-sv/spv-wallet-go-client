@@ -8,7 +8,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/libsv/go-bk/bip32"
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 )
 
 const (

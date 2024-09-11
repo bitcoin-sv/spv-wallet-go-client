@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"strconv"
 
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet-go-client/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
 )
 
 // SetSignRequest turn the signing of the http request on or off
@@ -478,8 +477,8 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models
 		return
 	}
 
-	var privateKey *bec.PrivateKey
-	if privateKey, err = bitcoin.PrivateKeyFromString(
+	var privateKey *ec.PrivateKey
+	if privateKey, err = ec.PrivateKeyFromHex(
 		privateKeyHex,
 	); err != nil {
 		return
@@ -488,7 +487,7 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models
 
 	// Get the AccessKey
 	payload = new(models.AuthPayload)
-	payload.AccessKey = hex.EncodeToString(publicKey.SerialiseCompressed())
+	payload.AccessKey = hex.EncodeToString(publicKey.SerializeCompressed())
 
 	// auth_nonce is a random unique string to seed the signing message
 	// this can be checked server side to make sure the request is not being replayed
@@ -553,7 +552,7 @@ func (wc *WalletClient) authenticateWithXpriv(sign bool, req *http.Request, xPri
 		}
 	} else {
 		var xPub string
-		xPub, err := bitcoin.GetExtendedPublicKey(xPriv)
+		xPub, err := bip32.GetExtendedPublicKey(xPriv)
 		if err != nil {
 			return WrapError(err)
 		}
@@ -567,7 +566,7 @@ func (wc *WalletClient) authenticateWithAccessKey(req *http.Request, rawJSON []b
 	if wc.accessKey == nil {
 		return ErrMissingAccessKey
 	}
-	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(wc.accessKey.Serialise()), string(rawJSON))
+	return SetSignatureFromAccessKey(&req.Header, hex.EncodeToString(wc.accessKey.Serialize()), string(rawJSON))
 }
 
 // AcceptContact will accept the contact associated with the paymail
