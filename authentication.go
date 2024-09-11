@@ -66,7 +66,12 @@ func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (string
 }
 
 func prepareLockingScript(dst *models.Destination) (*script.Script, error) {
-	return script.NewFromHex(dst.LockingScript)
+	lockingScript, err := script.NewFromHex(dst.LockingScript)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create locking script from hex for destination: %w", err)
+	}
+
+	return lockingScript, nil
 }
 
 func prepareUnlockingScript(xPriv *bip32.ExtendedKey, dst *models.Destination) (*p2pkh.P2PKH, error) {
@@ -171,7 +176,7 @@ func createSignatureCommon(payload *models.AuthPayload, bodyString string, priva
 // getSigningMessage will build the signing message byte array
 func getSigningMessage(xPub string, auth *models.AuthPayload) []byte {
 	message := fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
-	return []byte(message) // Convert string to byte array
+	return []byte(message)
 }
 
 func setSignatureHeaders(header *http.Header, authData *models.AuthPayload) {
