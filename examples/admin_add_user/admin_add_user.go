@@ -19,12 +19,16 @@ func main() {
 
 	server := "http://localhost:3003/v1"
 
-	adminClient := walletclient.NewWithAdminKey(server, examples.ExampleAdminKey)
+	adminClient, err := walletclient.NewWithAdminKey(server, examples.ExampleAdminKey)
+	if err != nil {
+		examples.GetFullErrorMessage(err)
+		os.Exit(1)
+	}
 	ctx := context.Background()
 
 	metadata := map[string]any{"some_metadata": "example"}
 
-	err := adminClient.AdminNewXpub(ctx, examples.ExampleXPub, metadata)
+	err = adminClient.AdminNewXpub(ctx, examples.ExampleXPub, metadata)
 	if err != nil {
 		examples.GetFullErrorMessage(err)
 		os.Exit(1)

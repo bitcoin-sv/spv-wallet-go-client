@@ -21,7 +21,11 @@ func main() {
 	const digits = 4
 	const period = 1200 // 20 minutes
 
-	client := walletclient.NewWithXPriv(server, aliceXPriv)
+	client, err := walletclient.NewWithXPriv(server, aliceXPriv)
+	if err != nil {
+		examples.GetFullErrorMessage(err)
+		os.Exit(1)
+	}
 
 	mockContact := &models.Contact{
 		PubKey:  bobPKI,
@@ -30,14 +34,14 @@ func main() {
 
 	totpCode, err := client.GenerateTotpForContact(mockContact, period, digits)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 	fmt.Println("TOTP code from Alice to Bob: ", totpCode)
 
 	valid, err := client.ValidateTotpForContact(mockContact, totpCode, mockContact.Paymail, period, digits)
 	if err != nil {
-		fmt.Println(err)
+		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 	fmt.Println("Is TOTP code valid: ", valid)

@@ -18,10 +18,14 @@ func main() {
 
 	const server = "http://localhost:3003/v1"
 
-	adminClient := walletclient.NewWithAdminKey(server, examples.ExampleAdminKey)
+	adminClient, err := walletclient.NewWithAdminKey(server, examples.ExampleAdminKey)
+	if err != nil {
+		examples.GetFullErrorMessage(err)
+		os.Exit(1)
+	}
 	ctx := context.Background()
 
-	err := adminClient.AdminDeletePaymail(ctx, examples.ExamplePaymail)
+	err = adminClient.AdminDeletePaymail(ctx, examples.ExamplePaymail)
 	if err != nil {
 		examples.GetFullErrorMessage(err)
 		os.Exit(1)

@@ -67,7 +67,10 @@ func getEnvVariables() (*regressionTestConfig, error) {
 
 // getPaymailDomain retrieves the shared configuration from the SPV Wallet.
 func getPaymailDomain(ctx context.Context, xpriv string, clientUrl string) (string, error) {
-	wc := walletclient.NewWithXPriv(clientUrl, xpriv)
+	wc, err := walletclient.NewWithXPriv(clientUrl, xpriv)
+	if err != nil {
+		return "", err
+	}
 	sharedConfig, err := wc.GetSharedConfig(ctx)
 	if err != nil {
 		return "", err
@@ -91,7 +94,10 @@ func createUser(ctx context.Context, paymail string, paymailDomain string, insta
 		Paymail: preparePaymail(paymail, paymailDomain),
 	}
 
-	adminClient := walletclient.NewWithAdminKey(instanceUrl, adminXPriv)
+	adminClient, err := walletclient.NewWithAdminKey(instanceUrl, adminXPriv)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := adminClient.AdminNewXpub(ctx, user.XPub, map[string]any{"some_metadata": "remove"}); err != nil {
 		return nil, err
@@ -107,8 +113,11 @@ func createUser(ctx context.Context, paymail string, paymailDomain string, insta
 
 // removeRegisteredPaymail soft deletes paymail from the SPV Wallet.
 func removeRegisteredPaymail(ctx context.Context, paymail string, instanceURL string, adminXPriv string) error {
-	adminClient := walletclient.NewWithAdminKey(instanceURL, adminXPriv)
-	err := adminClient.AdminDeletePaymail(ctx, paymail)
+	adminClient, err := walletclient.NewWithAdminKey(instanceURL, adminXPriv)
+	if err != nil {
+		return err
+	}
+	err = adminClient.AdminDeletePaymail(ctx, paymail)
 	if err != nil {
 		return err
 	}
@@ -117,8 +126,10 @@ func removeRegisteredPaymail(ctx context.Context, paymail string, instanceURL st
 
 // getBalance retrieves the balance from the SPV Wallet.
 func getBalance(ctx context.Context, fromInstance string, fromXPriv string) (int, error) {
-	client := walletclient.NewWithXPriv(fromInstance, fromXPriv)
-
+	client, err := walletclient.NewWithXPriv(fromInstance, fromXPriv)
+	if err != nil {
+		return -1, err
+	}
 	xpubInfo, err := client.GetXPub(ctx)
 	if err != nil {
 		return -1, err
@@ -128,7 +139,10 @@ func getBalance(ctx context.Context, fromInstance string, fromXPriv string) (int
 
 // getTransactions retrieves the transactions from the SPV Wallet.
 func getTransactions(ctx context.Context, fromInstance string, fromXPriv string) ([]*models.Transaction, error) {
-	client := walletclient.NewWithXPriv(fromInstance, fromXPriv)
+	client, err := walletclient.NewWithXPriv(fromInstance, fromXPriv)
+	if err != nil {
+		return nil, err
+	}
 
 	metadata := map[string]any{}
 	conditions := filter.TransactionFilter{}
@@ -143,7 +157,10 @@ func getTransactions(ctx context.Context, fromInstance string, fromXPriv string)
 
 // sendFunds sends funds from one paymail to another.
 func sendFunds(ctx context.Context, fromInstance string, fromXPriv string, toPaymail string, howMuch int) (*models.Transaction, error) {
-	client := walletclient.NewWithXPriv(fromInstance, fromXPriv)
+	client, err := walletclient.NewWithXPriv(fromInstance, fromXPriv)
+	if err != nil {
+		return nil, err
+	}
 
 	balance, err := getBalance(ctx, fromInstance, fromXPriv)
 	if err != nil {
