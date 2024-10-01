@@ -41,6 +41,36 @@ func Search[TFilter any, TResp any](
 	return resp, nil
 }
 
+// OldSearch prepares and sends a search request to the server.
+func OldSearch[TFilter any, TResp any](
+	ctx context.Context,
+	method string,
+	path string,
+	xPriv *bip32.ExtendedKey,
+	f *TFilter,
+	metadata map[string]any,
+	queryParams *filter.QueryParams,
+	requester SearchRequester,
+) (TResp, error) {
+	jsonStr, err := json.Marshal(filter.SearchModel[TFilter]{
+		ConditionsModel: filter.ConditionsModel[TFilter]{
+			Conditions: f,
+			Metadata:   metadata,
+		},
+		QueryParams: queryParams,
+	})
+	var resp TResp // before initialization, this var is empty slice or nil so it can be returned in case of error
+	if err != nil {
+		return resp, WrapError(err)
+	}
+
+	if err := requester(ctx, method, path, jsonStr, xPriv, true, &resp); err != nil {
+		return resp, err
+	}
+
+	return resp, nil
+}
+
 // Count prepares and sends a count request to the server.
 func Count[TFilter any](
 	ctx context.Context,

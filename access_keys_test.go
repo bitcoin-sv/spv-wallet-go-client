@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,13 +17,20 @@ import (
 func TestAccessKeys(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/v1/access-key":
+		case "/api/v1/users/current/keys/" + fixtures.AccessKey.ID:
 			switch r.Method {
-			case http.MethodGet, http.MethodPost, http.MethodDelete:
+			case http.MethodGet, http.MethodDelete:
 				json.NewEncoder(w).Encode(fixtures.AccessKey)
 			}
-		case "/v1/access-key/search":
-			json.NewEncoder(w).Encode([]*models.AccessKey{fixtures.AccessKey})
+		case "/api/v1/users/current/keys":
+			switch r.Method {
+			case http.MethodPost:
+				json.NewEncoder(w).Encode(fixtures.AccessKey)
+			case http.MethodGet:
+				json.NewEncoder(w).Encode(response.PageModel[response.AccessKey]{
+					Content: []*response.AccessKey{fixtures.AccessKey},
+				})
+			}
 		default:
 			w.WriteHeader(http.StatusNotFound)
 		}
@@ -42,7 +49,9 @@ func TestAccessKeys(t *testing.T) {
 	t.Run("GetAccessKeys", func(t *testing.T) {
 		accessKeys, err := client.GetAccessKeys(context.Background(), nil, nil, nil)
 		require.NoError(t, err)
-		require.Equal(t, []*models.AccessKey{fixtures.AccessKey}, accessKeys)
+		require.Equal(t, response.PageModel[response.AccessKey]{
+			Content: []*response.AccessKey{fixtures.AccessKey},
+		}, accessKeys)
 	})
 
 	t.Run("CreateAccessKey", func(t *testing.T) {

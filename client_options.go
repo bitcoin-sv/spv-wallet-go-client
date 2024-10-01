@@ -81,7 +81,7 @@ func (w *httpConf) Configure(c *WalletClient) {
 		return
 	}
 
-	const basePath = "/v1"
+	const basePath = "/api/v1"
 	c.server = fmt.Sprintf("%s%s", baseURL, basePath)
 
 	c.httpClient = w.HTTPClient

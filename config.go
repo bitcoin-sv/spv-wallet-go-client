@@ -1,6 +1,6 @@
 package walletclient
 
-import "github.com/bitcoin-sv/spv-wallet/models"
+import "github.com/bitcoin-sv/spv-wallet/models/response"
 
 // TransportType the type of transport being used ('http' for usage or 'mock' for testing)
 type TransportType string
@@ -18,9 +18,9 @@ const (
 
 // Recipients is a struct for recipients
 type Recipients struct {
-	OpReturn *models.OpReturn `json:"op_return"`
-	Satoshis uint64           `json:"satoshis"`
-	To       string           `json:"to"`
+	OpReturn *response.OpReturn `json:"opReturn"`
+	Satoshis uint64             `json:"satoshis"`
+	To       string             `json:"to"`
 }
 
 const (
