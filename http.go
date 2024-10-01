@@ -5,9 +5,7 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"strconv"
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
@@ -83,27 +81,11 @@ func (wc *WalletClient) GetAccessKeys(
 ) ([]*models.AccessKey, error) {
 	return Search[filter.AccessKeyFilter, []*models.AccessKey](
 		ctx, http.MethodPost,
-		"/access-key/search",
+		"/users/current",
 		wc.xPriv,
 		conditions,
 		metadata,
 		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// GetAccessKeysCount will get the count of access keys
-func (wc *WalletClient) GetAccessKeysCount(
-	ctx context.Context,
-	conditions *filter.AccessKeyFilter,
-	metadata map[string]any,
-) (int64, error) {
-	return Count[filter.AccessKeyFilter](
-		ctx, http.MethodPost,
-		"/access-key/count",
-		wc.xPriv,
-		conditions,
-		metadata,
 		wc.doHTTPRequest,
 	)
 }
@@ -138,150 +120,10 @@ func (wc *WalletClient) CreateAccessKey(ctx context.Context, metadata map[string
 	return &accessKey, nil
 }
 
-// GetDestinationByID will get a destination by id
-func (wc *WalletClient) GetDestinationByID(ctx context.Context, id string) (*models.Destination, error) {
-	var destination models.Destination
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, fmt.Sprintf("/destination?%s=%s", FieldID, id), nil, wc.xPriv, true, &destination,
-	); err != nil {
-		return nil, err
-	}
-
-	return &destination, nil
-}
-
-// GetDestinationByAddress will get a destination by address
-func (wc *WalletClient) GetDestinationByAddress(ctx context.Context, address string) (*models.Destination, error) {
-	var destination models.Destination
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/destination?"+FieldAddress+"="+address, nil, wc.xPriv, true, &destination,
-	); err != nil {
-		return nil, err
-	}
-
-	return &destination, nil
-}
-
-// GetDestinationByLockingScript will get a destination by locking script
-func (wc *WalletClient) GetDestinationByLockingScript(ctx context.Context, lockingScript string) (*models.Destination, error) {
-	var destination models.Destination
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/destination?"+FieldLockingScript+"="+lockingScript, nil, wc.xPriv, true, &destination,
-	); err != nil {
-		return nil, err
-	}
-
-	return &destination, nil
-}
-
-// GetDestinations will get all destinations matching the metadata filter
-func (wc *WalletClient) GetDestinations(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any, queryParams *filter.QueryParams) ([]*models.Destination, error) {
-	return Search[filter.DestinationFilter, []*models.Destination](
-		ctx, http.MethodPost,
-		"/destination/search",
-		wc.xPriv,
-		conditions,
-		metadata,
-		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// GetDestinationsCount will get the count of destinations matching the metadata filter
-func (wc *WalletClient) GetDestinationsCount(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any) (int64, error) {
-	return Count(
-		ctx,
-		http.MethodPost,
-		"/destination/count",
-		wc.xPriv,
-		conditions,
-		metadata,
-		wc.doHTTPRequest,
-	)
-}
-
-// NewDestination will create a new destination and return it
-func (wc *WalletClient) NewDestination(ctx context.Context, metadata map[string]any) (*models.Destination, error) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldMetadata: metadata,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-	var destination models.Destination
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/destination", jsonStr, wc.xPriv, true, &destination,
-	); err != nil {
-		return nil, err
-	}
-
-	return &destination, nil
-}
-
-// UpdateDestinationMetadataByID updates the destination metadata by id
-func (wc *WalletClient) UpdateDestinationMetadataByID(ctx context.Context, id string, metadata map[string]any) (*models.Destination, error) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldID:       id,
-		FieldMetadata: metadata,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-
-	var destination models.Destination
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/destination", jsonStr, wc.xPriv, true, &destination,
-	); err != nil {
-		return nil, err
-	}
-
-	return &destination, nil
-}
-
-// UpdateDestinationMetadataByAddress updates the destination metadata by address
-func (wc *WalletClient) UpdateDestinationMetadataByAddress(ctx context.Context, address string, metadata map[string]any) (*models.Destination, error) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldAddress:  address,
-		FieldMetadata: metadata,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-
-	var destination models.Destination
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/destination", jsonStr, wc.xPriv, true, &destination,
-	); err != nil {
-		return nil, err
-	}
-
-	return &destination, nil
-}
-
-// UpdateDestinationMetadataByLockingScript updates the destination metadata by locking script
-func (wc *WalletClient) UpdateDestinationMetadataByLockingScript(ctx context.Context, lockingScript string, metadata map[string]any) (*models.Destination, error) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldLockingScript: lockingScript,
-		FieldMetadata:      metadata,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-
-	var destination models.Destination
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/destination", jsonStr, wc.xPriv, true, &destination,
-	); err != nil {
-		return nil, err
-	}
-
-	return &destination, nil
-}
-
 // GetTransaction will get a transaction by ID
 func (wc *WalletClient) GetTransaction(ctx context.Context, txID string) (*models.Transaction, error) {
 	var transaction models.Transaction
-	if err := wc.doHTTPRequest(ctx, http.MethodGet, "/transaction?"+FieldID+"="+txID, nil, wc.xPriv, wc.signRequest, &transaction); err != nil {
+	if err := wc.doHTTPRequest(ctx, http.MethodGet, "/transactions/"+FieldID+"="+txID, nil, wc.xPriv, wc.signRequest, &transaction); err != nil {
 		return nil, err
 	}
 
@@ -297,27 +139,11 @@ func (wc *WalletClient) GetTransactions(
 ) ([]*models.Transaction, error) {
 	return Search[filter.TransactionFilter, []*models.Transaction](
 		ctx, http.MethodPost,
-		"/transaction/search",
+		"/transactions",
 		wc.xPriv,
 		conditions,
 		metadata,
 		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// GetTransactionsCount get number of user transactions
-func (wc *WalletClient) GetTransactionsCount(
-	ctx context.Context,
-	conditions *filter.TransactionFilter,
-	metadata map[string]any,
-) (int64, error) {
-	return Count[filter.TransactionFilter](
-		ctx, http.MethodPost,
-		"/transaction/count",
-		wc.xPriv,
-		conditions,
-		metadata,
 		wc.doHTTPRequest,
 	)
 }
@@ -360,7 +186,7 @@ func (wc *WalletClient) createDraftTransaction(ctx context.Context,
 
 	var draftTransaction *models.DraftTransaction
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/transaction", jsonStr, wc.xPriv, true, &draftTransaction,
+		ctx, http.MethodPost, "/transactions", jsonStr, wc.xPriv, true, &draftTransaction,
 	); err != nil {
 		return nil, err
 	}
@@ -384,7 +210,7 @@ func (wc *WalletClient) RecordTransaction(ctx context.Context, hex, referenceID 
 
 	var transaction models.Transaction
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/transaction/record", jsonStr, wc.xPriv, wc.signRequest, &transaction,
+		ctx, http.MethodPost, "/transactions", jsonStr, wc.xPriv, wc.signRequest, &transaction,
 	); err != nil {
 		return nil, err
 	}
@@ -404,7 +230,7 @@ func (wc *WalletClient) UpdateTransactionMetadata(ctx context.Context, txID stri
 
 	var transaction models.Transaction
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/transaction", jsonStr, wc.xPriv, wc.signRequest, &transaction,
+		ctx, http.MethodPatch, "/transactions", jsonStr, wc.xPriv, wc.signRequest, &transaction,
 	); err != nil {
 		return nil, err
 	}
@@ -428,43 +254,15 @@ func SetSignatureFromAccessKey(header *http.Header, privateKeyHex, bodyString st
 	return nil
 }
 
-// GetUtxo will get a utxo by transaction ID
-func (wc *WalletClient) GetUtxo(ctx context.Context, txID string, outputIndex uint32) (*models.Utxo, error) {
-	outputIndexStr := strconv.FormatUint(uint64(outputIndex), 10)
-
-	url := fmt.Sprintf("/utxo?%s=%s&%s=%s", FieldTransactionID, txID, FieldOutputIndex, outputIndexStr)
-
-	var utxo models.Utxo
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, url, nil, wc.xPriv, true, &utxo,
-	); err != nil {
-		return nil, err
-	}
-
-	return &utxo, nil
-}
-
 // GetUtxos will get a list of utxos filtered by conditions and metadata
 func (wc *WalletClient) GetUtxos(ctx context.Context, conditions *filter.UtxoFilter, metadata map[string]any, queryParams *filter.QueryParams) ([]*models.Utxo, error) {
 	return Search[filter.UtxoFilter, []*models.Utxo](
 		ctx, http.MethodPost,
-		"/utxo/search",
+		"/utxos",
 		wc.xPriv,
 		conditions,
 		metadata,
 		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// GetUtxosCount will get the count of utxos filtered by conditions and metadata
-func (wc *WalletClient) GetUtxosCount(ctx context.Context, conditions *filter.UtxoFilter, metadata map[string]any) (int64, error) {
-	return Count[filter.UtxoFilter](
-		ctx, http.MethodPost,
-		"/utxo/count",
-		wc.xPriv,
-		conditions,
-		metadata,
 		wc.doHTTPRequest,
 	)
 }
@@ -572,7 +370,7 @@ func (wc *WalletClient) authenticateWithAccessKey(req *http.Request, rawJSON []b
 // AcceptContact will accept the contact associated with the paymail
 func (wc *WalletClient) AcceptContact(ctx context.Context, paymail string) error {
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/contact/accepted/"+paymail, nil, wc.xPriv, wc.signRequest, nil,
+		ctx, http.MethodPatch, "/contacts/"+paymail, nil, wc.xPriv, wc.signRequest, nil,
 	); err != nil {
 		return err
 	}
@@ -583,7 +381,7 @@ func (wc *WalletClient) AcceptContact(ctx context.Context, paymail string) error
 // RejectContact will reject the contact associated with the paymail
 func (wc *WalletClient) RejectContact(ctx context.Context, paymail string) error {
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/contact/rejected/"+paymail, nil, wc.xPriv, wc.signRequest, nil,
+		ctx, http.MethodPatch, "/contacts/"+paymail, nil, wc.xPriv, wc.signRequest, nil,
 	); err != nil {
 		return err
 	}
@@ -603,7 +401,7 @@ func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Cont
 	}
 
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPatch, "/contact/confirmed/"+contact.Paymail, nil, wc.xPriv, wc.signRequest, nil,
+		ctx, http.MethodPatch, "/contacts/"+contact.Paymail, nil, wc.xPriv, wc.signRequest, nil,
 	); err != nil {
 		return err
 	}
@@ -615,7 +413,7 @@ func (wc *WalletClient) ConfirmContact(ctx context.Context, contact *models.Cont
 func (wc *WalletClient) GetContacts(ctx context.Context, conditions *filter.ContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, error) {
 	return Search[filter.ContactFilter, *models.SearchContactsResponse](
 		ctx, http.MethodPost,
-		"/contact/search",
+		"/contacts/",
 		wc.xPriv,
 		conditions,
 		metadata,
@@ -647,7 +445,7 @@ func (wc *WalletClient) UpsertContactForPaymail(ctx context.Context, paymail, fu
 
 	var result models.Contact
 	if err := wc.doHTTPRequest(
-		ctx, http.MethodPut, "/contact/"+paymail, jsonStr, wc.xPriv, wc.signRequest, &result,
+		ctx, http.MethodPut, "/contacts/"+paymail, jsonStr, wc.xPriv, wc.signRequest, &result,
 	); err != nil {
 		return nil, err
 	}
@@ -675,437 +473,6 @@ func (wc *WalletClient) GetSharedConfig(ctx context.Context) (*models.SharedConf
 	return model, nil
 }
 
-// AdminNewXpub will register an xPub
-func (wc *WalletClient) AdminNewXpub(ctx context.Context, rawXPub string, metadata map[string]any) error {
-	// Adding a xpub needs to be signed by an admin key
-	if wc.adminXPriv == nil {
-		return WrapError(ErrAdminKey)
-	}
-
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldMetadata: metadata,
-		FieldXpubKey:  rawXPub,
-	})
-	if err != nil {
-		return WrapError(err)
-	}
-
-	var xPubData models.Xpub
-
-	return wc.doHTTPRequest(
-		ctx, http.MethodPost, "/admin/xpub", jsonStr, wc.adminXPriv, true, &xPubData,
-	)
-}
-
-// AdminGetStatus get whether admin key is valid
-func (wc *WalletClient) AdminGetStatus(ctx context.Context) (bool, error) {
-	var status bool
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/admin/status", nil, wc.adminXPriv, true, &status,
-	); err != nil {
-		return false, err
-	}
-
-	return status, nil
-}
-
-// AdminGetStats get admin stats
-func (wc *WalletClient) AdminGetStats(ctx context.Context) (*models.AdminStats, error) {
-	var stats *models.AdminStats
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodGet, "/admin/stats", nil, wc.adminXPriv, true, &stats,
-	); err != nil {
-		return nil, err
-	}
-
-	return stats, nil
-}
-
-// AdminGetAccessKeys get all access keys filtered by conditions
-func (wc *WalletClient) AdminGetAccessKeys(
-	ctx context.Context,
-	conditions *filter.AdminAccessKeyFilter,
-	metadata map[string]any,
-	queryParams *filter.QueryParams,
-) ([]*models.AccessKey, error) {
-	return Search[filter.AdminAccessKeyFilter, []*models.AccessKey](
-		ctx, http.MethodPost,
-		"/admin/access-keys/search",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetAccessKeysCount get a count of all the access keys filtered by conditions
-func (wc *WalletClient) AdminGetAccessKeysCount(
-	ctx context.Context,
-	conditions *filter.AdminAccessKeyFilter,
-	metadata map[string]any,
-) (int64, error) {
-	return Count[filter.AdminAccessKeyFilter](
-		ctx, http.MethodPost,
-		"/admin/access-keys/count",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetBlockHeaders get all block headers filtered by conditions
-func (wc *WalletClient) AdminGetBlockHeaders(
-	ctx context.Context,
-	conditions map[string]interface{},
-	metadata map[string]any,
-	queryParams *filter.QueryParams,
-) ([]*models.BlockHeader, error) {
-	var models []*models.BlockHeader
-	if err := wc.adminGetModels(ctx, conditions, metadata, queryParams, "/admin/block-headers/search", &models); err != nil {
-		return nil, err
-	}
-
-	return models, nil
-}
-
-// AdminGetBlockHeadersCount get a count of all the block headers filtered by conditions
-func (wc *WalletClient) AdminGetBlockHeadersCount(
-	ctx context.Context,
-	conditions map[string]interface{},
-	metadata map[string]any,
-) (int64, error) {
-	return wc.adminCount(ctx, conditions, metadata, "/admin/block-headers/count")
-}
-
-// AdminGetDestinations get all block destinations filtered by conditions
-func (wc *WalletClient) AdminGetDestinations(ctx context.Context, conditions *filter.DestinationFilter,
-	metadata map[string]any, queryParams *filter.QueryParams,
-) ([]*models.Destination, error) {
-	return Search[filter.DestinationFilter, []*models.Destination](
-		ctx, http.MethodPost,
-		"/admin/destinations/search",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetDestinationsCount get a count of all the destinations filtered by conditions
-func (wc *WalletClient) AdminGetDestinationsCount(ctx context.Context, conditions *filter.DestinationFilter, metadata map[string]any) (int64, error) {
-	return Count(
-		ctx,
-		http.MethodPost,
-		"/admin/destinations/count",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetPaymail get a paymail by address
-func (wc *WalletClient) AdminGetPaymail(ctx context.Context, address string) (*models.PaymailAddress, error) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldAddress: address,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-
-	var model *models.PaymailAddress
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/admin/paymail/get", jsonStr, wc.adminXPriv, true, &model,
-	); err != nil {
-		return nil, err
-	}
-
-	return model, nil
-}
-
-// AdminGetPaymails get all block paymails filtered by conditions
-func (wc *WalletClient) AdminGetPaymails(
-	ctx context.Context,
-	conditions *filter.AdminPaymailFilter,
-	metadata map[string]any,
-	queryParams *filter.QueryParams,
-) ([]*models.PaymailAddress, error) {
-	return Search[filter.AdminPaymailFilter, []*models.PaymailAddress](
-		ctx, http.MethodPost,
-		"/admin/paymails/search",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetPaymailsCount get a count of all the paymails filtered by conditions
-func (wc *WalletClient) AdminGetPaymailsCount(ctx context.Context, conditions *filter.AdminPaymailFilter, metadata map[string]any) (int64, error) {
-	return Count(
-		ctx, http.MethodPost,
-		"/admin/paymails/count",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminCreatePaymail create a new paymail for a xpub
-func (wc *WalletClient) AdminCreatePaymail(ctx context.Context, rawXPub string, address string, publicName string, avatar string) (*models.PaymailAddress, error) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldXpubKey:    rawXPub,
-		FieldAddress:    address,
-		FieldPublicName: publicName,
-		FieldAvatar:     avatar,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-
-	var model *models.PaymailAddress
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/admin/paymail/create", jsonStr, wc.adminXPriv, true, &model,
-	); err != nil {
-		return nil, err
-	}
-
-	return model, nil
-}
-
-// AdminDeletePaymail delete a paymail address from the database
-func (wc *WalletClient) AdminDeletePaymail(ctx context.Context, address string) error {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldAddress: address,
-	})
-	if err != nil {
-		return WrapError(err)
-	}
-
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodDelete, "/admin/paymail/delete", jsonStr, wc.adminXPriv, true, nil,
-	); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// AdminGetTransactions get all block transactions filtered by conditions
-func (wc *WalletClient) AdminGetTransactions(
-	ctx context.Context,
-	conditions *filter.TransactionFilter,
-	metadata map[string]any,
-	queryParams *filter.QueryParams,
-) ([]*models.Transaction, error) {
-	return Search[filter.TransactionFilter, []*models.Transaction](
-		ctx, http.MethodPost,
-		"/admin/transactions/search",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetTransactionsCount get a count of all the transactions filtered by conditions
-func (wc *WalletClient) AdminGetTransactionsCount(
-	ctx context.Context,
-	conditions *filter.TransactionFilter,
-	metadata map[string]any,
-) (int64, error) {
-	return Count[filter.TransactionFilter](
-		ctx, http.MethodPost,
-		"/admin/transactions/count",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetUtxos get all block utxos filtered by conditions
-func (wc *WalletClient) AdminGetUtxos(
-	ctx context.Context,
-	conditions *filter.AdminUtxoFilter,
-	metadata map[string]any,
-	queryParams *filter.QueryParams,
-) ([]*models.Utxo, error) {
-	return Search[filter.AdminUtxoFilter, []*models.Utxo](
-		ctx, http.MethodPost,
-		"/admin/utxos/search",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetUtxosCount get a count of all the utxos filtered by conditions
-func (wc *WalletClient) AdminGetUtxosCount(
-	ctx context.Context,
-	conditions *filter.AdminUtxoFilter,
-	metadata map[string]any,
-) (int64, error) {
-	return Count[filter.AdminUtxoFilter](
-		ctx, http.MethodPost,
-		"/admin/utxos/count",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetXPubs get all block xpubs filtered by conditions
-func (wc *WalletClient) AdminGetXPubs(ctx context.Context, conditions *filter.XpubFilter,
-	metadata map[string]any, queryParams *filter.QueryParams,
-) ([]*models.Xpub, error) {
-	return Search[filter.XpubFilter, []*models.Xpub](
-		ctx, http.MethodPost,
-		"/admin/xpubs/search",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminGetXPubsCount get a count of all the xpubs filtered by conditions
-func (wc *WalletClient) AdminGetXPubsCount(
-	ctx context.Context,
-	conditions *filter.XpubFilter,
-	metadata map[string]any,
-) (int64, error) {
-	return Count[filter.XpubFilter](
-		ctx, http.MethodPost,
-		"/admin/xpubs/count",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		wc.doHTTPRequest,
-	)
-}
-
-func (wc *WalletClient) adminGetModels(
-	ctx context.Context,
-	conditions map[string]interface{},
-	metadata map[string]any,
-	queryParams *filter.QueryParams,
-	path string,
-	models interface{},
-) error {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldConditions:  conditions,
-		FieldMetadata:    metadata,
-		FieldQueryParams: queryParams,
-	})
-	if err != nil {
-		return WrapError(err)
-	}
-
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, path, jsonStr, wc.adminXPriv, true, &models,
-	); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (wc *WalletClient) adminCount(ctx context.Context, conditions map[string]interface{}, metadata map[string]any, path string) (int64, error) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldConditions: conditions,
-		FieldMetadata:   metadata,
-	})
-	if err != nil {
-		return 0, WrapError(err)
-	}
-
-	var count int64
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, path, jsonStr, wc.adminXPriv, true, &count,
-	); err != nil {
-		return 0, err
-	}
-
-	return count, nil
-}
-
-// AdminRecordTransaction will record a transaction as an admin
-func (wc *WalletClient) AdminRecordTransaction(ctx context.Context, hex string) (*models.Transaction, error) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		FieldHex: hex,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-
-	var transaction models.Transaction
-	if err := wc.doHTTPRequest(
-		ctx, http.MethodPost, "/admin/transactions/record", jsonStr, wc.adminXPriv, wc.signRequest, &transaction,
-	); err != nil {
-		return nil, err
-	}
-
-	return &transaction, nil
-}
-
-// AdminGetContacts executes an HTTP POST request to search for contacts based on specified conditions, metadata, and query parameters.
-func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions *filter.ContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, error) {
-	return Search[filter.ContactFilter, *models.SearchContactsResponse](
-		ctx, http.MethodPost,
-		"/admin/contact/search",
-		wc.adminXPriv,
-		conditions,
-		metadata,
-		queryParams,
-		wc.doHTTPRequest,
-	)
-}
-
-// AdminUpdateContact executes an HTTP PATCH request to update a specific contact's full name using their ID.
-func (wc *WalletClient) AdminUpdateContact(ctx context.Context, id, fullName string, metadata map[string]any) (*models.Contact, error) {
-	jsonStr, err := json.Marshal(map[string]interface{}{
-		"fullName":    fullName,
-		FieldMetadata: metadata,
-	})
-	if err != nil {
-		return nil, WrapError(err)
-	}
-	var contact models.Contact
-	err = wc.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/%s", id), jsonStr, wc.adminXPriv, true, &contact)
-	return &contact, WrapError(err)
-}
-
-// AdminDeleteContact executes an HTTP DELETE request to remove a contact using their ID.
-func (wc *WalletClient) AdminDeleteContact(ctx context.Context, id string) error {
-	err := wc.doHTTPRequest(ctx, http.MethodDelete, fmt.Sprintf("/admin/contact/%s", id), nil, wc.adminXPriv, true, nil)
-	return WrapError(err)
-}
-
-// AdminAcceptContact executes an HTTP PATCH request to mark a contact as accepted using their ID.
-func (wc *WalletClient) AdminAcceptContact(ctx context.Context, id string) (*models.Contact, error) {
-	var contact models.Contact
-	err := wc.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/accepted/%s", id), nil, wc.adminXPriv, true, &contact)
-	return &contact, WrapError(err)
-}
-
-// AdminRejectContact executes an HTTP PATCH request to mark a contact as rejected using their ID.
-func (wc *WalletClient) AdminRejectContact(ctx context.Context, id string) (*models.Contact, error) {
-	var contact models.Contact
-	err := wc.doHTTPRequest(ctx, http.MethodPatch, fmt.Sprintf("/admin/contact/rejected/%s", id), nil, wc.adminXPriv, true, &contact)
-	return &contact, WrapError(err)
-}
-
 // FinalizeTransaction will finalize the transaction
 func (wc *WalletClient) FinalizeTransaction(draft *models.DraftTransaction) (string, error) {
 	res, err := GetSignedHex(draft, wc.xPriv)
@@ -1129,42 +496,4 @@ func (wc *WalletClient) SendToRecipients(ctx context.Context, recipients []*Reci
 	}
 
 	return wc.RecordTransaction(ctx, hex, draft.ID, metadata)
-}
-
-// AdminSubscribeWebhook subscribes to a webhook to receive notifications from spv-wallet
-func (wc *WalletClient) AdminSubscribeWebhook(ctx context.Context, webhookURL, tokenHeader, tokenValue string) error {
-	requestModel := models.SubscribeRequestBody{
-		URL:         webhookURL,
-		TokenHeader: tokenHeader,
-		TokenValue:  tokenValue,
-	}
-	rawJSON, err := json.Marshal(requestModel)
-	if err != nil {
-		return WrapError(err)
-	}
-	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/webhooks/subscriptions", rawJSON, wc.adminXPriv, true, nil)
-	return WrapError(err)
-}
-
-// AdminUnsubscribeWebhook unsubscribes from a webhook
-func (wc *WalletClient) AdminUnsubscribeWebhook(ctx context.Context, webhookURL string) error {
-	requestModel := models.UnsubscribeRequestBody{
-		URL: webhookURL,
-	}
-	rawJSON, err := json.Marshal(requestModel)
-	if err != nil {
-		return WrapError(err)
-	}
-	err = wc.doHTTPRequest(ctx, http.MethodDelete, "/admin/webhooks/subscriptions", rawJSON, wc.adminXPriv, true, nil)
-	return err
-}
-
-// AdminGetWebhooks gets all webhooks
-func (wc *WalletClient) AdminGetWebhooks(ctx context.Context) ([]*models.Webhook, error) {
-	var webhooks []*models.Webhook
-	err := wc.doHTTPRequest(ctx, http.MethodGet, "/admin/webhooks/subscriptions", nil, wc.adminXPriv, true, &webhooks)
-	if err != nil {
-		return nil, WrapError(err)
-	}
-	return webhooks, nil
 }

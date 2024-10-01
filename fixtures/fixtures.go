@@ -4,8 +4,7 @@ package fixtures
 import (
 	"encoding/json"
 
-	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/common"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	responsemodels "github.com/bitcoin-sv/spv-wallet/models/response"
 )
 

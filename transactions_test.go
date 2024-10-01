@@ -16,7 +16,7 @@ import (
 func TestTransactions(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/v1/transactions":
+		case "/api/v1/transactions":
 			switch r.Method {
 			case http.MethodGet:
 				json.NewEncoder(w).Encode([]*response.Transaction{fixtures.Transaction})
@@ -24,12 +24,12 @@ func TestTransactions(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				json.NewEncoder(w).Encode(fixtures.Transaction)
 			}
-		case "/v1/transactions/" + fixtures.Transaction.ID:
+		case "/api/v1/transactions/" + fixtures.Transaction.ID:
 			switch r.Method {
 			case http.MethodGet, http.MethodPatch:
 				handleTransaction(w, r)
 			}
-		case "/v1/transactions/drafts":
+		case "/api/v1/transactions/drafts":
 			if r.Method == http.MethodPost {
 				handleTransaction(w, r)
 			}
@@ -56,12 +56,6 @@ func TestTransactions(t *testing.T) {
 		txs, err := client.GetTransactions(context.Background(), conditions, fixtures.TestMetadata, nil)
 		require.NoError(t, err)
 		require.Equal(t, []*response.Transaction{fixtures.Transaction}, txs)
-	})
-
-	t.Run("GetTransactionsCount", func(t *testing.T) {
-		count, err := client.GetTransactionsCount(context.Background(), nil, fixtures.TestMetadata)
-		require.NoError(t, err)
-		require.Equal(t, int64(1), count)
 	})
 
 	t.Run("RecordTransaction", func(t *testing.T) {
