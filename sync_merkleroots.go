@@ -40,6 +40,7 @@ type Repository interface {
 	SaveMerkleRoots(syncedMerkleRoots []MerkleRoot) error
 }
 
+// SyncMerkleRoots syncs merkleroots known to spv-wallet with the client database
 func (wc *WalletClient) SyncMerkleRoots(ctx context.Context, repo Repository) error {
 	lastEvaluatedKey := repo.GetLastEvaluatedKey()
 	requestPath := "merkleroots"
