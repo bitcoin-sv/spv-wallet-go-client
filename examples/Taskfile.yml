@@ -71,3 +71,8 @@ tasks:
     cmds:
       - echo "running webhooks..."
       - go run ./webhooks/webhooks.go || true
+  sync_merkleroots:
+    desc: "running sync_merkleroots.."
+    cmds:
+      - echo "running sync_merkleroots..."
+      - go run ./sync_merkleroots/sync_merkleroots.go
