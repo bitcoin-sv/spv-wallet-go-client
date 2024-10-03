@@ -13,12 +13,13 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 )
 
-// simulate database
+// simulate a storage of merkle roots that exists on a client side that is using SyncMerkleRoots method
 type db struct {
 	MerkleRoots []walletclient.MerkleRoot
 }
 
 func (db *db) SaveMerkleRoots(syncedMerkleRoots []walletclient.MerkleRoot) error {
+	fmt.Print("\nSaveMerkleRoots called\n")
 	db.MerkleRoots = append(db.MerkleRoots, syncedMerkleRoots...)
 	time.Sleep(1 * time.Second)
 	return nil
@@ -31,7 +32,7 @@ func (db *db) GetLastEvaluatedKey() string {
 	return db.MerkleRoots[len(db.MerkleRoots)-1].MerkleRoot
 }
 
-// simulate repository
+// initalize the storage that exists on a client side
 var repository = &db{
 	MerkleRoots: []walletclient.MerkleRoot{
 		{
@@ -46,10 +47,6 @@ var repository = &db{
 			MerkleRoot:  "9b0fc92260312ce44e74ef369f5c66bbb85848f2eddd5a7a1cde251e54ccfdd5",
 			BlockHeight: 2,
 		},
-		{
-			MerkleRoot:  "612209eca3ff078e55d1ffe4602e78ac9a53458c7f9196b38c232d8af9ed635d",
-			BlockHeight: 864550,
-		},
 	},
 }
 
@@ -58,18 +55,17 @@ func main() {
 
 	server := "http://localhost:3003/api/v1"
 
-	// client := walletclient.NewWithAccessKey(server, examples.ExampleAccessKey)
 	client := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
 	ctx := context.Background()
 
-	fmt.Printf("\n\n Initial State: \n %+v\n\n", repository.MerkleRoots)
+	fmt.Printf("\n\n Initial State: \n %d\n\n", len(repository.MerkleRoots))
 
-	err := client.SyncMerkleRoots(ctx, repository)
+	err := client.SyncMerkleRoots(ctx, repository, 1000*time.Millisecond)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("\n\n After Sync State: \n %+v\n\n", repository.MerkleRoots)
+	fmt.Printf("\n\n After Sync State: \n %d\n\n", len(repository.MerkleRoots))
 }
