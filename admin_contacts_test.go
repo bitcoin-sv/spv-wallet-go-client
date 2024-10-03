@@ -43,7 +43,8 @@ func TestAdminContactActions(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewWithAdminKey(server.URL, fixtures.XPrivString)
+	client, err := NewWithAdminKey(server.URL, fixtures.XPrivString)
+	require.NoError(t, err)
 	require.NotNil(t, client.adminXPriv)
 
 	t.Run("AdminGetContacts", func(t *testing.T) {

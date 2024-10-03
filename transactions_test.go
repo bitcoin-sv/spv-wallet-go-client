@@ -35,7 +35,8 @@ func TestTransactions(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewWithXPriv(server.URL, fixtures.XPrivString)
+	client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
+	require.NoError(t, err)
 	require.NotNil(t, client.xPriv)
 
 	t.Run("GetTransaction", func(t *testing.T) {

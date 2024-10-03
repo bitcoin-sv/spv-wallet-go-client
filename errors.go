@@ -12,6 +12,24 @@ var ErrAdminKey = models.SPVError{Message: "an admin key must be set to be able 
 // ErrMissingXpriv is when xpriv is missing
 var ErrMissingXpriv = models.SPVError{Message: "xpriv is missing", StatusCode: 401, Code: "error-unauthorized-xpriv-missing"}
 
+// ErrInvalidXpriv is when xpriv is invalid
+var ErrInvalidXpriv = models.SPVError{Message: "xpriv is invalid", StatusCode: 401, Code: "error-unauthorized-xpriv-invalid"}
+
+// ErrInvalidXpub is when xpub is invalid
+var ErrInvalidXpub = models.SPVError{Message: "xpub is invalid", StatusCode: 401, Code: "error-unauthorized-xpub-invalid"}
+
+// ErrInvalidAccessKey is when access key is invalid
+var ErrInvalidAccessKey = models.SPVError{Message: "access key is invalid", StatusCode: 401, Code: "error-unauthorized-access-key-invalid"}
+
+// ErrInvalidAdminKey is when admin key is invalid
+var ErrInvalidAdminKey = models.SPVError{Message: "admin key is invalid", StatusCode: 401, Code: "error-unauthorized-admin-key-invalid"}
+
+// ErrInvalidServerURL is when server url is invalid
+var ErrInvalidServerURL = models.SPVError{Message: "server url is invalid", StatusCode: 401, Code: "error-unauthorized-server-url-invalid"}
+
+// ErrCreateClient is when client creation fails
+var ErrCreateClient = models.SPVError{Message: "failed to create client", StatusCode: 500, Code: "error-create-client-failed"}
+
 // ErrMissingKey is when neither xPriv nor adminXPriv is provided
 var ErrMissingKey = models.SPVError{Message: "neither xPriv nor adminXPriv is provided", StatusCode: 404, Code: "error-shared-config-key-missing"}
 

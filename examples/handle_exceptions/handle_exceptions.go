@@ -23,14 +23,17 @@ func main() {
 
 	const server = "http://localhost:3003/v1"
 
-	client := walletclient.NewWithXPub(server, examples.ExampleAdminKey)
+	client, err := walletclient.NewWithXPub(server, examples.ExampleAdminKey)
+	if err != nil {
+		examples.GetFullErrorMessage(err)
+		os.Exit(1)
+	}
 	ctx := context.Background()
 
 	fmt.Println("Client created")
 
 	status, err := client.AdminGetStatus(ctx)
 	if err != nil {
-		fmt.Println("Error: ", err)
 		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}

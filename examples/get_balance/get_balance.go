@@ -19,7 +19,11 @@ func main() {
 
 	const server = "http://localhost:3003/v1"
 
-	client := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
+	client, err := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
+	if err != nil {
+		examples.GetFullErrorMessage(err)
+		os.Exit(1)
+	}
 	ctx := context.Background()
 
 	xpubInfo, err := client.GetXPub(ctx)

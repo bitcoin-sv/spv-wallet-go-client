@@ -41,7 +41,8 @@ func TestXpub(t *testing.T) {
 	keys, err := xpriv.Generate()
 	require.NoError(t, err)
 
-	client := NewWithXPriv(server.URL, keys.XPriv())
+	client, err := NewWithXPriv(server.URL, keys.XPriv())
+	require.NoError(t, err)
 	require.NotNil(t, client.xPriv)
 
 	t.Run("GetXPub", func(t *testing.T) {
