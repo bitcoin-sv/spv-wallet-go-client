@@ -88,7 +88,7 @@ func (wc *WalletClient) SyncMerkleRoots(ctx context.Context, repo MerkleRootsRep
 				break
 			}
 
-			lastEvaluatedKey = fmt.Sprintf("?lastEvaluatedKey=%s", merkleRootsResponse.Page.LastEvaluatedKey)
+			lastEvaluatedKeyQuery = fmt.Sprintf("?lastEvaluatedKey=%s", merkleRootsResponse.Page.LastEvaluatedKey)
 			previousLastEvaluatedKey = merkleRootsResponse.Page.LastEvaluatedKey
 		}
 	}

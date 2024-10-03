@@ -50,6 +50,15 @@ var repository = &db{
 	},
 }
 
+func getLastFiveOrFewer(merkleroots []walletclient.MerkleRoot) []walletclient.MerkleRoot {
+	startIndex := len(merkleroots) - 5
+	if startIndex < 0 {
+		startIndex = 0
+	}
+
+	return merkleroots[startIndex:]
+}
+
 func main() {
 	defer examples.HandlePanic()
 
@@ -58,7 +67,8 @@ func main() {
 	client := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
 	ctx := context.Background()
 
-	fmt.Printf("\n\n Initial State: \n %d\n\n", len(repository.MerkleRoots))
+	fmt.Printf("\n\n Initial State Length: \n %d\n\n", len(repository.MerkleRoots))
+	fmt.Printf("\n\nInitial State Last 5 MerkleRoots (or fewer):\n%+v\n", getLastFiveOrFewer(repository.MerkleRoots))
 
 	err := client.SyncMerkleRoots(ctx, repository, 1000*time.Millisecond)
 	if err != nil {
@@ -67,5 +77,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("\n\n After Sync State: \n %d\n\n", len(repository.MerkleRoots))
+	fmt.Printf("\n\n After Sync State Length: \n %d\n\n", len(repository.MerkleRoots))
+	fmt.Printf("\n\n After Sync State Last 5 MerkleRoots (or fewer):\n%+v\n", getLastFiveOrFewer(repository.MerkleRoots))
 }
