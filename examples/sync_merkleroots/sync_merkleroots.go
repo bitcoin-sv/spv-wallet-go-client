@@ -25,7 +25,7 @@ func (db *db) SaveMerkleRoots(syncedMerkleRoots []walletclient.MerkleRoot) error
 	return nil
 }
 
-func (db *db) GetLastEvaluatedKey() string {
+func (db *db) GetLastMerkleRoot() string {
 	if len(db.MerkleRoots) == 0 {
 		return ""
 	}

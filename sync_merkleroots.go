@@ -37,8 +37,8 @@ type MerkleRoot struct {
 
 // MerkleRootsRepository is an interface responsible for saving synced merkleroots and getting last evaluat key from database
 type MerkleRootsRepository interface {
-	// GetLastEvaluatedKey should return the merkle root with the heighest height from your storage or undefined if empty
-	GetLastEvaluatedKey() string
+	// GetLastMerkleRoot should return the merkle root with the heighest height from your storage or undefined if empty
+	GetLastMerkleRoot() string
 	// SaveMerkleRoots should store newly synced merkle roots into your storage;
 	// NOTE: items are ordered with ascending order by block height
 	SaveMerkleRoots(syncedMerkleRoots []MerkleRoot) error
@@ -52,7 +52,7 @@ func (wc *WalletClient) SyncMerkleRoots(ctx context.Context, repo MerkleRootsRep
 		defer cancel()
 	}
 
-	lastEvaluatedKey := repo.GetLastEvaluatedKey()
+	lastEvaluatedKey := repo.GetLastMerkleRoot()
 	requestPath := "merkleroots"
 	lastEvaluatedKeyQuery := ""
 	previousLastEvaluatedKey := lastEvaluatedKey
