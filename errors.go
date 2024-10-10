@@ -45,6 +45,14 @@ var ErrTotpInvalid = models.SPVError{Message: "totp is invalid", StatusCode: 400
 // ErrContactPubKeyInvalid is when contact's PubKey is invalid
 var ErrContactPubKeyInvalid = models.SPVError{Message: "contact's PubKey is invalid", StatusCode: 400, Code: "error-contact-pubkey-invalid"}
 
+// ErrStaleLastEvaluatedKey is when the last evaluated key returned from sync merkleroots is the same as it was in a previous iteration
+// indicating sync issue or a potential loop
+var ErrStaleLastEvaluatedKey = models.SPVError{Message: "The last evaluated key has not changed between requests, indicating a possible loop or synchronization issue.", StatusCode: 500, Code: "error-stale-last-evaluated-key"}
+
+// ErrStaleLastEvaluatedKey is when the last evaluated key returned from sync merkleroots is the same as it was in a previous iteration
+// indicating sync issue or a potential loop
+var ErrSyncMerkleRootsTimeout = models.SPVError{Message: "SyncMerkleRoots operation timed out", StatusCode: 500, Code: "error-sync-merkleroots-timeout"}
+
 // WrapError wraps an error into SPVError
 func WrapError(err error) error {
 	if err == nil {
