@@ -65,13 +65,18 @@ func main() {
 
 	server := "http://localhost:3003/api/v1"
 
-	client := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
+	client, err := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		examples.GetFullErrorMessage(err)
+		os.Exit(1)
+	}
 	ctx := context.Background()
 
 	fmt.Printf("\n\n Initial State Length: \n %d\n\n", len(repository.MerkleRoots))
 	fmt.Printf("\n\nInitial State Last 5 MerkleRoots (or fewer):\n%+v\n", getLastFiveOrFewer(repository.MerkleRoots))
 
-	err := client.SyncMerkleRoots(ctx, repository, 1000*time.Millisecond)
+	err = client.SyncMerkleRoots(ctx, repository, 1000*time.Millisecond)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		examples.GetFullErrorMessage(err)

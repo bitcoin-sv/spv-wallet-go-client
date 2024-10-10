@@ -18,11 +18,12 @@ func TestSyncMerkleRoots(t *testing.T) {
 
 		// given
 		repo := fixtures.CreateRepository([]models.MerkleRoot{})
-		client := NewWithXPriv(server.URL, fixtures.XPrivString)
+		client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
 		require.NotNil(t, client.xPriv)
+		require.NoError(t, err)
 
 		// when
-		err := client.SyncMerkleRoots(context.Background(), repo, 0)
+		err = client.SyncMerkleRoots(context.Background(), repo, 0)
 
 		// then
 		require.NoError(t, err)
@@ -51,11 +52,12 @@ func TestSyncMerkleRoots(t *testing.T) {
 				BlockHeight: 2,
 			},
 		})
-		client := NewWithXPriv(server.URL, fixtures.XPrivString)
+		client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
 		require.NotNil(t, client.xPriv)
+		require.NoError(t, err)
 
 		// when
-		err := client.SyncMerkleRoots(context.Background(), repo, 0)
+		err = client.SyncMerkleRoots(context.Background(), repo, 0)
 
 		// then
 		require.NoError(t, err)
@@ -71,11 +73,12 @@ func TestSyncMerkleRoots(t *testing.T) {
 
 		// given
 		repo := fixtures.CreateRepository([]models.MerkleRoot{})
-		client := NewWithXPriv(server.URL, fixtures.XPrivString)
+		client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
 		require.NotNil(t, client.xPriv)
+		require.NoError(t, err)
 
 		// when
-		err := client.SyncMerkleRoots(context.Background(), repo, 10)
+		err = client.SyncMerkleRoots(context.Background(), repo, 10)
 
 		// then
 		require.ErrorIs(t, err, ErrSyncMerkleRootsTimeout)
@@ -88,11 +91,12 @@ func TestSyncMerkleRoots(t *testing.T) {
 
 		// given
 		repo := fixtures.CreateRepository([]models.MerkleRoot{})
-		client := NewWithXPriv(server.URL, fixtures.XPrivString)
+		client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
 		require.NotNil(t, client.xPriv)
+		require.NoError(t, err)
 
 		// when
-		err := client.SyncMerkleRoots(context.Background(), repo, 0)
+		err = client.SyncMerkleRoots(context.Background(), repo, 0)
 
 		// then
 		require.ErrorIs(t, err, ErrStaleLastEvaluatedKey)
