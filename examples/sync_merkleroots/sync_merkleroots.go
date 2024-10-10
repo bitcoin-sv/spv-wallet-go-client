@@ -11,14 +11,15 @@ import (
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
+	"github.com/bitcoin-sv/spv-wallet-go-client/models"
 )
 
 // simulate a storage of merkle roots that exists on a client side that is using SyncMerkleRoots method
 type db struct {
-	MerkleRoots []walletclient.MerkleRoot
+	MerkleRoots []models.MerkleRoot
 }
 
-func (db *db) SaveMerkleRoots(syncedMerkleRoots []walletclient.MerkleRoot) error {
+func (db *db) SaveMerkleRoots(syncedMerkleRoots []models.MerkleRoot) error {
 	fmt.Print("\nSaveMerkleRoots called\n")
 	db.MerkleRoots = append(db.MerkleRoots, syncedMerkleRoots...)
 	time.Sleep(1 * time.Second)
@@ -34,7 +35,7 @@ func (db *db) GetLastMerkleRoot() string {
 
 // initalize the storage that exists on a client side
 var repository = &db{
-	MerkleRoots: []walletclient.MerkleRoot{
+	MerkleRoots: []models.MerkleRoot{
 		{
 			MerkleRoot:  "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
 			BlockHeight: 0,
@@ -50,7 +51,7 @@ var repository = &db{
 	},
 }
 
-func getLastFiveOrFewer(merkleroots []walletclient.MerkleRoot) []walletclient.MerkleRoot {
+func getLastFiveOrFewer(merkleroots []models.MerkleRoot) []models.MerkleRoot {
 	startIndex := len(merkleroots) - 5
 	if startIndex < 0 {
 		startIndex = 0
