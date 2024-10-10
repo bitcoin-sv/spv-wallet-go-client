@@ -37,7 +37,7 @@ func (wc *WalletClient) SyncMerkleRoots(ctx context.Context, repo models.MerkleR
 
 			err := wc.doHTTPRequest(ctx, http.MethodGet, url, nil, wc.xPriv, true, &merkleRootsResponse)
 			if err != nil {
-				return err
+				return WrapError(err)
 			}
 
 			lastEvaluatedKey = merkleRootsResponse.Page.LastEvaluatedKey
