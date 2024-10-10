@@ -2,7 +2,6 @@ package fixtures
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -44,9 +43,8 @@ func sendJSONResponse(data interface{}, w *http.ResponseWriter) {
 
 func MockMerkleRootsAPIResponseNormal() *httptest.Server {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Sprintf("%+v", r.URL)
 		switch {
-		case r.URL.Path == "/api/v1/merkleroots" && r.Method == http.MethodGet:
+		case r.URL.Path == "/v1/merkleroots" && r.Method == http.MethodGet:
 			lastEvaluatedKey := r.URL.Query().Get("lastEvaluatedKey")
 			sendJSONResponse(MockedMerkleRootsAPIResponseFn(lastEvaluatedKey), &w)
 		default:
@@ -60,7 +58,7 @@ func MockMerkleRootsAPIResponseNormal() *httptest.Server {
 func MockMerkleRootsAPIResponseDelayed() *httptest.Server {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
-		case r.URL.Path == "/api/v1/merkleroots" && r.Method == http.MethodGet:
+		case r.URL.Path == "/v1/merkleroots" && r.Method == http.MethodGet:
 			lastEvaluatedKey := r.URL.Query().Get("lastEvaluatedKey")
 			// it is to limit the result up to 3 merkle roots per request to ensure
 			// that the sync merkleroots will loop more than once and hit the timeout
@@ -90,7 +88,7 @@ func MockMerkleRootsAPIResponseDelayed() *httptest.Server {
 func MockMerkleRootsAPIResponseStale() *httptest.Server {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
-		case r.URL.Path == "/api/v1/merkleroots" && r.Method == http.MethodGet:
+		case r.URL.Path == "/v1/merkleroots" && r.Method == http.MethodGet:
 			staleLastEvaluatedKeyResponse := models.ExclusiveStartKeyPage[[]models.MerkleRoot]{
 				Content: []models.MerkleRoot{
 					{
