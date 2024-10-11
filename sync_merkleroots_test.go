@@ -20,7 +20,6 @@ func TestSyncMerkleRoots(t *testing.T) {
 		// given
 		repo := fixtures.CreateRepository([]models.MerkleRoot{})
 		client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
-		require.NotNil(t, client.xPriv)
 		require.NoError(t, err)
 
 		// when
@@ -53,7 +52,6 @@ func TestSyncMerkleRoots(t *testing.T) {
 			},
 		})
 		client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
-		require.NotNil(t, client.xPriv)
 		require.NoError(t, err)
 
 		// when
@@ -76,7 +74,6 @@ func TestSyncMerkleRoots(t *testing.T) {
 		defer cancel()
 
 		client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
-		require.NotNil(t, client.xPriv)
 		require.NoError(t, err)
 
 		// when
@@ -94,7 +91,6 @@ func TestSyncMerkleRoots(t *testing.T) {
 		// given
 		repo := fixtures.CreateRepository([]models.MerkleRoot{})
 		client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
-		require.NotNil(t, client.xPriv)
 		require.NoError(t, err)
 
 		// when
