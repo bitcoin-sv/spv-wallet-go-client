@@ -4,19 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
+	"strings"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/models"
 )
 
 // SyncMerkleRoots syncs merkleroots known to spv-wallet with the client database
-func (wc *WalletClient) SyncMerkleRoots(ctx context.Context, repo models.MerkleRootsRepository, timeoutMs time.Duration) error {
-	var cancel context.CancelFunc
-	if timeoutMs > 0 {
-		ctx, cancel = context.WithTimeout(ctx, timeoutMs)
-		defer cancel()
-	}
-
+// If timeout is needed pass context.WithTimeout() as ctx param
+func (wc *WalletClient) SyncMerkleRoots(ctx context.Context, repo models.MerkleRootsRepository) error {
 	lastEvaluatedKey := repo.GetLastMerkleRoot()
 	requestPath := "merkleroots"
 	lastEvaluatedKeyQuery := ""
@@ -36,7 +31,14 @@ func (wc *WalletClient) SyncMerkleRoots(ctx context.Context, repo models.MerkleR
 			var merkleRootsResponse models.ExclusiveStartKeyPage[[]models.MerkleRoot]
 
 			err := wc.doHTTPRequest(ctx, http.MethodGet, url, nil, wc.xPriv, true, &merkleRootsResponse)
+
 			if err != nil {
+				// In case if the context deadline exceeds its limit during http request, httpClient
+				// cancels the request wrapping it as spverror, so we need to check if the message
+				// is the same as context deadline exceeded error
+				if strings.Contains(err.Error(), context.DeadlineExceeded.Error()) {
+					return ErrSyncMerkleRootsTimeout
+				}
 				return WrapError(err)
 			}
 

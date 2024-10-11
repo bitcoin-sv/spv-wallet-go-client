@@ -74,6 +74,11 @@ var MockedSPVWalletData = []models.MerkleRoot{
 	},
 }
 
+// LastMockedMerkleRoot returns last merkleroot value from MockedSPVWalletData
+func LastMockedMerkleRoot() models.MerkleRoot {
+	return MockedSPVWalletData[len(MockedSPVWalletData)-1]
+}
+
 // MockedMerkleRootsAPIResponseFn is a mock of SPV-Wallet it will return a paged response of merkle roots since last evaluated merkle root
 func MockedMerkleRootsAPIResponseFn(lastMerkleRoot string) models.ExclusiveStartKeyPage[[]models.MerkleRoot] {
 	if lastMerkleRoot == "" {

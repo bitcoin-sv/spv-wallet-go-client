@@ -16,7 +16,6 @@ type DB struct {
 
 func (db *DB) SaveMerkleRoots(syncedMerkleRoots []models.MerkleRoot) error {
 	db.MerkleRoots = append(db.MerkleRoots, syncedMerkleRoots...)
-	time.Sleep(5 * time.Millisecond)
 	return nil
 }
 

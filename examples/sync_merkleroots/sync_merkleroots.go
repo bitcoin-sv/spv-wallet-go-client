@@ -22,7 +22,6 @@ type db struct {
 func (db *db) SaveMerkleRoots(syncedMerkleRoots []models.MerkleRoot) error {
 	fmt.Print("\nSaveMerkleRoots called\n")
 	db.MerkleRoots = append(db.MerkleRoots, syncedMerkleRoots...)
-	time.Sleep(1 * time.Second)
 	return nil
 }
 
@@ -71,12 +70,13 @@ func main() {
 		examples.GetFullErrorMessage(err)
 		os.Exit(1)
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
+	defer cancel()
 
 	fmt.Printf("\n\n Initial State Length: \n %d\n\n", len(repository.MerkleRoots))
 	fmt.Printf("\n\nInitial State Last 5 MerkleRoots (or fewer):\n%+v\n", getLastFiveOrFewer(repository.MerkleRoots))
 
-	err = client.SyncMerkleRoots(ctx, repository, 1000*time.Millisecond)
+	err = client.SyncMerkleRoots(ctx, repository)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		examples.GetFullErrorMessage(err)

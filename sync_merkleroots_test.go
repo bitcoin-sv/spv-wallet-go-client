@@ -3,6 +3,7 @@ package walletclient
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/fixtures"
 	"github.com/bitcoin-sv/spv-wallet-go-client/models"
@@ -23,13 +24,12 @@ func TestSyncMerkleRoots(t *testing.T) {
 		require.NoError(t, err)
 
 		// when
-		err = client.SyncMerkleRoots(context.Background(), repo, 0)
+		err = client.SyncMerkleRoots(context.Background(), repo)
 
 		// then
 		require.NoError(t, err)
-		require.Equal(t, len(fixtures.MockedSPVWalletData), len(repo.MerkleRoots))
-		require.Equal(t, fixtures.MockedSPVWalletData[len(fixtures.MockedSPVWalletData)-1].MerkleRoot, repo.MerkleRoots[len(repo.MerkleRoots)-1].MerkleRoot)
-		require.Equal(t, fixtures.MockedSPVWalletData[len(fixtures.MockedSPVWalletData)-1].BlockHeight, repo.MerkleRoots[len(repo.MerkleRoots)-1].BlockHeight)
+		require.Len(t, repo.MerkleRoots, len(fixtures.MockedSPVWalletData))
+		require.Equal(t, fixtures.LastMockedMerkleRoot(), repo.MerkleRoots[len(repo.MerkleRoots)-1])
 	})
 
 	t.Run("Should properly sync database when partially filled", func(t *testing.T) {
@@ -57,13 +57,12 @@ func TestSyncMerkleRoots(t *testing.T) {
 		require.NoError(t, err)
 
 		// when
-		err = client.SyncMerkleRoots(context.Background(), repo, 0)
+		err = client.SyncMerkleRoots(context.Background(), repo)
 
 		// then
 		require.NoError(t, err)
-		require.Equal(t, len(fixtures.MockedSPVWalletData), len(repo.MerkleRoots))
-		require.Equal(t, fixtures.MockedSPVWalletData[len(fixtures.MockedSPVWalletData)-1].MerkleRoot, repo.MerkleRoots[len(repo.MerkleRoots)-1].MerkleRoot)
-		require.Equal(t, fixtures.MockedSPVWalletData[len(fixtures.MockedSPVWalletData)-1].BlockHeight, repo.MerkleRoots[len(repo.MerkleRoots)-1].BlockHeight)
+		require.Len(t, repo.MerkleRoots, len(fixtures.MockedSPVWalletData))
+		require.Equal(t, fixtures.LastMockedMerkleRoot(), repo.MerkleRoots[len(repo.MerkleRoots)-1])
 	})
 
 	t.Run("Should fail sync merkleroots due to the time out", func(t *testing.T) {
@@ -73,12 +72,15 @@ func TestSyncMerkleRoots(t *testing.T) {
 
 		// given
 		repo := fixtures.CreateRepository([]models.MerkleRoot{})
+		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Millisecond)
+		defer cancel()
+
 		client, err := NewWithXPriv(server.URL, fixtures.XPrivString)
 		require.NotNil(t, client.xPriv)
 		require.NoError(t, err)
 
 		// when
-		err = client.SyncMerkleRoots(context.Background(), repo, 10)
+		err = client.SyncMerkleRoots(ctx, repo)
 
 		// then
 		require.ErrorIs(t, err, ErrSyncMerkleRootsTimeout)
@@ -96,7 +98,7 @@ func TestSyncMerkleRoots(t *testing.T) {
 		require.NoError(t, err)
 
 		// when
-		err = client.SyncMerkleRoots(context.Background(), repo, 0)
+		err = client.SyncMerkleRoots(context.Background(), repo)
 
 		// then
 		require.ErrorIs(t, err, ErrStaleLastEvaluatedKey)
