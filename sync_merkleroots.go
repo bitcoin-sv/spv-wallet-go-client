@@ -11,7 +11,7 @@ import (
 
 // MerkleRootsRepository is an interface responsible for storing synchronized MerkleRoots and retrieving the last evaluation key from the database.
 type MerkleRootsRepository interface {
-	// GetLastMerkleRoot should return the merkle root with the heighest height from your storage or undefined if empty
+	// GetLastMerkleRoot should return the Merkle root with the highest height from your memory, or undefined if empty.
 	GetLastMerkleRoot() string
 	// SaveMerkleRoots should store newly synced merkle roots into your storage;
 	// NOTE: items are ordered with ascending order by block height
