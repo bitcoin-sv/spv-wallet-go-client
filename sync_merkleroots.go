@@ -9,7 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// MerkleRootsRepository is an interface responsible for saving synced merkleroots and getting last evaluat key from database
+// MerkleRootsRepository is an interface responsible for storing synchronized MerkleRoots and retrieving the last evaluation key from the database.
 type MerkleRootsRepository interface {
 	// GetLastMerkleRoot should return the merkle root with the heighest height from your storage or undefined if empty
 	GetLastMerkleRoot() string
