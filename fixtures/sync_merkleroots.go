@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // simulate a storage of merkle roots that exists on a client side that is using SyncMerkleRoots method

@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	github.com/bitcoin-sv/go-sdk v1.1.9
-	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.30
+	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.31
 	github.com/pquerna/otp v1.4.0
 	github.com/stretchr/testify v1.9.0
 )

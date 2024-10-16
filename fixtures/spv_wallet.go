@@ -3,7 +3,7 @@ package fixtures
 import (
 	"slices"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 const (
