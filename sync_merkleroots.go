@@ -6,12 +6,21 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
+
+// MerkleRootsRepository is an interface responsible for storing synchronized MerkleRoots and retrieving the last evaluation key from the database.
+type MerkleRootsRepository interface {
+	// GetLastMerkleRoot should return the Merkle root with the highest height from your memory, or undefined if empty.
+	GetLastMerkleRoot() string
+	// SaveMerkleRoots should store newly synced merkle roots into your storage;
+	// NOTE: items are sorted in ascending order by block height.
+	SaveMerkleRoots(syncedMerkleRoots []models.MerkleRoot) error
+}
 
 // SyncMerkleRoots syncs merkleroots known to spv-wallet with the client database
 // If timeout is needed pass context.WithTimeout() as ctx param
-func (wc *WalletClient) SyncMerkleRoots(ctx context.Context, repo models.MerkleRootsRepository) error {
+func (wc *WalletClient) SyncMerkleRoots(ctx context.Context, repo MerkleRootsRepository) error {
 	lastEvaluatedKey := repo.GetLastMerkleRoot()
 	requestPath := "merkleroots"
 	lastEvaluatedKeyQuery := ""
