@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
-// SearchRequester is a function that sends a request to the server and returns the response.
+// SearchRequester is a function that sends a request to the server and returns the response..
 type SearchRequester func(ctx context.Context, method string, path string, rawJSON []byte, xPriv *bip32.ExtendedKey, sign bool, responseJSON interface{}) error
 
 // Search prepares and sends a search request to the server.
