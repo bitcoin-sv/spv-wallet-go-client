@@ -16,7 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
-// SetSignRequest turn the signing of the http request on or off
+// SetSignRequest turn the signing of the http request on or off......
 func (wc *WalletClient) SetSignRequest(signRequest bool) {
 	wc.signRequest = signRequest
 }
