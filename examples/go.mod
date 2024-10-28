@@ -10,7 +10,7 @@ require (
 )
 
 require (
-	github.com/bitcoin-sv/go-sdk v1.1.9 // indirect
+	github.com/bitcoin-sv/go-sdk v1.1.11 // indirect
 	github.com/boombuler/barcode v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pquerna/otp v1.4.0 // indirect
