@@ -1,10 +1,8 @@
-// Package auth is responsible for handling the authentication of the requests to the server.
-// nolint: unused,nolintlint // FIXME: this file will be used soon
 package auth
 
 import (
 	"encoding/base64"
-	"errors"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"time"
@@ -20,7 +18,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// GetSignedHex will sign all the inputs using the given xPriv key
 func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (string, error) {
 	// Create transaction from hex
 	tx, err := trx.NewTransactionFromHex(dt.Hex)
@@ -36,10 +33,12 @@ func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (string
 		if err != nil {
 			return "", fmt.Errorf("failed to prepare locking script, %w", err)
 		}
+
 		unlockScript, err := prepareUnlockingScript(xPriv, &draftInput.Destination)
 		if err != nil {
 			return "", fmt.Errorf("failed to prepare unlocking script, %w", err)
 		}
+
 		err = tx.AddInputFrom(draftInput.TransactionID, draftInput.OutputIndex, lockingScript.String(), draftInput.Satoshis, unlockScript)
 		if err != nil {
 			return "", fmt.Errorf("failed to add inputs to transaction, %w", err)
@@ -50,15 +49,15 @@ func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (string
 	if err != nil {
 		return "", fmt.Errorf("failed to sign transaction, %w", err)
 	}
+
 	return tx.String(), nil
 }
 
-// SetSignature will set the signature on the header for the request
 func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString string) error {
 	// Create the signature
 	authData, err := createSignature(xPriv, bodyString)
 	if err != nil {
-		return fmt.Errorf("create signature op failure: %w", err)
+		return fmt.Errorf("failed to create signature: %w", err)
 	}
 
 	// Set the auth header
@@ -72,14 +71,16 @@ func prepareLockingScript(dst *models.Destination) (*script.Script, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create locking script from hex for destination: %w", err)
 	}
+
 	return lockingScript, nil
 }
 
 func prepareUnlockingScript(xPriv *bip32.ExtendedKey, dst *models.Destination) (*p2pkh.P2PKH, error) {
 	key, err := getDerivedKeyForDestination(xPriv, dst)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get derived key for destination: %w", err)
 	}
+
 	return getUnlockingScript(key)
 }
 
@@ -89,6 +90,7 @@ func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destinati
 	if err != nil {
 		return nil, fmt.Errorf("failed to derive key for unlocking input, %w", err)
 	}
+
 	// Handle paymail destination derivation if applicable
 	if dst.PaymailExternalDerivationNum != nil {
 		derivedKey, err = derivedKey.Child(*dst.PaymailExternalDerivationNum)
@@ -96,32 +98,27 @@ func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destinati
 			return nil, fmt.Errorf("failed to derive key for unlocking paymail input, %w", err)
 		}
 	}
+
 	// Get the private key from the derived key
 	priv, err := bip32.GetPrivateKeyFromHDKey(derivedKey)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get private key for unlocking paymail input, %w", err)
 	}
+
 	return priv, nil
 }
 
-// Generate unlocking script using private key
 func getUnlockingScript(privateKey *ec.PrivateKey) (*p2pkh.P2PKH, error) {
 	sigHashFlags := sighash.AllForkID
 	unlocked, err := p2pkh.Unlock(privateKey, &sigHashFlags)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create unlocking script, %w", err)
 	}
+
 	return unlocked, nil
 }
 
-// createSignature will create a signature for the given key & body contents
 func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *models.AuthPayload, err error) {
-	// No key?
-	if xPriv == nil {
-		err = ErrMissingXpriv
-		return
-	}
-
 	// Get the xPub
 	payload = new(models.AuthPayload)
 	if payload.XPub, err = bip32.GetExtendedPublicKey(xPriv); err != nil { // Should never error if key is correct
@@ -147,7 +144,6 @@ func createSignature(xPriv *bip32.ExtendedKey, bodyString string) (payload *mode
 	return createSignatureCommon(payload, bodyString, privateKey)
 }
 
-// createSignatureCommon will create a signature
 func createSignatureCommon(payload *models.AuthPayload, bodyString string, privateKey *ec.PrivateKey) (*models.AuthPayload, error) {
 	// Create the auth header hash
 	payload.AuthHash = cryptoutil.Hash(bodyString)
@@ -168,22 +164,36 @@ func createSignatureCommon(payload *models.AuthPayload, bodyString string, priva
 	return payload, nil
 }
 
-// getSigningMessage will build the signing message byte array
 func getSigningMessage(xPub string, auth *models.AuthPayload) []byte {
 	message := fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
 	return []byte(message)
 }
 
 func setSignatureHeaders(header *http.Header, authData *models.AuthPayload) {
-	// Create the auth header hash
 	header.Set(models.AuthHeaderHash, authData.AuthHash)
-	// Set the nonce
 	header.Set(models.AuthHeaderNonce, authData.AuthNonce)
-	// Set the time
 	header.Set(models.AuthHeaderTime, fmt.Sprintf("%d", authData.AuthTime))
-	// Set the signature
 	header.Set(models.AuthSignature, authData.Signature)
 }
 
-// ErrMissingXpriv is when xpriv is missing
-var ErrMissingXpriv = errors.New("xpriv is missing")
+func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models.AuthPayload, err error) {
+	privateKey, err := ec.PrivateKeyFromHex(privateKeyHex)
+	if err != nil {
+		return
+	}
+
+	publicKey := privateKey.PubKey()
+
+	// Get the AccessKey
+	payload = new(models.AuthPayload)
+	payload.AccessKey = hex.EncodeToString(publicKey.SerializeCompressed())
+
+	// auth_nonce is a random unique string to seed the signing message
+	// this can be checked server side to make sure the request is not being replayed
+	payload.AuthNonce, err = cryptoutil.RandomHex(32)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate random hexadecimal string: %w", err)
+	}
+
+	return createSignatureCommon(payload, bodyString, privateKey)
+}

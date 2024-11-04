@@ -90,7 +90,7 @@ linters-settings:
   revive:
     rules:
       - name: exported
-        exclude: "**/testabilities/**"
+        exclude: ["**/testabilities/**", "**/internal/**"]
 
 issues:
   # List of regexps of issue texts to exclude, empty list by default.
