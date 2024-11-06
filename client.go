@@ -10,6 +10,8 @@ import (
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -41,7 +43,9 @@ func NewDefaultConfig(addr string) Config {
 // interact with both user and admin APIs without needing to manage the details
 // of the HTTP requests and responses directly.
 type Client struct {
-	configsAPI *configs.API
+	configsAPI     *configs.API
+	contactsAPI    *contacts.API
+	invitationsAPI *invitations.API
 }
 
 // NewWithXPub creates a new client instance using an extended public key (xPub).
@@ -95,6 +99,78 @@ func NewWithAccessKey(cfg Config, accessKey string) (*Client, error) {
 	return newClient(cfg, authenticator), nil
 }
 
+func (c *Client) Contacts(ctx context.Context) ([]*response.Contact, error) {
+	res, err := c.contactsAPI.Contacts(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve contacts from user contacts API: %w", err)
+	}
+
+	return res, nil
+}
+
+func (c *Client) ContactWithPaymail(ctx context.Context, paymail string) (*response.Contact, error) {
+	res, err := c.contactsAPI.ContactWithPaymail(ctx, paymail)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve contact with paymail from user contacts API: %w", err)
+	}
+
+	return res, nil
+}
+
+func (c *Client) UpsertContact(ctx context.Context, args UpsertContactArgs) (*response.Contact, error) {
+	res, err := c.contactsAPI.UpsertContact(ctx, args.parseUpsertContactRequest())
+	if err != nil {
+		return nil, fmt.Errorf("failed to upsert contact by calling the user contacts API: %w", err)
+	}
+
+	return res, nil
+}
+
+func (c *Client) RemoveContact(ctx context.Context, paymail string) error {
+	err := c.contactsAPI.RemoveContact(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to remove contact by calling the user contacts API: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) ConfirmContact(ctx context.Context, paymail string) error {
+	err := c.contactsAPI.ConfirmContact(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to confirm contact by calling the user contacts API: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) UnconfirmContact(ctx context.Context, paymail string) error {
+	err := c.contactsAPI.UnconfirmContact(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to unconfirm contact by calling the user contacts API: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) AcceptInvitation(ctx context.Context, paymail string) error {
+	err := c.invitationsAPI.AcceptInvitation(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to accept inivtation by calling the user invitations API: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) RejectInvitation(ctx context.Context, paymail string) error {
+	err := c.invitationsAPI.RejectInvitation(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to reject inivtation by calling the user invitations API: %w", err)
+	}
+
+	return nil
+}
+
 // SharedConfig retrieves the shared configuration from the user configurations API.
 // This method constructs an HTTP GET request to the "/shared" endpoint and expects
 // a response that can be unmarshaled into the response.SharedConfig struct.
@@ -129,7 +205,9 @@ type authenticator interface {
 func newClient(cfg Config, auth authenticator) *Client {
 	restyCli := newRestyClient(cfg, auth)
 	cli := Client{
-		configsAPI: configs.NewAPI(cfg.Addr, restyCli),
+		configsAPI:     configs.NewAPI(cfg.Addr, restyCli),
+		contactsAPI:    contacts.NewAPI(cfg.Addr, restyCli),
+		invitationsAPI: invitations.NewAPI(cfg.Addr, restyCli),
 	}
 	return &cli
 }
