@@ -129,5 +129,5 @@ func makeMockPKI(xpub string) string {
 		panic(err)
 	}
 
-	return hex.EncodeToString(pubKey.SerializeCompressed())
+	return hex.EncodeToString(pubKey.Compressed())
 }
