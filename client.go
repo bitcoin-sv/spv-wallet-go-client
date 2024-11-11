@@ -10,7 +10,9 @@ import (
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
+	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
@@ -41,7 +43,8 @@ func NewDefaultConfig(addr string) Config {
 // interact with both user and admin APIs without needing to manage the details
 // of the HTTP requests and responses directly.
 type Client struct {
-	configsAPI *configs.API
+	configsAPI     *configs.API
+	merkleRootsAPI *merkleroots.API
 }
 
 // NewWithXPub creates a new client instance using an extended public key (xPub).
@@ -108,6 +111,19 @@ func (c *Client) SharedConfig(ctx context.Context) (*response.SharedConfig, erro
 	return res, nil
 }
 
+// MerkleRoots retrieves the full list of user merkle roots. This method sends an HTTP GET request
+// to the "api/v1/merkleroots" endpoint. The server's response is expected to be unmarshaled into
+// a slice of *models.MerkleRoot structs. If the request fails or the response cannot be decoded,
+// an error is returned.
+func (c *Client) MerkleRoots(ctx context.Context, opts ...queries.MerkleRootsQueryOption) ([]*models.MerkleRoot, error) {
+	res, err := c.merkleRootsAPI.MerkleRoots(ctx, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve shared configuration from user configs API: %w", err)
+	}
+
+	return res, nil
+}
+
 func privateKeyFromHexOrWIF(s string) (*ec.PrivateKey, error) {
 	pk, err1 := ec.PrivateKeyFromWif(s)
 	if err1 == nil {
@@ -129,7 +145,8 @@ type authenticator interface {
 func newClient(cfg Config, auth authenticator) *Client {
 	restyCli := newRestyClient(cfg, auth)
 	cli := Client{
-		configsAPI: configs.NewAPI(cfg.Addr, restyCli),
+		configsAPI:     configs.NewAPI(cfg.Addr, restyCli),
+		merkleRootsAPI: merkleroots.NewAPI(cfg.Addr, restyCli),
 	}
 	return &cli
 }

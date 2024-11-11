@@ -1,0 +1,23 @@
+{
+    "content": [
+      {
+        "blockHeight": 1,
+        "merkleRoot": "d02ab7b5-ac3e-4612-9377-9bffe05ac689"
+      },
+      {
+        "blockHeight": 2,
+        "merkleRoot": "132a2a38-b23f-404b-940f-f811de886114"
+      },
+      {
+        "blockHeight": 3,
+        "merkleRoot": "d229c224-6c21-4c68-ba25-261119e9b8dc"
+      }
+    ],
+    "page": {
+      "lastEvaluatedKey": "6bad63f5-8f2e-4756-aca9-cc9cb4a001c6",
+      "orderByField": "blockHeight",
+      "size": 0,
+      "sortDirection": "asc",
+      "totalElements": 0
+    }
+  }
