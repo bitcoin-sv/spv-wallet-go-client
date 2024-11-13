@@ -1,0 +1,30 @@
+{
+  "blockHash": "47758f612c6bf5b454bcd642fe8031f6",
+  "blockHeight": 1024,
+  "createdAt": "2024-10-07T14:03:26.736816Z",
+  "direction": "outgoing",
+  "draftId": "d3fb66d6-6e3b-4a1f-aa80-dda848079663",
+  "fee": 1,
+  "hex": "fda8f356-615e-4b4c-a3c8-53a47531a446",
+  "id": "fdad0324-1185-4a54-8eae-f0c8858fa3ce",
+  "metadata": {
+    "key": "value",
+    "key2": "value2"
+  },
+  "numberOfInputs": 3,
+  "numberOfOutputs": 2,
+  "outputValue": 50,
+  "outputs": {
+    "92640954841510a9d95f7737a43075f22ebf7255976549de4c52e8f3faf57470": -51,
+    "9d07977d2fc14402426288a6010b4cdf7d91b61461acfb75af050b209d2d07ba": 50
+  },
+  "status": "MINED",
+  "totalValue": 51,
+  "updatedAt": "2024-10-07T14:03:26.736816Z",
+  "xpubInIds": [
+    "e2be970c-a867-4e65-b141-7f2aafd44a42"
+  ],
+  "xpubOutIds": [
+    "475e5e90-a117-46b6-b9e5-6983f2721b19"
+  ]
+}

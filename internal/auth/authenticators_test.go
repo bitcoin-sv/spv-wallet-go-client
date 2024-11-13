@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testfixtures"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/clienttest"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"
 )
@@ -30,7 +30,7 @@ func TestAccessKeyAuthenitcator_NewWithNilAccessKey(t *testing.T) {
 
 func TestAccessKeyAuthenticator_Authenticate(t *testing.T) {
 	// given:
-	key := testfixtures.PrivateKey(t)
+	key := clienttest.PrivateKey(t)
 	authenticator, err := auth.NewAccessKeyAuthenticator(key)
 	require.NotNil(t, authenticator)
 	require.NoError(t, err)
@@ -57,7 +57,7 @@ func TestXprivAuthenitcator_NewWithNilXpriv(t *testing.T) {
 
 func TestXprivAuthenitcator_Authenticate(t *testing.T) {
 	// given:
-	key := testfixtures.ExtendedKey(t)
+	key := clienttest.ExtendedKey(t)
 	authenticator, err := auth.NewXprivAuthenticator(key)
 	require.NotNil(t, authenticator)
 	require.NoError(t, err)
@@ -84,7 +84,7 @@ func TestXpubOnlyAuthenticator_NewWithNilXpub(t *testing.T) {
 
 func TestXpubOnlyAuthenticator_Authenticate(t *testing.T) {
 	// given:
-	key := testfixtures.ExtendedKey(t)
+	key := clienttest.ExtendedKey(t)
 
 	authenticator, err := auth.NewXpubOnlyAuthenticator(key)
 	require.NotNil(t, authenticator)
@@ -101,11 +101,11 @@ func TestXpubOnlyAuthenticator_Authenticate(t *testing.T) {
 }
 
 func requireXAuthHeaderToBeSet(t *testing.T, h http.Header) {
-	require.Equal(t, []string{testfixtures.UserPubAccessKey}, h[xAuthKey])
+	require.Equal(t, []string{clienttest.UserPubAccessKey}, h[xAuthKey])
 }
 
 func requireXpubHeaderToBeSet(t *testing.T, h http.Header) {
-	require.Equal(t, []string{testfixtures.UserXPub}, h[xAuthXPubKey])
+	require.Equal(t, []string{clienttest.UserXPub}, h[xAuthXPubKey])
 }
 
 func requireSignatureHeadersToBeSet(t *testing.T, h http.Header) {

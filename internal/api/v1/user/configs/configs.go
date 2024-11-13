@@ -11,13 +11,13 @@ import (
 const route = "api/v1/configs"
 
 type API struct {
-	addr string
-	cli  *resty.Client
+	addr       string
+	httpClient *resty.Client
 }
 
 func (a *API) SharedConfig(ctx context.Context) (*response.SharedConfig, error) {
 	var result response.SharedConfig
-	_, err := a.cli.
+	_, err := a.httpClient.
 		R().
 		SetContext(ctx).
 		SetResult(&result).
@@ -31,7 +31,7 @@ func (a *API) SharedConfig(ctx context.Context) (*response.SharedConfig, error) 
 
 func NewAPI(addr string, cli *resty.Client) *API {
 	return &API{
-		addr: addr + "/" + route,
-		cli:  cli,
+		addr:       addr + "/" + route,
+		httpClient: cli,
 	}
 }

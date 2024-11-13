@@ -1,4 +1,4 @@
-package testfixtures
+package clienttest
 
 import (
 	"testing"

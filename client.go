@@ -9,8 +9,11 @@ import (
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
+	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
@@ -41,7 +44,8 @@ func NewDefaultConfig(addr string) Config {
 // interact with both user and admin APIs without needing to manage the details
 // of the HTTP requests and responses directly.
 type Client struct {
-	configsAPI *configs.API
+	configsAPI      *configs.API
+	transactionsAPI *transactions.API
 }
 
 // NewWithXPub creates a new client instance using an extended public key (xPub).
@@ -108,6 +112,74 @@ func (c *Client) SharedConfig(ctx context.Context) (*response.SharedConfig, erro
 	return res, nil
 }
 
+// DraftTransaction creates a new draft transaction using the user transactions API.
+// This method sends an HTTP POST request to the "/draft" endpoint and expects
+// a response that can be unmarshaled into a response.DraftTransaction struct.
+// If the request fails or the response cannot be decoded, an error is returned.
+func (c *Client) DraftTransaction(ctx context.Context, cmd *commands.DraftTransaction) (*response.DraftTransaction, error) {
+	res, err := c.transactionsAPI.DraftTransaction(ctx, cmd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create a draft transaction by calling the user transactions API: %w", err)
+	}
+
+	return res, nil
+}
+
+// RecordTransaction submits a transaction for recording using the user transactions API.
+// This method sends an HTTP POST request to the "/transactions" endpoint, expecting
+// a response that can be unmarshaled into a response.Transaction struct.
+// If the request fails or the response cannot be decoded, an error is returned.
+func (c *Client) RecordTransaction(ctx context.Context, cmd *commands.RecordTransaction) (*response.Transaction, error) {
+	res, err := c.transactionsAPI.RecordTransaction(ctx, cmd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to record a transaction with reference ID: %s by calling the user transactions API: %w", cmd.ReferenceID, err)
+	}
+
+	return res, nil
+}
+
+// UpdateTransactionMetadata updates the metadata of a transaction using the user transactions API.
+// This method sends an HTTP PATCH request with updated metadata and expects a response
+// that can be unmarshaled into a response.Transaction struct.
+// If the request fails or the response cannot be decoded, an error is returned.
+func (c *Client) UpdateTransactionMetadata(ctx context.Context, cmd *commands.UpdateTransactionMetadata) (*response.Transaction, error) {
+	res, err := c.transactionsAPI.UpdateTransactionMetadata(ctx, cmd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update a transaction metadata by calling the user user transactions API: %w", err)
+	}
+
+	return res, nil
+}
+
+// Transactions retrieves a list of transactions using the user transactions API.
+// This method applies optional query parameters and expects a response that can be
+// unmarshaled into a slice of response.Transaction pointers.
+// If the request fails or the response cannot be decoded, an error is returned.
+func (c *Client) Transactions(ctx context.Context, opts ...queries.TransctionsQueryOption) ([]*response.Transaction, error) {
+	res, err := c.transactionsAPI.Transactions(ctx, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve transactions from the user transactions API: %w", err)
+	}
+
+	return res, nil
+}
+
+// Transaction retrieves a specific transaction by its ID using the user transactions API.
+// This method expects a response that can be unmarshaled into a response.Transaction struct.
+// If the request fails or the response cannot be decoded, an error is returned.
+func (c *Client) Transaction(ctx context.Context, ID string) (*response.Transaction, error) {
+	res, err := c.transactionsAPI.Transaction(ctx, ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve transaction with ID: %s from the user transactions API: %w", ID, err)
+	}
+
+	return res, nil
+}
+
+// ErrUnrecognizedAPIResponse indicates that the response received from the SPV Wallet API
+// does not match the expected expected format or structure.
+var ErrUnrecognizedAPIResponse = errors.New("unrecognized response from API")
+
 func privateKeyFromHexOrWIF(s string) (*ec.PrivateKey, error) {
 	pk, err1 := ec.PrivateKeyFromWif(s)
 	if err1 == nil {
@@ -129,7 +201,8 @@ type authenticator interface {
 func newClient(cfg Config, auth authenticator) *Client {
 	restyCli := newRestyClient(cfg, auth)
 	cli := Client{
-		configsAPI: configs.NewAPI(cfg.Addr, restyCli),
+		configsAPI:      configs.NewAPI(cfg.Addr, restyCli),
+		transactionsAPI: transactions.NewAPI(cfg.Addr, restyCli),
 	}
 	return &cli
 }
@@ -155,7 +228,3 @@ func newRestyClient(cfg Config, auth authenticator) *resty.Client {
 			return fmt.Errorf("%w: %s", ErrUnrecognizedAPIResponse, r.Body())
 		})
 }
-
-// ErrUnrecognizedAPIResponse indicates that the response received from the SPV Wallet API
-// does not match the expected expected format or structure.
-var ErrUnrecognizedAPIResponse = errors.New("unrecognized response from API")

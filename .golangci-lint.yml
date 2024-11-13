@@ -91,6 +91,11 @@ linters-settings:
     rules:
       - name: exported
         exclude: ["**/testabilities/**", "**/internal/**"]
+  exhaustive:
+    # Presence of "default" case in switch statements satisfies exhaustiveness,
+    # even if all enum members are not listed.
+    # Default: false
+    default-signifies-exhaustive: true
 
 issues:
   # List of regexps of issue texts to exclude, empty list by default.
