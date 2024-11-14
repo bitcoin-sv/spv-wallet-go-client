@@ -9,15 +9,6 @@ import (
 
 type QueryBuilderOption func(*QueryBuilder)
 
-func WithQueryParamsFilter(q filter.QueryParams) QueryBuilderOption {
-	var zero filter.QueryParams
-	return func(qb *QueryBuilder) {
-		if q != zero {
-			qb.builders = append(qb.builders, &QueryParamsFilterBuilder{q})
-		}
-	}
-}
-
 func WithMetadataFilter(m Metadata) QueryBuilderOption {
 	return func(qb *QueryBuilder) {
 		if m != nil {
@@ -31,6 +22,15 @@ func WithModelFilter(m filter.ModelFilter) QueryBuilderOption {
 	return func(qb *QueryBuilder) {
 		if m != zero {
 			qb.builders = append(qb.builders, &ModelFilterBuilder{ModelFilter: m})
+		}
+	}
+}
+
+func WithPageFilterQueryBuilder(p filter.Page) QueryBuilderOption {
+	var zero filter.Page
+	return func(qb *QueryBuilder) {
+		if p != zero {
+			qb.builders = append(qb.builders, &PageFilterBuilder{Page: p})
 		}
 	}
 }

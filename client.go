@@ -151,14 +151,17 @@ func (c *Client) UpdateTransactionMetadata(ctx context.Context, cmd *commands.Up
 	return res, nil
 }
 
-// Transactions retrieves a list of transactions using the user transactions API.
-// This method applies optional query parameters and expects a response that can be
-// unmarshaled into a slice of response.Transaction pointers.
-// If the request fails or the response cannot be decoded, an error is returned.
-func (c *Client) Transactions(ctx context.Context, opts ...queries.TransctionsQueryOption) ([]*response.Transaction, error) {
+// Transactions retrieves a paginated list of transactions from the user transactions API.
+// The returned response includes transactions and pagination details, such as the page number,
+// sort order, and sorting field (sortBy).
+//
+// This method allows optional query parameters to be applied via the provided query options.
+// The response is expected to unmarshal into a *response.PageModel[response.Transaction] struct.
+// If the API request fails or the response cannot be decoded successfully, an error is returned.
+func (c *Client) Transactions(ctx context.Context, opts ...queries.TransactionsQueryOption) (*queries.TransactionPage, error) {
 	res, err := c.transactionsAPI.Transactions(ctx, opts...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve transactions from the user transactions API: %w", err)
+		return nil, fmt.Errorf("failed to retrieve transactions page from the user transactions API: %w", err)
 	}
 
 	return res, nil

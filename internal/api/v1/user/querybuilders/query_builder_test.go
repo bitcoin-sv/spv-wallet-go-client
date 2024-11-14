@@ -14,9 +14,9 @@ import (
 
 func TestQueryBuilder_Build(t *testing.T) {
 	type filters struct {
-		QueryParamsFilter filter.QueryParams
-		MetadataFilter    querybuilders.Metadata
-		ModelFilter       filter.ModelFilter
+		MetadataFilter querybuilders.Metadata
+		ModelFilter    filter.ModelFilter
+		PageFilter     filter.Page
 	}
 	tests := map[string]struct {
 		filters        filters
@@ -28,13 +28,13 @@ func TestQueryBuilder_Build(t *testing.T) {
 			filters:        filters{},
 			expectedParams: make(url.Values),
 		},
-		"query builder: URL values with query params filter-only": {
+		"query builder: URL values with page filter-only": {
 			filters: filters{
-				QueryParamsFilter: filter.QueryParams{
-					Page:          10,
-					PageSize:      20,
-					OrderByField:  "id",
-					SortDirection: "asc",
+				PageFilter: filter.Page{
+					Number: 10,
+					Size:   20,
+					SortBy: "id",
+					Sort:   "asc",
 				},
 			},
 			expectedParams: url.Values{
@@ -58,11 +58,11 @@ func TestQueryBuilder_Build(t *testing.T) {
 		},
 		"query builder: URL values with all filters set": {
 			filters: filters{
-				QueryParamsFilter: filter.QueryParams{
-					Page:          10,
-					PageSize:      20,
-					OrderByField:  "id",
-					SortDirection: "asc",
+				PageFilter: filter.Page{
+					Number: 10,
+					Size:   20,
+					Sort:   "asc",
+					SortBy: "id",
 				},
 				ModelFilter: filter.ModelFilter{
 					IncludeDeleted: querybuilderstest.Ptr(true),
@@ -96,11 +96,11 @@ func TestQueryBuilder_Build(t *testing.T) {
 		},
 		"query builder: injected dependency filter query builder failure": {
 			filters: filters{
-				QueryParamsFilter: filter.QueryParams{
-					Page:          10,
-					PageSize:      20,
-					OrderByField:  "id",
-					SortDirection: "asc",
+				PageFilter: filter.Page{
+					Number: 10,
+					Size:   20,
+					Sort:   "id",
+					SortBy: "asc",
 				},
 			},
 			builder:     &filterQueryBuilderFailureStub{},
@@ -113,7 +113,7 @@ func TestQueryBuilder_Build(t *testing.T) {
 			// when:
 			opts := []querybuilders.QueryBuilderOption{
 				querybuilders.WithMetadataFilter(tc.filters.MetadataFilter),
-				querybuilders.WithQueryParamsFilter(tc.filters.QueryParamsFilter),
+				querybuilders.WithPageFilterQueryBuilder(tc.filters.PageFilter),
 				querybuilders.WithModelFilter(tc.filters.ModelFilter),
 				querybuilders.WithFilterQueryBuilder(tc.builder),
 			}

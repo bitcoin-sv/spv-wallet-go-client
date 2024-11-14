@@ -205,12 +205,12 @@ func TestTransactionsAPI_Transactions(t *testing.T) {
 	tests := map[string]struct {
 		responder        httpmock.Responder
 		statusCode       int
-		expectedResponse []*response.Transaction
+		expectedResponse *response.PageModel[response.Transaction]
 		expectedErr      error
 	}{
 		"HTTP GET /api/v1/transactions response: 200": {
 			statusCode:       http.StatusOK,
-			expectedResponse: transactionstest.ExpectedTransactions(t),
+			expectedResponse: transactionstest.ExpectedTransactionsPage(t),
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/transactions_200.json")),
 		},
 		"HTTP GET /api/v1/transactions response: 400": {
