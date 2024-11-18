@@ -13,6 +13,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/invitations"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos"
@@ -51,6 +52,7 @@ type Client struct {
 	xpubAPI         *users.XPubAPI
 	accessKeyAPI    *users.AccessKeyAPI
 	configsAPI      *configs.API
+	merkleRootsAPI  *merkleroots.API
 	contactsAPI     *contacts.API
 	invitationsAPI  *invitations.API
 	transactionsAPI *transactions.API
@@ -366,6 +368,25 @@ func (c *Client) UTXOs(ctx context.Context, opts ...queries.UtxoQueryOption) (*q
 	return res, nil
 }
 
+// MerkleRoots retrieves a paginated list of Merkle roots from the user Merkle roots API.
+// The API response includes Merkle roots along with pagination details, such as the current
+// page number, sort order, and sorting field (sortBy).
+//
+// This method supports optional query parameters, which can be specified using the provided
+// query options. These options customize the behavior of the API request, such as setting
+// batch size or applying filters for pagination.
+//
+// The response is unmarshaled into a *queries.MerkleRootPage struct. If the API request fails
+// or the response cannot be successfully decoded, an error is returned.
+func (c *Client) MerkleRoots(ctx context.Context, opts ...queries.MerkleRootsQueryOption) (*queries.MerkleRootPage, error) {
+	res, err := c.merkleRootsAPI.MerkleRoots(ctx, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve Merkle roots from the API: %w", err)
+	}
+
+	return res, nil
+}
+
 // ErrUnrecognizedAPIResponse indicates that the response received from the SPV Wallet API
 // does not match the expected expected format or structure.
 var ErrUnrecognizedAPIResponse = errors.New("unrecognized response from API")
@@ -392,13 +413,14 @@ func newClient(cfg Config, auth authenticator) *Client {
 	httpClient := newRestyClient(cfg, auth)
 
 	return &Client{
+		merkleRootsAPI:  merkleroots.NewAPI(cfg.Addr, httpClient),
 		configsAPI:      configs.NewAPI(cfg.Addr, httpClient),
+		transactionsAPI: transactions.NewAPI(cfg.Addr, httpClient),
 		utxosAPI:        utxos.NewAPI(cfg.Addr, httpClient),
 		accessKeyAPI:    users.NewAccessKeyAPI(cfg.Addr, httpClient),
 		xpubAPI:         users.NewXPubAPI(cfg.Addr, httpClient),
 		contactsAPI:     contacts.NewAPI(cfg.Addr, httpClient),
 		invitationsAPI:  invitations.NewAPI(cfg.Addr, httpClient),
-		transactionsAPI: transactions.NewAPI(cfg.Addr, httpClient),
 	}
 }
 
