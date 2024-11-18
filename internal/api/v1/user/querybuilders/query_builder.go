@@ -26,7 +26,7 @@ func WithModelFilter(m filter.ModelFilter) QueryBuilderOption {
 	}
 }
 
-func WithPageFilterQueryBuilder(p filter.Page) QueryBuilderOption {
+func WithPageFilter(p filter.Page) QueryBuilderOption {
 	var zero filter.Page
 	return func(qb *QueryBuilder) {
 		if p != zero {

@@ -88,7 +88,7 @@ func (a *API) Transactions(ctx context.Context, transactionsOpts ...queries.Tran
 
 	builderOpts := []querybuilders.QueryBuilderOption{
 		querybuilders.WithMetadataFilter(query.Metadata),
-		querybuilders.WithPageFilterQueryBuilder(query.Page),
+		querybuilders.WithPageFilter(query.Page),
 		querybuilders.WithFilterQueryBuilder(&transactionFilterBuilder{
 			TransactionFilter:  query.Filter,
 			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.Filter.ModelFilter},
@@ -114,9 +114,9 @@ func (a *API) Transactions(ctx context.Context, transactionsOpts ...queries.Tran
 	return &result, nil
 }
 
-func NewAPI(addr string, cli *resty.Client) *API {
+func NewAPI(addr string, httpClient *resty.Client) *API {
 	return &API{
 		addr:       addr + "/" + route,
-		httpClient: cli,
+		httpClient: httpClient,
 	}
 }

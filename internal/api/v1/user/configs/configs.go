@@ -29,9 +29,9 @@ func (a *API) SharedConfig(ctx context.Context) (*response.SharedConfig, error) 
 	return &result, nil
 }
 
-func NewAPI(addr string, cli *resty.Client) *API {
+func NewAPI(addr string, httpClient *resty.Client) *API {
 	return &API{
 		addr:       addr + "/" + route,
-		httpClient: cli,
+		httpClient: httpClient,
 	}
 }

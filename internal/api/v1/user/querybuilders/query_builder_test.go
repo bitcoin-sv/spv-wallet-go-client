@@ -113,7 +113,7 @@ func TestQueryBuilder_Build(t *testing.T) {
 			// when:
 			opts := []querybuilders.QueryBuilderOption{
 				querybuilders.WithMetadataFilter(tc.filters.MetadataFilter),
-				querybuilders.WithPageFilterQueryBuilder(tc.filters.PageFilter),
+				querybuilders.WithPageFilter(tc.filters.PageFilter),
 				querybuilders.WithModelFilter(tc.filters.ModelFilter),
 				querybuilders.WithFilterQueryBuilder(tc.builder),
 			}

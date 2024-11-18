@@ -11,6 +11,8 @@ import (
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
@@ -45,6 +47,8 @@ func NewDefaultConfig(addr string) Config {
 // of the HTTP requests and responses directly.
 type Client struct {
 	configsAPI      *configs.API
+	contactsAPI     *contacts.API
+	invitationsAPI  *invitations.API
 	transactionsAPI *transactions.API
 }
 
@@ -99,10 +103,97 @@ func NewWithAccessKey(cfg Config, accessKey string) (*Client, error) {
 	return newClient(cfg, authenticator), nil
 }
 
+// Contacts retrieves a paginated list of user contacts from the user contacts API.
+// The API response includes user contacts along with pagination details, such as
+// the current page number, sort order, and the field used for sorting (sortBy).
+//
+// Optional query parameters can be provided via query options. The response is
+// unmarshaled into a *queries.UserContactsPage struct. If the API request fails
+// or the response cannot be decoded, an error is returned.
+func (c *Client) Contacts(ctx context.Context, contactOpts ...queries.ContactQueryOption) (*queries.UserContactsPage, error) {
+	res, err := c.contactsAPI.Contacts(ctx, contactOpts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve contacts from the user contacts API: %w", err)
+	}
+	return res, nil
+}
+
+// ContactWithPaymail retrieves a specific user contact by their paymail address.
+// The response is unmarshaled into a *response.Contact struct. If the API request
+// fails or the response cannot be decoded, an error is returned.
+func (c *Client) ContactWithPaymail(ctx context.Context, paymail string) (*response.Contact, error) {
+	res, err := c.contactsAPI.ContactWithPaymail(ctx, paymail)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve contact by paymail from the user contacts API: %w", err)
+	}
+	return res, nil
+}
+
+// UpsertContact adds or updates a user contact through the user contacts API.
+// The response is unmarshaled into a *response.Contact struct. If the API request
+// fails or the response cannot be decoded, an error is returned.
+func (c *Client) UpsertContact(ctx context.Context, cmd commands.UpsertContact) (*response.Contact, error) {
+	res, err := c.contactsAPI.UpsertContact(ctx, cmd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upsert contact using the user contacts API: %w", err)
+	}
+	return res, nil
+}
+
+// RemoveContact deletes a user contact using the user contacts API.
+// If the API request fails, an error is returned.
+func (c *Client) RemoveContact(ctx context.Context, paymail string) error {
+	err := c.contactsAPI.RemoveContact(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to remove contact using the user contacts API: %w", err)
+	}
+	return nil
+}
+
+// ConfirmContact confirms a user contact using the user contacts API.
+// If the API request fails, an error is returned.
+func (c *Client) ConfirmContact(ctx context.Context, paymail string) error {
+	err := c.contactsAPI.ConfirmContact(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to confirm contact using the user contacts API: %w", err)
+	}
+	return nil
+}
+
+// UnconfirmContact unconfirms a user contact using the user contacts API.
+// If the API request fails, an error is returned.
+func (c *Client) UnconfirmContact(ctx context.Context, paymail string) error {
+	err := c.contactsAPI.UnconfirmContact(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to unconfirm contact using the user contacts API: %w", err)
+	}
+	return nil
+}
+
+// AcceptInvitation accepts a contact invitation using the user invitations API.
+// If the API request fails, an error is returned.
+func (c *Client) AcceptInvitation(ctx context.Context, paymail string) error {
+	err := c.invitationsAPI.AcceptInvitation(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to accept invitation using the user invitations API: %w", err)
+	}
+	return nil
+}
+
+// RejectInvitation rejects a contact invitation using the user invitations API.
+// If the API request fails, an error is returned.
+func (c *Client) RejectInvitation(ctx context.Context, paymail string) error {
+	err := c.invitationsAPI.RejectInvitation(ctx, paymail)
+	if err != nil {
+		return fmt.Errorf("failed to reject invitation using the user invitations API: %w", err)
+	}
+	return nil
+}
+
 // SharedConfig retrieves the shared configuration from the user configurations API.
-// This method constructs an HTTP GET request to the "/shared" endpoint and expects
-// a response that can be unmarshaled into the response.SharedConfig struct.
-// If the request fails or the response cannot be decoded, an error will be returned.
+// This method constructs an HTTP GET request to the "api/v1/configs/shared" endpoint and expects
+// a response that can be unmarshaled into the response.SharedConfig struct. If the request fails
+// or the response cannot be decoded, an error will be returned.
 func (c *Client) SharedConfig(ctx context.Context) (*response.SharedConfig, error) {
 	res, err := c.configsAPI.SharedConfig(ctx)
 	if err != nil {
@@ -202,12 +293,13 @@ type authenticator interface {
 }
 
 func newClient(cfg Config, auth authenticator) *Client {
-	restyCli := newRestyClient(cfg, auth)
-	cli := Client{
-		configsAPI:      configs.NewAPI(cfg.Addr, restyCli),
-		transactionsAPI: transactions.NewAPI(cfg.Addr, restyCli),
+	httpClient := newRestyClient(cfg, auth)
+	return &Client{
+		configsAPI:      configs.NewAPI(cfg.Addr, httpClient),
+		contactsAPI:     contacts.NewAPI(cfg.Addr, httpClient),
+		invitationsAPI:  invitations.NewAPI(cfg.Addr, httpClient),
+		transactionsAPI: transactions.NewAPI(cfg.Addr, httpClient),
 	}
-	return &cli
 }
 
 func newRestyClient(cfg Config, auth authenticator) *resty.Client {

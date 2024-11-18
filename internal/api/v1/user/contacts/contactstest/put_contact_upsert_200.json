@@ -1,0 +1,16 @@
+{
+    "contact": {
+        "createdAt": "2024-10-18T12:07:44.739839Z",
+        "updatedAt": "2024-11-06T11:30:35.090124Z",
+        "deletedAt": null,
+        "metadata": {
+            "example_key": "example_val"
+        },
+        "id": "68acf78f-5ece-4917-821d-8028ecf06c9a",
+        "fullName": "John Doe",
+        "paymail": "john.doe.test@john.doe.test.4chain.space",
+        "pubKey": "0df36839-67bb-49e7-a9c7-e839aa564871",
+        "status": "unconfirmed"
+    },
+    "additionalInfo": {}
+}
