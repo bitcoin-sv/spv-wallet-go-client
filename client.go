@@ -15,6 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -53,6 +54,7 @@ type Client struct {
 	contactsAPI     *contacts.API
 	invitationsAPI  *invitations.API
 	transactionsAPI *transactions.API
+	utxosAPI        *utxos.API
 }
 
 // NewWithXPub creates a new client instance using an extended public key (xPub).
@@ -348,6 +350,22 @@ func (c *Client) RevokeAccessKey(ctx context.Context, ID string) error {
 	return nil
 }
 
+// UTXOs fetches a paginated list of UTXOs from the user UTXOs API.
+// The response includes UTXOs along with pagination details, such as page number,
+// sort order, and sorting field.
+//
+// Optional query parameters can be applied using the provided query options.
+// The response is unmarshaled into a *queries.UtxosPage struct.
+// Returns an error if the API request fails or the response cannot be decoded.
+func (c *Client) UTXOs(ctx context.Context, opts ...queries.UtxoQueryOption) (*queries.UtxosPage, error) {
+	res, err := c.utxosAPI.UTXOs(ctx, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve UTXOs page from the user UTXOs API: %w", err)
+	}
+
+	return res, nil
+}
+
 // ErrUnrecognizedAPIResponse indicates that the response received from the SPV Wallet API
 // does not match the expected expected format or structure.
 var ErrUnrecognizedAPIResponse = errors.New("unrecognized response from API")
@@ -372,8 +390,10 @@ type authenticator interface {
 
 func newClient(cfg Config, auth authenticator) *Client {
 	httpClient := newRestyClient(cfg, auth)
+
 	return &Client{
 		configsAPI:      configs.NewAPI(cfg.Addr, httpClient),
+		utxosAPI:        utxos.NewAPI(cfg.Addr, httpClient),
 		accessKeyAPI:    users.NewAccessKeyAPI(cfg.Addr, httpClient),
 		xpubAPI:         users.NewXPubAPI(cfg.Addr, httpClient),
 		contactsAPI:     contacts.NewAPI(cfg.Addr, httpClient),
