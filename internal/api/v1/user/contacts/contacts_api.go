@@ -3,6 +3,7 @@ package contacts
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/querybuilders"
@@ -14,7 +15,7 @@ import (
 const route = "api/v1/contacts"
 
 type API struct {
-	addr       string
+	url        *url.URL
 	httpClient *resty.Client
 }
 
@@ -45,7 +46,7 @@ func (a *API) Contacts(ctx context.Context, opts ...queries.ContactQueryOption) 
 		SetContext(ctx).
 		SetResult(&result).
 		SetQueryParams(params.ParseToMap()).
-		Get(a.addr)
+		Get(a.url.String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -55,13 +56,11 @@ func (a *API) Contacts(ctx context.Context, opts ...queries.ContactQueryOption) 
 
 func (a *API) ContactWithPaymail(ctx context.Context, paymail string) (*response.Contact, error) {
 	var result response.Contact
-
-	URL := a.addr + "/" + paymail
 	_, err := a.httpClient.
 		R().
 		SetContext(ctx).
 		SetResult(&result).
-		Get(URL)
+		Get(a.url.JoinPath(paymail).String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -69,16 +68,14 @@ func (a *API) ContactWithPaymail(ctx context.Context, paymail string) (*response
 	return &result, nil
 }
 
-func (a *API) UpsertContact(ctx context.Context, r commands.UpsertContact) (*response.Contact, error) {
+func (a *API) UpsertContact(ctx context.Context, cmd commands.UpsertContact) (*response.Contact, error) {
 	var result response.CreateContactResponse
-
-	URL := a.addr + "/" + r.Paymail
 	_, err := a.httpClient.
 		R().
-		SetBody(r).
+		SetBody(cmd).
 		SetContext(ctx).
 		SetResult(&result).
-		Put(URL)
+		Put(a.url.JoinPath(cmd.Paymail).String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -94,11 +91,10 @@ func (a *API) UpsertContact(ctx context.Context, r commands.UpsertContact) (*res
 }
 
 func (a *API) RemoveContact(ctx context.Context, paymail string) error {
-	URL := a.addr + "/" + paymail
 	_, err := a.httpClient.
 		R().
 		SetContext(ctx).
-		Delete(URL)
+		Delete(a.url.JoinPath(paymail).String())
 	if err != nil {
 		return fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -107,11 +103,10 @@ func (a *API) RemoveContact(ctx context.Context, paymail string) error {
 }
 
 func (a *API) ConfirmContact(ctx context.Context, paymail string) error {
-	URL := a.addr + "/" + paymail + "/confirmation"
 	_, err := a.httpClient.
 		R().
 		SetContext(ctx).
-		Post(URL)
+		Post(a.url.JoinPath(paymail, "confirmation").String())
 	if err != nil {
 		return fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -120,11 +115,10 @@ func (a *API) ConfirmContact(ctx context.Context, paymail string) error {
 }
 
 func (a *API) UnconfirmContact(ctx context.Context, paymail string) error {
-	URL := a.addr + "/" + paymail + "/confirmation"
 	_, err := a.httpClient.
 		R().
 		SetContext(ctx).
-		Delete(URL)
+		Delete(a.url.JoinPath(paymail, "confirmation").String())
 	if err != nil {
 		return fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -132,9 +126,9 @@ func (a *API) UnconfirmContact(ctx context.Context, paymail string) error {
 	return nil
 }
 
-func NewAPI(addr string, httpClient *resty.Client) *API {
+func NewAPI(url *url.URL, httpClient *resty.Client) *API {
 	return &API{
-		addr:       addr + "/" + route,
+		url:        url.JoinPath(route),
 		httpClient: httpClient,
 	}
 }

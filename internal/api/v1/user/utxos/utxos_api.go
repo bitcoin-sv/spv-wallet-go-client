@@ -3,6 +3,7 @@ package utxos
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
@@ -12,7 +13,7 @@ import (
 const route = "api/v1/utxos"
 
 type API struct {
-	addr       string
+	url        *url.URL
 	httpClient *resty.Client
 }
 
@@ -41,7 +42,7 @@ func (a *API) UTXOs(ctx context.Context, opts ...queries.UtxoQueryOption) (*quer
 		SetContext(ctx).
 		SetResult(&result).
 		SetQueryParams(params.ParseToMap()).
-		Get(a.addr)
+		Get(a.url.String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -49,9 +50,9 @@ func (a *API) UTXOs(ctx context.Context, opts ...queries.UtxoQueryOption) (*quer
 	return &result, nil
 }
 
-func NewAPI(addr string, httpClient *resty.Client) *API {
+func NewAPI(url *url.URL, httpClient *resty.Client) *API {
 	return &API{
-		addr:       addr + "/" + route,
+		url:        url.JoinPath(route),
 		httpClient: httpClient,
 	}
 }

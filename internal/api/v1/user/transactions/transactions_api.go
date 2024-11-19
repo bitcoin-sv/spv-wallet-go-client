@@ -3,6 +3,7 @@ package transactions
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/querybuilders"
@@ -14,19 +15,18 @@ import (
 const route = "api/v1/transactions"
 
 type API struct {
-	addr       string
+	url        *url.URL
 	httpClient *resty.Client
 }
 
 func (a *API) DraftTransaction(ctx context.Context, r *commands.DraftTransaction) (*response.DraftTransaction, error) {
 	var result response.DraftTransaction
 
-	URL := a.addr + "/drafts"
 	_, err := a.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
 		SetBody(r).
-		Post(URL)
+		Post(a.url.JoinPath("drafts").String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -41,7 +41,7 @@ func (a *API) RecordTransaction(ctx context.Context, r *commands.RecordTransacti
 		SetContext(ctx).
 		SetResult(&result).
 		SetBody(r).
-		Post(a.addr)
+		Post(a.url.String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -52,12 +52,11 @@ func (a *API) RecordTransaction(ctx context.Context, r *commands.RecordTransacti
 func (a *API) UpdateTransactionMetadata(ctx context.Context, r *commands.UpdateTransactionMetadata) (*response.Transaction, error) {
 	var result response.Transaction
 
-	URL := a.addr + "/" + r.ID
 	_, err := a.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
 		SetBody(r).
-		Patch(URL)
+		Patch(a.url.JoinPath(r.ID).String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -68,11 +67,10 @@ func (a *API) UpdateTransactionMetadata(ctx context.Context, r *commands.UpdateT
 func (a *API) Transaction(ctx context.Context, ID string) (*response.Transaction, error) {
 	var result response.Transaction
 
-	URL := a.addr + "/" + ID
 	_, err := a.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
-		Get(URL)
+		Get(a.url.JoinPath(ID).String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -86,16 +84,14 @@ func (a *API) Transactions(ctx context.Context, transactionsOpts ...queries.Tran
 		o(&query)
 	}
 
-	builderOpts := []querybuilders.QueryBuilderOption{
-		querybuilders.WithMetadataFilter(query.Metadata),
+	queryBuilder := querybuilders.NewQueryBuilder(querybuilders.WithMetadataFilter(query.Metadata),
 		querybuilders.WithPageFilter(query.Page),
 		querybuilders.WithFilterQueryBuilder(&transactionFilterBuilder{
 			TransactionFilter:  query.Filter,
 			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.Filter.ModelFilter},
 		}),
-	}
-	builder := querybuilders.NewQueryBuilder(builderOpts...)
-	params, err := builder.Build()
+	)
+	params, err := queryBuilder.Build()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create transactions query params: %w", err)
 	}
@@ -106,7 +102,7 @@ func (a *API) Transactions(ctx context.Context, transactionsOpts ...queries.Tran
 		SetContext(ctx).
 		SetResult(&result).
 		SetQueryParams(params.ParseToMap()).
-		Get(a.addr)
+		Get(a.url.String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -114,9 +110,9 @@ func (a *API) Transactions(ctx context.Context, transactionsOpts ...queries.Tran
 	return &result, nil
 }
 
-func NewAPI(addr string, httpClient *resty.Client) *API {
+func NewAPI(URL *url.URL, httpClient *resty.Client) *API {
 	return &API{
-		addr:       addr + "/" + route,
+		url:        URL.JoinPath(route),
 		httpClient: httpClient,
 	}
 }

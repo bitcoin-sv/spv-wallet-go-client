@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/querybuilders"
@@ -12,19 +13,18 @@ import (
 )
 
 type AccessKeyAPI struct {
-	addr       string
+	url        *url.URL
 	httpClient *resty.Client
 }
 
 func (a *AccessKeyAPI) GenerateAccessKey(ctx context.Context, cmd *commands.GenerateAccessKey) (*response.AccessKey, error) {
 	var result response.AccessKey
 
-	URL := a.addr + "/keys"
 	_, err := a.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
 		SetBody(cmd).
-		Post(URL)
+		Post(a.url.JoinPath("keys").String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -35,11 +35,10 @@ func (a *AccessKeyAPI) GenerateAccessKey(ctx context.Context, cmd *commands.Gene
 func (a *AccessKeyAPI) AccessKey(ctx context.Context, ID string) (*response.AccessKey, error) {
 	var result response.AccessKey
 
-	URL := a.addr + "/keys/" + ID
 	_, err := a.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
-		Get(URL)
+		Get(a.url.JoinPath("keys", ID).String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -67,13 +66,12 @@ func (a *AccessKeyAPI) AccessKeys(ctx context.Context, opts ...queries.AccessKey
 	}
 
 	var result response.PageModel[response.AccessKey]
-	URL := a.addr + "/keys"
 	_, err = a.httpClient.
 		R().
 		SetContext(ctx).
 		SetResult(&result).
 		SetQueryParams(params.ParseToMap()).
-		Get(URL)
+		Get(a.url.JoinPath("keys").String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -82,10 +80,9 @@ func (a *AccessKeyAPI) AccessKeys(ctx context.Context, opts ...queries.AccessKey
 }
 
 func (a *AccessKeyAPI) RevokeAccessKey(ctx context.Context, ID string) error {
-	URL := a.addr + "/keys/" + ID
 	_, err := a.httpClient.R().
 		SetContext(ctx).
-		Delete(URL)
+		Delete(a.url.JoinPath("keys", ID).String())
 	if err != nil {
 		return fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -93,9 +90,9 @@ func (a *AccessKeyAPI) RevokeAccessKey(ctx context.Context, ID string) error {
 	return nil
 }
 
-func NewAccessKeyAPI(addr string, httpClient *resty.Client) *AccessKeyAPI {
+func NewAccessKeyAPI(url *url.URL, httpClient *resty.Client) *AccessKeyAPI {
 	return &AccessKeyAPI{
-		addr:       addr + "/" + route,
+		url:        url.JoinPath(route),
 		httpClient: httpClient,
 	}
 }

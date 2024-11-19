@@ -3,6 +3,7 @@ package invitations
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -10,16 +11,15 @@ import (
 const route = "api/v1/invitations"
 
 type API struct {
-	addr       string
+	url        *url.URL
 	httpClient *resty.Client
 }
 
 func (a *API) AcceptInvitation(ctx context.Context, paymail string) error {
-	URL := a.addr + "/" + paymail + "/contacts"
 	_, err := a.httpClient.
 		R().
 		SetContext(ctx).
-		Post(URL)
+		Post(a.url.JoinPath(paymail, "contacts").String())
 	if err != nil {
 		return fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -28,11 +28,10 @@ func (a *API) AcceptInvitation(ctx context.Context, paymail string) error {
 }
 
 func (a *API) RejectInvitation(ctx context.Context, paymail string) error {
-	URL := a.addr + "/" + paymail
 	_, err := a.httpClient.
 		R().
 		SetContext(ctx).
-		Delete(URL)
+		Delete(a.url.JoinPath(paymail).String())
 	if err != nil {
 		return fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -40,9 +39,9 @@ func (a *API) RejectInvitation(ctx context.Context, paymail string) error {
 	return nil
 }
 
-func NewAPI(addr string, httpClient *resty.Client) *API {
+func NewAPI(url *url.URL, httpClient *resty.Client) *API {
 	return &API{
-		addr:       addr + "/" + route,
+		url:        url.JoinPath(route),
 		httpClient: httpClient,
 	}
 }

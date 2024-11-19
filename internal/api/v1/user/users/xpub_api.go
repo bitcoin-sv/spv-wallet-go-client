@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -12,7 +13,7 @@ import (
 const route = "api/v1/users/current"
 
 type XPubAPI struct {
-	addr       string
+	url        *url.URL
 	httpClient *resty.Client
 }
 
@@ -22,7 +23,7 @@ func (x *XPubAPI) XPub(ctx context.Context) (*response.Xpub, error) {
 		R().
 		SetContext(ctx).
 		SetResult(&result).
-		Get(x.addr)
+		Get(x.url.String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -36,7 +37,7 @@ func (x *XPubAPI) UpdateXPubMetadata(ctx context.Context, cmd *commands.UpdateXP
 		SetContext(ctx).
 		SetResult(&result).
 		SetBody(cmd).
-		Patch(x.addr)
+		Patch(x.url.String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -44,9 +45,9 @@ func (x *XPubAPI) UpdateXPubMetadata(ctx context.Context, cmd *commands.UpdateXP
 	return &result, nil
 }
 
-func NewXPubAPI(addr string, httpClient *resty.Client) *XPubAPI {
+func NewXPubAPI(url *url.URL, httpClient *resty.Client) *XPubAPI {
 	return &XPubAPI{
-		addr:       addr + "/" + route,
+		url:        url.JoinPath(route),
 		httpClient: httpClient,
 	}
 }
