@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users/userstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/clienttest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
@@ -40,18 +40,18 @@ func TestAccessKeyAPI_GenerateAccessKey(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP POST /api/v1/users/current/keys str response: 500": {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/users/current/keys"
+	url := clienttest.TestAPIAddr + "/api/v1/users/current/keys"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodPost, URL, tc.responder)
+			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			// then:
 			got, err := wallet.GenerateAccessKey(context.Background(), &commands.GenerateAccessKey{
@@ -89,18 +89,18 @@ func TestAccessKeyAPI_AccessKey(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/users/current/keys/%s str response: 500", ID): {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/users/current/keys/" + ID
+	url := clienttest.TestAPIAddr + "/api/v1/users/current/keys/" + ID
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
+			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
 			got, err := wallet.AccessKey(context.Background(), ID)
@@ -133,18 +133,18 @@ func TestAccessKeyAPI_AccessKeys(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/users/current/keys str response: 500": {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/users/current/keys"
+	url := clienttest.TestAPIAddr + "/api/v1/users/current/keys"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
+			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
 			got, err := wallet.AccessKeys(context.Background())
@@ -176,18 +176,18 @@ func TestAccessKeyAPI_RevokeAccessKey(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/users/current/keys/%s str response: 500", ID): {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/users/current/keys/" + ID
+	url := clienttest.TestAPIAddr + "/api/v1/users/current/keys/" + ID
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodDelete, URL, tc.responder)
+			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
 			// then:
 			err := wallet.RevokeAccessKey(context.Background(), ID)

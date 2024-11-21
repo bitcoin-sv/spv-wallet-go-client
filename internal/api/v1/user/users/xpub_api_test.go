@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	client "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users/userstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/clienttest"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -38,18 +38,18 @@ func TestXPubAPI_UpdateXPubMetadata(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP PATCH /api/v1/users/current str response: 500": {
-			expectedErr: client.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/users/current"
+	url := clienttest.TestAPIAddr + "/api/v1/users/current"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodPatch, URL, tc.responder)
+			transport.RegisterResponder(http.MethodPatch, url, tc.responder)
 
 			// then:
 			got, err := wallet.UpdateXPubMetadata(context.Background(), &commands.UpdateXPubMetadata{
@@ -86,18 +86,18 @@ func TestXPubAPI_XPub(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/users/current str response: 500": {
-			expectedErr: client.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/users/current"
+	url := clienttest.TestAPIAddr + "/api/v1/users/current"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
+			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
 			got, err := wallet.XPub(context.Background())

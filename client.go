@@ -11,10 +11,12 @@ import (
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	goclienterr "github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/totp"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos"
@@ -58,6 +60,8 @@ type Client struct {
 	invitationsAPI  *invitations.API
 	transactionsAPI *transactions.API
 	utxosAPI        *utxos.API
+
+	totp *totp.Client //only available when using xPriv
 }
 
 // NewWithXPub creates a new client instance using an extended public key (xPub).
@@ -72,8 +76,11 @@ func NewWithXPub(cfg Config, xPub string) (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to intialized xpub authenticator: %w", err)
 	}
-
-	return newClient(cfg, authenticator)
+	client, err := newClient(cfg, authenticator)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new client: %w", err)
+	}
+	return client, nil
 }
 
 // NewWithXPriv creates a new client instance using an extended private key (xPriv).
@@ -90,7 +97,14 @@ func NewWithXPriv(cfg Config, xPriv string) (*Client, error) {
 		return nil, fmt.Errorf("failed to intialized xpriv authenticator: %w", err)
 	}
 
-	return newClient(cfg, authenticator)
+	client, err := newClient(cfg, authenticator)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new client: %w", err)
+	}
+
+	client.totp = totp.New(key)
+
+	return client, nil
 }
 
 // NewWithAccessKey creates a new client instance using an access key.
@@ -162,10 +176,13 @@ func (c *Client) RemoveContact(ctx context.Context, paymail string) error {
 	return nil
 }
 
-// ConfirmContact confirms a user contact using the user contacts API.
-// If the API request fails, an error is returned.
-func (c *Client) ConfirmContact(ctx context.Context, paymail string) error {
-	err := c.contactsAPI.ConfirmContact(ctx, paymail)
+// ConfirmContact checks the TOTP code and if it's ok, confirms user's contact using the user contacts API.
+func (c *Client) ConfirmContact(ctx context.Context, contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
+	if err := c.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits); err != nil {
+		return fmt.Errorf("failed to validate TOTP for contact: %w", err)
+	}
+
+	err := c.contactsAPI.ConfirmContact(ctx, contact.Paymail)
 	if err != nil {
 		return fmt.Errorf("failed to confirm contact using the user contacts API: %w", err)
 	}
@@ -396,9 +413,28 @@ func (c *Client) MerkleRoots(ctx context.Context, opts ...queries.MerkleRootsQue
 	return res, nil
 }
 
-// ErrUnrecognizedAPIResponse indicates that the response received from the SPV Wallet API
-// does not match the expected expected format or structure.
-var ErrUnrecognizedAPIResponse = errors.New("unrecognized response from API")
+// GenerateTotpForContact generates a TOTP code for the specified contact.
+func (c *Client) GenerateTotpForContact(contact *models.Contact, period, digits uint) (string, error) {
+	if c.totp == nil {
+		return "", errors.New("totp client not initialized - xPriv authentication required")
+	}
+	totp, err := c.totp.GenerateTotpForContact(contact, period, digits)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate TOTP for contact: %w", err)
+	}
+	return totp, nil
+}
+
+// ValidateTotpForContact validates a TOTP code for the specified contact.
+func (c *Client) ValidateTotpForContact(contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
+	if c.totp == nil {
+		return errors.New("totp client not initialized - xPriv authentication required")
+	}
+	if err := c.totp.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits); err != nil {
+		return fmt.Errorf("failed to validate TOTP for contact: %w", err)
+	}
+	return nil
+}
 
 func privateKeyFromHexOrWIF(s string) (*ec.PrivateKey, error) {
 	pk, err1 := ec.PrivateKeyFromWif(s)
@@ -455,6 +491,6 @@ func newRestyClient(cfg Config, auth authenticator) *resty.Client {
 				return spvError
 			}
 
-			return fmt.Errorf("%w: %s", ErrUnrecognizedAPIResponse, r.Body())
+			return fmt.Errorf("%w: %s", goclienterr.ErrUnrecognizedAPIResponse, r.Body())
 		})
 }

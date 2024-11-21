@@ -1,6 +1,8 @@
 package clienttest
 
 import (
+	"encoding/hex"
+	"net/http"
 	"testing"
 	"time"
 
@@ -17,6 +19,12 @@ const (
 	UserXPub          = "xpub661MyMwAqRbcG9uqtWJY8pcBhVdrJBYvz8FUHZffnR1pNVPyQpXnaKeM5w2FyH5Wwhf5Cf15mFDVRZnuK9sEHDqqd39qWz36UDoobrzLyFM"
 	UserPrivAccessKey = "03a446ede05f04fd92d2707599a80b67ad76f63b3958706819c76308bfc7c1143d"
 	UserPubAccessKey  = "0239a60e37d62b0217ac86881caba194ab943e18099c080de70c173daf75d917b2"
+	PubKey            = "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
+
+	AliceXPriv = "xprv9s21ZrQH143K4JFXqGhBzdrthyNFNuHPaMUwvuo8xvpHwWXprNK7T4JPj1w53S1gojQncyj8JhSh8qouYPZpbocsq934cH5G1t1DRBfgbod"
+	AliceXPub  = "xpub661MyMwAqRbcGnKzwJECMmodG1CjnN1EwaQYjJCkXGMGpJryPudMzrcsaK6frwUxXqFxRJwPkKvJh6myJEpQPJS9N67jhZWr24biGe277DH"
+	BobXPriv   = "xprv9s21ZrQH143K4VneY3UWCF1o5Kk2tmgGrGtMtsrThCTsHsszEZ6H1iP37ZTwuUBvMwudG68SRkcfTjeu8h3rkayfyqkjKAStFBkuNsBnAkS"
+	BobXPub    = "xpub661MyMwAqRbcGys7e51WZNxXdMaXJEQ8DVoxhGG5FXzrAgD8n6QXZWhWxrm2yMzH8e9fxV8TYxmkL9sivVEEoPfDpg4u5mrp2VTqvfGT1Us"
 )
 
 func ExtendedKey(t *testing.T) *bip32.ExtendedKey {
@@ -30,6 +38,7 @@ func ExtendedKey(t *testing.T) *bip32.ExtendedKey {
 }
 
 func PrivateKey(t *testing.T) *ec.PrivateKey {
+	t.Helper()
 	key, err := ec.PrivateKeyFromHex(UserPrivAccessKey)
 	if err != nil {
 		t.Fatalf("test helper - ec private key from hex: %s", err)
@@ -53,4 +62,50 @@ func GivenSPVWalletClient(t *testing.T) (*client.Client, *httpmock.MockTransport
 	}
 
 	return spv, transport
+}
+
+func GivenSPVWalletClientWithTransport(t *testing.T, transport http.RoundTripper) (*client.Client, *httpmock.MockTransport) {
+	t.Helper()
+
+	// Extract the wrapped MockTransport if it's a TransportWrapper
+	var mockTransport *httpmock.MockTransport
+	if wrapper, ok := transport.(*TransportWrapper); ok {
+		mockTransport = wrapper.MockTransport
+	} else if mt, ok := transport.(*httpmock.MockTransport); ok {
+		mockTransport = mt
+	} else {
+		t.Fatalf("expected transport to be of type *httpmock.MockTransport or *httpmockwrapper.TransportWrapper, got %T", transport)
+	}
+
+	cfg := client.Config{
+		Addr:      TestAPIAddr,
+		Timeout:   5 * time.Second,
+		Transport: transport,
+	}
+
+	spv, err := client.NewWithXPriv(cfg, UserXPriv)
+	if err != nil {
+		t.Fatalf("test helper - spv wallet client with xpriv: %s", err)
+	}
+
+	return spv, mockTransport
+}
+
+func MockPKI(t *testing.T, xpub string) string {
+	t.Helper()
+	xPub, _ := bip32.NewKeyFromString(xpub)
+	var err error
+	for i := 0; i < 3; i++ { //magicNumberOfInheritance is 3 -> 2+1; 2: because of the way spv-wallet stores xpubs in db; 1: to make a PKI
+		xPub, err = xPub.Child(0)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	pubKey, err := xPub.ECPubKey()
+	if err != nil {
+		t.Fatalf("test helper - ec public key from xpub: %s", err)
+	}
+
+	return hex.EncodeToString(pubKey.SerializeCompressed())
 }

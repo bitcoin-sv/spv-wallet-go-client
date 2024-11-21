@@ -1,10 +1,11 @@
 package querybuilders
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"reflect"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 )
 
 type Metadata map[string]any
@@ -51,7 +52,7 @@ func (m *MetadataFilterBuilder) Build() (url.Values, error) {
 
 func (m *MetadataFilterBuilder) generateQueryParams(depth int, path metadataPath, val any, params url.Values) error {
 	if depth > m.MaxDepth {
-		return fmt.Errorf("%w - max depth: %d", ErrMetadataFilterMaxDepthExceeded, m.MaxDepth)
+		return fmt.Errorf("%w - max depth: %d", errors.ErrMetadataFilterMaxDepthExceeded, m.MaxDepth)
 	}
 
 	if val == nil {
@@ -91,7 +92,7 @@ func (m *MetadataFilterBuilder) processSliceQueryParams(val any, path metadataPa
 		// note: kind := item.Kind() is not enough, because it returns interface instead of actual underlying type
 		kind := reflect.TypeOf(item.Interface()).Kind()
 		if kind == reflect.Map || kind == reflect.Slice {
-			return ErrMetadataWrongTypeInArray
+			return errors.ErrMetadataWrongTypeInArray
 		}
 
 		arr[i] = item.Interface()
@@ -100,8 +101,3 @@ func (m *MetadataFilterBuilder) processSliceQueryParams(val any, path metadataPa
 
 	return nil
 }
-
-var (
-	ErrMetadataFilterMaxDepthExceeded = errors.New("maximum depth of nesting in metadata map exceeded")
-	ErrMetadataWrongTypeInArray       = errors.New("wrong type in array")
-)

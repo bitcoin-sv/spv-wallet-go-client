@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/querybuilders"
 	"github.com/stretchr/testify/require"
 )
@@ -183,7 +184,7 @@ func TestMetadataFilterBuilder_Build(t *testing.T) {
 				},
 			},
 			depth:       3,
-			expectedErr: querybuilders.ErrMetadataFilterMaxDepthExceeded,
+			expectedErr: errors.ErrMetadataFilterMaxDepthExceeded,
 		},
 		"metadata: unsupported map in array": {
 			metadata: querybuilders.Metadata{
@@ -196,7 +197,7 @@ func TestMetadataFilterBuilder_Build(t *testing.T) {
 				},
 			},
 			depth:       querybuilders.DefaultMaxDepth,
-			expectedErr: querybuilders.ErrMetadataWrongTypeInArray,
+			expectedErr: errors.ErrMetadataWrongTypeInArray,
 		},
 	}
 

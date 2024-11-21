@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts/contactstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/clienttest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
@@ -39,18 +39,18 @@ func TestContactsAPI_Contacts(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/contacts str response: 500": {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/contacts"
+	url := clienttest.TestAPIAddr + "/api/v1/contacts"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
+			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
 			got, err := wallet.Contacts(context.Background())
@@ -83,18 +83,18 @@ func TestContactsAPI_ContactWithPaymail(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/contacts/%s str response: 500", paymail): {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail
+	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
+			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
 			got, err := wallet.ContactWithPaymail(context.Background(), paymail)
@@ -127,18 +127,18 @@ func TestContactsAPI_UpsertContact(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP PUT /api/v1/contacts/%s str response: 500", paymail): {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail
+	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodPut, URL, tc.responder)
+			transport.RegisterResponder(http.MethodPut, url, tc.responder)
 
 			// then:
 			got, err := wallet.UpsertContact(context.Background(), commands.UpsertContact{
@@ -173,18 +173,18 @@ func TestContactsAPI_RemoveContact(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/contacts/%s str response: 500", paymail): {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail
+	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodDelete, URL, tc.responder)
+			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
 			// then:
 			err := wallet.RemoveContact(context.Background(), paymail)
@@ -194,43 +194,58 @@ func TestContactsAPI_RemoveContact(t *testing.T) {
 }
 
 func TestContactsAPI_ConfirmContact(t *testing.T) {
-	paymail := "john.doe.test@john.doe.test.4chain.space"
+	contact := &models.Contact{
+		Paymail: "alice@example.com",
+		PubKey:  clienttest.MockPKI(t, clienttest.UserXPub),
+	}
+
 	tests := map[string]struct {
 		responder   httpmock.Responder
 		statusCode  int
 		expectedErr error
 	}{
-		fmt.Sprintf("HTTP POST /api/v1/contacts/%s/confirmation response: 200", paymail): {
+		fmt.Sprintf("HTTP POST /api/v1/contacts/%s/confirmation response: 200", contact.Paymail): {
 			statusCode: http.StatusOK,
 			responder:  httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
-		fmt.Sprintf("HTTP POST /api/v1/contacts/%s/confirmation response: 400", paymail): {
+		fmt.Sprintf("HTTP POST /api/v1/contacts/%s/confirmation response: 400", contact.Paymail): {
 			expectedErr: models.SPVError{
 				Message:    http.StatusText(http.StatusBadRequest),
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
+			statusCode: http.StatusBadRequest,
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
-		fmt.Sprintf("HTTP POST /api/v1/contacts/%s/confirmation str response: 500", paymail): {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+		fmt.Sprintf("HTTP POST /api/v1/contacts/%s/confirmation str response: 500", contact.Paymail): {
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail + "/confirmation"
+	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + contact.Paymail + "/confirmation"
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodPost, URL, tc.responder)
+			wrappedTransport := clienttest.NewTransportWrapper()
+			aliceClient, _ := clienttest.GivenSPVWalletClientWithTransport(t, wrappedTransport)
+			wrappedTransport.RegisterResponder(http.MethodPost, url, tc.responder)
+
+			passcode, err := aliceClient.GenerateTotpForContact(contact, 3600, 6)
+			require.NoError(t, err)
 
 			// then:
-			err := wallet.ConfirmContact(context.Background(), paymail)
+			err = aliceClient.ConfirmContact(context.Background(), contact, passcode, contact.Paymail, 3600, 6)
 			require.ErrorIs(t, err, tc.expectedErr)
+
+			// Assert status code:
+			resp, respErr := wrappedTransport.GetResponse()
+			require.NoError(t, respErr)
+			require.NotNil(t, resp, "response should not be nil")
+			require.Equal(t, tc.statusCode, resp.StatusCode, "unexpected HTTP status code")
+
 		})
 	}
 }
@@ -256,18 +271,18 @@ func TestContactsAPI_UnconfirmContact(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/contacts/%s/confirmation str response: 500", paymail): {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail + "/confirmation"
+	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail + "/confirmation"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			wallet, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodDelete, URL, tc.responder)
+			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
 			// then:
 			err := wallet.UnconfirmContact(context.Background(), paymail)

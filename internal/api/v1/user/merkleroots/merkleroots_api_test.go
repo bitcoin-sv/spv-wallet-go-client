@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots/merklerootstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/clienttest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
@@ -36,18 +36,18 @@ func TestMerkleRootsAPI_MerkleRoots(t *testing.T) {
 			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, merklerootstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/merkleroots str response: 500": {
-			expectedErr: wallet.ErrUnrecognizedAPIResponse,
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
 			statusCode:  http.StatusInternalServerError,
 			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
-	URL := clienttest.TestAPIAddr + "/api/v1/merkleroots"
+	url := clienttest.TestAPIAddr + "/api/v1/merkleroots"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
 			spvWalletClient, transport := clienttest.GivenSPVWalletClient(t)
-			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
+			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
 			got, err := spvWalletClient.MerkleRoots(context.Background())
