@@ -1,0 +1,117 @@
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task --list
+    desc: "Display all available tasks."
+
+  generate-keys:
+    desc: "Generate keys for SPV Wallet API access."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ../walletkeys/cmd/main.go
+      - echo "=================================================================="
+
+  fetch-user-shared-config:
+    desc: "Fetch user shared configuration."
+    silent: true
+    cmds:
+      - go run ./fetch_shared_config/fetch_shared_config.go
+
+  fetch-user-merkleroots:
+    desc: "Fetch user Merkle roots page."
+    silent: true
+    cmds:
+      - go run ./fetch_merkleroots/fetch_merkleroots.go
+
+  fetch-user-contacts:
+    desc: "Fetch user contacts page."
+    silent: true
+    cmds:
+      - go run ./fetch_contacts/fetch_contacts.go
+
+  fetch-user-contact-by-paymail:
+    desc: "Fetch user contact by given paymail."
+    silent: true
+    cmds:
+      - go run ./fetch_contact_by_paymail/fetch_contact_by_paymail.go
+
+  user-contact-confirmation:
+    desc: "Confirm user contact with a given paymail address."
+    silent: true
+    cmds:
+      - go run ./contact_confirmation/contact_confirmation.go
+
+  user-contact-unconfirm:
+    desc: "Unconfirm user contact with a given paymail address."
+    silent: true
+    cmds:
+      - go run ./unconfirm_contact/unconfirm_contact.go
+
+  user-contact-remove:
+    desc: "Remove user contact with a given paymail address."
+    silent: true
+    cmds:
+      - go run ./contact_remove/contact_remove.go
+
+  user-contact-upsert:
+    desc: "Upsert user contact with a given paymail address."
+    silent: true
+    cmds:
+      - go run ./contact_upsert/contact_upsert.go
+
+  user-invitation-accept:
+    desc: "Accept user contact invitation with a given paymail address."
+    silent: true
+    cmds:
+      - go run ./accept_invitation/accept_invitation.go
+
+  user-invitation-reject:
+    desc: "Reject user contact invitation with a given paymail address."
+    silent: true
+    cmds:
+      - go run ./reject_invitation/reject_invitation.go
+
+  fetch-user-transactions:
+    desc: "Fetch user transactions page."
+    silent: true
+    cmds:
+      - go run ./fetch_transactions/fetch_transactions.go
+
+  fetch-user-transaction:
+    desc: "Fetch user transaction with a given ID."
+    silent: true
+    cmds:
+      - go run ./fetch_transaction/fetch_transaction.go
+
+  user-draft-transaction:
+    desc: "Create a user draft transaction."
+    silent: true
+    cmds:
+      - go run ./draft_transaction/draft_transaction.go
+
+  user-transaction-metadata-update:
+    desc: "Update user transaction metadata with a given ID."
+    silent: true
+    cmds:
+      - go run ./update_transaction_metadata/update_transaction_metadata.go
+
+  fetch-user-utxos:
+    desc: "Fetch user UTXOs page."
+    silent: true
+    cmds:
+      - go run ./fetch_utxos/fetch_utxos.go
+
+  fetch-user-xpub:
+    desc: "Fetch current authorized user's xpub info."
+    silent: true
+    cmds:
+      - go run ./fetch_xpub/fetch_xpub.go
+
+  user-xpub-metadata:
+    desc: "Update current authorized user's xpub metadata."
+    silent: true
+    cmds:
+      - go run ./update_xpub_metadata/update_xpub_metadata.go
