@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/clienttest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -41,11 +41,11 @@ func TestInvitationsAPI_AcceptInvitation(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/invitations/" + paymail + "/contacts"
+	url := spvwallettest.TestAPIAddr + "/api/v1/invitations/" + paymail + "/contacts"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
+			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			// then:
@@ -82,11 +82,11 @@ func TestInvitationsAPI_RejectInvitation(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/invitations/" + paymail
+	url := spvwallettest.TestAPIAddr + "/api/v1/invitations/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
+			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
 			// then:

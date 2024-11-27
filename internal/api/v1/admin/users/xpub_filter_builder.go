@@ -1,4 +1,4 @@
-package users
+package xpubs
 
 import (
 	"fmt"
@@ -8,13 +8,13 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
-type accessKeyFilterQueryBuilder struct {
-	accessKeyFilter    filter.AccessKeyFilter
+type xpubFilterBuilder struct {
+	xpubFilter         filter.XpubFilter
 	modelFilterBuilder querybuilders.ModelFilterBuilder
 }
 
-func (a *accessKeyFilterQueryBuilder) Build() (url.Values, error) {
-	modelFilterBuilder, err := a.modelFilterBuilder.Build()
+func (x *xpubFilterBuilder) Build() (url.Values, error) {
+	modelFilterBuilder, err := x.modelFilterBuilder.Build()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build model filter query params: %w", err)
 	}
@@ -24,6 +24,7 @@ func (a *accessKeyFilterQueryBuilder) Build() (url.Values, error) {
 		params.Append(modelFilterBuilder)
 	}
 
-	params.AddPair("revokedRange", a.accessKeyFilter.RevokedRange)
+	params.AddPair("id", x.xpubFilter.ID)
+	params.AddPair("currentBalance", x.xpubFilter.CurrentBalance)
 	return params.Values, nil
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users/userstest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/clienttest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
@@ -44,11 +44,11 @@ func TestXPubAPI_UpdateXPubMetadata(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/users/current"
+	url := spvwallettest.TestAPIAddr + "/api/v1/users/current"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
+			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPatch, url, tc.responder)
 
 			// then:
@@ -92,11 +92,11 @@ func TestXPubAPI_XPub(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/users/current"
+	url := spvwallettest.TestAPIAddr + "/api/v1/users/current"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
+			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:

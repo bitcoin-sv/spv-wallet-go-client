@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 )
 
 const (
@@ -95,6 +96,20 @@ func Int64ToUint32(value int64) (uint32, error) {
 		return 0, ErrMaxUint32LimitExceeded
 	}
 	return uint32(value), nil
+}
+
+func PrivateKeyFromHexOrWIF(s string) (*ec.PrivateKey, error) {
+	pk, err1 := ec.PrivateKeyFromWif(s)
+	if err1 == nil {
+		return pk, nil
+	}
+
+	pk, err2 := ec.PrivateKeyFromHex(s)
+	if err2 != nil {
+		return nil, errors.Join(err1, err2)
+	}
+
+	return pk, nil
 }
 
 var (

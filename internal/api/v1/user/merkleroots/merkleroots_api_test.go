@@ -7,7 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots/merklerootstest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/clienttest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/jarcoal/httpmock"
@@ -43,11 +43,11 @@ func TestMerkleRootsAPI_MerkleRoots(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/merkleroots"
+	url := spvwallettest.TestAPIAddr + "/api/v1/merkleroots"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			spvWalletClient, transport := clienttest.GivenSPVWalletClient(t)
+			spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
@@ -113,12 +113,12 @@ func TestMerkleRootsAPI_SyncMerkleRoots(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/merkleroots"
+	url := spvwallettest.TestAPIAddr + "/api/v1/merkleroots"
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// Arrange
-			spvWalletClient, transport := clienttest.GivenSPVWalletClient(t)
+			spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			mockRepo := new(MockMerkleRootsRepository)
@@ -142,8 +142,8 @@ func TestMerkleRootsAPI_SyncMerkleRoots(t *testing.T) {
 func TestMerkleRootsAPI_SyncMerkleRoots_PartialResponsesStoredSuccessfully(t *testing.T) {
 	// given:
 	db := merklerootstest.CreateRepository([]models.MerkleRoot{})
-	url := clienttest.TestAPIAddr + "/api/v1/merkleroots"
-	spvWalletClient, transport := clienttest.GivenSPVWalletClient(t)
+	url := spvwallettest.TestAPIAddr + "/api/v1/merkleroots"
+	spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
 
 	var expected []models.MerkleRoot
 	expected = append(expected, merklerootstest.FirstMerkleRootsPage().Content...)

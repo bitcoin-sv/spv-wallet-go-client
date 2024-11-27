@@ -7,8 +7,8 @@ import (
 	"time"
 
 	goclienterr "github.com/bitcoin-sv/spv-wallet-go-client/errors"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/querybuilders"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/querybuilders/querybuilderstest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders/querybuilderstest"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
 )

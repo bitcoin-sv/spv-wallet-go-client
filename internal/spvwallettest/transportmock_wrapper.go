@@ -1,4 +1,4 @@
-package clienttest
+package spvwallettest
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package clienttest
+package spvwallettest
 
 import (
 	"encoding/hex"
@@ -8,7 +8,8 @@ import (
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
-	client "github.com/bitcoin-sv/spv-wallet-go-client"
+	spvwallet "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/config"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -47,16 +48,16 @@ func PrivateKey(t *testing.T) *ec.PrivateKey {
 	return key
 }
 
-func GivenSPVWalletClient(t *testing.T) (*client.Client, *httpmock.MockTransport) {
+func GivenSPVUserAPI(t *testing.T) (*spvwallet.UserAPI, *httpmock.MockTransport) {
 	t.Helper()
 	transport := httpmock.NewMockTransport()
-	cfg := client.Config{
+	cfg := config.Config{
 		Addr:      TestAPIAddr,
 		Timeout:   5 * time.Second,
 		Transport: transport,
 	}
 
-	spv, err := client.NewWithXPriv(cfg, UserXPriv)
+	spv, err := spvwallet.NewUserAPIWithXPriv(cfg, UserXPriv)
 	if err != nil {
 		t.Fatalf("test helper - spv wallet client with xpriv: %s", err)
 	}
@@ -64,7 +65,24 @@ func GivenSPVWalletClient(t *testing.T) (*client.Client, *httpmock.MockTransport
 	return spv, transport
 }
 
-func GivenSPVWalletClientWithTransport(t *testing.T, transport http.RoundTripper) (*client.Client, *httpmock.MockTransport) {
+func GivenSPVAdminAPI(t *testing.T) (*spvwallet.AdminAPI, *httpmock.MockTransport) {
+	t.Helper()
+	transport := httpmock.NewMockTransport()
+	cfg := config.Config{
+		Addr:      TestAPIAddr,
+		Timeout:   5 * time.Second,
+		Transport: transport,
+	}
+
+	api, err := spvwallet.NewAdminAPIWithXPriv(cfg, UserXPriv)
+	if err != nil {
+		t.Fatalf("test helper - admin api with xPub: %s", err)
+	}
+
+	return api, transport
+}
+
+func GivenSPVWalletClientWithTransport(t *testing.T, transport http.RoundTripper) (*spvwallet.UserAPI, *httpmock.MockTransport) {
 	t.Helper()
 
 	// Extract the wrapped MockTransport if it's a TransportWrapper
@@ -77,13 +95,13 @@ func GivenSPVWalletClientWithTransport(t *testing.T, transport http.RoundTripper
 		t.Fatalf("expected transport to be of type *httpmock.MockTransport or *httpmockwrapper.TransportWrapper, got %T", transport)
 	}
 
-	cfg := client.Config{
+	cfg := config.Config{
 		Addr:      TestAPIAddr,
 		Timeout:   5 * time.Second,
 		Transport: transport,
 	}
 
-	spv, err := client.NewWithXPriv(cfg, UserXPriv)
+	spv, err := spvwallet.NewUserAPIWithXPriv(cfg, UserXPriv)
 	if err != nil {
 		t.Fatalf("test helper - spv wallet client with xpriv: %s", err)
 	}

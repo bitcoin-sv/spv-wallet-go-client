@@ -9,7 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts/contactstest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/clienttest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -45,11 +45,11 @@ func TestContactsAPI_Contacts(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/contacts"
+	url := spvwallettest.TestAPIAddr + "/api/v1/contacts"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
+			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
@@ -89,11 +89,11 @@ func TestContactsAPI_ContactWithPaymail(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail
+	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
+			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
@@ -133,11 +133,11 @@ func TestContactsAPI_UpsertContact(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail
+	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
+			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPut, url, tc.responder)
 
 			// then:
@@ -179,11 +179,11 @@ func TestContactsAPI_RemoveContact(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail
+	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
+			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
 			// then:
@@ -196,7 +196,7 @@ func TestContactsAPI_RemoveContact(t *testing.T) {
 func TestContactsAPI_ConfirmContact(t *testing.T) {
 	contact := &models.Contact{
 		Paymail: "alice@example.com",
-		PubKey:  clienttest.MockPKI(t, clienttest.UserXPub),
+		PubKey:  spvwallettest.MockPKI(t, spvwallettest.UserXPub),
 	}
 
 	tests := map[string]struct {
@@ -224,13 +224,13 @@ func TestContactsAPI_ConfirmContact(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + contact.Paymail + "/confirmation"
+	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + contact.Paymail + "/confirmation"
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wrappedTransport := clienttest.NewTransportWrapper()
-			aliceClient, _ := clienttest.GivenSPVWalletClientWithTransport(t, wrappedTransport)
+			wrappedTransport := spvwallettest.NewTransportWrapper()
+			aliceClient, _ := spvwallettest.GivenSPVWalletClientWithTransport(t, wrappedTransport)
 			wrappedTransport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			passcode, err := aliceClient.GenerateTotpForContact(contact, 3600, 6)
@@ -277,11 +277,11 @@ func TestContactsAPI_UnconfirmContact(t *testing.T) {
 		},
 	}
 
-	url := clienttest.TestAPIAddr + "/api/v1/contacts/" + paymail + "/confirmation"
+	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + paymail + "/confirmation"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := clienttest.GivenSPVWalletClient(t)
+			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
 			// then:

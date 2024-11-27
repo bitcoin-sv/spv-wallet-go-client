@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
 )
@@ -49,5 +50,13 @@ func NewXPubAPI(url *url.URL, httpClient *resty.Client) *XPubAPI {
 	return &XPubAPI{
 		url:        url.JoinPath(route),
 		httpClient: httpClient,
+	}
+
+}
+func XPubsHTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {
+	return &errutil.HTTPErrorFormatter{
+		Action: action,
+		API:    "User XPubs API",
+		Err:    err,
 	}
 }

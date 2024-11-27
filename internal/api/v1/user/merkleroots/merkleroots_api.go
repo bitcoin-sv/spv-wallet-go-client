@@ -7,7 +7,8 @@ import (
 	"net/url"
 
 	goclienterr "github.com/bitcoin-sv/spv-wallet-go-client/errors"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
@@ -61,11 +62,15 @@ func NewAPI(url *url.URL, httpClient *resty.Client) *API {
 	}
 }
 
-// SyncMerkleRoots syncs merkleroots known to spv-wallet with the client database
-// If timeout is needed pass context.WithTimeout() as ctx param
-// SyncMerkleRoots synchronizes Merkle roots known to SPV Wallet with the client database.
-func (a *API) SyncMerkleRoots(ctx context.Context, repo MerkleRootsRepository) error {
+func HTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {
+	return &errutil.HTTPErrorFormatter{
+		Action: action,
+		API:    "User Merkle roots API",
+		Err:    err,
+	}
+}
 
+func (a *API) SyncMerkleRoots(ctx context.Context, repo MerkleRootsRepository) error {
 	lastEvaluatedKey := repo.GetLastMerkleRoot()
 	previousLastEvaluatedKey := lastEvaluatedKey
 

@@ -6,7 +6,8 @@ import (
 	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
@@ -114,5 +115,13 @@ func NewAPI(URL *url.URL, httpClient *resty.Client) *API {
 	return &API{
 		url:        URL.JoinPath(route),
 		httpClient: httpClient,
+	}
+}
+
+func HTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {
+	return &errutil.HTTPErrorFormatter{
+		Action: action,
+		API:    "User Transactions API",
+		Err:    err,
 	}
 }
