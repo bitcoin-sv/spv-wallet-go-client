@@ -60,8 +60,7 @@ type Client struct {
 	invitationsAPI  *invitations.API
 	transactionsAPI *transactions.API
 	utxosAPI        *utxos.API
-
-	totp *totp.Client //only available when using xPriv
+	totp            *totp.Client
 }
 
 // NewWithXPub creates a new client instance using an extended public key (xPub).
@@ -432,6 +431,16 @@ func (c *Client) ValidateTotpForContact(contact *models.Contact, passcode, reque
 	}
 	if err := c.totp.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits); err != nil {
 		return fmt.Errorf("failed to validate TOTP for contact: %w", err)
+	}
+	return nil
+}
+
+// SyncMerkleRoots synchronizes Merkle roots known to the SPV Wallet with the client database.
+// This method sends a series of HTTP GET requests to the "/merkleroots" endpoint, fetching
+// Merkle roots and storing them in the client database. The process continues until all
+func (c *Client) SyncMerkleRoots(ctx context.Context, repo merkleroots.MerkleRootsRepository) error {
+	if err := c.merkleRootsAPI.SyncMerkleRoots(ctx, repo); err != nil {
+		return fmt.Errorf("failed to sync Merkle roots: %w", err)
 	}
 	return nil
 }

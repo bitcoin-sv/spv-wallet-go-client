@@ -1,0 +1,14 @@
+{
+    "content": [
+      { "blockHeight": 1, "merkleRoot": "d02ab7b5-ac3e-4612-9377-9bffe05ac689" },
+      { "blockHeight": 2, "merkleRoot": "132a2a38-b23f-404b-940f-f811de886114" }
+    ],
+    "page": {
+      "lastEvaluatedKey": "key-1",
+      "orderByField": "blockHeight",
+      "size": 20,
+      "sortDirection": "asc",
+      "totalElements": 10
+    }
+  }
+  

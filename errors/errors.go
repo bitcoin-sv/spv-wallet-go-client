@@ -16,4 +16,11 @@ var (
 	// ErrUnrecognizedAPIResponse indicates that the response received from the SPV Wallet API
 	// does not match the expected format or structure.
 	ErrUnrecognizedAPIResponse = errors.New("unrecognized response from API")
+	// ErrSyncMerkleRootsTimeout is returned when the SyncMerkleRoots operation times out.
+	ErrSyncMerkleRootsTimeout = errors.New("SyncMerkleRoots operation timed out")
+	// ErrStaleLastEvaluatedKey is returned when the last evaluated key has not changed between requests,
+	ErrStaleLastEvaluatedKey = errors.New("the last evaluated key has not changed between requests, indicating a possible loop or synchronization issue.")
+
+	// ErrFailedToFetchMerkleRootsFromAPI is returned when the API fails to fetch merkle roots.
+	ErrFailedToFetchMerkleRootsFromAPI = errors.New("failed to fetch merkle roots from API")
 )
