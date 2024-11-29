@@ -26,39 +26,28 @@ func TestMerkleRootsAPI_MerkleRoots(t *testing.T) {
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("merklerootstest/get_merkleroots_200.json")),
 		},
 		"HTTP GET /api/v1/merkleroots response: 400": {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, merklerootstest.NewBadRequestSPVError()),
+			expectedErr: merklerootstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, merklerootstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/merkleroots str response: 500": {
-			expectedErr: models.SPVError{
-				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: http.StatusInternalServerError,
-				Code:       "internal-server-error",
-			},
-			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/merkleroots"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := spvWalletClient.MerkleRoots(context.Background())
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expectedErr.Error())
-			} else {
-				require.NoError(t, err)
-			}
-			require.EqualValues(t, tc.expectedResponse, got)
+
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
+			require.Equal(t, tc.expectedResponse, got)
 		})
 	}
 }
@@ -119,31 +108,23 @@ func TestMerkleRootsAPI_SyncMerkleRoots(t *testing.T) {
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/merkleroots"
-
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// Arrange
+			// given:
+			mockRepo := new(MockMerkleRootsRepository)
 			spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
-
-			mockRepo := new(MockMerkleRootsRepository)
 			tc.setupMock(mockRepo)
 
-			// Act
+			// when:
 			err := spvWalletClient.SyncMerkleRoots(context.Background(), mockRepo)
 
-			// Assert
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.ErrorIs(t, err, tc.expectedErr)
-			} else {
-				require.NoError(t, err)
-			}
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
 		})
 	}
 }
 
-// TestMerkleRootsAPI_SyncMerkleRoots_PartialResponsesStoredSuccessfully tests the SyncMerkleRoots functionality
 func TestMerkleRootsAPI_SyncMerkleRoots_PartialResponsesStoredSuccessfully(t *testing.T) {
 	// given:
 	db := merklerootstest.CreateRepository([]models.MerkleRoot{})

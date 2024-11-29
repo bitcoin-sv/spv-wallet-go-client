@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs/configstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -30,42 +30,27 @@ func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 			responder: httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("configstest/response_200_status_code.json")),
 		},
 		"HTTP GET /api/v1/configs/shared response: 400": {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, &models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			}),
+			expectedErr: configstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, configstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/configs/shared str response: 500": {
-			expectedErr: models.SPVError{
-				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: http.StatusInternalServerError,
-				Code:       "internal-server-error",
-			},
-			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/configs/shared"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.SharedConfig(context.Background())
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expectedErr.Error())
-			} else {
-				require.NoError(t, err)
-			}
+
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
 			require.Equal(t, tc.expectedResponse, got)
 		})
 	}

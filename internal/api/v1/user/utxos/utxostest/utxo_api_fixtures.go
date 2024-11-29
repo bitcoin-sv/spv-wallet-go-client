@@ -10,8 +10,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
-func NewBadRequestSPVError() *models.SPVError {
-	return &models.SPVError{
+func NewBadRequestSPVError() models.SPVError {
+	return models.SPVError{
 		Message:    http.StatusText(http.StatusBadRequest),
 		StatusCode: http.StatusBadRequest,
 		Code:       "invalid-data-format",

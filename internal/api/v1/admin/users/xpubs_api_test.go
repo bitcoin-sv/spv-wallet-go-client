@@ -10,7 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/users/userstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -39,17 +38,19 @@ func TestXPubsAPI_CreateXPub(t *testing.T) {
 	URL := spvwallettest.TestAPIAddr + "/api/v1/admin/users"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodPost, URL, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.CreateXPub(context.Background(), &commands.CreateUserXpub{
 				Metadata: map[string]any{},
 				XPub:     "",
 			})
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
-			require.EqualValues(t, tc.expectedResponse, got)
+			require.Equal(t, tc.expectedResponse, got)
 		})
 	}
 }
@@ -69,31 +70,24 @@ func TestXPubsAPI_XPubs(t *testing.T) {
 			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/admin/users str response: 500": {
-			expectedErr: models.SPVError{
-				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: http.StatusInternalServerError,
-				Code:       "internal-server-error",
-			},
-			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
 	URL := spvwallettest.TestAPIAddr + "/api/v1/admin/users"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.XPubs(context.Background())
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expectedErr.Error())
-			} else {
-				require.NoError(t, err)
-			}
-			require.EqualValues(t, tc.expectedResponse, got)
+
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
+			require.Equal(t, tc.expectedResponse, got)
 		})
 	}
 }

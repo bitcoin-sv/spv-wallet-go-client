@@ -28,39 +28,28 @@ func TestContactsAPI_Contacts(t *testing.T) {
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("contactstest/get_contacts_200.json")),
 		},
 		"HTTP GET /api/v1/contacts response: 400": {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
+			expectedErr: contactstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/contacts str response: 500": {
-			expectedErr: models.SPVError{
-				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: http.StatusInternalServerError,
-				Code:       "internal-server-error",
-			},
-			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/contacts"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.Contacts(context.Background())
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expectedErr.Error())
-			} else {
-				require.NoError(t, err)
-			}
-			require.EqualValues(t, tc.expectedResponse, got)
+
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
+			require.Equal(t, tc.expectedResponse, got)
 		})
 	}
 }
@@ -77,39 +66,28 @@ func TestContactsAPI_ContactWithPaymail(t *testing.T) {
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("contactstest/get_contact_paymail_200.json")),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/contacts/%s response: 400", paymail): {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
+			expectedErr: contactstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/contacts/%s str response: 500", paymail): {
-			expectedErr: models.SPVError{
-				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: http.StatusInternalServerError,
-				Code:       "internal-server-error",
-			},
-			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.ContactWithPaymail(context.Background(), paymail)
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expectedErr.Error())
-			} else {
-				require.NoError(t, err)
-			}
-			require.EqualValues(t, tc.expectedResponse, got)
+
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
+			require.Equal(t, tc.expectedResponse, got)
 		})
 	}
 }
@@ -126,43 +104,32 @@ func TestContactsAPI_UpsertContact(t *testing.T) {
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("contactstest/put_contact_upsert_200.json")),
 		},
 		fmt.Sprintf("HTTP PUT /api/v1/contacts/%s response: 400", paymail): {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
+			expectedErr: contactstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP PUT /api/v1/contacts/%s str response: 500", paymail): {
-			expectedErr: models.SPVError{
-				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: http.StatusInternalServerError,
-				Code:       "internal-server-error",
-			},
-			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPut, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.UpsertContact(context.Background(), commands.UpsertContact{
 				FullName: "John Doe",
 				Metadata: map[string]any{"example_key": "example_val"},
 				Paymail:  paymail,
 			})
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expectedErr.Error())
-			} else {
-				require.NoError(t, err)
-			}
-			require.EqualValues(t, tc.expectedResponse, got)
+
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
+			require.Equal(t, tc.expectedResponse, got)
 		})
 	}
 }
@@ -177,38 +144,27 @@ func TestContactsAPI_RemoveContact(t *testing.T) {
 			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/contacts/%s response: 400", paymail): {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
+			expectedErr: contactstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/contacts/%s str response: 500", paymail): {
-			expectedErr: models.SPVError{
-				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: http.StatusInternalServerError,
-				Code:       "internal-server-error",
-			},
-			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + paymail
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
-			// then:
+			// when:
 			err := wallet.RemoveContact(context.Background(), paymail)
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expectedErr.Error())
-			} else {
-				require.NoError(t, err)
-			}
+
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
 		})
 	}
 }
@@ -227,43 +183,35 @@ func TestContactsAPI_ConfirmContact(t *testing.T) {
 			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/contacts/%s/confirmation response: 400", contact.Paymail): {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
+			expectedErr: contactstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/contacts/%s/confirmation str response: 500", contact.Paymail): {
-			expectedErr: models.SPVError{
-				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: http.StatusInternalServerError,
-				Code:       "internal-server-error",
-			},
-			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + contact.Paymail + "/confirmation"
-
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
+			const period = 3600
+			const digits = 6
+
 			wrappedTransport := spvwallettest.NewTransportWrapper()
 			aliceClient, _ := spvwallettest.GivenSPVWalletClientWithTransport(t, wrappedTransport)
 			wrappedTransport.RegisterResponder(http.MethodPost, url, tc.responder)
 
-			passcode, err := aliceClient.GenerateTotpForContact(contact, 3600, 6)
-			require.NoError(t, err)
+			// when:
+			passcode, err := aliceClient.GenerateTotpForContact(contact, period, digits)
 
 			// then:
-			err = aliceClient.ConfirmContact(context.Background(), contact, passcode, contact.Paymail, 3600, 6)
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expectedErr.Error())
-			} else {
-				require.NoError(t, err)
-			}
+			require.NoError(t, err)
+			require.NotEmpty(t, passcode)
+
+			err = aliceClient.ConfirmContact(context.Background(), contact, passcode, contact.Paymail, period, digits)
+			require.ErrorIs(t, err, tc.expectedErr)
 		})
 	}
 }
@@ -278,38 +226,27 @@ func TestContactsAPI_UnconfirmContact(t *testing.T) {
 			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/contacts/%s/confirmation response: 400", paymail): {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
+			expectedErr: contactstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/contacts/%s/confirmation str response: 500", paymail): {
-			expectedErr: models.SPVError{
-				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: http.StatusInternalServerError,
-				Code:       "internal-server-error",
-			},
-			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + paymail + "/confirmation"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
-			// then:
+			// when:
 			err := wallet.UnconfirmContact(context.Background(), paymail)
-			if tc.expectedErr != nil {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expectedErr.Error())
-			} else {
-				require.NoError(t, err)
-			}
+
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
 		})
 	}
 }
