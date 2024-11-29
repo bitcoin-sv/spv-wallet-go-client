@@ -5,16 +5,15 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/require"
-
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/users/userstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestXPubsAPI_CreateXPub(t *testing.T) {
