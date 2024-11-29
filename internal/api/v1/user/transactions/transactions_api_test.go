@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/require"
+
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions/transactionstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
-	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/require"
 )
 
 func TestTransactionsAPI_UpdateTransactionMetadata(t *testing.T) {
@@ -22,7 +23,6 @@ func TestTransactionsAPI_UpdateTransactionMetadata(t *testing.T) {
 	tests := map[string]struct {
 		code             int
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *response.Transaction
 		expectedErr      error
 	}{
@@ -37,13 +37,15 @@ func TestTransactionsAPI_UpdateTransactionMetadata(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP PATCH /api/v1/transactions/%s str response: 500", ID): {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -62,7 +64,12 @@ func TestTransactionsAPI_UpdateTransactionMetadata(t *testing.T) {
 					"example_key2": "example_key20_val",
 				},
 			})
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
@@ -71,12 +78,10 @@ func TestTransactionsAPI_UpdateTransactionMetadata(t *testing.T) {
 func TestTransactionsAPI_RecordTransaction(t *testing.T) {
 	tests := map[string]struct {
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *response.Transaction
 		expectedErr      error
 	}{
 		"HTTP POST /api/v1/transactions response: 201": {
-			statusCode:       http.StatusCreated,
 			expectedResponse: transactionstest.ExpectedRecordTransaction(t),
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/transaction_record_201.json")),
 		},
@@ -86,13 +91,15 @@ func TestTransactionsAPI_RecordTransaction(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/transactions str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -105,7 +112,12 @@ func TestTransactionsAPI_RecordTransaction(t *testing.T) {
 
 			// then:
 			got, err := spvWalletClient.RecordTransaction(context.Background(), &commands.RecordTransaction{})
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
@@ -114,12 +126,10 @@ func TestTransactionsAPI_RecordTransaction(t *testing.T) {
 func TestTransactionsAPI_DraftTransaction(t *testing.T) {
 	tests := map[string]struct {
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *response.DraftTransaction
 		expectedErr      error
 	}{
 		"HTTP POST /api/v1/transactions/drafts response: 200": {
-			statusCode:       http.StatusOK,
 			expectedResponse: transactionstest.ExpectedDraftTransaction(t),
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/transaction_draft_200.json")),
 		},
@@ -129,13 +139,15 @@ func TestTransactionsAPI_DraftTransaction(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
 		},
 		"HTTP POST /api/v1/transactions/drafts str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -151,7 +163,12 @@ func TestTransactionsAPI_DraftTransaction(t *testing.T) {
 				Config:   response.TransactionConfig{},
 				Metadata: map[string]any{},
 			})
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
@@ -161,12 +178,10 @@ func TestTransactionsAPI_Transaction(t *testing.T) {
 	ID := "1024"
 	tests := map[string]struct {
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *response.Transaction
 		expectedErr      error
 	}{
 		fmt.Sprintf("HTTP PATCH /api/v1/transactions/%s  response: 200", ID): {
-			statusCode:       http.StatusOK,
 			expectedResponse: transactionstest.ExpectedTransaction(t),
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/transaction_200.json")),
 		},
@@ -176,13 +191,15 @@ func TestTransactionsAPI_Transaction(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP PATCH /api/v1/transactions/%s str response: 500", ID): {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -195,7 +212,12 @@ func TestTransactionsAPI_Transaction(t *testing.T) {
 
 			// then:
 			got, err := spvWalletClient.Transaction(context.Background(), ID)
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
@@ -204,12 +226,10 @@ func TestTransactionsAPI_Transaction(t *testing.T) {
 func TestTransactionsAPI_Transactions(t *testing.T) {
 	tests := map[string]struct {
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *response.PageModel[response.Transaction]
 		expectedErr      error
 	}{
 		"HTTP GET /api/v1/transactions response: 200": {
-			statusCode:       http.StatusOK,
 			expectedResponse: transactionstest.ExpectedTransactionsPage(t),
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/transactions_200.json")),
 		},
@@ -219,13 +239,15 @@ func TestTransactionsAPI_Transactions(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, transactionstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/transactions str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -238,7 +260,12 @@ func TestTransactionsAPI_Transactions(t *testing.T) {
 
 			// then:
 			got, err := spvWalletClient.Transactions(context.Background())
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}

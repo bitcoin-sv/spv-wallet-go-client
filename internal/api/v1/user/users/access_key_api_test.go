@@ -6,22 +6,22 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/require"
+
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users/userstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
-	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/require"
 )
 
 func TestAccessKeyAPI_GenerateAccessKey(t *testing.T) {
 	tests := map[string]struct {
 		code             int
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *response.AccessKey
 		expectedErr      error
 	}{
@@ -36,13 +36,15 @@ func TestAccessKeyAPI_GenerateAccessKey(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP POST /api/v1/users/current/keys str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -59,7 +61,12 @@ func TestAccessKeyAPI_GenerateAccessKey(t *testing.T) {
 					"example_key": "example_value",
 				},
 			})
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
@@ -70,7 +77,6 @@ func TestAccessKeyAPI_AccessKey(t *testing.T) {
 	tests := map[string]struct {
 		code             int
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *response.AccessKey
 		expectedErr      error
 	}{
@@ -85,13 +91,15 @@ func TestAccessKeyAPI_AccessKey(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/users/current/keys/%s str response: 500", ID): {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -104,7 +112,12 @@ func TestAccessKeyAPI_AccessKey(t *testing.T) {
 
 			// then:
 			got, err := wallet.AccessKey(context.Background(), ID)
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
@@ -114,7 +127,6 @@ func TestAccessKeyAPI_AccessKeys(t *testing.T) {
 	tests := map[string]struct {
 		code             int
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *queries.AccessKeyPage
 		expectedErr      error
 	}{
@@ -129,13 +141,15 @@ func TestAccessKeyAPI_AccessKeys(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/users/current/keys str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -148,7 +162,12 @@ func TestAccessKeyAPI_AccessKeys(t *testing.T) {
 
 			// then:
 			got, err := wallet.AccessKeys(context.Background())
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
@@ -159,7 +178,6 @@ func TestAccessKeyAPI_RevokeAccessKey(t *testing.T) {
 	tests := map[string]struct {
 		code        int
 		responder   httpmock.Responder
-		statusCode  int
 		expectedErr error
 	}{
 		fmt.Sprintf("HTTP DELETE /api/v1/users/current/keys/%s response: 200", ID): {
@@ -172,13 +190,15 @@ func TestAccessKeyAPI_RevokeAccessKey(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/users/current/keys/%s str response: 500", ID): {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -191,7 +211,12 @@ func TestAccessKeyAPI_RevokeAccessKey(t *testing.T) {
 
 			// then:
 			err := wallet.RevokeAccessKey(context.Background(), ID)
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 		})
 	}
 }

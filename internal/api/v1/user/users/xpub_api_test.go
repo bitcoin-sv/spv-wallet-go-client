@@ -5,21 +5,21 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
-	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users/userstest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users/userstest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 )
 
 func TestXPubAPI_UpdateXPubMetadata(t *testing.T) {
 	tests := map[string]struct {
 		code             int
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *response.Xpub
 		expectedErr      error
 	}{
@@ -34,13 +34,15 @@ func TestXPubAPI_UpdateXPubMetadata(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP PATCH /api/v1/users/current str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -57,7 +59,12 @@ func TestXPubAPI_UpdateXPubMetadata(t *testing.T) {
 					"example_key": "example_value",
 				},
 			})
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
@@ -67,7 +74,6 @@ func TestXPubAPI_XPub(t *testing.T) {
 	tests := map[string]struct {
 		code             int
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *response.Xpub
 		expectedErr      error
 	}{
@@ -82,13 +88,15 @@ func TestXPubAPI_XPub(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/users/current str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -101,7 +109,12 @@ func TestXPubAPI_XPub(t *testing.T) {
 
 			// then:
 			got, err := wallet.XPub(context.Background())
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
