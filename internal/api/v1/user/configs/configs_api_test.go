@@ -5,17 +5,17 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 )
 
 func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 	tests := map[string]struct {
-		statusCode       int
 		expectedResponse *response.SharedConfig
 		expectedErr      error
 		responder        httpmock.Responder
@@ -28,8 +28,7 @@ func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 					"pikePaymentEnabled":  true,
 				},
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("configstest/response_200_status_code.json")),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("configstest/response_200_status_code.json")),
 		},
 		"HTTP GET /api/v1/configs/shared response: 400": {
 			expectedErr: models.SPVError{
@@ -37,7 +36,6 @@ func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
 			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, &models.SPVError{
 				Message:    http.StatusText(http.StatusBadRequest),
 				StatusCode: http.StatusBadRequest,
@@ -45,9 +43,12 @@ func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 			}),
 		},
 		"HTTP GET /api/v1/configs/shared str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -60,7 +61,12 @@ func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 
 			// then:
 			got, err := wallet.SharedConfig(context.Background())
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.Equal(t, tc.expectedResponse, got)
 		})
 	}

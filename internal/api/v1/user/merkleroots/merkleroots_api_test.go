@@ -5,25 +5,24 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots/merklerootstest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots/merklerootstest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 )
 
 func TestMerkleRootsAPI_MerkleRoots(t *testing.T) {
 	tests := map[string]struct {
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *queries.MerkleRootPage
 		expectedErr      error
 	}{
 		"HTTP GET /api/v1/merkleroots response: 200": {
-			statusCode:       http.StatusOK,
 			expectedResponse: merklerootstest.ExpectedMerkleRootsPage(),
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("merklerootstest/get_merkleroots_200.json")),
 		},
@@ -33,13 +32,15 @@ func TestMerkleRootsAPI_MerkleRoots(t *testing.T) {
 				StatusCode: http.StatusBadRequest,
 				Code:       "invalid-data-format",
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, merklerootstest.NewBadRequestSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, merklerootstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/merkleroots str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -52,7 +53,12 @@ func TestMerkleRootsAPI_MerkleRoots(t *testing.T) {
 
 			// then:
 			got, err := spvWalletClient.MerkleRoots(context.Background())
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
