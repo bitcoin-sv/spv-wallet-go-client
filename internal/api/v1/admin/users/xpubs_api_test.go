@@ -5,14 +5,16 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/require"
+
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/users/userstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/require"
 )
 
 func TestXPubsAPI_CreateXPub(t *testing.T) {
@@ -68,8 +70,12 @@ func TestXPubsAPI_XPubs(t *testing.T) {
 			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/admin/users str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: models.SPVError{
+				Message:    errors.ErrUnrecognizedAPIResponse.Error(),
+				StatusCode: http.StatusInternalServerError,
+				Code:       "internal-server-error",
+			},
+			responder: httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
 		},
 	}
 
@@ -82,7 +88,12 @@ func TestXPubsAPI_XPubs(t *testing.T) {
 
 			// then:
 			got, err := wallet.XPubs(context.Background())
-			require.ErrorIs(t, err, tc.expectedErr)
+			if tc.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expectedErr.Error())
+			} else {
+				require.NoError(t, err)
+			}
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
 	}
