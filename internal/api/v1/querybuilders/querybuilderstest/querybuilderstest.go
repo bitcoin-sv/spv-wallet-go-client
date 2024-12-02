@@ -1,11 +1,8 @@
 package querybuilderstest
 
 import (
-	"net/http"
 	"testing"
 	"time"
-
-	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 func ParseTime(t *testing.T, s string) time.Time {
@@ -18,12 +15,4 @@ func ParseTime(t *testing.T, s string) time.Time {
 
 func Ptr[T any](value T) *T {
 	return &value
-}
-
-func NewBadRequestSPVError() *models.SPVError {
-	return &models.SPVError{
-		Message:    http.StatusText(http.StatusBadRequest),
-		StatusCode: http.StatusBadRequest,
-		Code:       "invalid-data-format",
-	}
 }

@@ -37,10 +37,18 @@ func Ptr[T any](value T) *T {
 	return &value
 }
 
-func NewBadRequestSPVError() *models.SPVError {
-	return &models.SPVError{
+func NewBadRequestSPVError() models.SPVError {
+	return models.SPVError{
 		Message:    http.StatusText(http.StatusBadRequest),
 		StatusCode: http.StatusBadRequest,
 		Code:       "invalid-data-format",
+	}
+}
+
+func NewInternalServerSPVError() models.SPVError {
+	return models.SPVError{
+		Message:    http.StatusText(http.StatusInternalServerError),
+		StatusCode: http.StatusInternalServerError,
+		Code:       models.UnknownErrorCode,
 	}
 }

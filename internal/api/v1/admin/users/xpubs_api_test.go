@@ -38,17 +38,19 @@ func TestXPubsAPI_CreateXPub(t *testing.T) {
 	URL := spvwallettest.TestAPIAddr + "/api/v1/admin/users"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodPost, URL, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.CreateXPub(context.Background(), &commands.CreateUserXpub{
 				Metadata: map[string]any{},
 				XPub:     "",
 			})
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
-			require.EqualValues(t, tc.expectedResponse, got)
+			require.Equal(t, tc.expectedResponse, got)
 		})
 	}
 }
@@ -68,22 +70,24 @@ func TestXPubsAPI_XPubs(t *testing.T) {
 			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/admin/users str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: userstest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, userstest.NewInternalServerSPVError()),
 		},
 	}
 
 	URL := spvwallettest.TestAPIAddr + "/api/v1/admin/users"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.XPubs(context.Background())
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
-			require.EqualValues(t, tc.expectedResponse, got)
+			require.Equal(t, tc.expectedResponse, got)
 		})
 	}
 }

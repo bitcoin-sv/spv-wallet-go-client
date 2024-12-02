@@ -5,9 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs/configstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -15,7 +14,6 @@ import (
 
 func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 	tests := map[string]struct {
-		statusCode       int
 		expectedResponse *response.SharedConfig
 		expectedErr      error
 		responder        httpmock.Responder
@@ -28,38 +26,29 @@ func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 					"pikePaymentEnabled":  true,
 				},
 			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("configstest/response_200_status_code.json")),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("configstest/response_200_status_code.json")),
 		},
 		"HTTP GET /api/v1/configs/shared response: 400": {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			statusCode: http.StatusOK,
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, &models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			}),
+			expectedErr: configstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, configstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/configs/shared str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: configstest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, configstest.NewInternalServerSPVError()),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/configs/shared"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.SharedConfig(context.Background())
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.Equal(t, tc.expectedResponse, got)
 		})

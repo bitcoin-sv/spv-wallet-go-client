@@ -5,55 +5,46 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos/utxostest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
 
 func TestUTXOAPI_UTXOs(t *testing.T) {
 	tests := map[string]struct {
-		code             int
 		responder        httpmock.Responder
-		statusCode       int
 		expectedResponse *queries.UtxosPage
 		expectedErr      error
 	}{
 		"HTTP GET /api/v1/utxos response: 200": {
 			expectedResponse: utxostest.ExpectedUtxosPage(t),
-			code:             http.StatusOK,
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("utxostest/get_utxos_200.json")),
 		},
 		"HTTP GET /api/v1/utxos response: 400": {
-			expectedErr: models.SPVError{
-				Message:    http.StatusText(http.StatusBadRequest),
-				StatusCode: http.StatusBadRequest,
-				Code:       "invalid-data-format",
-			},
-			statusCode: http.StatusOK,
-			responder:  httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, utxostest.NewBadRequestSPVError()),
+			expectedErr: utxostest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, utxostest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/utxos str response: 500": {
-			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			statusCode:  http.StatusInternalServerError,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			expectedErr: utxostest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, utxostest.NewInternalServerSPVError()),
 		},
 	}
 
 	url := spvwallettest.TestAPIAddr + "/api/v1/utxos"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.UTXOs(context.Background())
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
-			require.EqualValues(t, tc.expectedResponse, got)
+			require.Equal(t, tc.expectedResponse, got)
 		})
 	}
 }

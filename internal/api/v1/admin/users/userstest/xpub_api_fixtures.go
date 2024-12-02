@@ -18,6 +18,14 @@ func NewBadRequestSPVError() models.SPVError {
 	}
 }
 
+func NewInternalServerSPVError() models.SPVError {
+	return models.SPVError{
+		Message:    http.StatusText(http.StatusInternalServerError),
+		StatusCode: http.StatusInternalServerError,
+		Code:       models.UnknownErrorCode,
+	}
+}
+
 func ExpectedXPub(t *testing.T) *response.Xpub {
 	return &response.Xpub{
 		Model: response.Model{

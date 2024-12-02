@@ -45,14 +45,6 @@ func ExpectedUserXPub(t *testing.T) *response.Xpub {
 	}
 }
 
-func NewBadRequestSPVError() *models.SPVError {
-	return &models.SPVError{
-		Message:    http.StatusText(http.StatusBadRequest),
-		StatusCode: http.StatusBadRequest,
-		Code:       "invalid-data-format",
-	}
-}
-
 func ParseTime(t *testing.T, s string) time.Time {
 	ts, err := time.Parse(time.RFC3339Nano, s)
 	if err != nil {
@@ -63,4 +55,20 @@ func ParseTime(t *testing.T, s string) time.Time {
 
 func Ptr[T any](value T) *T {
 	return &value
+}
+
+func NewBadRequestSPVError() models.SPVError {
+	return models.SPVError{
+		Message:    http.StatusText(http.StatusBadRequest),
+		StatusCode: http.StatusBadRequest,
+		Code:       "invalid-data-format",
+	}
+}
+
+func NewInternalServerSPVError() models.SPVError {
+	return models.SPVError{
+		Message:    http.StatusText(http.StatusInternalServerError),
+		StatusCode: http.StatusInternalServerError,
+		Code:       models.UnknownErrorCode,
+	}
 }

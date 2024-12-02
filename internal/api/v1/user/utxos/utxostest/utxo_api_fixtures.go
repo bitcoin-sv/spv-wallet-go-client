@@ -10,14 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
-func NewBadRequestSPVError() *models.SPVError {
-	return &models.SPVError{
-		Message:    http.StatusText(http.StatusBadRequest),
-		StatusCode: http.StatusBadRequest,
-		Code:       "invalid-data-format",
-	}
-}
-
 func ParseTime(t *testing.T, s string) time.Time {
 	ts, err := time.Parse(time.RFC3339Nano, s)
 	if err != nil {
@@ -119,5 +111,21 @@ func ExpectedUtxosPage(t *testing.T) *queries.UtxosPage {
 			TotalElements: 9,
 			TotalPages:    5,
 		},
+	}
+}
+
+func NewBadRequestSPVError() models.SPVError {
+	return models.SPVError{
+		Message:    http.StatusText(http.StatusBadRequest),
+		StatusCode: http.StatusBadRequest,
+		Code:       "invalid-data-format",
+	}
+}
+
+func NewInternalServerSPVError() models.SPVError {
+	return models.SPVError{
+		Message:    http.StatusText(http.StatusInternalServerError),
+		StatusCode: http.StatusInternalServerError,
+		Code:       models.UnknownErrorCode,
 	}
 }
