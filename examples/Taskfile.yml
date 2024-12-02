@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 tasks:
   default:
@@ -97,6 +97,12 @@ tasks:
     silent: true
     cmds:
       - go run ./update_transaction_metadata/update_transaction_metadata.go
+
+  create-transaction:
+    desc: "Send OP return."
+    silent: true
+    cmds:
+      - go run ./send_op_return/send_op_return.go
 
   fetch-user-utxos:
     desc: "Fetch user UTXOs page."

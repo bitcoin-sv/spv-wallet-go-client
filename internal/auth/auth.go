@@ -16,9 +16,10 @@ import (
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/cryptoutil"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
-func GetSignedHex(dt *models.DraftTransaction, xPriv *bip32.ExtendedKey) (string, error) {
+func GetSignedHex(dt *response.DraftTransaction, xPriv *bip32.ExtendedKey) (string, error) {
 	// Create transaction from hex
 	tx, err := trx.NewTransactionFromHex(dt.Hex)
 	// we need to reset the inputs as we are going to add them via tx.AddInputFrom (ts-sdk method) and then sign
@@ -66,7 +67,7 @@ func setSignature(header *http.Header, xPriv *bip32.ExtendedKey, bodyString stri
 	return nil
 }
 
-func prepareLockingScript(dst *models.Destination) (*script.Script, error) {
+func prepareLockingScript(dst *response.Destination) (*script.Script, error) {
 	lockingScript, err := script.NewFromHex(dst.LockingScript)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create locking script from hex for destination: %w", err)
@@ -75,7 +76,7 @@ func prepareLockingScript(dst *models.Destination) (*script.Script, error) {
 	return lockingScript, nil
 }
 
-func prepareUnlockingScript(xPriv *bip32.ExtendedKey, dst *models.Destination) (*p2pkh.P2PKH, error) {
+func prepareUnlockingScript(xPriv *bip32.ExtendedKey, dst *response.Destination) (*p2pkh.P2PKH, error) {
 	key, err := getDerivedKeyForDestination(xPriv, dst)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get derived key for destination: %w", err)
@@ -84,7 +85,7 @@ func prepareUnlockingScript(xPriv *bip32.ExtendedKey, dst *models.Destination) (
 	return getUnlockingScript(key)
 }
 
-func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *models.Destination) (*ec.PrivateKey, error) {
+func getDerivedKeyForDestination(xPriv *bip32.ExtendedKey, dst *response.Destination) (*ec.PrivateKey, error) {
 	// Derive the child key (m/chain/num)
 	derivedKey, err := bip32.GetHDKeyByPath(xPriv, dst.Chain, dst.Num)
 	if err != nil {

@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"net/url"
 
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
@@ -18,6 +20,55 @@ const route = "api/v1/transactions"
 type API struct {
 	url        *url.URL
 	httpClient *resty.Client
+}
+
+func (a *API) FinalizeTransaction(draft *response.DraftTransaction, xPriv *bip32.ExtendedKey) (string, error) {
+	res, err := auth.GetSignedHex(draft, xPriv)
+	if err != nil {
+		return "", err
+	}
+
+	return res, nil
+}
+
+func (a *API) DraftToRecipients(ctx context.Context, r *commands.SendToRecipients) (*response.DraftTransaction, error) {
+	outputs := make([]*response.TransactionOutput, 0)
+
+	for _, recipient := range r.Recipients {
+		outputs = append(outputs, &response.TransactionOutput{
+			To:       recipient.To,
+			Satoshis: recipient.Satoshis,
+			OpReturn: recipient.OpReturn,
+		})
+	}
+
+	draftTransactionCmd := &commands.DraftTransaction{
+		Config: response.TransactionConfig{
+			Outputs: outputs,
+		},
+		Metadata: r.Metadata,
+	}
+
+	return a.DraftTransaction(ctx, draftTransactionCmd)
+}
+
+func (a *API) SendToRecipients(ctx context.Context, r *commands.SendToRecipients, xPriv *bip32.ExtendedKey) (*response.Transaction, error) {
+	draft, err := a.DraftToRecipients(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+
+	var hex string
+	if hex, err = a.FinalizeTransaction(draft, xPriv); err != nil {
+		return nil, err
+	}
+
+	recordTransactionCmd := &commands.RecordTransaction{
+		Metadata:    r.Metadata,
+		Hex:         hex,
+		ReferenceID: draft.ID,
+	}
+	return a.RecordTransaction(ctx, recordTransactionCmd)
 }
 
 func (a *API) DraftTransaction(ctx context.Context, r *commands.DraftTransaction) (*response.DraftTransaction, error) {

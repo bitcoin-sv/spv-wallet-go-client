@@ -25,3 +25,19 @@ type UpdateTransactionMetadata struct {
 	ID       string                 `json:"-"`        // Unique identifier of the transaction to be updated.
 	Metadata querybuilders.Metadata `json:"metadata"` // New metadata to associate with the transaction.
 }
+
+// Recipients represents a single recipient in a transaction.
+// It includes details about the recipient address, the amount to send,
+// and an optional OP_RETURN script for including additional data in the transaction.
+type Recipients struct {
+	OpReturn *response.OpReturn `json:"op_return"` // Optional OP_RETURN script for attaching data to the transaction.
+	Satoshis uint64             `json:"satoshis"`  // Amount to send to the recipient, in satoshis.
+	To       string             `json:"to"`        // Paymails address of the recipient.
+}
+
+// SendToRecipients holds the arguments required to send a transaction to multiple recipients.
+// This includes the list of recipients with their details and optional metadata for the transaction.
+type SendToRecipients struct {
+	Recipients []*Recipients          `json:"recipients"` // List of recipients for the transaction.
+	Metadata   querybuilders.Metadata `json:"metadata"`   // Metadata associated with the transaction.
+}

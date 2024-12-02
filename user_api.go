@@ -37,6 +37,7 @@ import (
 // UserAPI methods may return wrapped errors, including models.SPVError or
 // ErrUnrecognizedAPIResponse, depending on the behavior of the SPV Wallet API.
 type UserAPI struct {
+	xPriv           *bip32.ExtendedKey
 	xpubAPI         *users.XPubAPI
 	accessKeyAPI    *users.AccessKeyAPI
 	configsAPI      *configs.API
@@ -226,6 +227,34 @@ func (u *UserAPI) Transaction(ctx context.Context, ID string) (*response.Transac
 	return res, nil
 }
 
+// FinalizeTransaction finalizes a draft transaction and returns its signed hex representation.
+// It uses the draft transaction details to construct, enrich, and sign the transaction
+// through the `auth.GetSignedHex` utility function.
+// The response is the signed transaction in hex format.
+// Returns an error if the transaction cannot be finalized.
+func (u *UserAPI) FinalizeTransaction(draft *response.DraftTransaction) (string, error) {
+	res, err := u.transactionsAPI.FinalizeTransaction(draft, u.xPriv)
+	if err != nil {
+		return "", fmt.Errorf("couldn't finalize transaction with ID: %s, %w", draft.ID, err)
+	}
+
+	return res, nil
+}
+
+// SendToRecipients creates, finalizes, and broadcasts a transaction to multiple recipients.
+// This method handles the complete process of drafting, finalizing, and recording the transaction
+// using the recipient details provided in the command.
+// The response is unmarshalled into a *response.Transaction struct.
+// Returns an error if the transaction fails at any step, such as drafting, finalization or recording.
+func (u *UserAPI) SendToRecipients(ctx context.Context, cmd *commands.SendToRecipients) (*response.Transaction, error) {
+	res, err := u.transactionsAPI.SendToRecipients(ctx, cmd, u.xPriv)
+	if err != nil {
+		return nil, transactions.HTTPErrorFormatter("send to recipients", err).FormatPostErr()
+	}
+
+	return res, nil
+}
+
 // XPub retrieves the full xpub information for the current user via the users API.
 // The response is unmarshaled into a *response.Xpub.
 // Returns an error if the request fails or the response cannot be decoded.
@@ -395,7 +424,7 @@ func NewUserAPIWithXPub(cfg config.Config, xPub string) (*UserAPI, error) {
 		return nil, fmt.Errorf("failed to intialized xPub authenticator: %w", err)
 	}
 
-	return initUserAPI(cfg, authenticator)
+	return initUserAPI(cfg, nil, authenticator)
 }
 
 // NewUserAPIWithXPriv initializes a new UserAPI instance using an extended private key (xPriv).
@@ -414,7 +443,7 @@ func NewUserAPIWithXPriv(cfg config.Config, xPriv string) (*UserAPI, error) {
 		return nil, fmt.Errorf("failed to intialized xPriv authenticator: %w", err)
 	}
 
-	userAPI, err := initUserAPI(cfg, authenticator)
+	userAPI, err := initUserAPI(cfg, key, authenticator)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new client: %w", err)
 	}
@@ -439,14 +468,14 @@ func NewUserAPIWithAccessKey(cfg config.Config, accessKey string) (*UserAPI, err
 		return nil, fmt.Errorf("failed to intialized access key authenticator: %w", err)
 	}
 
-	return initUserAPI(cfg, authenticator)
+	return initUserAPI(cfg, nil, authenticator)
 }
 
 type authenticator interface {
 	Authenticate(r *resty.Request) error
 }
 
-func initUserAPI(cfg config.Config, auth authenticator) (*UserAPI, error) {
+func initUserAPI(cfg config.Config, xPriv *bip32.ExtendedKey, auth authenticator) (*UserAPI, error) {
 	url, err := url.Parse(cfg.Addr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse addr to url.URL: %w", err)
@@ -454,6 +483,7 @@ func initUserAPI(cfg config.Config, auth authenticator) (*UserAPI, error) {
 
 	httpClient := restyutil.NewHTTPClient(cfg, auth)
 	return &UserAPI{
+		xPriv:           xPriv,
 		merkleRootsAPI:  merkleroots.NewAPI(url, httpClient),
 		configsAPI:      configs.NewAPI(url, httpClient),
 		transactionsAPI: transactions.NewAPI(url, httpClient),
