@@ -194,13 +194,11 @@ func TestContactsAPI_ConfirmContact(t *testing.T) {
 	url := spvwallettest.TestAPIAddr + "/api/v1/contacts/" + contact.Paymail + "/confirmation"
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
+			aliceClient, transport := spvwallettest.GivenSPVUserAPI(t)
+			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 			// given:
 			const period = 3600
 			const digits = 6
-
-			wrappedTransport := spvwallettest.NewTransportWrapper()
-			aliceClient, _ := spvwallettest.GivenSPVWalletClientWithTransport(t, wrappedTransport)
-			wrappedTransport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			// when:
 			passcode, err := aliceClient.GenerateTotpForContact(contact, period, digits)
