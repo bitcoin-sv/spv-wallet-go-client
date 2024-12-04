@@ -21,7 +21,11 @@ the wallet client package during interaction wit the SPV Wallet API.
 ```
 task: [default] task --list
 task: Available tasks for this project:
+* accept-invitation-as-admin:             Accept invitation with a given ID as Admin.
+* create-xpub-as-admin:                   Create xPub as Admin.
 * default:                                Display all available tasks.
+* delete-contact-as-admin:                Delete contact with a given ID as Admin.
+* fetch-contacts-as-admin:                Fetch contacts page as Admin.
 * fetch-user-contact-by-paymail:          Fetch user contact by given paymail.
 * fetch-user-contacts:                    Fetch user contacts page.
 * fetch-user-merkleroots:                 Fetch user Merkle roots page.
@@ -30,7 +34,10 @@ task: Available tasks for this project:
 * fetch-user-transactions:                Fetch user transactions page.
 * fetch-user-utxos:                       Fetch user UTXOs page.
 * fetch-user-xpub:                        Fetch current authorized user's xpub info.
+* fetch-xpubs-as-admin:                   Fetch xPubs page as Admin.
 * generate-keys:                          Generate keys for SPV Wallet API access.
+* reject-invitation-as-admin:             Reject invitation with a given ID as Admin.
+* update-contact-as-admin:                Update contact with a given ID as Admin.
 * user-contact-confirmation:              Confirm user contact with a given paymail address.
 * user-contact-remove:                    Remove user contact with a given paymail address.
 * user-contact-unconfirm:                 Unconfirm user contact with a given paymail address.
@@ -53,7 +60,7 @@ task: Available tasks for this project:
 
 Before interacting with the SPV Wallet API, you must complete the authorization process.
 
-To begin, generate a pair of keys using the `task generate-keys command`, which is included in the dedicated Taskfile. 
+To begin, generate a pair of keys using the `task generate-keys` command, which is included in the dedicated Taskfile. 
 
 **Example output:**
 ```
@@ -89,12 +96,12 @@ import (
 func main() {
 	xPriv := "121d2f43-4261-42ab-813e-3d3fa4d87313"
 	cfg := wallet.NewDefaultConfig("http://localhost:3003")
-	spv, err := wallet.NewWithXPriv(cfg, xPriv)
+	userAPI, err := wallet.NewUserAPIWithXPriv(cfg, xPriv)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	xPub, err := spv.XPub(context.Background())
+	xPub, err := userAPI.XPub(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,8 +118,11 @@ func Print(s string, a any) {
 	}
 	fmt.Println(string(res))
 }
-
 ```
+
+> [!TIP]
+> The same principle applies when creating an AdminAPI client instance using one of the available constructors.
+
 **Example output:**
 
 ```
@@ -144,5 +154,5 @@ cd examples
 task name_of_the_example
 ```
 
- > [!TIP]
+> [!TIP]
 > To verify Taskfile installation run: `task` command in the terminal.

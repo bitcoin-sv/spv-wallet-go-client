@@ -1,0 +1,34 @@
+{
+    "content": [
+        {
+            "createdAt": "2024-11-28T14:58:13.262238Z",
+            "updatedAt": "2024-11-28T16:18:43.842434Z",
+            "deletedAt": null,
+            "metadata": null,
+            "id": "7a5625ac-8256-454a-84a3-7f03f50cd7dc",
+            "fullName": "John Doe",
+            "paymail": "john.doe.test@john.doe.4chain.space",
+            "pubKey": "bbbb7a4e-a3f4-4ca4-800a-fdd8029eda37",
+            "status": "confirmed"
+        },
+        {
+            "createdAt": "2024-11-28T14:58:13.029966Z",
+            "updatedAt": "2024-11-28T14:58:13.03002Z",
+            "deletedAt": null,
+            "metadata": {
+                "phoneNumber": "123456789"
+            },
+            "id": "d05d2388-3c16-426d-98f1-ced9d9c5f4e1",
+            "fullName": "Jane Doe",
+            "paymail": "jane.doe.jane@john.doe.4chain.space",
+            "pubKey": "ee191d63-1619-4fd3-ae3d-2202cfab751d",
+            "status": "unconfirmed"
+        }
+    ],
+    "page": {
+        "size": 50,
+        "number": 1,
+        "totalElements": 2,
+        "totalPages": 1
+    }
+}

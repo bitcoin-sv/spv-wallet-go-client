@@ -8,13 +8,13 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
-type contactFilterQueryBuilder struct {
-	modelFilterBuilder querybuilders.ModelFilterBuilder
-	contactFilter      filter.ContactFilter
+type ContactFilterQueryBuilder struct {
+	ModelFilterBuilder querybuilders.ModelFilterBuilder
+	ContactFilter      filter.ContactFilter
 }
 
-func (c *contactFilterQueryBuilder) Build() (url.Values, error) {
-	modelFilterBuilder, err := c.modelFilterBuilder.Build()
+func (c *ContactFilterQueryBuilder) Build() (url.Values, error) {
+	modelFilterBuilder, err := c.ModelFilterBuilder.Build()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build model filter query params: %w", err)
 	}
@@ -24,10 +24,10 @@ func (c *contactFilterQueryBuilder) Build() (url.Values, error) {
 		params.Append(modelFilterBuilder)
 	}
 
-	params.AddPair("id", c.contactFilter.ID)
-	params.AddPair("fullName", c.contactFilter.FullName)
-	params.AddPair("paymail", c.contactFilter.Paymail)
-	params.AddPair("pubKey", c.contactFilter.PubKey)
-	params.AddPair("status", c.contactFilter.Status)
+	params.AddPair("id", c.ContactFilter.ID)
+	params.AddPair("fullName", c.ContactFilter.FullName)
+	params.AddPair("paymail", c.ContactFilter.Paymail)
+	params.AddPair("pubKey", c.ContactFilter.PubKey)
+	params.AddPair("status", c.ContactFilter.Status)
 	return params.Values, nil
 }

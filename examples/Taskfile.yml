@@ -14,6 +14,48 @@ tasks:
       - go run ../walletkeys/cmd/main.go
       - echo "=================================================================="
 
+  accept-invitation-as-admin:
+    desc: "Accept invitation with a given ID as Admin."
+    silent: true
+    cmds:
+      - go run ./accept_invitation_as_admin/accept_invitation_as_admin.go
+
+  reject-invitation-as-admin:
+    desc: "Reject invitation with a given ID as Admin."
+    silent: true
+    cmds:
+      - go run ./reject_invitation_as_admin/reject_invitation_as_admin.go
+
+  fetch-contacts-as-admin:
+    desc: "Fetch contacts page as Admin."
+    silent: true
+    cmds:
+      - go run ./fetch_contacts_as_admin/fetch_contacts_as_admin.go
+
+  update-contact-as-admin:
+    desc: "Update contact with a given ID as Admin."
+    silent: true
+    cmds:
+      - go run ./update_contact_as_admin/update_contact_as_admin.go
+
+  delete-contact-as-admin:
+    desc: "Delete contact with a given ID as Admin."
+    silent: true
+    cmds:
+      - go run ./delete_contact_as_admin/delete_contact_as_admin.go
+
+  fetch-xpubs-as-admin:
+    desc: "Fetch xPubs page as Admin."
+    silent: true
+    cmds:
+      - go run ./fetch_xpubs_as_admin/fetch_xpubs_as_admin.go
+
+  create-xpub-as-admin:
+    desc: "Create xPub as Admin."
+    silent: true
+    cmds:
+      - go run ./create_xpub_as_admin/create_xpub_as_admin.go
+
   fetch-user-shared-config:
     desc: "Fetch user shared configuration."
     silent: true

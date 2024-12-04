@@ -1,4 +1,4 @@
-package userstest
+package xpubstest
 
 import (
 	"net/http"

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/users/userstest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/xpubs/xpubstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
@@ -22,7 +22,7 @@ func TestXPubFilterBuilder_Build(t *testing.T) {
 		},
 		"xpub filter: filter with only 'id' field set": {
 			filter: filter.XpubFilter{
-				ID: userstest.Ptr("5505cbc3-b38f-40d4-885f-c53efd84828f"),
+				ID: xpubstest.Ptr("5505cbc3-b38f-40d4-885f-c53efd84828f"),
 			},
 			expectedParams: url.Values{
 				"id": []string{"5505cbc3-b38f-40d4-885f-c53efd84828f"},
@@ -30,7 +30,7 @@ func TestXPubFilterBuilder_Build(t *testing.T) {
 		},
 		"xpub filter: filter with only 'current balance' field set": {
 			filter: filter.XpubFilter{
-				CurrentBalance: userstest.Ptr(uint64(24)),
+				CurrentBalance: xpubstest.Ptr(uint64(24)),
 			},
 			expectedParams: url.Values{
 				"currentBalance": []string{"24"},
@@ -38,17 +38,17 @@ func TestXPubFilterBuilder_Build(t *testing.T) {
 		},
 		"xpub filter: all fields set": {
 			filter: filter.XpubFilter{
-				ID:             userstest.Ptr("5505cbc3-b38f-40d4-885f-c53efd84828f"),
-				CurrentBalance: userstest.Ptr(uint64(24)),
+				ID:             xpubstest.Ptr("5505cbc3-b38f-40d4-885f-c53efd84828f"),
+				CurrentBalance: xpubstest.Ptr(uint64(24)),
 				ModelFilter: filter.ModelFilter{
-					IncludeDeleted: userstest.Ptr(true),
+					IncludeDeleted: xpubstest.Ptr(true),
 					CreatedRange: &filter.TimeRange{
-						From: userstest.Ptr(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-						To:   userstest.Ptr(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
+						From: xpubstest.Ptr(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+						To:   xpubstest.Ptr(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
 					},
 					UpdatedRange: &filter.TimeRange{
-						From: userstest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
-						To:   userstest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
+						From: xpubstest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
+						To:   xpubstest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
 					},
 				},
 			},

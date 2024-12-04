@@ -1,10 +1,11 @@
-package contacts
+package contacts_test
 
 import (
 	"net/url"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts/contactstest"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
@@ -70,9 +71,9 @@ func TestContactFilterQueryBuilder_Build(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			queryBuilder := contactFilterQueryBuilder{
-				contactFilter:      tc.filter,
-				modelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: tc.filter.ModelFilter},
+			queryBuilder := contacts.ContactFilterQueryBuilder{
+				ContactFilter:      tc.filter,
+				ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: tc.filter.ModelFilter},
 			}
 
 			// then:
