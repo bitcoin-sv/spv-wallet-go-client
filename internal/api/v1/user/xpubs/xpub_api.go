@@ -1,4 +1,4 @@
-package users
+package xpubs
 
 import (
 	"context"
@@ -11,20 +11,23 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-const route = "api/v1/users/current"
+const (
+	route = "api/v1/users/current"
+	api   = "User XPubs API"
+)
 
-type XPubAPI struct {
+type API struct {
 	url        *url.URL
 	httpClient *resty.Client
 }
 
-func (x *XPubAPI) XPub(ctx context.Context) (*response.Xpub, error) {
+func (a *API) XPub(ctx context.Context) (*response.Xpub, error) {
 	var result response.Xpub
-	_, err := x.httpClient.
+	_, err := a.httpClient.
 		R().
 		SetContext(ctx).
 		SetResult(&result).
-		Get(x.url.String())
+		Get(a.url.String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -32,13 +35,13 @@ func (x *XPubAPI) XPub(ctx context.Context) (*response.Xpub, error) {
 	return &result, nil
 }
 
-func (x *XPubAPI) UpdateXPubMetadata(ctx context.Context, cmd *commands.UpdateXPubMetadata) (*response.Xpub, error) {
+func (a *API) UpdateXPubMetadata(ctx context.Context, cmd *commands.UpdateXPubMetadata) (*response.Xpub, error) {
 	var result response.Xpub
-	_, err := x.httpClient.R().
+	_, err := a.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
 		SetBody(cmd).
-		Patch(x.url.String())
+		Patch(a.url.String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}
@@ -46,17 +49,17 @@ func (x *XPubAPI) UpdateXPubMetadata(ctx context.Context, cmd *commands.UpdateXP
 	return &result, nil
 }
 
-func NewXPubAPI(url *url.URL, httpClient *resty.Client) *XPubAPI {
-	return &XPubAPI{
+func NewAPI(url *url.URL, httpClient *resty.Client) *API {
+	return &API{
 		url:        url.JoinPath(route),
 		httpClient: httpClient,
 	}
 
 }
-func XPubsHTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {
+func HTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {
 	return &errutil.HTTPErrorFormatter{
 		Action: action,
-		API:    "User XPubs API",
+		API:    api,
 		Err:    err,
 	}
 }

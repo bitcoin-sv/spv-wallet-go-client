@@ -1,4 +1,4 @@
-package users_test
+package xpubs_test
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users/userstest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/xpubs/xpubstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
@@ -20,16 +20,16 @@ func TestXPubAPI_UpdateXPubMetadata(t *testing.T) {
 		expectedErr      error
 	}{
 		"HTTP PATCH /api/v1/users/current response: 200": {
-			expectedResponse: userstest.ExpectedUpdatedXPubMetadata(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("userstest/patch_xpub_metadata_200.json")),
+			expectedResponse: xpubstest.ExpectedUpdatedXPubMetadata(t),
+			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("xpubstest/patch_xpub_metadata_200.json")),
 		},
 		"HTTP PATCH /api/v1/users/current response: 400": {
-			expectedErr: userstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			expectedErr: xpubstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, xpubstest.NewBadRequestSPVError()),
 		},
 		"HTTP PATCH /api/v1/users/current str response: 500": {
-			expectedErr: userstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, userstest.NewInternalServerSPVError()),
+			expectedErr: xpubstest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, xpubstest.NewInternalServerSPVError()),
 		},
 	}
 
@@ -59,16 +59,16 @@ func TestXPubAPI_XPub(t *testing.T) {
 		expectedErr      error
 	}{
 		"HTTP GET /api/v1/users/current/ response: 200": {
-			expectedResponse: userstest.ExpectedUserXPub(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("userstest/get_xpub_200.json")),
+			expectedResponse: xpubstest.ExpectedUserXPub(t),
+			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("xpubstest/get_xpub_200.json")),
 		},
 		"HTTP GET /api/v1/users/current response: 400": {
-			expectedErr: userstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			expectedErr: xpubstest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, xpubstest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/users/current str response: 500": {
-			expectedErr: userstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, userstest.NewInternalServerSPVError()),
+			expectedErr: xpubstest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, xpubstest.NewInternalServerSPVError()),
 		},
 	}
 

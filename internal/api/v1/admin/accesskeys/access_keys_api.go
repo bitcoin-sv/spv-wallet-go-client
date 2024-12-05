@@ -1,4 +1,4 @@
-package utxos
+package accesskeys
 
 import (
 	"context"
@@ -12,17 +12,17 @@ import (
 )
 
 const (
-	route = "api/v1/utxos"
-	api   = "User UTXOs API"
+	route = "/api/v1/admin/users/keys"
+	api   = "Admin Access Keys API"
 )
 
 type API struct {
-	url        *url.URL
 	httpClient *resty.Client
+	url        *url.URL
 }
 
-func (a *API) UTXOs(ctx context.Context, opts ...queries.UtxoQueryOption) (*queries.UtxosPage, error) {
-	var query queries.UtxoQuery
+func (a *API) AccessKeys(ctx context.Context, opts ...queries.AdminAccessKeyQueryOption) (*queries.AccessKeyPage, error) {
+	var query queries.AdminAccessKeyQuery
 	for _, o := range opts {
 		o(&query)
 	}
@@ -30,17 +30,14 @@ func (a *API) UTXOs(ctx context.Context, opts ...queries.UtxoQueryOption) (*quer
 	queryBuilder := querybuilders.NewQueryBuilder(
 		querybuilders.WithMetadataFilter(query.Metadata),
 		querybuilders.WithPageFilter(query.PageFilter),
-		querybuilders.WithFilterQueryBuilder(&utxoFilterQueryBuilder{
-			utxoFilter:         query.UtxoFilter,
-			modelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.UtxoFilter.ModelFilter},
-		}),
+		querybuilders.WithFilterQueryBuilder(&adminAccessKeyFilterQueryBuilder{adminAccessKeyFilter: query.AdminAccessKeyFilter}),
 	)
 	params, err := queryBuilder.Build()
 	if err != nil {
-		return nil, fmt.Errorf("failed to build utxo query params: %w", err)
+		return nil, fmt.Errorf("failed to build access keys query params: %w", err)
 	}
 
-	var result queries.UtxosPage
+	var result queries.AccessKeyPage
 	_, err = a.httpClient.
 		R().
 		SetContext(ctx).
@@ -55,10 +52,7 @@ func (a *API) UTXOs(ctx context.Context, opts ...queries.UtxoQueryOption) (*quer
 }
 
 func NewAPI(url *url.URL, httpClient *resty.Client) *API {
-	return &API{
-		url:        url.JoinPath(route),
-		httpClient: httpClient,
-	}
+	return &API{url: url.JoinPath(route), httpClient: httpClient}
 }
 
 func HTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {

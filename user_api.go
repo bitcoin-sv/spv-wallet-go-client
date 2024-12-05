@@ -9,14 +9,15 @@ import (
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/accesskeys"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/totp"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/xpubs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/cryptoutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
@@ -37,8 +38,8 @@ import (
 // UserAPI methods may return wrapped errors, including models.SPVError or
 // ErrUnrecognizedAPIResponse, depending on the behavior of the SPV Wallet API.
 type UserAPI struct {
-	xpubAPI         *users.XPubAPI
-	accessKeyAPI    *users.AccessKeyAPI
+	xpubAPI         *xpubs.API
+	accessKeyAPI    *accesskeys.API
 	configsAPI      *configs.API
 	merkleRootsAPI  *merkleroots.API
 	contactsAPI     *contacts.API
@@ -57,7 +58,7 @@ type UserAPI struct {
 func (u *UserAPI) Contacts(ctx context.Context, contactOpts ...queries.ContactQueryOption) (*queries.UserContactsPage, error) {
 	res, err := u.contactsAPI.Contacts(ctx, contactOpts...)
 	if err != nil {
-		return nil, contacts.HTTPErrorFormatter("retrieve user contacts page", err).FormatGetErr()
+		return nil, contacts.HTTPErrorFormatter("retrieve contacts page", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -232,7 +233,7 @@ func (u *UserAPI) Transaction(ctx context.Context, ID string) (*response.Transac
 func (u *UserAPI) XPub(ctx context.Context) (*response.Xpub, error) {
 	res, err := u.xpubAPI.XPub(ctx)
 	if err != nil {
-		return nil, users.XPubsHTTPErrorFormatter("retrieve xpub information", err).FormatGetErr()
+		return nil, xpubs.HTTPErrorFormatter("retrieve xpub information", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -244,7 +245,7 @@ func (u *UserAPI) XPub(ctx context.Context) (*response.Xpub, error) {
 func (u *UserAPI) UpdateXPubMetadata(ctx context.Context, cmd *commands.UpdateXPubMetadata) (*response.Xpub, error) {
 	res, err := u.xpubAPI.UpdateXPubMetadata(ctx, cmd)
 	if err != nil {
-		return nil, users.XPubsHTTPErrorFormatter("update xpub metadata ", err).FormatGetErr()
+		return nil, xpubs.HTTPErrorFormatter("update xpub metadata ", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -256,7 +257,7 @@ func (u *UserAPI) UpdateXPubMetadata(ctx context.Context, cmd *commands.UpdateXP
 func (u *UserAPI) GenerateAccessKey(ctx context.Context, cmd *commands.GenerateAccessKey) (*response.AccessKey, error) {
 	res, err := u.accessKeyAPI.GenerateAccessKey(ctx, cmd)
 	if err != nil {
-		return nil, users.AccessKeysHTTPErrorFormatter("generate access key ", err).FormatPostErr()
+		return nil, accesskeys.HTTPErrorFormatter("generate access key ", err).FormatPostErr()
 	}
 
 	return res, nil
@@ -272,7 +273,7 @@ func (u *UserAPI) GenerateAccessKey(ctx context.Context, cmd *commands.GenerateA
 func (u *UserAPI) AccessKeys(ctx context.Context, accessKeyOpts ...queries.AccessKeyQueryOption) (*queries.AccessKeyPage, error) {
 	res, err := u.accessKeyAPI.AccessKeys(ctx, accessKeyOpts...)
 	if err != nil {
-		return nil, users.AccessKeysHTTPErrorFormatter("retrieve access keys page ", err).FormatGetErr()
+		return nil, accesskeys.HTTPErrorFormatter("retrieve access keys page ", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -285,7 +286,7 @@ func (u *UserAPI) AccessKey(ctx context.Context, ID string) (*response.AccessKey
 	res, err := u.accessKeyAPI.AccessKey(ctx, ID)
 	if err != nil {
 		msg := fmt.Sprintf("retrieve access key with ID: %s", ID)
-		return nil, users.AccessKeysHTTPErrorFormatter(msg, err).FormatGetErr()
+		return nil, accesskeys.HTTPErrorFormatter(msg, err).FormatGetErr()
 	}
 
 	return res, nil
@@ -298,7 +299,7 @@ func (u *UserAPI) RevokeAccessKey(ctx context.Context, ID string) error {
 	err := u.accessKeyAPI.RevokeAccessKey(ctx, ID)
 	if err != nil {
 		msg := fmt.Sprintf("revoke access key with ID: %s", ID)
-		return users.AccessKeysHTTPErrorFormatter(msg, err).FormatDeleteErr()
+		return accesskeys.HTTPErrorFormatter(msg, err).FormatDeleteErr()
 	}
 
 	return nil
@@ -462,8 +463,8 @@ func initUserAPI(cfg config.Config, auth authenticator) (*UserAPI, error) {
 		configsAPI:      configs.NewAPI(url, httpClient),
 		transactionsAPI: transactions.NewAPI(url, httpClient),
 		utxosAPI:        utxos.NewAPI(url, httpClient),
-		accessKeyAPI:    users.NewAccessKeyAPI(url, httpClient),
-		xpubAPI:         users.NewXPubAPI(url, httpClient),
+		accessKeyAPI:    accesskeys.NewAPI(url, httpClient),
+		xpubAPI:         xpubs.NewAPI(url, httpClient),
 		contactsAPI:     contacts.NewAPI(url, httpClient),
 		invitationsAPI:  invitations.NewAPI(url, httpClient),
 	}, nil

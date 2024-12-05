@@ -8,6 +8,7 @@ import (
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/accesskeys"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/transactions"
@@ -29,6 +30,7 @@ import (
 // ErrUnrecognizedAPIResponse, depending on the behavior of the SPV Wallet API.
 type AdminAPI struct {
 	xpubsAPI        *xpubs.API
+	accessKeyAPI    *accesskeys.API
 	transactionsAPI *transactions.API
 	contactsAPI     *contacts.API
 	invitationsAPI  *invitations.API
@@ -163,6 +165,22 @@ func (a *AdminAPI) Transaction(ctx context.Context, ID string) (*response.Transa
 	return res, nil
 }
 
+// AccessKeys retrieves a paginated list of access keys via the Admin XPubs API.
+// The response includes access keys and pagination details, such as the page number,
+// sort order, and sorting field (sortBy).
+//
+// This method allows optional query parameters to be applied via the provided query options.
+// The response is expected to unmarshal into a *queries.AccessKeyPage struct.
+// Returns an error if the request fails or the response cannot be decoded.
+func (a *AdminAPI) AccessKeys(ctx context.Context, accessKeyOpts ...queries.AdminAccessKeyQueryOption) (*queries.AccessKeyPage, error) {
+	res, err := a.accessKeyAPI.AccessKeys(ctx, accessKeyOpts...)
+	if err != nil {
+		return nil, accesskeys.HTTPErrorFormatter("retrieve access keys page ", err).FormatGetErr()
+	}
+
+	return res, nil
+}
+
 // NewAdminAPIWithXPriv initializes a new AdminAPI instance using an extended private key (xPriv).
 // This function configures the API client with the provided configuration and uses the xPriv key for authentication.
 // If any step fails, an appropriate error is returned.
@@ -214,8 +232,9 @@ func initAdminAPI(cfg config.Config, auth authenticator) (*AdminAPI, error) {
 	}
 
 	return &AdminAPI{
-		transactionsAPI: transactions.NewAPI(url, httpClient),
 		xpubsAPI:        xpubs.NewAPI(url, httpClient),
+		accessKeyAPI:    accesskeys.NewAPI(url, httpClient),
+		transactionsAPI: transactions.NewAPI(url, httpClient),
 		contactsAPI:     contacts.NewAPI(url, httpClient),
 		invitationsAPI:  invitations.NewAPI(url, httpClient),
 	}, nil

@@ -14,7 +14,10 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-const route = "api/v1/admin/contacts"
+const (
+	route = "api/v1/admin/contacts"
+	api   = "Admin Contacts API"
+)
 
 type API struct {
 	httpClient *resty.Client
@@ -90,7 +93,7 @@ func NewAPI(url *url.URL, httpClient *resty.Client) *API {
 func HTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {
 	return &errutil.HTTPErrorFormatter{
 		Action: action,
-		API:    "Admin Contacts API",
+		API:    api,
 		Err:    err,
 	}
 }

@@ -1,4 +1,4 @@
-package users_test
+package accesskeys_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/users/userstest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/accesskeys/accesskeystest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -22,16 +22,16 @@ func TestAccessKeyAPI_GenerateAccessKey(t *testing.T) {
 		expectedErr      error
 	}{
 		"HTTP POST /api/v1/users/current/keys response: 200": {
-			expectedResponse: userstest.ExpectedCreatedAccessKey(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("userstest/post_access_key_200.json")),
+			expectedResponse: accesskeystest.ExpectedCreatedAccessKey(t),
+			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("accesskeystest/post_access_key_200.json")),
 		},
 		"HTTP POST /api/v1/users/current/keys response: 400": {
-			expectedErr: userstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		"HTTP POST /api/v1/users/current/keys str response: 500": {
-			expectedErr: userstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, userstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 	}
 
@@ -62,16 +62,16 @@ func TestAccessKeyAPI_AccessKey(t *testing.T) {
 		expectedErr      error
 	}{
 		fmt.Sprintf("HTTP GET /api/v1/users/current/keys/%s response: 200", ID): {
-			expectedResponse: userstest.ExpectedRertrivedAccessKey(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("userstest/get_access_key_200.json")),
+			expectedResponse: accesskeystest.ExpectedRertrivedAccessKey(t),
+			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("accesskeystest/get_access_key_200.json")),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/users/current/keys/%s response: 400", ID): {
-			expectedErr: userstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/users/current/keys/%s str response: 500", ID): {
-			expectedErr: userstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, userstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 	}
 
@@ -99,16 +99,16 @@ func TestAccessKeyAPI_AccessKeys(t *testing.T) {
 		expectedErr      error
 	}{
 		"HTTP GET /api/v1/users/current/keys response: 200": {
-			expectedResponse: userstest.ExpectedAccessKeyPage(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("userstest/get_access_keys_200.json")),
+			expectedResponse: accesskeystest.ExpectedAccessKeyPage(t),
+			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("accesskeystest/get_access_keys_200.json")),
 		},
 		"HTTP GET /api/v1/users/current/keys response: 400": {
-			expectedErr: userstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/users/current/keys str response: 500": {
-			expectedErr: userstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, userstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 	}
 
@@ -139,12 +139,12 @@ func TestAccessKeyAPI_RevokeAccessKey(t *testing.T) {
 			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/users/current/keys/%s response: 400", ID): {
-			expectedErr: userstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, userstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/users/current/keys/%s str response: 500", ID): {
-			expectedErr: userstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, userstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 	}
 
