@@ -2,6 +2,7 @@ package spvwallettest
 
 import (
 	"encoding/hex"
+	"net/http"
 	"testing"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	spvwallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -98,4 +100,32 @@ func MockPKI(t *testing.T, xpub string) string {
 	}
 
 	return hex.EncodeToString(pubKey.SerializeCompressed())
+}
+
+func NewBadRequestSPVError() models.SPVError {
+	return models.SPVError{
+		Message:    http.StatusText(http.StatusBadRequest),
+		StatusCode: http.StatusBadRequest,
+		Code:       models.UnknownErrorCode,
+	}
+}
+
+func NewInternalServerSPVError() models.SPVError {
+	return models.SPVError{
+		Message:    http.StatusText(http.StatusInternalServerError),
+		StatusCode: http.StatusInternalServerError,
+		Code:       models.UnknownErrorCode,
+	}
+}
+
+func ParseTime(t *testing.T, s string) time.Time {
+	ts, err := time.Parse(time.RFC3339Nano, s)
+	if err != nil {
+		t.Fatalf("test helper - time parse: %s", err)
+	}
+	return ts
+}
+
+func Ptr[T any](value T) *T {
+	return &value
 }

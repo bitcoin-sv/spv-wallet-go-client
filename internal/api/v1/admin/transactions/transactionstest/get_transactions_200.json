@@ -1,0 +1,75 @@
+{
+    "content": [
+        {
+            "createdAt": "2024-11-18T07:19:51.661646Z",
+            "updatedAt": "2024-11-18T08:24:08.217141Z",
+            "deletedAt": null,
+            "metadata": {
+                "receiver": "john.doe.test@john.test.4chain.space",
+                "sender": "jane.doe.test@jane.test.4chain.space"
+            },
+            "id": "8b17fb99-bb11-4cdd-b04c-2d35c3d5070f",
+            "hex": "ae3d28fe-2610-496d-95ea-fbfa50dd571d",
+            "xpubInIds": [
+                "70dbd5a2-ab71-4a62-8240-ca5960d1327b"
+            ],
+            "xpubOutIds": [
+                "f3d9355f-a152-4075-be05-52daa98cc87c"
+            ],
+            "blockHash": "8bcc3e0b-3a0f-44a2-a32e-7fa40fe50db5",
+            "blockHeight": 871343,
+            "fee": 1,
+            "numberOfInputs": 2,
+            "numberOfOutputs": 1,
+            "draftId": "c78a5ced-d3b0-4acf-bfff-7f4268760b0f",
+            "totalValue": 1,
+            "outputs": {
+                "ba121a0d-af03-41cb-bfb2-592005f73e55": 1,
+                "79c17f30-0580-48e1-8491-f147c869b73b": -2
+            },
+            "status": "",
+            "direction": ""
+        },
+        {
+            "createdAt": "2024-11-18T07:16:04.821925Z",
+            "updatedAt": "2024-11-19T13:09:39.501356Z",
+            "deletedAt": null,
+            "metadata": {
+                "domain": "john.doe.test.4chain.space",
+                "ip_address": "127.0.0.1",
+                "p2p_tx_metadata": {
+                    "note": "example note",
+                    "pubkey": "bd568915-e532-4466-a0ab-70c7dead4b4b",
+                    "sender": "jane.doe@handcash.io"
+                },
+                "paymail_request": "HandleReceivedP2pTransaction",
+                "reference_id": "c7056aa68fb3586c74d0f8f7cb0ae52b",
+                "user_agent": "node-fetch"
+            },
+            "id": "2f130e50-3d0b-46b1-a1e6-ad866d60c2d2",
+            "hex": "8741462f-50ac-4fdc-bb22-b1db155899dc",
+            "xpubInIds": null,
+            "xpubOutIds": [
+                "1f1724bb-b167-4ac2-b97b-7a8e03a111c8"
+            ],
+            "blockHash": "fca9446e-5c56-44eb-930f-275ce0594f24",
+            "blockHeight": 871343,
+            "fee": 0,
+            "numberOfInputs": 2,
+            "numberOfOutputs": 3,
+            "draftId": "",
+            "totalValue": 513,
+            "outputs": {
+                "e95ab632-2a96-466a-9676-5e86bc8a8d8d": 100
+            },
+            "status": "",
+            "direction": ""
+        }
+    ],
+    "page": {
+        "size": 2,
+        "number": 2,
+        "totalElements": 2,
+        "totalPages": 1
+    }
+}

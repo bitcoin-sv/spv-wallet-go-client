@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/invitations/invitationstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -23,12 +22,12 @@ func TestInvitationsAPI_AcceptInvitation(t *testing.T) {
 			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/admin/invitations/%s response: 400", id): {
-			expectedErr: invitationstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, invitationstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/admin/invitations/%s response: 500", id): {
-			expectedErr: invitationstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, invitationstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewInternalServerSPVError()),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/admin/invitations/%s str response: 500", id): {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
@@ -60,12 +59,12 @@ func TestInvitationsAPI_RejectInvitation(t *testing.T) {
 			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/admin/invitations/%s response: 400", id): {
-			expectedErr: invitationstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, invitationstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/admin/invitations/%s response: 500", id): {
-			expectedErr: invitationstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, invitationstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/admin/invitations/%s str response: 500", id): {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,

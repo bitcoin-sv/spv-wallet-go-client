@@ -8,12 +8,12 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
-type transactionFilterBuilder struct {
+type TransactionFilterBuilder struct {
 	TransactionFilter  filter.TransactionFilter
 	ModelFilterBuilder querybuilders.ModelFilterBuilder
 }
 
-func (t *transactionFilterBuilder) Build() (url.Values, error) {
+func (t *TransactionFilterBuilder) Build() (url.Values, error) {
 	modelFilterBuilder, err := t.ModelFilterBuilder.Build()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build model filter query params: %w", err)

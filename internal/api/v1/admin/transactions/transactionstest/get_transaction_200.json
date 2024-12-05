@@ -1,0 +1,31 @@
+{
+    "createdAt": "2024-10-02T10:34:57.931744Z",
+    "updatedAt": "2024-10-18T13:59:02.237607Z",
+    "deletedAt": null,
+    "metadata": {
+        "domain": "john.doe.test.4chain.space",
+        "ip_address": "127.0.0.1",
+        "p2p_tx_metadata": {
+            "pubkey": "c110ad13-9ded-4df3-a7af-99215e80a609",
+            "sender": "john.doe@handcash.io"
+        },
+        "paymail_request": "HandleReceivedP2pTransaction",
+        "reference_id": "802f85de-23fa-40e3-adc2-165f33b9c853",
+        "user_agent": "node-fetch"
+    },
+    "id": "7efb8617-deb9-43cf-90df-d78782d40ab2",
+    "hex": "7198c88c-b695-4a19-b4af-6d912f87bf29",
+    "xpubInIds": null,
+    "xpubOutIds": [
+        "df5b2ccc-04cc-4ae3-8e8b-d311160eba75"
+    ],
+    "blockHash": "d97337d6-d735-4b41-a118-70a8813e616d",
+    "blockHeight": 864633,
+    "fee": 0,
+    "numberOfInputs": 2,
+    "numberOfOutputs": 3,
+    "draftId": "",
+    "totalValue": 631,
+    "status": "MINED",
+    "direction": "outgoing"
+}

@@ -26,12 +26,12 @@ func TestXPubsAPI_CreateXPub(t *testing.T) {
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusCreated, httpmock.File("xpubstest/post_xpub_201.json")),
 		},
 		"HTTP POST /api/v1/admin/users response: 400": {
-			expectedErr: xpubstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, xpubstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		"HTTP POST /api/v1/admin/users response: 500": {
-			expectedErr: xpubstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, xpubstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 		"HTTP POST /api/v1/admin/users str response: 500": {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
@@ -70,16 +70,16 @@ func TestXPubsAPI_XPubs(t *testing.T) {
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("xpubstest/get_xpubs_200.json")),
 		},
 		"HTTP GET /api/v1/admin/users response: 400": {
-			expectedErr: xpubstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, xpubstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/admin/users response: 500": {
-			expectedErr: xpubstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, xpubstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 		"HTTP GET /api/v1/admin/users str response: 500": {
-			expectedErr: xpubstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, xpubstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 	}
 

@@ -1,19 +1,17 @@
 package transactionstest
 
 import (
-	"net/http"
 	"testing"
-	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 	return &response.DraftTransaction{
 		Model: response.Model{
-			CreatedAt: ParseTime(t, "2024-11-05T07:30:14.219077Z"),
-			UpdatedAt: ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+			CreatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+			UpdatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
 			Metadata: map[string]interface{}{
 				"receiver": "john.doe.test4@john.doe.test.4chain.space",
 				"sender":   "john.doe.test4@john.doe.test.4chain.space",
@@ -22,14 +20,14 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 		ID:        "36be741b-31c7-4aed-8840-5e5b2eafeb41",
 		Hex:       "c959fdb6-f438-4ef9-aef9-92a1852885ef",
 		XpubID:    "3f0a90d3-4f8b-45f6-81e4-9858fa47ecc0",
-		ExpiresAt: ParseTime(t, "2024-11-05T07:30:27.372912Z"),
+		ExpiresAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:27.372912Z"),
 		Configuration: response.TransactionConfig{
 			ChangeSatoshis: 98,
 			ChangeDestinations: []*response.Destination{
 				{
 					Model: response.Model{
-						CreatedAt: ParseTime(t, "2024-11-05T07:30:14.219077Z"),
-						UpdatedAt: ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+						CreatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+						UpdatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
 					},
 					ID:            "c86dd8f4-316f-4d71-be00-7bd1a38079e4",
 					XpubID:        "d6884260-1624-415b-8625-652a59345ead",
@@ -49,8 +47,8 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 				{
 					Utxo: response.Utxo{
 						Model: response.Model{
-							CreatedAt: ParseTime(t, "2024-11-05T07:30:14.219077Z"),
-							UpdatedAt: ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+							CreatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+							UpdatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
 						},
 						UtxoPointer: response.UtxoPointer{
 							TransactionID: "3e0c5f6d-0dfc-462d-8a63-31b7a20d0c6b",
@@ -61,12 +59,12 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 						ScriptPubKey: "9d7eede4-00cd-47fd-ab3d-b0ae6d2ca6a6",
 						Type:         "pubkeyhash",
 						DraftID:      "f1ebe294-d921-4fb7-8b22-ed33e090e7ea",
-						ReservedAt:   ParseTime(t, "2024-11-05T07:30:14.207287Z"),
+						ReservedAt:   spvwallettest.ParseTime(t, "2024-11-05T07:30:14.207287Z"),
 					},
 					Destination: response.Destination{
 						Model: response.Model{
-							CreatedAt: ParseTime(t, "2024-11-05T07:30:14.219077Z"),
-							UpdatedAt: ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+							CreatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+							UpdatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
 							Metadata: map[string]interface{}{
 								"domain":          "john.doe.test.4chain.space",
 								"ip_address":      "127.0.0.1",
@@ -82,7 +80,7 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 						Type:                         "pubkeyhash",
 						Chain:                        0,
 						Num:                          0,
-						PaymailExternalDerivationNum: Ptr(uint32(3)),
+						PaymailExternalDerivationNum: spvwallettest.Ptr(uint32(3)),
 						Address:                      "6e4f50b1-356b-4453-a83e-2f412f328c25",
 						DraftID:                      "",
 					},
@@ -131,8 +129,8 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 func ExpectedRecordTransaction(t *testing.T) *response.Transaction {
 	return &response.Transaction{
 		Model: response.Model{
-			CreatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-			UpdatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 			Metadata: map[string]interface{}{
 				"key":  "value",
 				"key2": "value2",
@@ -162,8 +160,8 @@ func ExpectedRecordTransaction(t *testing.T) *response.Transaction {
 func ExpectedTransactionWithUpdatedMetadata(t *testing.T) *response.Transaction {
 	return &response.Transaction{
 		Model: response.Model{
-			CreatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-			UpdatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 			Metadata: map[string]any{
 				"domain":          "john.doe.test.4chain.space",
 				"example_key1":    "example_key10_val",
@@ -196,8 +194,8 @@ func ExpectedTransactionWithUpdatedMetadata(t *testing.T) *response.Transaction 
 func ExpectedTransaction(t *testing.T) *response.Transaction {
 	return &response.Transaction{
 		Model: response.Model{
-			CreatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-			UpdatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 			Metadata: map[string]any{
 				"domain":          "john.doe.test.4chain.space",
 				"example_key1":    "example_key10_val",
@@ -231,8 +229,8 @@ func ExpectedTransactionsPage(t *testing.T) *response.PageModel[response.Transac
 		Content: []*response.Transaction{
 			{
 				Model: response.Model{
-					CreatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-					UpdatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+					CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+					UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 					Metadata: map[string]any{
 						"domain":          "john.doe.test.4chain.space",
 						"example_key1":    "example_key10_val",
@@ -261,8 +259,8 @@ func ExpectedTransactionsPage(t *testing.T) *response.PageModel[response.Transac
 			},
 			{
 				Model: response.Model{
-					CreatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-					UpdatedAt: ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+					CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+					UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 					Metadata: map[string]any{
 						"domain":          "jane.doe.test.4chain.space",
 						"example_key101":  "example_key101_val",
@@ -296,33 +294,5 @@ func ExpectedTransactionsPage(t *testing.T) *response.PageModel[response.Transac
 			TotalElements: 2,
 			TotalPages:    1,
 		},
-	}
-}
-
-func ParseTime(t *testing.T, s string) time.Time {
-	ts, err := time.Parse(time.RFC3339Nano, s)
-	if err != nil {
-		t.Fatalf("test helper - time parse: %s", err)
-	}
-	return ts
-}
-
-func Ptr[T any](value T) *T {
-	return &value
-}
-
-func NewBadRequestSPVError() models.SPVError {
-	return models.SPVError{
-		Message:    http.StatusText(http.StatusBadRequest),
-		StatusCode: http.StatusBadRequest,
-		Code:       "invalid-data-format",
-	}
-}
-
-func NewInternalServerSPVError() models.SPVError {
-	return models.SPVError{
-		Message:    http.StatusText(http.StatusInternalServerError),
-		StatusCode: http.StatusInternalServerError,
-		Code:       models.UnknownErrorCode,
 	}
 }

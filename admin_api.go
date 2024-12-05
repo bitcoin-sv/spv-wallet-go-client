@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/invitations"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/xpubs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
@@ -27,9 +28,10 @@ import (
 // Methods may return wrapped errors, including models.SPVError or
 // ErrUnrecognizedAPIResponse, depending on the behavior of the SPV Wallet API.
 type AdminAPI struct {
-	xpubsAPI       *xpubs.API // Internal API for managing operations related to XPubs.
-	contactsAPI    *contacts.API
-	invitationsAPI *invitations.API
+	xpubsAPI        *xpubs.API
+	transactionsAPI *transactions.API
+	contactsAPI     *contacts.API
+	invitationsAPI  *invitations.API
 }
 
 // CreateXPub creates a new XPub record via the Admin XPubs API.
@@ -132,6 +134,35 @@ func (a *AdminAPI) RejectInvitation(ctx context.Context, ID string) error {
 	return nil
 }
 
+// Transactions retrieves a paginated list of transactions via the Admin transactions API.
+// The returned response includes transactions and pagination details, such as the page number,
+// sort order, and sorting field (sortBy).
+//
+// This method allows optional query parameters to be applied via the provided query options.
+// The response is expected to be to unmarshal into a *queries.TransactionPage struct.
+// Returns an error if the request fails or the response cannot be decoded.
+func (a *AdminAPI) Transactions(ctx context.Context, opts ...queries.TransactionsQueryOption) (*queries.TransactionPage, error) {
+	res, err := a.transactionsAPI.Transactions(ctx, opts...)
+	if err != nil {
+		return nil, transactions.HTTPErrorFormatter("retrieve transactions page", err).FormatGetErr()
+	}
+
+	return res, nil
+}
+
+// Transaction retrieves a specific transaction by its ID via the Admin transactions API.
+// The response is expected to be unmarshaled into a *response.Transaction struct.
+// Returns an error if the request fails or the response cannot be decoded.
+func (a *AdminAPI) Transaction(ctx context.Context, ID string) (*response.Transaction, error) {
+	res, err := a.transactionsAPI.Transaction(ctx, ID)
+	if err != nil {
+		msg := fmt.Sprintf("retrieve a transaction with ID: %s", ID)
+		return nil, transactions.HTTPErrorFormatter(msg, err).FormatGetErr()
+	}
+
+	return res, nil
+}
+
 // NewAdminAPIWithXPriv initializes a new AdminAPI instance using an extended private key (xPriv).
 // This function configures the API client with the provided configuration and uses the xPriv key for authentication.
 // If any step fails, an appropriate error is returned.
@@ -178,9 +209,14 @@ func initAdminAPI(cfg config.Config, auth authenticator) (*AdminAPI, error) {
 	}
 
 	httpClient := restyutil.NewHTTPClient(cfg, auth)
+	if httpClient == nil {
+		return nil, fmt.Errorf("failed to initialize HTTP client - nil value.")
+	}
+
 	return &AdminAPI{
-		xpubsAPI:       xpubs.NewAPI(url, httpClient),
-		contactsAPI:    contacts.NewAPI(url, httpClient),
-		invitationsAPI: invitations.NewAPI(url, httpClient),
+		transactionsAPI: transactions.NewAPI(url, httpClient),
+		xpubsAPI:        xpubs.NewAPI(url, httpClient),
+		contactsAPI:     contacts.NewAPI(url, httpClient),
+		invitationsAPI:  invitations.NewAPI(url, httpClient),
 	}, nil
 }

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/invitations/invitationstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -22,12 +21,12 @@ func TestInvitationsAPI_AcceptInvitation(t *testing.T) {
 			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s/contacts response: 400", paymail): {
-			expectedErr: invitationstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, invitationstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s/contacts str response: 500", paymail): {
-			expectedErr: invitationstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, invitationstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 	}
 
@@ -57,12 +56,12 @@ func TestInvitationsAPI_RejectInvitation(t *testing.T) {
 			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s response: 400", paymail): {
-			expectedErr: invitationstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, invitationstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s str response: 500", paymail): {
-			expectedErr: invitationstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, invitationstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 	}
 

@@ -26,12 +26,12 @@ func TestMerkleRootsAPI_MerkleRoots(t *testing.T) {
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("merklerootstest/get_merkleroots_200.json")),
 		},
 		"HTTP GET /api/v1/merkleroots response: 400": {
-			expectedErr: merklerootstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, merklerootstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/merkleroots str response: 500": {
-			expectedErr: merklerootstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, merklerootstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 		},
 	}
 
@@ -99,11 +99,11 @@ func TestMerkleRootsAPI_SyncMerkleRoots(t *testing.T) {
 			expectedErr: errors.ErrStaleLastEvaluatedKey,
 		},
 		"API Returns Error Response": {
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, merklerootstest.NewInternalServerSPVError()),
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
 			setupMock: func(mockRepo *MockMerkleRootsRepository) {
 				mockRepo.On("GetLastMerkleRoot").Return("") // No data initially
 			},
-			expectedErr: merklerootstest.NewInternalServerSPVError(),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
 		},
 	}
 

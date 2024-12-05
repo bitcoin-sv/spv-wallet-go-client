@@ -1,26 +1,12 @@
 package utxostest
 
 import (
-	"net/http"
 	"testing"
-	"time"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
-
-func ParseTime(t *testing.T, s string) time.Time {
-	ts, err := time.Parse(time.RFC3339Nano, s)
-	if err != nil {
-		t.Fatalf("test helper - time parse: %s", err)
-	}
-	return ts
-}
-
-func Ptr[T any](value T) *T {
-	return &value
-}
 
 func ExpectedUtxosPage(t *testing.T) *queries.UtxosPage {
 	return &queries.UtxosPage{
@@ -31,19 +17,19 @@ func ExpectedUtxosPage(t *testing.T) *queries.UtxosPage {
 				Satoshis:     100,
 				ScriptPubKey: "88ca49f2-816e-4a0b-b5c5-e5c574e2d292",
 				Type:         "pubkeyhash",
-				ReservedAt:   ParseTime(t, "0001-01-01T00:00:00Z"),
+				ReservedAt:   spvwallettest.ParseTime(t, "0001-01-01T00:00:00Z"),
 				UtxoPointer: response.UtxoPointer{
 					TransactionID: "f365f697-3db9-44fd-bd0d-ba8e94ca63f2",
 					OutputIndex:   0,
 				},
 				Model: response.Model{
-					CreatedAt: ParseTime(t, "2024-11-12T11:31:07.728974Z"),
-					UpdatedAt: ParseTime(t, "2024-11-12T11:31:07.732139Z"),
+					CreatedAt: spvwallettest.ParseTime(t, "2024-11-12T11:31:07.728974Z"),
+					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-12T11:31:07.732139Z"),
 				},
 				Transaction: &response.Transaction{
 					Model: response.Model{
-						CreatedAt: ParseTime(t, "2024-11-12T11:31:07.72894Z"),
-						UpdatedAt: ParseTime(t, "2024-11-12T12:33:35.266758Z"),
+						CreatedAt: spvwallettest.ParseTime(t, "2024-11-12T11:31:07.72894Z"),
+						UpdatedAt: spvwallettest.ParseTime(t, "2024-11-12T12:33:35.266758Z"),
 
 						Metadata: map[string]any{
 							"domain":     "john.doe.test.space",
@@ -75,19 +61,19 @@ func ExpectedUtxosPage(t *testing.T) *queries.UtxosPage {
 				Satoshis:     18,
 				ScriptPubKey: "5e63148d-f506-43fb-88c3-2d98491625da",
 				Type:         "pubkeyhash",
-				ReservedAt:   ParseTime(t, "0001-01-01T00:00:00Z"),
+				ReservedAt:   spvwallettest.ParseTime(t, "0001-01-01T00:00:00Z"),
 				UtxoPointer: response.UtxoPointer{
 					TransactionID: "54ed5bcb-a964-47af-892b-1054065c28a8",
 					OutputIndex:   1,
 				},
 				Model: response.Model{
-					CreatedAt: ParseTime(t, "2024-11-08T13:40:55.592Z"),
-					UpdatedAt: ParseTime(t, "2024-11-08T13:40:55.593441Z"),
+					CreatedAt: spvwallettest.ParseTime(t, "2024-11-08T13:40:55.592Z"),
+					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-08T13:40:55.593441Z"),
 				},
 				Transaction: &response.Transaction{
 					Model: response.Model{
-						CreatedAt: ParseTime(t, "2024-11-08T13:40:55.591986Z"),
-						UpdatedAt: ParseTime(t, "2024-11-08T14:43:56.256571Z"),
+						CreatedAt: spvwallettest.ParseTime(t, "2024-11-08T13:40:55.591986Z"),
+						UpdatedAt: spvwallettest.ParseTime(t, "2024-11-08T14:43:56.256571Z"),
 					},
 					ID:                   "29b89717-f139-45ae-9848-f2d7415ea596",
 					Hex:                  "6a1c1ddb-f3c1-4491-98b4-9ce3eb016e60",
@@ -111,21 +97,5 @@ func ExpectedUtxosPage(t *testing.T) *queries.UtxosPage {
 			TotalElements: 9,
 			TotalPages:    5,
 		},
-	}
-}
-
-func NewBadRequestSPVError() models.SPVError {
-	return models.SPVError{
-		Message:    http.StatusText(http.StatusBadRequest),
-		StatusCode: http.StatusBadRequest,
-		Code:       "invalid-data-format",
-	}
-}
-
-func NewInternalServerSPVError() models.SPVError {
-	return models.SPVError{
-		Message:    http.StatusText(http.StatusInternalServerError),
-		StatusCode: http.StatusInternalServerError,
-		Code:       models.UnknownErrorCode,
 	}
 }

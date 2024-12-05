@@ -28,12 +28,12 @@ func TestContactsAPI_Contacts(t *testing.T) {
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("contactstest/get_contacts_200.json")),
 		},
 		"HTTP GET /api/v1/admin/contacts response: 400": {
-			expectedErr: contactstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		"HTTP GET /api/v1/admin/contacts response: 500": {
-			expectedErr: contactstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewInternalServerSPVError()),
 		},
 		"HTTP GET /api/v1/admin/contacts str response: 500": {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
@@ -68,12 +68,12 @@ func TestContactsAPI_ContactUpdate(t *testing.T) {
 			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("contactstest/put_contact_update_200.json")),
 		},
 		fmt.Sprintf("HTTP PUT /api/v1/admin/contacts/%s response: 400", id): {
-			expectedErr: contactstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP PUT /api/v1/admin/contacts/%s response: 500", id): {
-			expectedErr: contactstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewInternalServerSPVError()),
 		},
 		fmt.Sprintf("HTTP PUT /api/v1/admin/contacts/%s str response: 500", id): {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
@@ -110,12 +110,12 @@ func TestContactsAPI_DeleteContact(t *testing.T) {
 			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP DELETE/api/v1/admin/contacts/%s response: 400", id): {
-			expectedErr: contactstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewBadRequestSPVError()),
+			expectedErr: spvwallettest.NewBadRequestSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/admin/contacts/%s response: 500", id): {
-			expectedErr: contactstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, contactstest.NewInternalServerSPVError()),
+			expectedErr: spvwallettest.NewInternalServerSPVError(),
+			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewInternalServerSPVError()),
 		},
 		fmt.Sprintf("HTTP DELETE /api/v1/admin/contacts/%s str response: 500", id): {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,

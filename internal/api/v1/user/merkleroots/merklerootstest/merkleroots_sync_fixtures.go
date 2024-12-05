@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/jarcoal/httpmock"
@@ -264,8 +265,8 @@ func FirstMerkleRootsPage() *queries.MerkleRootPage {
 			},
 		},
 		Page: models.ExclusiveStartKeyPageInfo{
-			OrderByField:     Ptr("blockHeight"),
-			SortDirection:    Ptr("asc"),
+			OrderByField:     spvwallettest.Ptr("blockHeight"),
+			SortDirection:    spvwallettest.Ptr("asc"),
 			TotalElements:    9,
 			Size:             3,
 			LastEvaluatedKey: "e4774f7a-eb99-4cac-956e-634d2aeccc93",
@@ -290,8 +291,8 @@ func SecondMerkleRootsPage() *queries.MerkleRootPage {
 			},
 		},
 		Page: models.ExclusiveStartKeyPageInfo{
-			OrderByField:     Ptr("blockHeight"),
-			SortDirection:    Ptr("asc"),
+			OrderByField:     spvwallettest.Ptr("blockHeight"),
+			SortDirection:    spvwallettest.Ptr("asc"),
 			TotalElements:    9,
 			Size:             3,
 			LastEvaluatedKey: "6bad63f5-8f2e-4756-aca9-cc9cb4a001c6",
@@ -316,8 +317,8 @@ func ThirdMerkleRootsPage() *queries.MerkleRootPage {
 			},
 		},
 		Page: models.ExclusiveStartKeyPageInfo{
-			OrderByField:     Ptr("blockHeight"),
-			SortDirection:    Ptr("asc"),
+			OrderByField:     spvwallettest.Ptr("blockHeight"),
+			SortDirection:    spvwallettest.Ptr("asc"),
 			TotalElements:    9,
 			Size:             3,
 			LastEvaluatedKey: "09232c7e-ecf7-4e33-8feb-a32170c6e7b6",

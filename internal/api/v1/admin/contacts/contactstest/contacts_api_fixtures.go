@@ -1,20 +1,18 @@
 package contactstest
 
 import (
-	"net/http"
 	"testing"
-	"time"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 func ExpectedUpdatedUserContact(t *testing.T) *response.Contact {
 	return &response.Contact{
 		Model: response.Model{
-			CreatedAt: parseTime(t, "2024-11-28T13:34:52.11722Z"),
-			UpdatedAt: parseTime(t, "2024-11-29T08:23:19.66093Z"),
+			CreatedAt: spvwallettest.ParseTime(t, "2024-11-28T13:34:52.11722Z"),
+			UpdatedAt: spvwallettest.ParseTime(t, "2024-11-29T08:23:19.66093Z"),
 			Metadata:  map[string]any{"phoneNumber": "123456789"},
 		},
 		ID:       "4d570959-dd85-4f53-bad1-18d0671761e9",
@@ -30,8 +28,8 @@ func ExpectedUserContactsPage(t *testing.T) *queries.UserContactsPage {
 		Content: []*response.Contact{
 			{
 				Model: response.Model{
-					CreatedAt: parseTime(t, "2024-11-28T14:58:13.262238Z"),
-					UpdatedAt: parseTime(t, "2024-11-28T16:18:43.842434Z"),
+					CreatedAt: spvwallettest.ParseTime(t, "2024-11-28T14:58:13.262238Z"),
+					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-28T16:18:43.842434Z"),
 				},
 				ID:       "7a5625ac-8256-454a-84a3-7f03f50cd7dc",
 				FullName: "John Doe",
@@ -41,8 +39,8 @@ func ExpectedUserContactsPage(t *testing.T) *queries.UserContactsPage {
 			},
 			{
 				Model: response.Model{
-					CreatedAt: parseTime(t, "2024-11-28T14:58:13.029966Z"),
-					UpdatedAt: parseTime(t, "2024-11-28T14:58:13.03002Z"),
+					CreatedAt: spvwallettest.ParseTime(t, "2024-11-28T14:58:13.029966Z"),
+					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-28T14:58:13.03002Z"),
 					Metadata: map[string]any{
 						"phoneNumber": "123456789",
 					},
@@ -61,28 +59,4 @@ func ExpectedUserContactsPage(t *testing.T) *queries.UserContactsPage {
 			TotalPages:    1,
 		},
 	}
-}
-
-func NewBadRequestSPVError() models.SPVError {
-	return models.SPVError{
-		Message:    http.StatusText(http.StatusBadRequest),
-		StatusCode: http.StatusBadRequest,
-		Code:       "invalid-data-format",
-	}
-}
-
-func NewInternalServerSPVError() models.SPVError {
-	return models.SPVError{
-		Message:    http.StatusText(http.StatusInternalServerError),
-		StatusCode: http.StatusInternalServerError,
-		Code:       models.UnknownErrorCode,
-	}
-}
-
-func parseTime(t *testing.T, s string) time.Time {
-	ts, err := time.Parse(time.RFC3339Nano, s)
-	if err != nil {
-		t.Fatalf("test helper - time parse: %s", err)
-	}
-	return ts
 }
