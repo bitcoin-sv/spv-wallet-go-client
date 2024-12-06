@@ -1,0 +1,12 @@
+{
+    "createdAt": "2024-10-02T10:28:15.544234Z",
+    "updatedAt": "2024-10-02T10:34:54.836433Z",
+    "deletedAt": null,
+    "metadata": null,
+    "id": "98dbafe0-4e2b-4307-8fbf-c55209214bae",
+    "xpubId": "0d71ac87-ef56-4b1a-8372-814481cface6",
+    "alias": "john.doe.test",
+    "domain": "john.doe.test.4chain.space",
+    "publicName": "john.doe.test",
+    "avatar": "http://localhost:3003/static/paymail/avatar.jpg"
+   }

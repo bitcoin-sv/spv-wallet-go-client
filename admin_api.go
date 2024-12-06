@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/accesskeys"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/invitations"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/paymails"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/webhooks"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/xpubs"
@@ -30,6 +31,7 @@ import (
 // ErrUnrecognizedAPIResponse, depending on the behavior of the SPV Wallet API.
 type AdminAPI struct {
 	xpubsAPI        *xpubs.API
+	paymailsAPI     *paymails.API
 	accessKeyAPI    *accesskeys.API
 	transactionsAPI *transactions.API
 	contactsAPI     *contacts.API
@@ -225,6 +227,64 @@ func NewAdminAPIWithXPriv(cfg config.Config, xPriv string) (*AdminAPI, error) {
 	return initAdminAPI(cfg, authenticator)
 }
 
+// Paymails retrieves a paginated list of paymail addresses via the Admin Paymails API.
+// The response includes user paymails along with pagination metadata, such as
+// the current page number, sort order, and the field used for sorting (sortBy).
+//
+// Query parameters can be configured using optional query options. These options allow
+// filtering based on metadata, pagination settings, or specific paymail attributes.
+//
+// The API response is unmarshaled into a *queries.PaymailAddressPage struct.
+// Returns an error if the API request fails or the response cannot be decoded.
+func (a *AdminAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption) (*queries.PaymailAddressPage, error) {
+	res, err := a.paymailsAPI.Paymails(ctx, opts...)
+	if err != nil {
+		return nil, paymails.HTTPErrorFormatter("failed to retrieve paymail addresses page", err).FormatGetErr()
+	}
+
+	return res, nil
+}
+
+// Paymail retrieves the paymail address associated with the specified ID via the Admin Paymails API.
+// The response is expected to be unmarshaled into a *response.PaymailAddress struct.
+// Returns an error if the request fails or the response cannot be decoded.
+func (a *AdminAPI) Paymail(ctx context.Context, ID string) (*response.PaymailAddress, error) {
+	res, err := a.paymailsAPI.Paymail(ctx, ID)
+	if err != nil {
+		msg := fmt.Sprintf("failed retrieve paymail address with ID: %s", ID)
+		return nil, paymails.HTTPErrorFormatter(msg, err).FormatGetErr()
+	}
+
+	return res, nil
+}
+
+// CreatePaymail creates a new paymail address record via the Admin Paymails API.
+// The provided command contains the necessary parameters to define the paymail address record.
+//
+// The API response is unmarshaled into a *response.Xpub PaymailAddress.
+// Returns an error if the API request fails or the response cannot be decoded.
+func (a *AdminAPI) CreatePaymail(ctx context.Context, cmd *commands.CreatePaymail) (*response.PaymailAddress, error) {
+	res, err := a.paymailsAPI.CreatePaymail(ctx, cmd)
+	if err != nil {
+		return nil, paymails.HTTPErrorFormatter("failed to create paymail address", err).FormatPostErr()
+	}
+
+	return res, nil
+}
+
+// DeletePaymail deletes a paymail address with via the Admin Paymails API.
+// It returns an error if the API request fails. A nil error indicates that the paymail
+// was successfully deleted.
+func (a *AdminAPI) DeletePaymail(ctx context.Context, address string) error {
+	err := a.paymailsAPI.DeletePaymail(ctx, address)
+	if err != nil {
+		msg := fmt.Sprintf("failed to remove paymail address: %s", address)
+		return paymails.HTTPErrorFormatter(msg, err).FormatGetErr()
+	}
+
+	return nil
+}
+
 // NewAdminWithXPub initializes a new AdminAPI instance using an extended public key (xPub).
 // This function configures the API client with the provided configuration and uses the xPub key for authentication.
 // If any configuration or initialization step fails, an appropriate error is returned.
@@ -252,10 +312,11 @@ func initAdminAPI(cfg config.Config, auth authenticator) (*AdminAPI, error) {
 	}
 
 	return &AdminAPI{
+		paymailsAPI:     paymails.NewAPI(url, httpClient),
+		transactionsAPI: transactions.NewAPI(url, httpClient),
 		xpubsAPI:        xpubs.NewAPI(url, httpClient),
 		accessKeyAPI:    accesskeys.NewAPI(url, httpClient),
 		webhooksAPI:     webhooks.NewAPI(url, httpClient),
-		transactionsAPI: transactions.NewAPI(url, httpClient),
 		contactsAPI:     contacts.NewAPI(url, httpClient),
 		invitationsAPI:  invitations.NewAPI(url, httpClient),
 	}, nil

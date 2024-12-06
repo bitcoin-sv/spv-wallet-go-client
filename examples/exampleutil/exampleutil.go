@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
+
+	"math/rand"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
 )
@@ -20,4 +23,11 @@ func Print(s string, a any) {
 		log.Fatal(err)
 	}
 	fmt.Println(string(res))
+}
+
+func RandomPaymail() string {
+	seed := time.Now().UnixNano()
+	n := rand.New(rand.NewSource(seed)).Intn(500)
+	addr := fmt.Sprintf("john.doe.%dtest@4chain.test.com", n)
+	return addr
 }

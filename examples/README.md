@@ -21,6 +21,11 @@ the wallet client package during interaction wit the SPV Wallet API.
 ```
 task: [default] task --list
 task: Available tasks for this project:
+* create-paymail-as-admin:                Create a paymail address.
+* default:                                Display all available tasks.
+* delete-paymail-as-admin:                Delete paymail address.
+* fetch-paymail-as-admin:                 Fetch paymail with a given address.
+* fetch-paymails-as-admin:                Fetch paymails page.
 * accept-invitation-as-admin:             Accept invitation with a given ID as Admin.
 * create-xpub-as-admin:                   Create xPub as Admin.
 * default:                                Display all available tasks.

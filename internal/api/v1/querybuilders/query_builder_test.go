@@ -8,7 +8,7 @@ import (
 
 	goclienterr "github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders/querybuilderstest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
 )
@@ -66,14 +66,14 @@ func TestQueryBuilder_Build(t *testing.T) {
 					SortBy: "id",
 				},
 				ModelFilter: filter.ModelFilter{
-					IncludeDeleted: querybuilderstest.Ptr(true),
+					IncludeDeleted: spvwallettest.Ptr(true),
 					CreatedRange: &filter.TimeRange{
-						From: querybuilderstest.Ptr(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-						To:   querybuilderstest.Ptr(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
+						From: spvwallettest.Ptr(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+						To:   spvwallettest.Ptr(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
 					},
 					UpdatedRange: &filter.TimeRange{
-						From: querybuilderstest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
-						To:   querybuilderstest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
+						From: spvwallettest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
+						To:   spvwallettest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
 					},
 				},
 				MetadataFilter: querybuilders.Metadata{
