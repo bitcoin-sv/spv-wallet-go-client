@@ -7,6 +7,143 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
+func ExpectedDraftTransactionWithWrongInputs(t *testing.T) *response.DraftTransaction {
+	draftWithWrongInputs := ExpectedDraftTransactionWithHex(t)
+	draftWithWrongInputs.Configuration.Inputs[0].TransactionID = "wrong-input-transaction-id"
+	return draftWithWrongInputs
+}
+
+func ExpectedDraftTransactionWithWrongLockingScript(t *testing.T) *response.DraftTransaction {
+	draftWithWrongLockingScript := ExpectedDraftTransactionWithHex(t)
+	draftWithWrongLockingScript.Configuration.Inputs[0].Destination.LockingScript = "wrong-locking-script"
+	return draftWithWrongLockingScript
+}
+
+func ExpectedDraftTransactionWithWrongHex(t *testing.T) *response.DraftTransaction {
+	draftWithWrongHex := ExpectedDraftTransactionWithHex(t)
+	draftWithWrongHex.Hex = "wrong-hex"
+	return draftWithWrongHex
+}
+
+func ExpectedDraftTransactionWithHex(t *testing.T) *response.DraftTransaction {
+	return &response.DraftTransaction{
+		Model: response.Model{
+			CreatedAt: spvwallettest.ParseTime(t, "2024-12-02T12:04:33.855018Z"),
+			UpdatedAt: spvwallettest.ParseTime(t, "2024-12-02T13:04:33.855036+01:00"),
+		},
+		ID:        "de3b8ef7041b2a528bc47ecdb3b87b06b61407fe24789bc02f9d49bfc234b4d5",
+		Hex:       "01000000014c037d55e72d2ee6a95ff67bd758c4cee9c7545bb4d72ba77584152fcfa070120100000000ffffffff0200000000000000000e006a0568656c6c6f05776f726c6408000000000000001976a914702cef80a7039a1aebb70dc05ce1e439646fa33788ac00000000",
+		XpubID:    "55e5aeae101bf7dc49db2abfccfab9fb5f56a6b594fdcc87e5f5a94bfe94b973",
+		ExpiresAt: spvwallettest.ParseTime(t, "2024-12-02T12:04:53.840989Z"),
+		Configuration: response.TransactionConfig{
+			ChangeSatoshis: 8,
+			ChangeDestinations: []*response.Destination{
+				{
+					Model: response.Model{
+						CreatedAt: spvwallettest.ParseTime(t, "2024-12-02T12:04:33.853019Z"),
+						UpdatedAt: spvwallettest.ParseTime(t, "2024-12-02T13:04:33.853035+01:00"),
+					},
+					ID:            "872a51f9eed774e7e5051cec19db192783521b5a9e0d4d814d46bdce338a32dc",
+					XpubID:        "55e5aeae101bf7dc49db2abfccfab9fb5f56a6b594fdcc87e5f5a94bfe94b973",
+					LockingScript: "76a914702cef80a7039a1aebb70dc05ce1e439646fa33788ac",
+					Type:          "pubkeyhash",
+					Chain:         1,
+					Num:           18,
+					Address:       "1BE8WfQkDDYE3zEgxBdRNuAxsnHkDcuPdT",
+					DraftID:       "de3b8ef7041b2a528bc47ecdb3b87b06b61407fe24789bc02f9d49bfc234b4d5",
+				},
+			},
+			FeeUnit: &response.FeeUnit{
+				Satoshis: 1,
+				Bytes:    1000,
+			},
+			Inputs: []*response.TransactionInput{
+				{
+					Utxo: response.Utxo{
+						Model: response.Model{
+							CreatedAt: spvwallettest.ParseTime(t, "2024-11-29T23:13:54.0229Z"),
+							UpdatedAt: spvwallettest.ParseTime(t, "2024-12-02T12:04:33.847931Z"),
+						},
+						UtxoPointer: response.UtxoPointer{
+							TransactionID: "1270a0cf2f158475a72bd7b45b54c7e9cec458d77bf65fa9e62e2de7557d034c",
+						},
+						ID:           "062bc7c22bf1f08e1716169e73f647e8ae2175ee3e8479de1bbc052eaa514d1d",
+						XpubID:       "55e5aeae101bf7dc49db2abfccfab9fb5f56a6b594fdcc87e5f5a94bfe94b973",
+						Satoshis:     9,
+						ScriptPubKey: "76a9146637345046fd4d78a9ce187370db0ab7c15dd10488ac",
+						Type:         "pubkeyhash",
+						DraftID:      "de3b8ef7041b2a528bc47ecdb3b87b06b61407fe24789bc02f9d49bfc234b4d5",
+						ReservedAt:   spvwallettest.ParseTime(t, "2024-12-02T12:04:33.846479Z"),
+					},
+					Destination: response.Destination{
+						Model: response.Model{
+							CreatedAt: spvwallettest.ParseTime(t, "2024-11-29T23:13:54.000014Z"),
+							UpdatedAt: spvwallettest.ParseTime(t, "2024-11-30T00:13:54.000029+01:00"),
+						},
+						ID:            "886d2ac60ac7fa630ad68954d6eb865314c484b4418e2469d48e4170dec7771f",
+						XpubID:        "55e5aeae101bf7dc49db2abfccfab9fb5f56a6b594fdcc87e5f5a94bfe94b973",
+						LockingScript: "76a9146637345046fd4d78a9ce187370db0ab7c15dd10488ac",
+						Type:          "pubkeyhash",
+						Chain:         1,
+						Num:           16,
+						Address:       "1AKU4EU46p38GWhaEcvuLL2UK23Fv14cwn",
+						DraftID:       "254686b74d37878852b41503cf33604d5f6ba692705df08a855dc4d926b47251",
+					},
+				},
+			},
+			Outputs: []*response.TransactionOutput{
+				{
+					PaymailP4: nil,
+					Satoshis:  0,
+					Scripts: []*response.ScriptOutput{
+						{
+							Script:     "006a0568656c6c6f05776f726c64",
+							ScriptType: "nulldata",
+						},
+					},
+					UseForChange: false,
+				},
+				{
+					Satoshis: 8,
+					Scripts: []*response.ScriptOutput{
+						{
+							Address:    "1BE8WfQkDDYE3zEgxBdRNuAxsnHkDcuPdT",
+							Satoshis:   8,
+							Script:     "76a914702cef80a7039a1aebb70dc05ce1e439646fa33788ac",
+							ScriptType: "pubkeyhash",
+						},
+					},
+					To:           "1BE8WfQkDDYE3zEgxBdRNuAxsnHkDcuPdT",
+					UseForChange: false,
+				},
+			},
+		},
+	}
+}
+
+func ExpectedSendToRecipientsTransaction(t *testing.T) *response.Transaction {
+	return &response.Transaction{
+		Model: response.Model{
+			CreatedAt: spvwallettest.ParseTime(t, "2024-12-03T16:10:48.551774Z"),
+			UpdatedAt: spvwallettest.ParseTime(t, "2024-12-03T16:10:49.080876Z"),
+		},
+		ID:                   "a4f86cdfefc3339bd3bd7861ad642feab05798f8a31cd67f81aec3c8c87083e0",
+		Hex:                  "01000000017c8b38da58d766c75d94ca65f919723651090ed03e89a6cbc31ab7b87923d6ea010000006b483045022100b2e654169dda17a68c74b24d21e7b2e0dfef7fccdad9ab1e1ec87d2cab910e1d02206e247df32c4fe845af61001c8ec1dda718d737021df27c1d3f2e47d9fe76dd4241210265332864a94ed4c82bf3dacafbb828479b0a7fd0a73e62f60f6224dbf1504261ffffffff0200000000000000000e006a0568656c6c6f05776f726c6407000000000000001976a91464d00b8045c9e432b469f762b7e5beac2ef5a20c88ac00000000",
+		XpubInIDs:            []string{"55e5aeae101bf7dc49db2abfccfab9fb5f56a6b594fdcc87e5f5a94bfe94b973"},
+		XpubOutIDs:           []string{"55e5aeae101bf7dc49db2abfccfab9fb5f56a6b594fdcc87e5f5a94bfe94b973"},
+		BlockHash:            "47758f612c6bf5b454bcd642fe8031f6",
+		BlockHeight:          1024,
+		Fee:                  1,
+		NumberOfInputs:       1,
+		NumberOfOutputs:      2,
+		DraftID:              "4b0571c11a8a96d5af85bfbc32b98d4de6f3cc788afa2a6cd028ef9b69acc779",
+		TotalValue:           0,
+		OutputValue:          -1,
+		Status:               "BROADCASTED",
+		TransactionDirection: "outgoing",
+	}
+}
+
 func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 	return &response.DraftTransaction{
 		Model: response.Model{

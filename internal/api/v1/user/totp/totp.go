@@ -22,22 +22,22 @@ const (
 	DefaultDigits uint = 2
 )
 
-// Client handles TOTP generation and validation.
-type Client struct {
+// API handles TOTP generation and validation.
+type API struct {
 	xPriv *bip32.ExtendedKey
 }
 
-func New(xPriv string) (*Client, error) {
+func NewAPI(xPriv string) (*API, error) {
 	hdKey, err := bip32.GenerateHDKeyFromString(xPriv)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate HD key from xPriv str: %w", err)
 	}
 
-	return &Client{xPriv: hdKey}, nil
+	return &API{xPriv: hdKey}, nil
 }
 
 // GenerateTotpForContact generates a time-based one-time password (TOTP) for a contact.
-func (b *Client) GenerateTotpForContact(contact *models.Contact, period, digits uint) (string, error) {
+func (b *API) GenerateTotpForContact(contact *models.Contact, period, digits uint) (string, error) {
 	sharedSecret, err := b.makeSharedSecret(contact)
 	if err != nil {
 		return "", fmt.Errorf("generateTotpForContact: error when making shared: %w", err)
@@ -52,7 +52,7 @@ func (b *Client) GenerateTotpForContact(contact *models.Contact, period, digits 
 }
 
 // ValidateTotpForContact validates a TOTP for a contact.
-func (b *Client) ValidateTotpForContact(contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
+func (b *API) ValidateTotpForContact(contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
 	sharedSecret, err := b.makeSharedSecret(contact)
 	if err != nil {
 		return fmt.Errorf("ValidateTotpForContact: error when making shared secret: %w", err)
@@ -69,7 +69,7 @@ func (b *Client) ValidateTotpForContact(contact *models.Contact, passcode, reque
 	return nil
 }
 
-func (b *Client) makeSharedSecret(contact *models.Contact) ([]byte, error) {
+func (b *API) makeSharedSecret(contact *models.Contact) ([]byte, error) {
 	privKey, pubKey, err := b.getSharedSecretFactors(contact)
 	if err != nil {
 		return nil, fmt.Errorf("makeSharedSecret: error when getting shared secret factors: %w", err)
@@ -79,7 +79,7 @@ func (b *Client) makeSharedSecret(contact *models.Contact) ([]byte, error) {
 	return x.Bytes(), nil
 }
 
-func (b *Client) getSharedSecretFactors(contact *models.Contact) (*ec.PrivateKey, *ec.PublicKey, error) {
+func (b *API) getSharedSecretFactors(contact *models.Contact) (*ec.PrivateKey, *ec.PublicKey, error) {
 	if b.xPriv == nil {
 		return nil, nil, errors.ErrMissingXpriv
 	}

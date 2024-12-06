@@ -44,7 +44,7 @@ type UserAPI struct {
 	invitationsAPI  *invitations.API
 	transactionsAPI *transactions.API
 	utxosAPI        *utxos.API
-	totp            *totp.Client //only available when using xPriv
+	totpAPI         *totp.API //only available when using xPriv
 }
 
 // Contacts retrieves a paginated list of user contacts from the user contacts API.
@@ -225,6 +225,34 @@ func (u *UserAPI) Transaction(ctx context.Context, ID string) (*response.Transac
 	return res, nil
 }
 
+// FinalizeTransaction finalizes a draft transaction and returns its signed hex representation.
+// It uses the draft transaction details to construct, enrich, and sign the transaction
+// through the `transactionsigner.TransactionSignedHex` utility function.
+// The response is the signed transaction in hex format.
+// Returns an error if the transaction cannot be finalized.
+func (u *UserAPI) FinalizeTransaction(draft *response.DraftTransaction) (string, error) {
+	res, err := u.transactionsAPI.FinalizeTransaction(draft)
+	if err != nil {
+		return "", fmt.Errorf("couldn't finalize transaction with ID: %s, %w", draft.ID, err)
+	}
+
+	return res, nil
+}
+
+// SendToRecipients creates, finalizes, and broadcasts a transaction to multiple recipients.
+// This method handles the complete process of drafting, finalizing, and recording the transaction
+// using the recipient details provided in the command.
+// The response is unmarshalled into a *response.Transaction struct.
+// Returns an error if the transaction fails at any step, such as drafting, finalization or recording.
+func (u *UserAPI) SendToRecipients(ctx context.Context, cmd *commands.SendToRecipients) (*response.Transaction, error) {
+	res, err := u.transactionsAPI.SendToRecipients(ctx, cmd)
+	if err != nil {
+		return nil, transactions.HTTPErrorFormatter("send to recipients", err).FormatPostErr()
+	}
+
+	return res, nil
+}
+
 // XPub retrieves the full xpub information for the current user via the users API.
 // The response is unmarshaled into a *response.Xpub.
 // Returns an error if the request fails or the response cannot be decoded.
@@ -352,11 +380,11 @@ func (u *UserAPI) SyncMerkleRoots(ctx context.Context, repo merkleroots.MerkleRo
 
 // GenerateTotpForContact generates a TOTP code for the specified contact.
 func (u *UserAPI) GenerateTotpForContact(contact *models.Contact, period, digits uint) (string, error) {
-	if u.totp == nil {
+	if u.totpAPI == nil {
 		return "", errors.New("totp client not initialized - xPriv authentication required")
 	}
 
-	totp, err := u.totp.GenerateTotpForContact(contact, period, digits)
+	totp, err := u.totpAPI.GenerateTotpForContact(contact, period, digits)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate TOTP for contact: %w", err)
 	}
@@ -366,11 +394,11 @@ func (u *UserAPI) GenerateTotpForContact(contact *models.Contact, period, digits
 
 // ValidateTotpForContact validates a TOTP code for the specified contact.
 func (u *UserAPI) ValidateTotpForContact(contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
-	if u.totp == nil {
+	if u.totpAPI == nil {
 		return errors.New("totp client not initialized - xPriv authentication required")
 	}
 
-	if err := u.totp.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits); err != nil {
+	if err := u.totpAPI.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits); err != nil {
 		return fmt.Errorf("failed to validate TOTP for contact: %w", err)
 	}
 
@@ -403,16 +431,11 @@ func NewUserAPIWithXPriv(cfg config.Config, xPriv string) (*UserAPI, error) {
 		return nil, fmt.Errorf("failed to intialized xPriv authenticator: %w", err)
 	}
 
-	totp, err := totp.New(xPriv)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize TOTP: %w", err)
-	}
-
-	userAPI, err := initUserAPI(cfg, authenticator)
+	userAPI, err := initUserAPIWithXPriv(cfg, xPriv, authenticator)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new client: %w", err)
 	}
-	userAPI.totp = totp
+
 	return userAPI, nil
 }
 
@@ -434,6 +457,36 @@ type authenticator interface {
 	Authenticate(r *resty.Request) error
 }
 
+func initUserAPIWithXPriv(cfg config.Config, xPriv string, auth authenticator) (*UserAPI, error) {
+	url, err := url.Parse(cfg.Addr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse addr to url.URL: %w", err)
+	}
+
+	httpClient := restyutil.NewHTTPClient(cfg, auth)
+	transactionsAPI, err := transactions.NewAPIWithXPriv(url, httpClient, xPriv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create transactionsAPI: %w", err)
+	}
+
+	totpAPI, err := totp.NewAPI(xPriv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create totpAPI: %w", err)
+	}
+
+	return &UserAPI{
+		merkleRootsAPI:  merkleroots.NewAPI(url, httpClient),
+		configsAPI:      configs.NewAPI(url, httpClient),
+		transactionsAPI: transactionsAPI,
+		utxosAPI:        utxos.NewAPI(url, httpClient),
+		accessKeyAPI:    accesskeys.NewAPI(url, httpClient),
+		xpubAPI:         xpubs.NewAPI(url, httpClient),
+		contactsAPI:     contacts.NewAPI(url, httpClient),
+		invitationsAPI:  invitations.NewAPI(url, httpClient),
+		totpAPI:         totpAPI,
+	}, nil
+}
+
 func initUserAPI(cfg config.Config, auth authenticator) (*UserAPI, error) {
 	url, err := url.Parse(cfg.Addr)
 	if err != nil {
@@ -442,13 +495,18 @@ func initUserAPI(cfg config.Config, auth authenticator) (*UserAPI, error) {
 
 	httpClient := restyutil.NewHTTPClient(cfg, auth)
 	if httpClient == nil {
-		return nil, fmt.Errorf("failed to initialize HTTP client - nil value.")
+		return nil, fmt.Errorf("failed to initialize HTTP client - nil value")
+	}
+
+	transactionsAPI, err := transactions.NewAPI(url, httpClient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create transactionsAPI: %w", err)
 	}
 
 	return &UserAPI{
 		merkleRootsAPI:  merkleroots.NewAPI(url, httpClient),
 		configsAPI:      configs.NewAPI(url, httpClient),
-		transactionsAPI: transactions.NewAPI(url, httpClient),
+		transactionsAPI: transactionsAPI,
 		utxosAPI:        utxos.NewAPI(url, httpClient),
 		accessKeyAPI:    accesskeys.NewAPI(url, httpClient),
 		xpubAPI:         xpubs.NewAPI(url, httpClient),

@@ -24,6 +24,18 @@ var (
 	ErrStaleLastEvaluatedKey = errors.New("the last evaluated key has not changed between requests, indicating a possible loop or synchronization issue.")
 	// ErrFailedToFetchMerkleRootsFromAPI is returned when the API fails to fetch merkle roots.
 	ErrFailedToFetchMerkleRootsFromAPI = errors.New("failed to fetch merkle roots from API")
+	// ErrFailedToParseHex is returned when NewTransactionFromHex fails to create a transaction from given hex
+	ErrFailedToParseHex = errors.New("failed to parse hex")
+	// ErrCreateLockingScript is returned when TransactionSignedHex fails to create locking script
+	ErrCreateLockingScript = errors.New("failed to create locking script from hex for destination")
+	// ErrGetDerivedKeyForDestination is when TransactionSignedHex fails to get derived key for destination
+	ErrGetDerivedKeyForDestination = errors.New("failed to get derived key for destination")
+	// ErrCreateUnlockingScript is returned when TransactionSignedHex fails to create unlocking script
+	ErrCreateUnlockingScript = errors.New("failed to create unlocking script")
+	// ErrAddInputsToTransaction is returned when TransactionSignedHex fails to add inputs to transaction
+	ErrAddInputsToTransaction = errors.New("failed to add inputs to transaction")
+	// ErrSignTransaction is when TransactionSignedHex fails to sign the transaction
+	ErrSignTransaction = errors.New("failed to sign transaction")
 	// ErrEmptyXprivKey is returned when the xpriv string is empty.
 	ErrEmptyXprivKey = errors.New("key string cannot be empty")
 
