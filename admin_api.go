@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/transactions"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/webhooks"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/xpubs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
@@ -34,6 +35,7 @@ type AdminAPI struct {
 	transactionsAPI *transactions.API
 	contactsAPI     *contacts.API
 	invitationsAPI  *invitations.API
+	webhooksAPI     *webhooks.API
 }
 
 // CreateXPub creates a new XPub record via the Admin XPubs API.
@@ -181,6 +183,35 @@ func (a *AdminAPI) AccessKeys(ctx context.Context, accessKeyOpts ...queries.Admi
 	return res, nil
 }
 
+// SubscribeWebhook registers a webhook subscription using the Admin Webhooks API.
+// The provided command contains the parameters required to define the webhook subscription.
+// Accepts context for controlling cancellation and timeout for the API request.
+// The CreateWebhookSubscription command includes the webhook URL and authentication details.
+// Returns a formatted error if the API request fails. A nil error indicates the webhook subscription was successful.
+func (a *AdminAPI) SubscribeWebhook(ctx context.Context, cmd *commands.CreateWebhookSubscription) error {
+	err := a.webhooksAPI.SubscribeWebhook(ctx, cmd)
+	if err != nil {
+		msg := fmt.Sprintf("failed to subscribe webhook URL address: %s", cmd.URL)
+		return webhooks.HTTPErrorFormatter(msg, err).FormatPostErr()
+	}
+
+	return nil
+}
+
+// UnsubscribeWebhook removes a webhook subscription using the Admin Webhooks API.
+// Accepts the context for controlling cancellation and timeout for the API request.
+// CancelWebhookSubscription command specifies the webhook URL to be unsubscribed.
+// Returns a formatted error if the API request fails. A nil error indicates the webhook subscription was successfully deleted.
+func (a *AdminAPI) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelWebhookSubscription) error {
+	err := a.webhooksAPI.UnsubscribeWebhook(ctx, cmd)
+	if err != nil {
+		msg := fmt.Sprintf("failed to unsubscribe webhook URL address: %s", cmd.URL)
+		return webhooks.HTTPErrorFormatter(msg, err).FormatDeleteErr()
+	}
+
+	return nil
+}
+
 // NewAdminAPIWithXPriv initializes a new AdminAPI instance using an extended private key (xPriv).
 // This function configures the API client with the provided configuration and uses the xPriv key for authentication.
 // If any step fails, an appropriate error is returned.
@@ -234,6 +265,7 @@ func initAdminAPI(cfg config.Config, auth authenticator) (*AdminAPI, error) {
 	return &AdminAPI{
 		xpubsAPI:        xpubs.NewAPI(url, httpClient),
 		accessKeyAPI:    accesskeys.NewAPI(url, httpClient),
+		webhooksAPI:     webhooks.NewAPI(url, httpClient),
 		transactionsAPI: transactions.NewAPI(url, httpClient),
 		contactsAPI:     contacts.NewAPI(url, httpClient),
 		invitationsAPI:  invitations.NewAPI(url, httpClient),
