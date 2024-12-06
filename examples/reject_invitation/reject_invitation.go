@@ -22,5 +22,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(fmt.Sprintf("\n[HTTP DELETE] Reject contact invitation - api/v1/invitations/%s", paymail))
+	fmt.Printf("\n[HTTP DELETE] Reject contact invitation - api/v1/invitations/%s\n", paymail)
 }

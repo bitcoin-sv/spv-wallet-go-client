@@ -22,5 +22,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(fmt.Sprintf("\n[HTTP DELETE] Revoke access key - api/v1/users/current/keys/%s", accessKeyID))
+	fmt.Printf("\n[HTTP DELETE] Revoke access key - api/v1/users/current/keys/%s", accessKeyID)
 }

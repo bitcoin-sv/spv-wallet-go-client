@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
+
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
-	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 func main() {
@@ -24,5 +25,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(fmt.Sprintf("\n[HTTP POST] Confirm contact - api/v1/contacts/%s/confirmation", paymail))
+	fmt.Printf("\n[HTTP POST] Confirm contact - api/v1/contacts/%s/confirmation\n", paymail)
 }

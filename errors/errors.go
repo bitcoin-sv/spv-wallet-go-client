@@ -24,4 +24,11 @@ var (
 	ErrStaleLastEvaluatedKey = errors.New("the last evaluated key has not changed between requests, indicating a possible loop or synchronization issue.")
 	// ErrFailedToFetchMerkleRootsFromAPI is returned when the API fails to fetch merkle roots.
 	ErrFailedToFetchMerkleRootsFromAPI = errors.New("failed to fetch merkle roots from API")
+	// ErrEmptyXprivKey is returned when the xpriv string is empty.
+	ErrEmptyXprivKey = errors.New("key string cannot be empty")
+
+	// ErrEmptyAccessKey is returned when the access key string is empty.
+	ErrEmptyAccessKey = errors.New("key hex string cannot be empty")
+	// ErrEmptyPubKey is returned when the key string is empty.
+	ErrEmptyPubKey = errors.New("key string cannot be empty")
 )

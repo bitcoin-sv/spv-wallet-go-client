@@ -8,6 +8,7 @@ import (
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	goclienterr "github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
 )
@@ -81,40 +82,52 @@ func bodyString(r *resty.Request) string {
 	return ""
 }
 
-func NewXprivAuthenticator(xpriv *bip32.ExtendedKey) (*XprivAuthenticator, error) {
-	if xpriv == nil {
-		return nil, ErrBip32ExtendedKey
+func NewXprivAuthenticator(xpriv string) (*XprivAuthenticator, error) {
+	if xpriv == "" {
+		return nil, goclienterr.ErrEmptyXprivKey
 	}
 
-	x := XprivAuthenticator{
-		xpriv:    xpriv,
-		xpubAuth: &XpubAuthenticator{hdKey: xpriv},
+	hdKey, err := bip32.GenerateHDKeyFromString(xpriv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse xpriv key: %w", err)
 	}
-	return &x, nil
+
+	return &XprivAuthenticator{
+		xpriv:    hdKey,
+		xpubAuth: &XpubAuthenticator{hdKey: hdKey},
+	}, nil
 }
 
-func NewAccessKeyAuthenticator(accessKey *ec.PrivateKey) (*AccessKeyAuthenticator, error) {
-	if accessKey == nil {
-		return nil, ErrEcPrivateKey
+func NewAccessKeyAuthenticator(accessKeyHex string) (*AccessKeyAuthenticator, error) {
+	if accessKeyHex == "" {
+		return nil, goclienterr.ErrEmptyAccessKey
 	}
 
-	a := AccessKeyAuthenticator{
-		priv: accessKey,
-		pub:  accessKey.PubKey(),
+	privKeyBytes, err := hex.DecodeString(accessKeyHex)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode private key string: %w", err)
 	}
-	return &a, nil
+
+	privKey, pubKey := ec.PrivateKeyFromBytes(privKeyBytes)
+	if privKey == nil || pubKey == nil {
+		return nil, errors.New("failed to parse private key: key generation resulted in nil")
+	}
+
+	return &AccessKeyAuthenticator{
+		priv: privKey,
+		pub:  pubKey,
+	}, nil
 }
 
-func NewXpubOnlyAuthenticator(xpub *bip32.ExtendedKey) (*XpubAuthenticator, error) {
-	if xpub == nil {
-		return nil, ErrBip32ExtendedKey
+func NewXpubOnlyAuthenticator(xpub string) (*XpubAuthenticator, error) {
+	if xpub == "" {
+		return nil, goclienterr.ErrEmptyPubKey
 	}
 
-	x := XpubAuthenticator{hdKey: xpub}
-	return &x, nil
-}
+	xpubKey, err := bip32.GetHDKeyFromExtendedPublicKey(xpub)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse xpub key: %w", err)
+	}
 
-var (
-	ErrBip32ExtendedKey = errors.New("authenticator failed: expected a BIP32 extended key but none was provided")
-	ErrEcPrivateKey     = errors.New("authenticator failed: expected an EC private key but none was provided")
-)
+	return &XpubAuthenticator{hdKey: xpubKey}, nil
+}

@@ -22,5 +22,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(fmt.Sprintf("\n[HTTP DELETE] Remove contact - api/v1/contacts/%s", paymail))
+	fmt.Printf("\n[HTTP DELETE] Remove contact - api/v1/contacts/%s\n", paymail)
 }

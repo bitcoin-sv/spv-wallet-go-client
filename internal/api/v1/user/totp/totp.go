@@ -27,9 +27,13 @@ type Client struct {
 	xPriv *bip32.ExtendedKey
 }
 
-// New creates a new TOTP WalletClient.
-func New(xPriv *bip32.ExtendedKey) *Client {
-	return &Client{xPriv: xPriv}
+func New(xPriv string) (*Client, error) {
+	hdKey, err := bip32.GenerateHDKeyFromString(xPriv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate HD key from xPriv str: %w", err)
+	}
+
+	return &Client{xPriv: hdKey}, nil
 }
 
 // GenerateTotpForContact generates a time-based one-time password (TOTP) for a contact.

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 
-	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/accesskeys"
@@ -218,12 +217,7 @@ func (a *AdminAPI) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelW
 //
 // Note: Requests made with this instance will be securely signed.
 func NewAdminAPIWithXPriv(cfg config.Config, xPriv string) (*AdminAPI, error) {
-	key, err := bip32.GenerateHDKeyFromString(xPriv)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate HD key from xPriv: %w", err)
-	}
-
-	authenticator, err := auth.NewXprivAuthenticator(key)
+	authenticator, err := auth.NewXprivAuthenticator(xPriv)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize xPriv authenticator: %w", err)
 	}
@@ -238,12 +232,7 @@ func NewAdminAPIWithXPriv(cfg config.Config, xPriv string) (*AdminAPI, error) {
 // Note: Requests made with this instance will not be signed.
 // For enhanced security, it is strongly recommended to use `NewAdminAPIWithXPriv` instead.
 func NewAdminWithXPub(cfg config.Config, xPub string) (*AdminAPI, error) {
-	key, err := bip32.GetHDKeyFromExtendedPublicKey(xPub)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate HD key from xPub: %w", err)
-	}
-
-	authenticator, err := auth.NewXpubOnlyAuthenticator(key)
+	authenticator, err := auth.NewXpubOnlyAuthenticator(xPub)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize xPub authenticator: %w", err)
 	}

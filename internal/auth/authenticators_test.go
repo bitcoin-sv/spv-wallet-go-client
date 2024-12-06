@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/go-resty/resty/v2"
@@ -21,17 +22,16 @@ const (
 
 func TestAccessKeyAuthenitcator_NewWithNilAccessKey(t *testing.T) {
 	// when:
-	authenticator, err := auth.NewAccessKeyAuthenticator(nil)
+	authenticator, err := auth.NewAccessKeyAuthenticator("")
 
 	// then:
 	require.Nil(t, authenticator)
-	require.ErrorIs(t, err, auth.ErrEcPrivateKey)
+	require.ErrorIs(t, err, errors.ErrEmptyAccessKey)
 }
 
 func TestAccessKeyAuthenticator_Authenticate(t *testing.T) {
 	// given:
-	key := spvwallettest.PrivateKey(t)
-	authenticator, err := auth.NewAccessKeyAuthenticator(key)
+	authenticator, err := auth.NewAccessKeyAuthenticator(spvwallettest.UserPrivAccessKey)
 	require.NotNil(t, authenticator)
 	require.NoError(t, err)
 
@@ -48,17 +48,16 @@ func TestAccessKeyAuthenticator_Authenticate(t *testing.T) {
 
 func TestXprivAuthenitcator_NewWithNilXpriv(t *testing.T) {
 	// when:
-	authenticator, err := auth.NewXprivAuthenticator(nil)
+	authenticator, err := auth.NewXprivAuthenticator("")
 
 	// then:
 	require.Nil(t, authenticator)
-	require.ErrorIs(t, err, auth.ErrBip32ExtendedKey)
+	require.ErrorIs(t, err, errors.ErrEmptyXprivKey)
 }
 
 func TestXprivAuthenitcator_Authenticate(t *testing.T) {
 	// given:
-	key := spvwallettest.ExtendedKey(t)
-	authenticator, err := auth.NewXprivAuthenticator(key)
+	authenticator, err := auth.NewXprivAuthenticator(spvwallettest.UserXPriv)
 	require.NotNil(t, authenticator)
 	require.NoError(t, err)
 
@@ -75,18 +74,16 @@ func TestXprivAuthenitcator_Authenticate(t *testing.T) {
 
 func TestXpubOnlyAuthenticator_NewWithNilXpub(t *testing.T) {
 	// when:
-	authenticator, err := auth.NewXpubOnlyAuthenticator(nil)
+	authenticator, err := auth.NewXpubOnlyAuthenticator("")
 
 	// then:
 	require.Nil(t, authenticator)
-	require.ErrorIs(t, err, auth.ErrBip32ExtendedKey)
+	require.ErrorIs(t, err, errors.ErrEmptyPubKey)
 }
 
 func TestXpubOnlyAuthenticator_Authenticate(t *testing.T) {
 	// given:
-	key := spvwallettest.ExtendedKey(t)
-
-	authenticator, err := auth.NewXpubOnlyAuthenticator(key)
+	authenticator, err := auth.NewXpubOnlyAuthenticator(spvwallettest.UserXPriv)
 	require.NotNil(t, authenticator)
 	require.NoError(t, err)
 
