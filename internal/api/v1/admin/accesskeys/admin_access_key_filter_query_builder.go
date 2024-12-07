@@ -23,6 +23,6 @@ func (a *adminAccessKeyFilterQueryBuilder) Build() (url.Values, error) {
 		return nil, fmt.Errorf("failed to build extended URL values: %w", err)
 	}
 
-	params.AddPair("xPubId", a.adminAccessKeyFilter.XpubID)
+	params.AddPair("xpubId", a.adminAccessKeyFilter.XpubID)
 	return params.Values, nil
 }

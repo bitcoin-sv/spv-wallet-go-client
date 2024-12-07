@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/paymails"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/transactions"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/utxos"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/webhooks"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/xpubs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
@@ -34,6 +35,7 @@ type AdminAPI struct {
 	paymailsAPI     *paymails.API
 	accessKeyAPI    *accesskeys.API
 	transactionsAPI *transactions.API
+	utxosAPI        *utxos.API
 	contactsAPI     *contacts.API
 	invitationsAPI  *invitations.API
 	webhooksAPI     *webhooks.API
@@ -213,18 +215,20 @@ func (a *AdminAPI) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelW
 	return nil
 }
 
-// NewAdminAPIWithXPriv initializes a new AdminAPI instance using an extended private key (xPriv).
-// This function configures the API client with the provided configuration and uses the xPriv key for authentication.
-// If any step fails, an appropriate error is returned.
+// UTXOs fetches a paginated list of UTXOs via the Admin XPubs API.
+// The response includes UTXOs along with pagination details, such as page number,
+// sort order, and sorting field.
 //
-// Note: Requests made with this instance will be securely signed.
-func NewAdminAPIWithXPriv(cfg config.Config, xPriv string) (*AdminAPI, error) {
-	authenticator, err := auth.NewXprivAuthenticator(xPriv)
+// Optional query parameters can be applied using the provided query options.
+// The response is unmarshaled into a *queries.UtxosPage struct.
+// Returns an error if the request fails or the response cannot be decoded.
+func (a *AdminAPI) UTXOs(ctx context.Context, opts ...queries.AdminUtxoQueryOption) (*queries.UtxosPage, error) {
+	res, err := a.utxosAPI.UTXOs(ctx, opts...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize xPriv authenticator: %w", err)
+		return nil, utxos.HTTPErrorFormatter("retrieve utxos page ", err).FormatGetErr()
 	}
 
-	return initAdminAPI(cfg, authenticator)
+	return res, nil
 }
 
 // Paymails retrieves a paginated list of paymail addresses via the Admin Paymails API.
@@ -285,6 +289,20 @@ func (a *AdminAPI) DeletePaymail(ctx context.Context, address string) error {
 	return nil
 }
 
+// NewAdminAPIWithXPriv initializes a new AdminAPI instance using an extended private key (xPriv).
+// This function configures the API client with the provided configuration and uses the xPriv key for authentication.
+// If any step fails, an appropriate error is returned.
+//
+// Note: Requests made with this instance will be securely signed.
+func NewAdminAPIWithXPriv(cfg config.Config, xPriv string) (*AdminAPI, error) {
+	authenticator, err := auth.NewXprivAuthenticator(xPriv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize xPriv authenticator: %w", err)
+	}
+
+	return initAdminAPI(cfg, authenticator)
+}
+
 // NewAdminWithXPub initializes a new AdminAPI instance using an extended public key (xPub).
 // This function configures the API client with the provided configuration and uses the xPub key for authentication.
 // If any configuration or initialization step fails, an appropriate error is returned.
@@ -315,6 +333,7 @@ func initAdminAPI(cfg config.Config, auth authenticator) (*AdminAPI, error) {
 		paymailsAPI:     paymails.NewAPI(url, httpClient),
 		transactionsAPI: transactions.NewAPI(url, httpClient),
 		xpubsAPI:        xpubs.NewAPI(url, httpClient),
+		utxosAPI:        utxos.NewAPI(url, httpClient),
 		accessKeyAPI:    accesskeys.NewAPI(url, httpClient),
 		webhooksAPI:     webhooks.NewAPI(url, httpClient),
 		contactsAPI:     contacts.NewAPI(url, httpClient),

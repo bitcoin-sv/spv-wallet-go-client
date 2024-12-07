@@ -1,4 +1,4 @@
-package utxos
+package utxos_test
 
 import (
 	"net/url"
@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
 )
@@ -24,7 +26,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"transactionId": []string{"124c2237-9b54-46c4-bf53-3cec86f7e316"},
 			},
 			filter: filter.UtxoFilter{
-				TransactionID: ptr("124c2237-9b54-46c4-bf53-3cec86f7e316"),
+				TransactionID: spvwallettest.Ptr("124c2237-9b54-46c4-bf53-3cec86f7e316"),
 			},
 		},
 		"utxo filter: filter with only 'output index' field set": {
@@ -32,7 +34,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"outputIndex": []string{"32"},
 			},
 			filter: filter.UtxoFilter{
-				OutputIndex: ptr(uint32(32)),
+				OutputIndex: spvwallettest.Ptr(uint32(32)),
 			},
 		},
 		"utxo filter: filter with only 'id' field set": {
@@ -40,7 +42,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"id": []string{"abb6a871-dd95-4f7a-8090-ca34cff63801"},
 			},
 			filter: filter.UtxoFilter{
-				ID: ptr("abb6a871-dd95-4f7a-8090-ca34cff63801"),
+				ID: spvwallettest.Ptr("abb6a871-dd95-4f7a-8090-ca34cff63801"),
 			},
 		},
 		"utxo filter: filter with only 'satoshis' field set": {
@@ -48,7 +50,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"satoshis": []string{"64"},
 			},
 			filter: filter.UtxoFilter{
-				Satoshis: ptr(uint64(64)),
+				Satoshis: spvwallettest.Ptr(uint64(64)),
 			},
 		},
 		"utxo filter: filter with only 'script pub key' field set": {
@@ -56,7 +58,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"scriptPubKey": []string{"3adec124-32eb-46f1-94f2-4949a86dbe8d"},
 			},
 			filter: filter.UtxoFilter{
-				ScriptPubKey: ptr("3adec124-32eb-46f1-94f2-4949a86dbe8d"),
+				ScriptPubKey: spvwallettest.Ptr("3adec124-32eb-46f1-94f2-4949a86dbe8d"),
 			},
 		},
 		"utxo filter: filter with only 'type' field set": {
@@ -64,7 +66,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"type": []string{"0f65e842-decf-4725-8ad9-877634280e4f"},
 			},
 			filter: filter.UtxoFilter{
-				Type: ptr("0f65e842-decf-4725-8ad9-877634280e4f"),
+				Type: spvwallettest.Ptr("0f65e842-decf-4725-8ad9-877634280e4f"),
 			},
 		},
 		"utxo filter: filter with only 'draft id' field set": {
@@ -72,7 +74,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"draftId": []string{"2453797c-4089-4078-8723-5ecb68e70bd7"},
 			},
 			filter: filter.UtxoFilter{
-				DraftID: ptr("2453797c-4089-4078-8723-5ecb68e70bd7"),
+				DraftID: spvwallettest.Ptr("2453797c-4089-4078-8723-5ecb68e70bd7"),
 			},
 		},
 		"utxo filter: filter with only reserved range 'from' field set": {
@@ -81,7 +83,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 			},
 			filter: filter.UtxoFilter{
 				ReservedRange: &filter.TimeRange{
-					From: ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
+					From: spvwallettest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
 				},
 			},
 		},
@@ -91,7 +93,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 			},
 			filter: filter.UtxoFilter{
 				ReservedRange: &filter.TimeRange{
-					To: ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
+					To: spvwallettest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
 				},
 			},
 		},
@@ -102,8 +104,8 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 			},
 			filter: filter.UtxoFilter{
 				ReservedRange: &filter.TimeRange{
-					To:   ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
-					From: ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
+					To:   spvwallettest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
+					From: spvwallettest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
 				},
 			},
 		},
@@ -112,7 +114,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"spendingTxId": []string{"7539366c-beb2-4405-8597-025bf2dc7cbd"},
 			},
 			filter: filter.UtxoFilter{
-				SpendingTxID: ptr("7539366c-beb2-4405-8597-025bf2dc7cbd"),
+				SpendingTxID: spvwallettest.Ptr("7539366c-beb2-4405-8597-025bf2dc7cbd"),
 			},
 		},
 		"utxo filter: all fields set": {
@@ -129,17 +131,17 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"outputIndex":         []string{"32"},
 			},
 			filter: filter.UtxoFilter{
-				SpendingTxID:  ptr("7539366c-beb2-4405-8597-025bf2dc7cbd"),
-				DraftID:       ptr("2453797c-4089-4078-8723-5ecb68e70bd7"),
-				Type:          ptr("0f65e842-decf-4725-8ad9-877634280e4f"),
-				ScriptPubKey:  ptr("3adec124-32eb-46f1-94f2-4949a86dbe8d"),
-				ID:            ptr("abb6a871-dd95-4f7a-8090-ca34cff63801"),
-				OutputIndex:   ptr(uint32(32)),
-				Satoshis:      ptr(uint64(64)),
-				TransactionID: ptr("124c2237-9b54-46c4-bf53-3cec86f7e316"),
+				SpendingTxID:  spvwallettest.Ptr("7539366c-beb2-4405-8597-025bf2dc7cbd"),
+				DraftID:       spvwallettest.Ptr("2453797c-4089-4078-8723-5ecb68e70bd7"),
+				Type:          spvwallettest.Ptr("0f65e842-decf-4725-8ad9-877634280e4f"),
+				ScriptPubKey:  spvwallettest.Ptr("3adec124-32eb-46f1-94f2-4949a86dbe8d"),
+				ID:            spvwallettest.Ptr("abb6a871-dd95-4f7a-8090-ca34cff63801"),
+				OutputIndex:   spvwallettest.Ptr(uint32(32)),
+				Satoshis:      spvwallettest.Ptr(uint64(64)),
+				TransactionID: spvwallettest.Ptr("124c2237-9b54-46c4-bf53-3cec86f7e316"),
 				ReservedRange: &filter.TimeRange{
-					To:   ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
-					From: ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
+					To:   spvwallettest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
+					From: spvwallettest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
 				},
 			},
 		},
@@ -148,9 +150,9 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			queryBuilder := utxoFilterQueryBuilder{
-				utxoFilter: tc.filter,
-				modelFilterBuilder: querybuilders.ModelFilterBuilder{
+			queryBuilder := utxos.UtxoFilterQueryBuilder{
+				UtxoFilter: tc.filter,
+				ModelFilterBuilder: querybuilders.ModelFilterBuilder{
 					ModelFilter: tc.filter.ModelFilter,
 				},
 			}
@@ -161,8 +163,4 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 			require.Equal(t, tc.expectedParams, got)
 		})
 	}
-}
-
-func ptr[T any](value T) *T {
-	return &value
 }

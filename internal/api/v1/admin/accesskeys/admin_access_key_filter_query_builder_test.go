@@ -15,18 +15,18 @@ func TestAdminAccessKeyFilterQueryBuilder_Build(t *testing.T) {
 		expectedParams url.Values
 		expectedErr    error
 	}{
-		"access key filter: zero values": {
+		"admin access key filter: zero values": {
 			expectedParams: make(url.Values),
 		},
-		"access key filter: filter with only 'revoked range' field set": {
+		"admin access key filter: filter with only 'xPubId' field set": {
 			filter: filter.AdminAccessKeyFilter{
 				XpubID: ptr("9b496655-616a-48cd-a3f8-89608473a5f1"),
 			},
 			expectedParams: url.Values{
-				"xPubId": []string{"9b496655-616a-48cd-a3f8-89608473a5f1"},
+				"xpubId": []string{"9b496655-616a-48cd-a3f8-89608473a5f1"},
 			},
 		},
-		"access key filter: all fields set": {
+		"admin access key filter: all fields set": {
 			filter: filter.AdminAccessKeyFilter{
 				XpubID: ptr("9b496655-616a-48cd-a3f8-89608473a5f1"),
 				AccessKeyFilter: filter.AccessKeyFilter{
@@ -48,7 +48,7 @@ func TestAdminAccessKeyFilterQueryBuilder_Build(t *testing.T) {
 				},
 			},
 			expectedParams: url.Values{
-				"xPubId":             []string{"9b496655-616a-48cd-a3f8-89608473a5f1"},
+				"xpubId":             []string{"9b496655-616a-48cd-a3f8-89608473a5f1"},
 				"revokedRange[from]": []string{"2021-02-01T00:00:00Z"},
 				"revokedRange[to]":   []string{"2021-02-02T00:00:00Z"},
 				"includeDeleted":     []string{"true"},
@@ -63,9 +63,7 @@ func TestAdminAccessKeyFilterQueryBuilder_Build(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			queryBuilder := adminAccessKeyFilterQueryBuilder{
-				adminAccessKeyFilter: tc.filter,
-			}
+			queryBuilder := adminAccessKeyFilterQueryBuilder{adminAccessKeyFilter: tc.filter}
 
 			// then:
 			got, err := queryBuilder.Build()
@@ -75,6 +73,4 @@ func TestAdminAccessKeyFilterQueryBuilder_Build(t *testing.T) {
 	}
 }
 
-func ptr[T any](value T) *T {
-	return &value
-}
+func ptr[T any](value T) *T { return &value }
