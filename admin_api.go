@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/paymails"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/stats"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/status"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/utxos"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/webhooks"
@@ -41,6 +42,7 @@ type AdminAPI struct {
 	contactsAPI     *contacts.API
 	invitationsAPI  *invitations.API
 	webhooksAPI     *webhooks.API
+	statusAPI       *status.API
 	statsAPI        *stats.API
 }
 
@@ -306,6 +308,19 @@ func (a *AdminAPI) Stats(ctx context.Context) (*models.AdminStats, error) {
 	return res, nil
 }
 
+// Status retrieves information about the key type used during the authentication phase.
+// If the key corresponds to the admin key, the method returns true with a nil error.
+// Otherwise, it returns false with a nil error, indicating that the key used does not match
+// the SPV Wallet API admin key. A non-nil error is returned if the API request fails.
+func (a *AdminAPI) Status(ctx context.Context) (bool, error) {
+	ok, err := a.statusAPI.Status(ctx)
+	if err != nil {
+		return false, status.HTTPErrorFormatter("retrieve information about the used key type: %w", err).FormatGetErr()
+	}
+
+	return ok, nil
+}
+
 // NewAdminAPIWithXPriv initializes a new AdminAPI instance using an extended private key (xPriv).
 // This function configures the API client with the provided configuration and uses the xPriv key for authentication.
 // If any step fails, an appropriate error is returned.
@@ -355,6 +370,7 @@ func initAdminAPI(cfg config.Config, auth authenticator) (*AdminAPI, error) {
 		webhooksAPI:     webhooks.NewAPI(url, httpClient),
 		contactsAPI:     contacts.NewAPI(url, httpClient),
 		invitationsAPI:  invitations.NewAPI(url, httpClient),
+		statusAPI:       status.NewAPI(url, httpClient),
 		statsAPI:        stats.NewAPI(url, httpClient),
 	}, nil
 }

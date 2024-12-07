@@ -89,6 +89,14 @@ func NewBadRequestSPVError() models.SPVError {
 	}
 }
 
+func NewUnauthorizedAccessSPVError() models.SPVError {
+	return models.SPVError{
+		Message:    "unauthorized",
+		StatusCode: http.StatusUnauthorized,
+		Code:       "error-unauthorized",
+	}
+}
+
 func NewInternalServerSPVError() models.SPVError {
 	return models.SPVError{
 		Message:    http.StatusText(http.StatusInternalServerError),

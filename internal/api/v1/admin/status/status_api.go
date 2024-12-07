@@ -1,37 +1,38 @@
-package stats
+package status
 
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
 )
 
 const (
-	route = "/v1/admin/stats"
-	api   = "Admin Stats API"
+	route = "v1/admin/status"
+	api   = "Admin Status API"
 )
 
 type API struct {
-	url        *url.URL
 	httpClient *resty.Client
+	url        *url.URL
 }
 
-func (a *API) Stats(ctx context.Context) (*models.AdminStats, error) {
-	var result models.AdminStats
-	_, err := a.httpClient.
+func (a *API) Status(ctx context.Context) (bool, error) {
+	res, err := a.httpClient.
 		R().
 		SetContext(ctx).
-		SetResult(&result).
 		Get(a.url.String())
 	if err != nil {
-		return nil, fmt.Errorf("HTTP response failure: %w", err)
+		if res.StatusCode() == http.StatusUnauthorized {
+			return false, nil
+		}
+		return false, fmt.Errorf("HTTP response failure: %w", err)
 	}
 
-	return &result, nil
+	return true, nil
 }
 
 func NewAPI(url *url.URL, httpClient *resty.Client) *API {
