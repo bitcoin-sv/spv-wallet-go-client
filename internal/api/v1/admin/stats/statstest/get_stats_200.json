@@ -1,0 +1,21 @@
+{
+    "balance": 0,
+    "destinations": 95,
+    "paymail_addresses": 20,
+    "transactions": 38,
+    "transactions_per_day": {
+     "20241003": 6,
+     "20241007": 3,
+     "20241107": 3,
+     "20241108": 5,
+     "20241111": 3,
+     "20241112": 10,
+     "20241118": 7,
+     "20241203": 1
+    },
+    "utxos": 54,
+    "utxos_per_type": {
+     "pubkeyhash": 54
+    },
+    "xpubs": 78
+   }

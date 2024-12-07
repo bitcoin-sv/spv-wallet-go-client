@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/paymails"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/stats"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/utxos"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/webhooks"
@@ -18,6 +19,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
@@ -39,6 +41,7 @@ type AdminAPI struct {
 	contactsAPI     *contacts.API
 	invitationsAPI  *invitations.API
 	webhooksAPI     *webhooks.API
+	statsAPI        *stats.API
 }
 
 // CreateXPub creates a new XPub record via the Admin XPubs API.
@@ -49,7 +52,7 @@ type AdminAPI struct {
 func (a *AdminAPI) CreateXPub(ctx context.Context, cmd *commands.CreateUserXpub) (*response.Xpub, error) {
 	res, err := a.xpubsAPI.CreateXPub(ctx, cmd)
 	if err != nil {
-		return nil, xpubs.HTTPErrorFormatter("failed to create XPub", err).FormatPostErr()
+		return nil, xpubs.HTTPErrorFormatter("create XPub", err).FormatPostErr()
 	}
 
 	return res, nil
@@ -67,7 +70,7 @@ func (a *AdminAPI) CreateXPub(ctx context.Context, cmd *commands.CreateUserXpub)
 func (a *AdminAPI) XPubs(ctx context.Context, opts ...queries.XPubQueryOption) (*queries.XPubPage, error) {
 	res, err := a.xpubsAPI.XPubs(ctx, opts...)
 	if err != nil {
-		return nil, xpubs.HTTPErrorFormatter("failed to retrieve XPubs page", err).FormatGetErr()
+		return nil, xpubs.HTTPErrorFormatter("retrieve XPubs page", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -194,7 +197,7 @@ func (a *AdminAPI) AccessKeys(ctx context.Context, accessKeyOpts ...queries.Admi
 func (a *AdminAPI) SubscribeWebhook(ctx context.Context, cmd *commands.CreateWebhookSubscription) error {
 	err := a.webhooksAPI.SubscribeWebhook(ctx, cmd)
 	if err != nil {
-		msg := fmt.Sprintf("failed to subscribe webhook URL address: %s", cmd.URL)
+		msg := fmt.Sprintf("subscribe webhook URL address: %s", cmd.URL)
 		return webhooks.HTTPErrorFormatter(msg, err).FormatPostErr()
 	}
 
@@ -208,7 +211,7 @@ func (a *AdminAPI) SubscribeWebhook(ctx context.Context, cmd *commands.CreateWeb
 func (a *AdminAPI) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelWebhookSubscription) error {
 	err := a.webhooksAPI.UnsubscribeWebhook(ctx, cmd)
 	if err != nil {
-		msg := fmt.Sprintf("failed to unsubscribe webhook URL address: %s", cmd.URL)
+		msg := fmt.Sprintf("unsubscribe webhook URL address: %s", cmd.URL)
 		return webhooks.HTTPErrorFormatter(msg, err).FormatDeleteErr()
 	}
 
@@ -243,7 +246,7 @@ func (a *AdminAPI) UTXOs(ctx context.Context, opts ...queries.AdminUtxoQueryOpti
 func (a *AdminAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption) (*queries.PaymailAddressPage, error) {
 	res, err := a.paymailsAPI.Paymails(ctx, opts...)
 	if err != nil {
-		return nil, paymails.HTTPErrorFormatter("failed to retrieve paymail addresses page", err).FormatGetErr()
+		return nil, paymails.HTTPErrorFormatter("retrieve paymail addresses page", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -255,7 +258,7 @@ func (a *AdminAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOpt
 func (a *AdminAPI) Paymail(ctx context.Context, ID string) (*response.PaymailAddress, error) {
 	res, err := a.paymailsAPI.Paymail(ctx, ID)
 	if err != nil {
-		msg := fmt.Sprintf("failed retrieve paymail address with ID: %s", ID)
+		msg := fmt.Sprintf("retrieve paymail address with ID: %s", ID)
 		return nil, paymails.HTTPErrorFormatter(msg, err).FormatGetErr()
 	}
 
@@ -270,7 +273,7 @@ func (a *AdminAPI) Paymail(ctx context.Context, ID string) (*response.PaymailAdd
 func (a *AdminAPI) CreatePaymail(ctx context.Context, cmd *commands.CreatePaymail) (*response.PaymailAddress, error) {
 	res, err := a.paymailsAPI.CreatePaymail(ctx, cmd)
 	if err != nil {
-		return nil, paymails.HTTPErrorFormatter("failed to create paymail address", err).FormatPostErr()
+		return nil, paymails.HTTPErrorFormatter("create paymail address", err).FormatPostErr()
 	}
 
 	return res, nil
@@ -282,11 +285,25 @@ func (a *AdminAPI) CreatePaymail(ctx context.Context, cmd *commands.CreatePaymai
 func (a *AdminAPI) DeletePaymail(ctx context.Context, address string) error {
 	err := a.paymailsAPI.DeletePaymail(ctx, address)
 	if err != nil {
-		msg := fmt.Sprintf("failed to remove paymail address: %s", address)
+		msg := fmt.Sprintf("remove paymail address: %s", address)
 		return paymails.HTTPErrorFormatter(msg, err).FormatGetErr()
 	}
 
 	return nil
+}
+
+// Stats retrieves information about the login status via the Admin XPubs API.
+// It accepts a context for controlling cancellation and timeout of the API request.
+// The response is expected to be unmarshaled into a *models.AdminStats struct.
+// A nil error with a valid response indicates the request was successful.
+// Returns a formatted error if the API request fails.
+func (a *AdminAPI) Stats(ctx context.Context) (*models.AdminStats, error) {
+	res, err := a.statsAPI.Stats(ctx)
+	if err != nil {
+		return nil, stats.HTTPErrorFormatter("retrieve stats", err).FormatGetErr()
+	}
+
+	return res, nil
 }
 
 // NewAdminAPIWithXPriv initializes a new AdminAPI instance using an extended private key (xPriv).
@@ -338,5 +355,6 @@ func initAdminAPI(cfg config.Config, auth authenticator) (*AdminAPI, error) {
 		webhooksAPI:     webhooks.NewAPI(url, httpClient),
 		contactsAPI:     contacts.NewAPI(url, httpClient),
 		invitationsAPI:  invitations.NewAPI(url, httpClient),
+		statsAPI:        stats.NewAPI(url, httpClient),
 	}, nil
 }
