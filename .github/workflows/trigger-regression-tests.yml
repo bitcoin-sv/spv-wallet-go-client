@@ -1,5 +1,5 @@
 name: "Regression Tests"
-run-name: "Regression Tests for ${{ github.head_ref || github.ref }} | ID: ${{ github.run_id }}-${{ github.run_attempt }}"
+run-name: "Regression Tests for client-v2 (${{ inputs.go_client_branch }}) | ID: ${{ github.run_id }}-${{ github.run_attempt }}"
 
 on:
   workflow_dispatch:
