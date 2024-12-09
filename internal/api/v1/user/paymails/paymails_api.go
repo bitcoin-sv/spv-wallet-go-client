@@ -5,69 +5,20 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/paymails"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
 )
 
 const (
-	route = "api/v1/admin/paymails"
-	api   = "Admin User Paymails API"
+	route = "api/v1/paymails"
+	api   = "User Paymails API"
 )
 
 type API struct {
-	httpClient *resty.Client
 	url        *url.URL
-}
-
-func (a *API) DeletePaymail(ctx context.Context, address string) error {
-	type body struct {
-		Address string `json:"address"`
-	}
-
-	_, err := a.httpClient.
-		R().
-		SetContext(ctx).
-		SetBody(body{Address: address}).
-		Delete(a.url.JoinPath(address).String())
-	if err != nil {
-		return fmt.Errorf("HTTP response failure: %w", err)
-	}
-
-	return nil
-}
-
-func (a *API) CreatePaymail(ctx context.Context, cmd *commands.CreatePaymail) (*response.PaymailAddress, error) {
-	var result response.PaymailAddress
-	_, err := a.httpClient.
-		R().
-		SetContext(ctx).
-		SetResult(&result).
-		SetBody(cmd).
-		Post(a.url.String())
-	if err != nil {
-		return nil, fmt.Errorf("HTTP response failure: %w", err)
-	}
-
-	return &result, nil
-}
-
-func (a *API) Paymail(ctx context.Context, ID string) (*response.PaymailAddress, error) {
-	var result response.PaymailAddress
-	_, err := a.httpClient.
-		R().
-		SetContext(ctx).
-		SetResult(&result).
-		Get(a.url.JoinPath(ID).String())
-	if err != nil {
-		return nil, fmt.Errorf("HTTP response failure: %w", err)
-	}
-
-	return &result, nil
+	httpClient *resty.Client
 }
 
 func (a *API) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption) (*queries.PaymailAddressPage, error) {
@@ -79,7 +30,7 @@ func (a *API) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption) 
 	queryBuilder := querybuilders.NewQueryBuilder(
 		querybuilders.WithMetadataFilter(query.Metadata),
 		querybuilders.WithPageFilter(query.PageFilter),
-		querybuilders.WithFilterQueryBuilder(&paymails.PaymailFilterBuilder{
+		querybuilders.WithFilterQueryBuilder(&PaymailFilterBuilder{
 			PaymailFilter:      query.PaymailFilter,
 			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.PaymailFilter.ModelFilter},
 		}),
@@ -104,7 +55,10 @@ func (a *API) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption) 
 }
 
 func NewAPI(url *url.URL, httpClient *resty.Client) *API {
-	return &API{url: url.JoinPath(route), httpClient: httpClient}
+	return &API{
+		url:        url.JoinPath(route),
+		httpClient: httpClient,
+	}
 }
 
 func HTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {

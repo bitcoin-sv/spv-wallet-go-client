@@ -13,6 +13,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/paymails"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/totp"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos"
@@ -44,6 +45,7 @@ type UserAPI struct {
 	invitationsAPI  *invitations.API
 	transactionsAPI *transactions.API
 	utxosAPI        *utxos.API
+	paymailsAPI     *paymails.API
 	totpAPI         *totp.API //only available when using xPriv
 }
 
@@ -405,6 +407,24 @@ func (u *UserAPI) ValidateTotpForContact(contact *models.Contact, passcode, requ
 	return nil
 }
 
+// Paymails retrieves a paginated list of paymail addresses via the User Paymails API.
+// The response includes user paymails along with pagination metadata, such as
+// the current page number, sort order, and the field used for sorting (sortBy).
+//
+// Query parameters can be configured using optional query options. These options allow
+// filtering based on metadata, pagination settings, or specific paymail attributes.
+//
+// The API response is unmarshaled into a *queries.PaymailAddressPage struct.
+// Returns an error if the API request fails or the response cannot be decoded.
+func (u *UserAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption) (*queries.PaymailAddressPage, error) {
+	res, err := u.paymailsAPI.Paymails(ctx, opts...)
+	if err != nil {
+		return nil, paymails.HTTPErrorFormatter("retrieve paymail addresses page", err).FormatGetErr()
+	}
+
+	return res, nil
+}
+
 // NewUserAPIWithXPub initializes a new UserAPI instance using an extended public key (xPub).
 // This function configures the API client with the provided configuration and uses the xPub key for authentication.
 // If any configuration or initialization step fails, an appropriate error is returned.
@@ -483,6 +503,7 @@ func initUserAPIWithXPriv(cfg config.Config, xPriv string, auth authenticator) (
 		xpubAPI:         xpubs.NewAPI(url, httpClient),
 		contactsAPI:     contacts.NewAPI(url, httpClient),
 		invitationsAPI:  invitations.NewAPI(url, httpClient),
+		paymailsAPI:     paymails.NewAPI(url, httpClient),
 		totpAPI:         totpAPI,
 	}, nil
 }
@@ -512,5 +533,6 @@ func initUserAPI(cfg config.Config, auth authenticator) (*UserAPI, error) {
 		xpubAPI:         xpubs.NewAPI(url, httpClient),
 		contactsAPI:     contacts.NewAPI(url, httpClient),
 		invitationsAPI:  invitations.NewAPI(url, httpClient),
+		paymailsAPI:     paymails.NewAPI(url, httpClient),
 	}, nil
 }
