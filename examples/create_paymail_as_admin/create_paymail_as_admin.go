@@ -14,7 +14,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	adminAPI, err := wallet.NewAdminAPIWithXPriv(exampleutil.ExampleConfig, examples.XPriv)
+	adminAPI, err := wallet.NewAdminAPIWithXPriv(exampleutil.NewDefaultConfig(), examples.XPriv)
 	if err != nil {
 		log.Fatal(err)
 	}

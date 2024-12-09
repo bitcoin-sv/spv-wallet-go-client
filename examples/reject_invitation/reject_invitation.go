@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
@@ -11,7 +10,7 @@ import (
 )
 
 func main() {
-	usersAPI, err := wallet.NewUserAPIWithXPriv(exampleutil.ExampleConfig, examples.XPriv)
+	usersAPI, err := wallet.NewUserAPIWithXPriv(exampleutil.NewDefaultConfig(), examples.XPriv)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,5 +21,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("\n[HTTP DELETE] Reject contact invitation - api/v1/invitations/%s\n", paymail)
+	exampleutil.Print("\n[HTTP DELETE] Reject contact invitation - api/v1/invitations/%s", paymail)
 }

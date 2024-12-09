@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
@@ -15,7 +14,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	adminAPI, err := wallet.NewAdminAPIWithXPriv(exampleutil.ExampleConfig, examples.XPriv)
+	adminAPI, err := wallet.NewAdminAPIWithXPriv(exampleutil.NewDefaultConfig(), examples.XPriv)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,5 +44,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("[HTTP DELETE][Step 3] Delete Paymail: %s - api/v1/admin/paymails", addr)
+	exampleutil.Print("[HTTP DELETE][Step 3] Delete Paymail: %s - api/v1/admin/paymails", addr)
 }

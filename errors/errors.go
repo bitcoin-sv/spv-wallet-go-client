@@ -43,4 +43,13 @@ var (
 	ErrEmptyAccessKey = errors.New("key hex string cannot be empty")
 	// ErrEmptyPubKey is returned when the key string is empty.
 	ErrEmptyPubKey = errors.New("key string cannot be empty")
+
+	// ErrConfigValidationMissingAddress is returned when the configuration is invalid.
+	ErrConfigValidationMissingAddress = errors.New("configuration validation error: address required")
+	// ErrConfigValidationInvalidAddress is returned when the address is invalid.
+	ErrConfigValidationInvalidAddress = errors.New("configuration validation error: invalid address")
+	// ErrConfigValidationInvalidTimeout is returned when the timeout is invalid.
+	ErrConfigValidationInvalidTimeout = errors.New("configuration validation error: invalid timeout must be greater than zero")
+	// ErrConfigValidationInvalidTransport is returned when the transport is invalid.
+	ErrConfigValidationInvalidTransport = errors.New("configuration validation error: invalid transport")
 )
