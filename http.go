@@ -1107,13 +1107,16 @@ func (wc *WalletClient) AdminRejectContact(ctx context.Context, id string) (*mod
 }
 
 // AdminConfirmContacts executes an HTTP POST request to confirm a contact using their xPubs IDs and paymails.
-func (wc *WalletClient) AdminConfirmContacts(ctx context.Context, contacts []*models.ContactConfirmationData) error {
-	jsonBytes, err := json.Marshal(contacts)
+func (wc *WalletClient) AdminConfirmContacts(ctx context.Context, paymailA, paymailB string) error {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		"paymailA": paymailA,
+		"paymailB": paymailB,
+	})
 	if err != nil {
 		return WrapError(err)
 	}
 
-	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/contacts/confirmations", jsonBytes, wc.adminXPriv, true, nil)
+	err = wc.doHTTPRequest(ctx, http.MethodPost, "/admin/contacts/confirmations", jsonStr, wc.adminXPriv, true, nil)
 	return WrapError(err)
 }
 
