@@ -79,7 +79,7 @@ func (a *API) UpsertContact(ctx context.Context, cmd commands.UpsertContact) (*r
 		SetBody(cmd).
 		SetContext(ctx).
 		SetResult(&result).
-		Put(a.url.JoinPath(cmd.Paymail).String())
+		Put(a.url.JoinPath(cmd.ContactPaymail).String())
 	if err != nil {
 		return nil, fmt.Errorf("HTTP response failure: %w", err)
 	}

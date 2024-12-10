@@ -121,9 +121,9 @@ func TestContactsAPI_UpsertContact(t *testing.T) {
 
 			// when:
 			got, err := wallet.UpsertContact(context.Background(), commands.UpsertContact{
-				FullName: "John Doe",
-				Metadata: map[string]any{"example_key": "example_val"},
-				Paymail:  paymail,
+				ContactPaymail: paymail,
+				FullName:       "John Doe",
+				Metadata:       map[string]any{"example_key": "example_val"},
 			})
 
 			// then:

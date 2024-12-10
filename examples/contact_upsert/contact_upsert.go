@@ -17,17 +17,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	paymail := "john.doe@example.com"
+	contactPaymail := "john.doe@example.com"
 	contact, err := usersAPI.UpsertContact(context.Background(), commands.UpsertContact{
-		FullName: "John Doe",
+		ContactPaymail: contactPaymail,
+		FullName:       "John Doe",
 		Metadata: map[string]any{
 			"key": "value",
 		},
-		Paymail: paymail,
+		// Optional field representing the paymail address of the user who is creating the contact.
+		// It is required in case if user has multiple paymail addresses associated with single xPub.
+		//RequesterPaymail: "",
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	exampleutil.Print(fmt.Sprintf("[HTTP PUT] Upsert contact - api/v1/contacts/%s", paymail), contact)
+	exampleutil.Print(fmt.Sprintf("[HTTP PUT] Upsert contact - api/v1/contacts/%s", contactPaymail), contact)
 }
