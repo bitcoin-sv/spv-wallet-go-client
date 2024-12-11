@@ -10,22 +10,27 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions/transactionstest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	transactionsURL     = "/api/v1/transactions"
+	transactionDraftURL = "/api/v1/transactions/drafts"
+)
+
 func TestTransactionsAPI_SendToRecipients(t *testing.T) {
-	drafTransactionURL := spvwallettest.TestAPIAddr + "/api/v1/transactions/drafts"
-	recordTransactionURL := spvwallettest.TestAPIAddr + "/api/v1/transactions"
+	drafTransactionURL := testutils.FullAPIURL(t, transactionDraftURL)
+	recordTransactionURL := testutils.FullAPIURL(t, transactionsURL)
 	opReturn := &response.OpReturn{StringParts: []string{"hello", "world"}}
 
 	t.Run("SendToRecipients success", func(t *testing.T) {
 		// given:
-		spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
-		transport.RegisterResponder(http.MethodPost, drafTransactionURL, httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/transaction_draft_with_hex_200.json")))
-		transport.RegisterResponder(http.MethodPost, recordTransactionURL, httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/transaction_send_to_recipients_200.json")))
+		spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+		transport.RegisterResponder(http.MethodPost, drafTransactionURL, testutils.NewJSONFileResponderWithStatusOK("transactionstest/transaction_draft_with_hex_200.json"))
+		transport.RegisterResponder(http.MethodPost, recordTransactionURL, testutils.NewJSONFileResponderWithStatusOK("transactionstest/transaction_send_to_recipients_200.json"))
 		ctx := context.Background()
 
 		// when:
@@ -44,8 +49,8 @@ func TestTransactionsAPI_SendToRecipients(t *testing.T) {
 
 	t.Run("SendToRecipients - DraftToRecipients error", func(t *testing.T) {
 		// given:
-		spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
-		transport.RegisterResponder(http.MethodPost, drafTransactionURL, httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()))
+		spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+		transport.RegisterResponder(http.MethodPost, drafTransactionURL, testutils.NewBadRequestSPVErrorResponder())
 		ctx := context.Background()
 
 		// when:
@@ -58,14 +63,14 @@ func TestTransactionsAPI_SendToRecipients(t *testing.T) {
 		})
 
 		// then:
-		require.ErrorIs(t, err, spvwallettest.NewBadRequestSPVError())
+		require.ErrorIs(t, err, testutils.NewBadRequestSPVError())
 		require.Nil(t, result)
 	})
 
 	t.Run("SendToRecipients - FinalizeTransaction error", func(t *testing.T) {
 		// given:
-		spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
-		transport.RegisterResponder(http.MethodPost, drafTransactionURL, httpmock.NewJsonResponderOrPanic(http.StatusOK, transactionstest.ExpectedDraftTransactionWithWrongHex(t)))
+		spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+		transport.RegisterResponder(http.MethodPost, drafTransactionURL, testutils.NewJSONBodyResponderWithStatusOK(transactionstest.ExpectedDraftTransactionWithWrongHex(t)))
 		ctx := context.Background()
 
 		// when:
@@ -84,9 +89,9 @@ func TestTransactionsAPI_SendToRecipients(t *testing.T) {
 
 	t.Run("SendToRecipients - RecordTransaction error", func(t *testing.T) {
 		// given:
-		spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
-		transport.RegisterResponder(http.MethodPost, drafTransactionURL, httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/transaction_draft_with_hex_200.json")))
-		transport.RegisterResponder(http.MethodPost, recordTransactionURL, httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()))
+		spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+		transport.RegisterResponder(http.MethodPost, drafTransactionURL, testutils.NewJSONFileResponderWithStatusOK("transactionstest/transaction_draft_with_hex_200.json"))
+		transport.RegisterResponder(http.MethodPost, recordTransactionURL, testutils.NewBadRequestSPVErrorResponder())
 		ctx := context.Background()
 
 		// when:
@@ -99,7 +104,7 @@ func TestTransactionsAPI_SendToRecipients(t *testing.T) {
 		})
 
 		// then:
-		require.ErrorIs(t, err, spvwallettest.NewBadRequestSPVError())
+		require.ErrorIs(t, err, testutils.NewBadRequestSPVError())
 		require.Nil(t, result)
 
 	})
@@ -132,7 +137,7 @@ func TestTransactionsAPI_FinalizeTransaction(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			//given:
-			spvWalletClient, _ := spvwallettest.GivenSPVUserAPI(t)
+			spvWalletClient, _ := testutils.GivenSPVUserAPI(t)
 
 			//when:
 			hex, err := spvWalletClient.FinalizeTransaction(tc.draft)
@@ -154,27 +159,27 @@ func TestTransactionsAPI_UpdateTransactionMetadata(t *testing.T) {
 	}{
 		fmt.Sprintf("HTTP PATCH /api/v1/transactions/%s response: 200", id): {
 			expectedResponse: transactionstest.ExpectedTransactionWithUpdatedMetadata(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/patch_transaction_update_metadata_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("transactionstest/patch_transaction_update_metadata_200.json"),
 		},
 		fmt.Sprintf("HTTP PATCH /api/v1/transactions/%s response: 400", id): {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		fmt.Sprintf("HTTP PATCH /api/v1/transactions/%s response: 500", id): {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		fmt.Sprintf("HTTP PATCH /api/v1/transactions/%s str response: 500", id): {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/transactions/" + id
+	url := testutils.FullAPIURL(t, transactionsURL, id)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
+			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPatch, url, tc.responder)
 
 			// when:
@@ -201,27 +206,27 @@ func TestTransactionsAPI_RecordTransaction(t *testing.T) {
 	}{
 		"HTTP POST /api/v1/transactions response: 201": {
 			expectedResponse: transactionstest.ExpectedRecordTransaction(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/post_transaction_record_201.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("transactionstest/post_transaction_record_201.json"),
 		},
 		"HTTP POST /api/v1/transactions response: 400": {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		"HTTP POST /api/v1/transactions response: 500": {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP POST /api/v1/transactions str response: 500": {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/transactions"
+	url := testutils.FullAPIURL(t, transactionsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
+			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			// when:
@@ -242,27 +247,27 @@ func TestTransactionsAPI_DraftTransaction(t *testing.T) {
 	}{
 		"HTTP POST /api/v1/transactions/drafts response: 200": {
 			expectedResponse: transactionstest.ExpectedDraftTransaction(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/post_transaction_draft_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("transactionstest/post_transaction_draft_200.json"),
 		},
 		"HTTP POST /api/v1/transactions/drafts response: 400": {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		"HTTP POST /api/v1/transactions/drafts response: 500": {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP POST /api/v1/transactions/drafts str response: 500": {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/transactions/drafts"
+	url := testutils.FullAPIURL(t, transactionDraftURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
+			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			// when:
@@ -287,27 +292,27 @@ func TestTransactionsAPI_Transaction(t *testing.T) {
 	}{
 		fmt.Sprintf("HTTP GET /api/v1/transactions/%s  response: 200", id): {
 			expectedResponse: transactionstest.ExpectedTransaction(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/get_transaction_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("transactionstest/get_transaction_200.json"),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/transactions/%s response: 400", id): {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/transactions/%s response: 500", id): {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/transactions/%s str response: 500", id): {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/transactions/" + id
+	url := testutils.FullAPIURL(t, transactionsURL, id)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
+			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// when:
@@ -328,27 +333,27 @@ func TestTransactionsAPI_Transactions(t *testing.T) {
 	}{
 		"HTTP GET /api/v1/transactions response: 200": {
 			expectedResponse: transactionstest.ExpectedTransactionsPage(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("transactionstest/get_transactions_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("transactionstest/get_transactions_200.json"),
 		},
 		"HTTP GET /api/v1/transactions response: 400": {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/transactions response: 500": {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/transactions str response: 500": {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/transactions"
+	url := testutils.FullAPIURL(t, transactionsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := spvwallettest.GivenSPVUserAPI(t)
+			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// when:

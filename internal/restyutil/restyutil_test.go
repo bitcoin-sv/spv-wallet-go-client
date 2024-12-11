@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
-	goclienterr "github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
@@ -34,53 +34,23 @@ func TestNewHTTPClient_OnAfterResponse(t *testing.T) {
 			expectedError: nil,
 		},
 		"Client Error 400": {
-			statusCode: 400,
-			responseBody: models.SPVError{
-				Message:    "Invalid request",
-				StatusCode: 400,
-				Code:       "invalid-request",
-			},
-			expectedError: models.SPVError{
-				Message:    "Invalid request",
-				StatusCode: 400,
-				Code:       "invalid-request",
-			},
+			statusCode:    400,
+			responseBody:  testutils.NewInvalidRequestError(),
+			expectedError: testutils.NewInvalidRequestError(),
 		},
 		"Server Error 500": {
-			statusCode: 500,
-			responseBody: models.SPVError{
-				Message:    goclienterr.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: 500,
-				Code:       "internal-server-error",
-			},
-			expectedError: models.SPVError{
-				Message:    goclienterr.ErrUnrecognizedAPIResponse.Error(),
-				StatusCode: 500,
-				Code:       "internal-server-error",
-			},
+			statusCode:    500,
+			responseBody:  testutils.NewUnrecognizedAPIResponseError(),
+			expectedError: testutils.NewUnrecognizedAPIResponseError(),
 		},
 	}
 
-	// Mock configuration
-	cfg := config.Config{
-		Addr:      "http://mock-api",
-		Timeout:   5,
-		Transport: httpmock.DefaultTransport, // Use httpmock
-	}
-
-	// Create HTTP client with mock authenticator
-	client := restyutil.NewHTTPClient(cfg, &mockAuthenticator{})
-	httpmock.ActivateNonDefault(client.GetClient())
-	defer httpmock.DeactivateAndReset()
+	client := setupMockHTTPClient(t)
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// Mock HTTP response
-			httpmock.RegisterResponder(
-				"GET",
-				"http://mock-api/test",
-				httpmock.NewJsonResponderOrPanic(tc.statusCode, tc.responseBody),
-			)
+			testutils.RegisterMockResponder(t, client, "/test", tc.statusCode, tc.responseBody)
 
 			// Make request
 			resp, err := client.R().Get("/test")
@@ -91,4 +61,17 @@ func TestNewHTTPClient_OnAfterResponse(t *testing.T) {
 
 		})
 	}
+}
+
+// setupMockHTTPClient initializes an HTTP client with a mock configuration and authenticator
+func setupMockHTTPClient(t *testing.T) *resty.Client {
+	cfg := config.Config{
+		Addr:      "http://mock-api",
+		Timeout:   5,
+		Transport: httpmock.DefaultTransport,
+	}
+	client := restyutil.NewHTTPClient(cfg, &mockAuthenticator{})
+	httpmock.ActivateNonDefault(client.GetClient())
+	t.Cleanup(httpmock.DeactivateAndReset)
+	return client
 }

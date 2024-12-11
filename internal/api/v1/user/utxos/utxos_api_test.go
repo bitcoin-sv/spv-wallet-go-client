@@ -7,11 +7,13 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos/utxostest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
+
+const utxosURL = "/api/v1/utxos"
 
 func TestUTXOAPI_UTXOs(t *testing.T) {
 	tests := map[string]struct {
@@ -21,27 +23,27 @@ func TestUTXOAPI_UTXOs(t *testing.T) {
 	}{
 		"HTTP GET /api/v1/utxos response: 200": {
 			expectedResponse: utxostest.ExpectedUtxosPage(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("utxostest/get_utxos_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("utxostest/get_utxos_200.json"),
 		},
 		"HTTP GET /api/v1/utxos response: 400": {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/utxos response: 500": {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/utxos str response: 500": {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/utxos"
+	url := testutils.FullAPIURL(t, utxosURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// when:

@@ -5,11 +5,14 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
+
+const configsURL = "/api/v1/configs/shared"
 
 func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 	tests := map[string]struct {
@@ -25,23 +28,27 @@ func TestConfigsAPI_SharedConfig_APIResponses(t *testing.T) {
 					"pikePaymentEnabled":  true,
 				},
 			},
-			responder: httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("configstest/response_200_status_code.json")),
+			responder: testutils.NewJSONFileResponderWithStatusOK("configstest/response_200_status_code.json"),
 		},
 		"HTTP GET /api/v1/configs/shared response: 400": {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
+		},
+		"HTTP GET /api/v1/configs/shared response: 500": {
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/configs/shared str response: 500": {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/configs/shared"
+	url := testutils.FullAPIURL(t, configsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// when:

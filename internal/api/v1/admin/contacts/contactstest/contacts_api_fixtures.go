@@ -3,7 +3,7 @@ package contactstest
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
@@ -11,8 +11,8 @@ import (
 func ExpectedUpdatedUserContact(t *testing.T) *response.Contact {
 	return &response.Contact{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-11-28T13:34:52.11722Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-11-29T08:23:19.66093Z"),
+			CreatedAt: testutils.ParseTime(t, "2024-11-28T13:34:52.11722Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-11-29T08:23:19.66093Z"),
 			Metadata:  map[string]any{"phoneNumber": "123456789"},
 		},
 		ID:       "4d570959-dd85-4f53-bad1-18d0671761e9",
@@ -28,8 +28,8 @@ func ExpectedUserContactsPage(t *testing.T) *queries.UserContactsPage {
 		Content: []*response.Contact{
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-11-28T14:58:13.262238Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-28T16:18:43.842434Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-11-28T14:58:13.262238Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-11-28T16:18:43.842434Z"),
 				},
 				ID:       "7a5625ac-8256-454a-84a3-7f03f50cd7dc",
 				FullName: "John Doe",
@@ -39,8 +39,8 @@ func ExpectedUserContactsPage(t *testing.T) *queries.UserContactsPage {
 			},
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-11-28T14:58:13.029966Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-28T14:58:13.03002Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-11-28T14:58:13.029966Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-11-28T14:58:13.03002Z"),
 					Metadata: map[string]any{
 						"phoneNumber": "123456789",
 					},

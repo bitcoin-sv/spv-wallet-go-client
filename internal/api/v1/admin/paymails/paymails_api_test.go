@@ -9,7 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/paymails/paymailstest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -17,40 +17,45 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	paymailsURL = "/api/v1/admin/paymails"
+	xpubID      = "xpub22e6cba6-ef6e-432a-8612-63ac4b290ce9"
+	id          = "98dbafe0-4e2b-4307-8fbf-c55209214bae"
+)
+
 func TestPaymailsAPI_DeletePaymail(t *testing.T) {
-	id := "xpub22e6cba6-ef6e-432a-8612-63ac4b290ce9"
 	tests := map[string]struct {
 		responder        httpmock.Responder
 		expectedResponse *response.PaymailAddress
 		expectedErr      error
 	}{
-		fmt.Sprintf("HTTP DELETE /api/v1/admin/paymails/%s response: 200", id): {
+		fmt.Sprintf("HTTP DELETE /api/v1/admin/paymails/%s response: 200", xpubID): {
 			expectedResponse: paymailstest.ExpectedCreatedPaymail(t),
-			responder:        httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
+			responder:        testutils.NewStringResponderStatusOK(http.StatusText(http.StatusOK)),
 		},
-		fmt.Sprintf("HTTP DELETE /api/v1/admin/paymails/%s response: 400", id): {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+		fmt.Sprintf("HTTP DELETE /api/v1/admin/paymails/%s response: 400", xpubID): {
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
-		fmt.Sprintf("HTTP DELETE /api/v1/admin/paymails/%s response: 500", id): {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+		fmt.Sprintf("HTTP DELETE /api/v1/admin/paymails/%s response: 500", xpubID): {
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
-		fmt.Sprintf("HTTP DELETE /api/v1/admin/paymails/%s str response: 500", id): {
+		fmt.Sprintf("HTTP DELETE /api/v1/admin/paymails/%s str response: 500", xpubID): {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/admin/paymails/" + id
+	url := testutils.FullAPIURL(t, paymailsURL, xpubID)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := spvwallettest.GivenSPVAdminAPI(t)
+			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
 			// then:
-			err := wallet.DeletePaymail(context.Background(), id)
+			err := wallet.DeletePaymail(context.Background(), xpubID)
 			require.ErrorIs(t, err, tc.expectedErr)
 		})
 	}
@@ -64,32 +69,32 @@ func TestPaymailsAPI_CreatePaymail(t *testing.T) {
 	}{
 		"HTTP POST /api/v1/admin/paymails response: 200": {
 			expectedResponse: paymailstest.ExpectedCreatedPaymail(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("paymailstest/post_paymail_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("paymailstest/post_paymail_200.json"),
 		},
 		"HTTP POST /api/v1/admin/paymails response: 400": {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		"HTTP POST /api/v1/admin/paymails response: 500": {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP POST /api/v1/admin/paymails str response: 500": {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/admin/paymails"
+	url := testutils.FullAPIURL(t, paymailsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := spvwallettest.GivenSPVAdminAPI(t)
+			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			// then:
 			got, err := wallet.CreatePaymail(context.Background(), &commands.CreatePaymail{
-				Key: "xpub22e6cba6-ef6e-432a-8612-63ac4b290ce9",
+				Key: xpubID,
 			})
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
@@ -105,27 +110,27 @@ func TestPaymailsAPI_Paymails(t *testing.T) {
 	}{
 		"HTTP GET /api/v1/admin/paymails response: 200": {
 			expectedResponse: paymailstest.ExpectedPaymailsPage(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("paymailstest/get_paymails_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("paymailstest/get_paymails_200.json"),
 		},
 		"HTTP GET /api/v1/admin/paymails response: 400": {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/admin/paymails response: 500": {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/admin/paymails str response: 500": {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/admin/paymails"
+	url := testutils.FullAPIURL(t, paymailsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := spvwallettest.GivenSPVAdminAPI(t)
+			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
@@ -137,7 +142,7 @@ func TestPaymailsAPI_Paymails(t *testing.T) {
 }
 
 func TestPaymailsAPI_Paymail(t *testing.T) {
-	id := "98dbafe0-4e2b-4307-8fbf-c55209214bae"
+
 	tests := map[string]struct {
 		responder        httpmock.Responder
 		expectedResponse *response.PaymailAddress
@@ -145,27 +150,27 @@ func TestPaymailsAPI_Paymail(t *testing.T) {
 	}{
 		fmt.Sprintf("HTTP GET /api/v1/admin/paymails/%s response: 200", id): {
 			expectedResponse: paymailstest.ExpectedPaymail(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("paymailstest/get_paymail_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("paymailstest/get_paymail_200.json"),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/admin/paymails/%s response: 400", id): {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/admin/paymails/%s response: 500", id): {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		fmt.Sprintf("HTTP GET /api/v1/admin/paymails/%s str response: 500", id): {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/admin/paymails/" + id
+	url := testutils.FullAPIURL(t, paymailsURL, id)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := spvwallettest.GivenSPVAdminAPI(t)
+			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:

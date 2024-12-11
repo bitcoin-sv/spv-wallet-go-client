@@ -7,12 +7,14 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/paymails/paymailstest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
+
+const paymailsURL = "/api/v1/paymails"
 
 func TestPaymailsAPI_Paymails(t *testing.T) {
 	tests := map[string]struct {
@@ -22,27 +24,27 @@ func TestPaymailsAPI_Paymails(t *testing.T) {
 	}{
 		"HTTP GET /api/v1/paymails response: 200": {
 			expectedResponse: paymailstest.ExpectedPaymailsPage(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("paymailstest/get_paymails_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("paymailstest/get_paymails_200.json"),
 		},
 		"HTTP GET /api/v1/paymails response: 400": {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/paymails response: 500": {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/paymails str response: 500": {
 			expectedErr: errors.ErrUnrecognizedAPIResponse,
-			responder:   httpmock.NewStringResponder(http.StatusInternalServerError, "unexpected internal server failure"),
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/paymails"
+	url := testutils.FullAPIURL(t, paymailsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:

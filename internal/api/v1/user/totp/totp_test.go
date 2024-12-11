@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/totp"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
 )
@@ -16,8 +16,8 @@ import (
 func TestClient_GenerateTotpForContact(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// given
-		contact := models.Contact{PubKey: spvwallettest.PubKey}
-		wc, err := totp.NewAPI(spvwallettest.UserXPriv)
+		contact := models.Contact{PubKey: testutils.PubKey}
+		wc, err := totp.NewAPI(testutils.UserXPriv)
 		require.NoError(t, err)
 
 		// when
@@ -31,7 +31,7 @@ func TestClient_GenerateTotpForContact(t *testing.T) {
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
 		// given
 		contact := models.Contact{PubKey: "invalid-pk-format"}
-		wc, err := totp.NewAPI(spvwallettest.UserXPriv)
+		wc, err := totp.NewAPI(testutils.UserXPriv)
 		require.NoError(t, err)
 
 		// when
@@ -44,25 +44,25 @@ func TestClient_GenerateTotpForContact(t *testing.T) {
 
 func TestClient_ValidateTotpForContact(t *testing.T) {
 	cfg := config.Config{
-		Addr:    spvwallettest.TestAPIAddr,
+		Addr:    testutils.TestAPIAddr,
 		Timeout: 5 * time.Second,
 	}
 	t.Run("success", func(t *testing.T) {
 		// given
-		clientAlice, err := client.NewUserAPIWithXPriv(cfg, spvwallettest.AliceXPriv)
+		clientAlice, err := client.NewUserAPIWithXPriv(cfg, testutils.AliceXPriv)
 		require.NoError(t, err)
 
-		clientBob, err := client.NewUserAPIWithXPriv(cfg, spvwallettest.BobXPriv)
+		clientBob, err := client.NewUserAPIWithXPriv(cfg, testutils.BobXPriv)
 		require.NoError(t, err)
 
 		// and
 		aliceContact := &models.Contact{
-			PubKey:  spvwallettest.MockPKI(t, spvwallettest.AliceXPub),
+			PubKey:  testutils.MockPKI(t, testutils.AliceXPub),
 			Paymail: "alice@example.com",
 		}
 
 		bobContact := &models.Contact{
-			PubKey:  spvwallettest.MockPKI(t, spvwallettest.BobXPub),
+			PubKey:  testutils.MockPKI(t, testutils.BobXPub),
 			Paymail: "bob@example.com",
 		}
 
@@ -81,7 +81,7 @@ func TestClient_ValidateTotpForContact(t *testing.T) {
 
 	t.Run("contact has invalid PubKey - returns error", func(t *testing.T) {
 		// given
-		sut, err := client.NewUserAPIWithXPriv(cfg, spvwallettest.UserXPriv)
+		sut, err := client.NewUserAPIWithXPriv(cfg, testutils.UserXPriv)
 		require.NoError(t, err)
 
 		// and

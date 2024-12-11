@@ -6,7 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"
 )
@@ -31,7 +31,7 @@ func TestAccessKeyAuthenitcator_NewWithNilAccessKey(t *testing.T) {
 
 func TestAccessKeyAuthenticator_Authenticate(t *testing.T) {
 	// given:
-	authenticator, err := auth.NewAccessKeyAuthenticator(spvwallettest.UserPrivAccessKey)
+	authenticator, err := auth.NewAccessKeyAuthenticator(testutils.UserPrivAccessKey)
 	require.NotNil(t, authenticator)
 	require.NoError(t, err)
 
@@ -57,7 +57,7 @@ func TestXprivAuthenitcator_NewWithNilXpriv(t *testing.T) {
 
 func TestXprivAuthenitcator_Authenticate(t *testing.T) {
 	// given:
-	authenticator, err := auth.NewXprivAuthenticator(spvwallettest.UserXPriv)
+	authenticator, err := auth.NewXprivAuthenticator(testutils.UserXPriv)
 	require.NotNil(t, authenticator)
 	require.NoError(t, err)
 
@@ -83,7 +83,7 @@ func TestXpubOnlyAuthenticator_NewWithNilXpub(t *testing.T) {
 
 func TestXpubOnlyAuthenticator_Authenticate(t *testing.T) {
 	// given:
-	authenticator, err := auth.NewXpubOnlyAuthenticator(spvwallettest.UserXPriv)
+	authenticator, err := auth.NewXpubOnlyAuthenticator(testutils.UserXPriv)
 	require.NotNil(t, authenticator)
 	require.NoError(t, err)
 
@@ -98,11 +98,11 @@ func TestXpubOnlyAuthenticator_Authenticate(t *testing.T) {
 }
 
 func requireXAuthHeaderToBeSet(t *testing.T, h http.Header) {
-	require.Equal(t, []string{spvwallettest.UserPubAccessKey}, h[xAuthKey])
+	require.Equal(t, []string{testutils.UserPubAccessKey}, h[xAuthKey])
 }
 
 func requireXpubHeaderToBeSet(t *testing.T, h http.Header) {
-	require.Equal(t, []string{spvwallettest.UserXPub}, h[xAuthXPubKey])
+	require.Equal(t, []string{testutils.UserXPub}, h[xAuthXPubKey])
 }
 
 func requireSignatureHeadersToBeSet(t *testing.T, h http.Header) {

@@ -1,15 +1,15 @@
-package spvwallettest
+package testutils
 
 import (
 	"encoding/hex"
-	"net/http"
+	"net/url"
+	"path"
 	"testing"
 	"time"
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	spvwallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -81,30 +81,6 @@ func MockPKI(t *testing.T, xpub string) string {
 	return hex.EncodeToString(pubKey.SerializeCompressed())
 }
 
-func NewBadRequestSPVError() models.SPVError {
-	return models.SPVError{
-		Message:    http.StatusText(http.StatusBadRequest),
-		StatusCode: http.StatusBadRequest,
-		Code:       models.UnknownErrorCode,
-	}
-}
-
-func NewUnauthorizedAccessSPVError() models.SPVError {
-	return models.SPVError{
-		Message:    "unauthorized",
-		StatusCode: http.StatusUnauthorized,
-		Code:       "error-unauthorized",
-	}
-}
-
-func NewInternalServerSPVError() models.SPVError {
-	return models.SPVError{
-		Message:    http.StatusText(http.StatusInternalServerError),
-		StatusCode: http.StatusInternalServerError,
-		Code:       models.UnknownErrorCode,
-	}
-}
-
 func ParseTime(t *testing.T, s string) time.Time {
 	ts, err := time.Parse(time.RFC3339Nano, s)
 	if err != nil {
@@ -115,4 +91,20 @@ func ParseTime(t *testing.T, s string) time.Time {
 
 func Ptr[T any](value T) *T {
 	return &value
+}
+
+// FullAPIURL constructs a full URL by combining the base address and an endpoint path.
+// It uses the testing context to fail gracefully if invalid input is provided.
+func FullAPIURL(t *testing.T, endpoint string, pathParams ...string) string {
+	t.Helper()
+	baseURL, err := url.Parse(TestAPIAddr)
+	if err != nil {
+		t.Fatalf("invalid TestAPIAddr: %s, error: %v", TestAPIAddr, err)
+	}
+
+	// Join the base path with additional path components
+	fullPath := path.Join(append([]string{baseURL.Path, endpoint}, pathParams...)...)
+	baseURL.Path = fullPath
+
+	return baseURL.String()
 }

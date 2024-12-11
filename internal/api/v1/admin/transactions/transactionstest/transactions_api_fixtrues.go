@@ -3,15 +3,15 @@ package transactionstest
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 func ExpectedTransaction(t *testing.T) *response.Transaction {
 	return &response.Transaction{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-10-02T10:34:57.931744Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-10-18T13:59:02.237607Z"),
+			CreatedAt: testutils.ParseTime(t, "2024-10-02T10:34:57.931744Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-10-18T13:59:02.237607Z"),
 			Metadata: map[string]any{
 				"domain":     "john.doe.test.4chain.space",
 				"ip_address": "127.0.0.1",
@@ -42,8 +42,8 @@ func ExpectedTransactionsPage(t *testing.T) *response.PageModel[response.Transac
 		Content: []*response.Transaction{
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-11-18T07:19:51.661646Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-18T08:24:08.217141Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-11-18T07:19:51.661646Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-11-18T08:24:08.217141Z"),
 					Metadata: map[string]any{
 						"receiver": "john.doe.test@john.test.4chain.space",
 						"sender":   "jane.doe.test@jane.test.4chain.space",
@@ -67,8 +67,8 @@ func ExpectedTransactionsPage(t *testing.T) *response.PageModel[response.Transac
 			},
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-11-18T07:16:04.821925Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-19T13:09:39.501356Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-11-18T07:16:04.821925Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-11-19T13:09:39.501356Z"),
 					Metadata: map[string]any{
 						"domain":     "john.doe.test.4chain.space",
 						"ip_address": "127.0.0.1",

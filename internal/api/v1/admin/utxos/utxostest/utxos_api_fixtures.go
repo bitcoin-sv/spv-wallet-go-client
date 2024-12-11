@@ -3,7 +3,7 @@ package utxostest
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
@@ -12,7 +12,7 @@ func ExpectedUtxosPage(t *testing.T) *queries.UtxosPage {
 	return &queries.UtxosPage{
 		Content: []*response.Utxo{
 			{
-				Model:        response.Model{CreatedAt: spvwallettest.ParseTime(t, "2024-11-18T07:19:51.661656Z"), UpdatedAt: spvwallettest.ParseTime(t, "2024-11-18T07:19:51.663878Z")},
+				Model:        response.Model{CreatedAt: testutils.ParseTime(t, "2024-11-18T07:19:51.661656Z"), UpdatedAt: testutils.ParseTime(t, "2024-11-18T07:19:51.663878Z")},
 				UtxoPointer:  response.UtxoPointer{TransactionID: "ba371529-9746-4912-b9e4-4b3dc0539a40"},
 				ID:           "21e69deb-8ea9-451b-9e1c-e89086ae439e",
 				XpubID:       "2054a737-18d1-4e6c-9d3e-370a68ffe7f0",
@@ -20,12 +20,12 @@ func ExpectedUtxosPage(t *testing.T) *queries.UtxosPage {
 				ScriptPubKey: "2c2de44c-acf8-4507-9cdb-cf9cf5273253",
 				Type:         "pubkeyhash",
 				DraftID:      "",
-				ReservedAt:   spvwallettest.ParseTime(t, "0001-01-01T00:00:00Z"),
+				ReservedAt:   testutils.ParseTime(t, "0001-01-01T00:00:00Z"),
 				SpendingTxID: "",
 				Transaction: &response.Transaction{
 					Model: response.Model{
-						CreatedAt: spvwallettest.ParseTime(t, "2024-11-18T07:19:51.661646Z"),
-						UpdatedAt: spvwallettest.ParseTime(t, "2024-11-18T08:24:08.217141Z"),
+						CreatedAt: testutils.ParseTime(t, "2024-11-18T07:19:51.661646Z"),
+						UpdatedAt: testutils.ParseTime(t, "2024-11-18T08:24:08.217141Z"),
 
 						Metadata: map[string]any{
 							"receiver": "john.doe.test@test.4chain.space",

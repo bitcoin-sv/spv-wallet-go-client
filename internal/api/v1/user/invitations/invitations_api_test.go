@@ -6,35 +6,46 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	invitationsURL = "/api/v1/invitations"
+	paymail        = "john.doe.test@john.doe.test.4chain.space"
+	contactsURI    = "/contacts"
+)
+
 func TestInvitationsAPI_AcceptInvitation(t *testing.T) {
-	paymail := "john.doe.test@john.doe.test.4chain.space"
+
 	tests := map[string]struct {
 		responder   httpmock.Responder
 		expectedErr error
 	}{
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s/contacts response: 200", paymail): {
-			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
+			responder: testutils.NewStringResponderStatusOK(http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s/contacts response: 400", paymail): {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
+		},
+		fmt.Sprintf("HTTP POST /api/v1/invitations/%s/contacts response: 500", paymail): {
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s/contacts str response: 500", paymail): {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/invitations/" + paymail + "/contacts"
+	url := testutils.FullAPIURL(t, invitationsURL, paymail, contactsURI)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			// when:
@@ -47,29 +58,33 @@ func TestInvitationsAPI_AcceptInvitation(t *testing.T) {
 }
 
 func TestInvitationsAPI_RejectInvitation(t *testing.T) {
-	paymail := "john.doe.test@john.doe.test.4chain.space"
+
 	tests := map[string]struct {
 		responder   httpmock.Responder
 		expectedErr error
 	}{
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s response: 200", paymail): {
-			responder: httpmock.NewStringResponder(http.StatusOK, http.StatusText(http.StatusOK)),
+			responder: testutils.NewStringResponderStatusOK(http.StatusText(http.StatusOK)),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s response: 400", paymail): {
-			expectedErr: spvwallettest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, spvwallettest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
+		},
+		fmt.Sprintf("HTTP POST /api/v1/invitations/%s response: 500", paymail): {
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		fmt.Sprintf("HTTP POST /api/v1/invitations/%s str response: 500", paymail): {
-			expectedErr: spvwallettest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, spvwallettest.NewInternalServerSPVError()),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/invitations/" + paymail
+	url := testutils.FullAPIURL(t, invitationsURL, paymail)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
 			// when:

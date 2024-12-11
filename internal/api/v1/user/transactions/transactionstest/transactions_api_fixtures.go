@@ -3,7 +3,7 @@ package transactionstest
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
@@ -28,20 +28,20 @@ func ExpectedDraftTransactionWithWrongHex(t *testing.T) *response.DraftTransacti
 func ExpectedDraftTransactionWithHex(t *testing.T) *response.DraftTransaction {
 	return &response.DraftTransaction{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-12-02T12:04:33.855018Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-12-02T13:04:33.855036+01:00"),
+			CreatedAt: testutils.ParseTime(t, "2024-12-02T12:04:33.855018Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-12-02T13:04:33.855036+01:00"),
 		},
 		ID:        "de3b8ef7041b2a528bc47ecdb3b87b06b61407fe24789bc02f9d49bfc234b4d5",
 		Hex:       "01000000014c037d55e72d2ee6a95ff67bd758c4cee9c7545bb4d72ba77584152fcfa070120100000000ffffffff0200000000000000000e006a0568656c6c6f05776f726c6408000000000000001976a914702cef80a7039a1aebb70dc05ce1e439646fa33788ac00000000",
 		XpubID:    "55e5aeae101bf7dc49db2abfccfab9fb5f56a6b594fdcc87e5f5a94bfe94b973",
-		ExpiresAt: spvwallettest.ParseTime(t, "2024-12-02T12:04:53.840989Z"),
+		ExpiresAt: testutils.ParseTime(t, "2024-12-02T12:04:53.840989Z"),
 		Configuration: response.TransactionConfig{
 			ChangeSatoshis: 8,
 			ChangeDestinations: []*response.Destination{
 				{
 					Model: response.Model{
-						CreatedAt: spvwallettest.ParseTime(t, "2024-12-02T12:04:33.853019Z"),
-						UpdatedAt: spvwallettest.ParseTime(t, "2024-12-02T13:04:33.853035+01:00"),
+						CreatedAt: testutils.ParseTime(t, "2024-12-02T12:04:33.853019Z"),
+						UpdatedAt: testutils.ParseTime(t, "2024-12-02T13:04:33.853035+01:00"),
 					},
 					ID:            "872a51f9eed774e7e5051cec19db192783521b5a9e0d4d814d46bdce338a32dc",
 					XpubID:        "55e5aeae101bf7dc49db2abfccfab9fb5f56a6b594fdcc87e5f5a94bfe94b973",
@@ -61,8 +61,8 @@ func ExpectedDraftTransactionWithHex(t *testing.T) *response.DraftTransaction {
 				{
 					Utxo: response.Utxo{
 						Model: response.Model{
-							CreatedAt: spvwallettest.ParseTime(t, "2024-11-29T23:13:54.0229Z"),
-							UpdatedAt: spvwallettest.ParseTime(t, "2024-12-02T12:04:33.847931Z"),
+							CreatedAt: testutils.ParseTime(t, "2024-11-29T23:13:54.0229Z"),
+							UpdatedAt: testutils.ParseTime(t, "2024-12-02T12:04:33.847931Z"),
 						},
 						UtxoPointer: response.UtxoPointer{
 							TransactionID: "1270a0cf2f158475a72bd7b45b54c7e9cec458d77bf65fa9e62e2de7557d034c",
@@ -73,12 +73,12 @@ func ExpectedDraftTransactionWithHex(t *testing.T) *response.DraftTransaction {
 						ScriptPubKey: "76a9146637345046fd4d78a9ce187370db0ab7c15dd10488ac",
 						Type:         "pubkeyhash",
 						DraftID:      "de3b8ef7041b2a528bc47ecdb3b87b06b61407fe24789bc02f9d49bfc234b4d5",
-						ReservedAt:   spvwallettest.ParseTime(t, "2024-12-02T12:04:33.846479Z"),
+						ReservedAt:   testutils.ParseTime(t, "2024-12-02T12:04:33.846479Z"),
 					},
 					Destination: response.Destination{
 						Model: response.Model{
-							CreatedAt: spvwallettest.ParseTime(t, "2024-11-29T23:13:54.000014Z"),
-							UpdatedAt: spvwallettest.ParseTime(t, "2024-11-30T00:13:54.000029+01:00"),
+							CreatedAt: testutils.ParseTime(t, "2024-11-29T23:13:54.000014Z"),
+							UpdatedAt: testutils.ParseTime(t, "2024-11-30T00:13:54.000029+01:00"),
 						},
 						ID:            "886d2ac60ac7fa630ad68954d6eb865314c484b4418e2469d48e4170dec7771f",
 						XpubID:        "55e5aeae101bf7dc49db2abfccfab9fb5f56a6b594fdcc87e5f5a94bfe94b973",
@@ -124,8 +124,8 @@ func ExpectedDraftTransactionWithHex(t *testing.T) *response.DraftTransaction {
 func ExpectedSendToRecipientsTransaction(t *testing.T) *response.Transaction {
 	return &response.Transaction{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-12-03T16:10:48.551774Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-12-03T16:10:49.080876Z"),
+			CreatedAt: testutils.ParseTime(t, "2024-12-03T16:10:48.551774Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-12-03T16:10:49.080876Z"),
 		},
 		ID:                   "a4f86cdfefc3339bd3bd7861ad642feab05798f8a31cd67f81aec3c8c87083e0",
 		Hex:                  "01000000017c8b38da58d766c75d94ca65f919723651090ed03e89a6cbc31ab7b87923d6ea010000006b483045022100b2e654169dda17a68c74b24d21e7b2e0dfef7fccdad9ab1e1ec87d2cab910e1d02206e247df32c4fe845af61001c8ec1dda718d737021df27c1d3f2e47d9fe76dd4241210265332864a94ed4c82bf3dacafbb828479b0a7fd0a73e62f60f6224dbf1504261ffffffff0200000000000000000e006a0568656c6c6f05776f726c6407000000000000001976a91464d00b8045c9e432b469f762b7e5beac2ef5a20c88ac00000000",
@@ -147,8 +147,8 @@ func ExpectedSendToRecipientsTransaction(t *testing.T) *response.Transaction {
 func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 	return &response.DraftTransaction{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+			CreatedAt: testutils.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
 			Metadata: map[string]interface{}{
 				"receiver": "john.doe.test4@john.doe.test.4chain.space",
 				"sender":   "john.doe.test4@john.doe.test.4chain.space",
@@ -157,14 +157,14 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 		ID:        "36be741b-31c7-4aed-8840-5e5b2eafeb41",
 		Hex:       "c959fdb6-f438-4ef9-aef9-92a1852885ef",
 		XpubID:    "3f0a90d3-4f8b-45f6-81e4-9858fa47ecc0",
-		ExpiresAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:27.372912Z"),
+		ExpiresAt: testutils.ParseTime(t, "2024-11-05T07:30:27.372912Z"),
 		Configuration: response.TransactionConfig{
 			ChangeSatoshis: 98,
 			ChangeDestinations: []*response.Destination{
 				{
 					Model: response.Model{
-						CreatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
-						UpdatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+						CreatedAt: testutils.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+						UpdatedAt: testutils.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
 					},
 					ID:            "c86dd8f4-316f-4d71-be00-7bd1a38079e4",
 					XpubID:        "d6884260-1624-415b-8625-652a59345ead",
@@ -184,8 +184,8 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 				{
 					Utxo: response.Utxo{
 						Model: response.Model{
-							CreatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
-							UpdatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+							CreatedAt: testutils.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+							UpdatedAt: testutils.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
 						},
 						UtxoPointer: response.UtxoPointer{
 							TransactionID: "3e0c5f6d-0dfc-462d-8a63-31b7a20d0c6b",
@@ -196,12 +196,12 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 						ScriptPubKey: "9d7eede4-00cd-47fd-ab3d-b0ae6d2ca6a6",
 						Type:         "pubkeyhash",
 						DraftID:      "f1ebe294-d921-4fb7-8b22-ed33e090e7ea",
-						ReservedAt:   spvwallettest.ParseTime(t, "2024-11-05T07:30:14.207287Z"),
+						ReservedAt:   testutils.ParseTime(t, "2024-11-05T07:30:14.207287Z"),
 					},
 					Destination: response.Destination{
 						Model: response.Model{
-							CreatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
-							UpdatedAt: spvwallettest.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+							CreatedAt: testutils.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
+							UpdatedAt: testutils.ParseTime(t, "2024-11-05T07:30:14.219077Z"),
 							Metadata: map[string]interface{}{
 								"domain":          "john.doe.test.4chain.space",
 								"ip_address":      "127.0.0.1",
@@ -217,7 +217,7 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 						Type:                         "pubkeyhash",
 						Chain:                        0,
 						Num:                          0,
-						PaymailExternalDerivationNum: spvwallettest.Ptr(uint32(3)),
+						PaymailExternalDerivationNum: testutils.Ptr(uint32(3)),
 						Address:                      "6e4f50b1-356b-4453-a83e-2f412f328c25",
 						DraftID:                      "",
 					},
@@ -266,8 +266,8 @@ func ExpectedDraftTransaction(t *testing.T) *response.DraftTransaction {
 func ExpectedRecordTransaction(t *testing.T) *response.Transaction {
 	return &response.Transaction{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			CreatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 			Metadata: map[string]interface{}{
 				"key":  "value",
 				"key2": "value2",
@@ -297,8 +297,8 @@ func ExpectedRecordTransaction(t *testing.T) *response.Transaction {
 func ExpectedTransactionWithUpdatedMetadata(t *testing.T) *response.Transaction {
 	return &response.Transaction{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			CreatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 			Metadata: map[string]any{
 				"domain":          "john.doe.test.4chain.space",
 				"example_key1":    "example_key10_val",
@@ -331,8 +331,8 @@ func ExpectedTransactionWithUpdatedMetadata(t *testing.T) *response.Transaction 
 func ExpectedTransaction(t *testing.T) *response.Transaction {
 	return &response.Transaction{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			CreatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 			Metadata: map[string]any{
 				"domain":          "john.doe.test.4chain.space",
 				"example_key1":    "example_key10_val",
@@ -366,8 +366,8 @@ func ExpectedTransactionsPage(t *testing.T) *response.PageModel[response.Transac
 		Content: []*response.Transaction{
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 					Metadata: map[string]any{
 						"domain":          "john.doe.test.4chain.space",
 						"example_key1":    "example_key10_val",
@@ -396,8 +396,8 @@ func ExpectedTransactionsPage(t *testing.T) *response.PageModel[response.Transac
 			},
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z"),
 					Metadata: map[string]any{
 						"domain":          "jane.doe.test.4chain.space",
 						"example_key101":  "example_key101_val",

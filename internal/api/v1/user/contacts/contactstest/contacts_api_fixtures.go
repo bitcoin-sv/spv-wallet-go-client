@@ -3,7 +3,7 @@ package contactstest
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
@@ -13,8 +13,8 @@ func ExpectedUserContactsPage(t *testing.T) *queries.UserContactsPage {
 		Content: []*response.Contact{
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-10-18T12:07:44.739839Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-10-18T15:08:44.739918Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-10-18T12:07:44.739839Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-10-18T15:08:44.739918Z"),
 				},
 				ID:       "4f730efa-2a33-4275-bfdb-1f21fc110963",
 				FullName: "John Doe",
@@ -24,8 +24,8 @@ func ExpectedUserContactsPage(t *testing.T) *queries.UserContactsPage {
 			},
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-10-18T12:07:44.739839Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-10-18T15:08:44.739918Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-10-18T12:07:44.739839Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-10-18T15:08:44.739918Z"),
 				},
 				ID:       "e55a4d4e-4a4b-4720-8556-1c00dd6a5cf3",
 				FullName: "Jane Doe",
@@ -46,8 +46,8 @@ func ExpectedUserContactsPage(t *testing.T) *queries.UserContactsPage {
 func ExpectedContactWithWithPaymail(t *testing.T) *response.Contact {
 	return &response.Contact{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-10-18T12:07:44.739839Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-10-18T15:08:44.739918Z"),
+			CreatedAt: testutils.ParseTime(t, "2024-10-18T12:07:44.739839Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-10-18T15:08:44.739918Z"),
 		},
 		ID:       "4f730efa-2a33-4275-bfdb-1f21fc110963",
 		FullName: "John Doe",
@@ -60,8 +60,8 @@ func ExpectedContactWithWithPaymail(t *testing.T) *response.Contact {
 func ExpectedUpsertContact(t *testing.T) *response.Contact {
 	return &response.Contact{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-10-18T12:07:44.739839Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-11-06T11:30:35.090124Z"),
+			CreatedAt: testutils.ParseTime(t, "2024-10-18T12:07:44.739839Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-11-06T11:30:35.090124Z"),
 			Metadata: map[string]interface{}{
 				"example_key": "example_val",
 			},

@@ -6,7 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/paymails"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
 )
@@ -20,35 +20,35 @@ func TestPaymailFilterBuilder_Build(t *testing.T) {
 		"paymail filter: zero values": {
 			expectedParams: make(url.Values),
 		},
-		"paymail filter: filter with only 'id' field set": {
+		"admin paymail filter: filter with only 'id' field set": {
 			filter: filter.PaymailFilter{
-				ID: spvwallettest.Ptr("b950f5de-3d3a-40b6-bdf8-c9d60e9e0a0a"),
+				ID: testutils.Ptr("b950f5de-3d3a-40b6-bdf8-c9d60e9e0a0a"),
 			},
 			expectedParams: url.Values{
 				"id": []string{"b950f5de-3d3a-40b6-bdf8-c9d60e9e0a0a"},
 			},
 		},
-		"paymail filter: filter with only 'alias' field set": {
+		"admin paymail filter: filter with only 'alias' field set": {
 			filter: filter.PaymailFilter{
-				Alias: spvwallettest.Ptr("alias"),
+				Alias: testutils.Ptr("alias"),
 			},
 			expectedParams: url.Values{
 				"alias": []string{"alias"},
 			},
 		},
-		"paymail filter: filter with only 'public name' field set": {
+		"admin paymail filter: filter with only 'public name' field set": {
 			filter: filter.PaymailFilter{
-				PublicName: spvwallettest.Ptr("Alice"),
+				PublicName: testutils.Ptr("Alice"),
 			},
 			expectedParams: url.Values{
 				"publicName": []string{"Alice"},
 			},
 		},
-		"paymail filter: all fields set": {
+		"admin paymail filter: all fields set": {
 			filter: filter.PaymailFilter{
-				ID:         spvwallettest.Ptr("b950f5de-3d3a-40b6-bdf8-c9d60e9e0a0a"),
-				PublicName: spvwallettest.Ptr("Alice"),
-				Alias:      spvwallettest.Ptr("alias"),
+				ID:         testutils.Ptr("b950f5de-3d3a-40b6-bdf8-c9d60e9e0a0a"),
+				PublicName: testutils.Ptr("Alice"),
+				Alias:      testutils.Ptr("alias"),
 			},
 			expectedParams: url.Values{
 				"publicName": []string{"Alice"},

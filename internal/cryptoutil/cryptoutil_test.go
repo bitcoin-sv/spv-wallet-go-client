@@ -6,6 +6,7 @@ import (
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/cryptoutil"
 	"github.com/stretchr/testify/require"
 )
@@ -129,12 +130,12 @@ func TestInt64ToUint32(t *testing.T) {
 	}{
 		"input: negative value": {
 			input:          -1,
-			expectedErr:    cryptoutil.ErrNegativeValueNotAllowed,
+			expectedErr:    errors.ErrNegativeValueNotAllowed,
 			expectedUint32: 0,
 		},
 		"input: max value exceeded": {
 			input:          math.MaxUint32 + 1,
-			expectedErr:    cryptoutil.ErrMaxUint32LimitExceeded,
+			expectedErr:    errors.ErrMaxUint32LimitExceeded,
 			expectedUint32: 0,
 		},
 	}
@@ -161,7 +162,7 @@ func TestParseChildNumsFromHex(t *testing.T) {
 		},
 		"input: invalid hex": {
 			hex:            "test",
-			expectedErr:    cryptoutil.ErrHexHashPartIntParse,
+			expectedErr:    errors.ErrHexHashPartIntParse,
 			expectedResult: nil,
 		},
 		"input: short hex ababab": {

@@ -11,6 +11,7 @@ import (
 
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	goclienterrors "github.com/bitcoin-sv/spv-wallet-go-client/errors"
 )
 
 const (
@@ -77,7 +78,7 @@ func ParseChildNumsFromHex(hexHash string) ([]uint32, error) {
 func parseHexPart(part string) (uint32, error) {
 	i, err := strconv.ParseInt(part, 16, 64)
 	if err != nil {
-		return 0, errors.Join(err, ErrHexHashPartIntParse)
+		return 0, errors.Join(err, goclienterrors.ErrHexHashPartIntParse)
 	}
 
 	u, err := Int64ToUint32(i % math.MaxInt32)
@@ -90,10 +91,10 @@ func parseHexPart(part string) (uint32, error) {
 
 func Int64ToUint32(value int64) (uint32, error) {
 	if value < 0 {
-		return 0, ErrNegativeValueNotAllowed
+		return 0, goclienterrors.ErrNegativeValueNotAllowed
 	}
 	if value > math.MaxUint32 {
-		return 0, ErrMaxUint32LimitExceeded
+		return 0, goclienterrors.ErrMaxUint32LimitExceeded
 	}
 	return uint32(value), nil
 }
@@ -111,9 +112,3 @@ func PrivateKeyFromHexOrWIF(s string) (*ec.PrivateKey, error) {
 
 	return pk, nil
 }
-
-var (
-	ErrMaxUint32LimitExceeded  = errors.New("max uint32 value exceeded")
-	ErrNegativeValueNotAllowed = errors.New("negative value is not allowed")
-	ErrHexHashPartIntParse     = errors.New("parse hex hash part to int64 failed")
-)

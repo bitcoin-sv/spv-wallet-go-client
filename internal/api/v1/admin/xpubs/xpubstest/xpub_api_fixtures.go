@@ -3,7 +3,7 @@ package xpubstest
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
@@ -11,8 +11,8 @@ import (
 func ExpectedXPub(t *testing.T) *response.Xpub {
 	return &response.Xpub{
 		Model: response.Model{
-			CreatedAt: spvwallettest.ParseTime(t, "2024-11-22T07:51:37.708754Z"),
-			UpdatedAt: spvwallettest.ParseTime(t, "2024-11-22T08:51:37.708865+01:00"),
+			CreatedAt: testutils.ParseTime(t, "2024-11-22T07:51:37.708754Z"),
+			UpdatedAt: testutils.ParseTime(t, "2024-11-22T08:51:37.708865+01:00"),
 			Metadata:  map[string]any{"key": "value"},
 		},
 		ID:              "d7ff33b6-8c25-4955-bcea-a5557c18bb95",
@@ -27,8 +27,8 @@ func ExpectedXPubsPage(t *testing.T) *queries.XPubPage {
 		Content: []*response.Xpub{
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-11-21T11:41:49.830635Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-21T11:41:49.830649Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-11-21T11:41:49.830635Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-11-21T11:41:49.830649Z"),
 					Metadata:  map[string]any{"key": "val"},
 				},
 				ID:              "3c7a9d02-32e3-4d83-a391-af64f1933acb",
@@ -38,8 +38,8 @@ func ExpectedXPubsPage(t *testing.T) *queries.XPubPage {
 			},
 			{
 				Model: response.Model{
-					CreatedAt: spvwallettest.ParseTime(t, "2024-11-21T11:26:43.091808Z"),
-					UpdatedAt: spvwallettest.ParseTime(t, "2024-11-21T11:26:43.091857Z"),
+					CreatedAt: testutils.ParseTime(t, "2024-11-21T11:26:43.091808Z"),
+					UpdatedAt: testutils.ParseTime(t, "2024-11-21T11:26:43.091857Z"),
 					Metadata:  map[string]any{"key": "val"},
 				},
 				ID:              "301f38e2-f1dc-43cb-9db2-f2835a648b8b",

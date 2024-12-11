@@ -1,7 +1,7 @@
 package merklerootstest
 
 import (
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
@@ -23,8 +23,8 @@ func ExpectedMerkleRootsPage() *queries.MerkleRootPage {
 			},
 		},
 		Page: models.ExclusiveStartKeyPageInfo{
-			OrderByField:     spvwallettest.Ptr("blockHeight"),
-			SortDirection:    spvwallettest.Ptr("asc"),
+			OrderByField:     testutils.Ptr("blockHeight"),
+			SortDirection:    testutils.Ptr("asc"),
 			TotalElements:    10,
 			Size:             20,
 			LastEvaluatedKey: "6bad63f5-8f2e-4756-aca9-cc9cb4a001c6",

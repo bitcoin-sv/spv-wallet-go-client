@@ -7,7 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
 )
@@ -26,7 +26,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"transactionId": []string{"124c2237-9b54-46c4-bf53-3cec86f7e316"},
 			},
 			filter: filter.UtxoFilter{
-				TransactionID: spvwallettest.Ptr("124c2237-9b54-46c4-bf53-3cec86f7e316"),
+				TransactionID: testutils.Ptr("124c2237-9b54-46c4-bf53-3cec86f7e316"),
 			},
 		},
 		"utxo filter: filter with only 'output index' field set": {
@@ -34,7 +34,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"outputIndex": []string{"32"},
 			},
 			filter: filter.UtxoFilter{
-				OutputIndex: spvwallettest.Ptr(uint32(32)),
+				OutputIndex: testutils.Ptr(uint32(32)),
 			},
 		},
 		"utxo filter: filter with only 'id' field set": {
@@ -42,7 +42,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"id": []string{"abb6a871-dd95-4f7a-8090-ca34cff63801"},
 			},
 			filter: filter.UtxoFilter{
-				ID: spvwallettest.Ptr("abb6a871-dd95-4f7a-8090-ca34cff63801"),
+				ID: testutils.Ptr("abb6a871-dd95-4f7a-8090-ca34cff63801"),
 			},
 		},
 		"utxo filter: filter with only 'satoshis' field set": {
@@ -50,7 +50,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"satoshis": []string{"64"},
 			},
 			filter: filter.UtxoFilter{
-				Satoshis: spvwallettest.Ptr(uint64(64)),
+				Satoshis: testutils.Ptr(uint64(64)),
 			},
 		},
 		"utxo filter: filter with only 'script pub key' field set": {
@@ -58,7 +58,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"scriptPubKey": []string{"3adec124-32eb-46f1-94f2-4949a86dbe8d"},
 			},
 			filter: filter.UtxoFilter{
-				ScriptPubKey: spvwallettest.Ptr("3adec124-32eb-46f1-94f2-4949a86dbe8d"),
+				ScriptPubKey: testutils.Ptr("3adec124-32eb-46f1-94f2-4949a86dbe8d"),
 			},
 		},
 		"utxo filter: filter with only 'type' field set": {
@@ -66,7 +66,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"type": []string{"0f65e842-decf-4725-8ad9-877634280e4f"},
 			},
 			filter: filter.UtxoFilter{
-				Type: spvwallettest.Ptr("0f65e842-decf-4725-8ad9-877634280e4f"),
+				Type: testutils.Ptr("0f65e842-decf-4725-8ad9-877634280e4f"),
 			},
 		},
 		"utxo filter: filter with only 'draft id' field set": {
@@ -74,7 +74,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"draftId": []string{"2453797c-4089-4078-8723-5ecb68e70bd7"},
 			},
 			filter: filter.UtxoFilter{
-				DraftID: spvwallettest.Ptr("2453797c-4089-4078-8723-5ecb68e70bd7"),
+				DraftID: testutils.Ptr("2453797c-4089-4078-8723-5ecb68e70bd7"),
 			},
 		},
 		"utxo filter: filter with only reserved range 'from' field set": {
@@ -83,7 +83,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 			},
 			filter: filter.UtxoFilter{
 				ReservedRange: &filter.TimeRange{
-					From: spvwallettest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
+					From: testutils.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
 				},
 			},
 		},
@@ -93,7 +93,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 			},
 			filter: filter.UtxoFilter{
 				ReservedRange: &filter.TimeRange{
-					To: spvwallettest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
+					To: testutils.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
 				},
 			},
 		},
@@ -104,8 +104,8 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 			},
 			filter: filter.UtxoFilter{
 				ReservedRange: &filter.TimeRange{
-					To:   spvwallettest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
-					From: spvwallettest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
+					To:   testutils.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
+					From: testutils.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
 				},
 			},
 		},
@@ -114,7 +114,7 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"spendingTxId": []string{"7539366c-beb2-4405-8597-025bf2dc7cbd"},
 			},
 			filter: filter.UtxoFilter{
-				SpendingTxID: spvwallettest.Ptr("7539366c-beb2-4405-8597-025bf2dc7cbd"),
+				SpendingTxID: testutils.Ptr("7539366c-beb2-4405-8597-025bf2dc7cbd"),
 			},
 		},
 		"utxo filter: all fields set": {
@@ -131,17 +131,17 @@ func TestUtoxFilterQueryBuilder_Build(t *testing.T) {
 				"outputIndex":         []string{"32"},
 			},
 			filter: filter.UtxoFilter{
-				SpendingTxID:  spvwallettest.Ptr("7539366c-beb2-4405-8597-025bf2dc7cbd"),
-				DraftID:       spvwallettest.Ptr("2453797c-4089-4078-8723-5ecb68e70bd7"),
-				Type:          spvwallettest.Ptr("0f65e842-decf-4725-8ad9-877634280e4f"),
-				ScriptPubKey:  spvwallettest.Ptr("3adec124-32eb-46f1-94f2-4949a86dbe8d"),
-				ID:            spvwallettest.Ptr("abb6a871-dd95-4f7a-8090-ca34cff63801"),
-				OutputIndex:   spvwallettest.Ptr(uint32(32)),
-				Satoshis:      spvwallettest.Ptr(uint64(64)),
-				TransactionID: spvwallettest.Ptr("124c2237-9b54-46c4-bf53-3cec86f7e316"),
+				SpendingTxID:  testutils.Ptr("7539366c-beb2-4405-8597-025bf2dc7cbd"),
+				DraftID:       testutils.Ptr("2453797c-4089-4078-8723-5ecb68e70bd7"),
+				Type:          testutils.Ptr("0f65e842-decf-4725-8ad9-877634280e4f"),
+				ScriptPubKey:  testutils.Ptr("3adec124-32eb-46f1-94f2-4949a86dbe8d"),
+				ID:            testutils.Ptr("abb6a871-dd95-4f7a-8090-ca34cff63801"),
+				OutputIndex:   testutils.Ptr(uint32(32)),
+				Satoshis:      testutils.Ptr(uint64(64)),
+				TransactionID: testutils.Ptr("124c2237-9b54-46c4-bf53-3cec86f7e316"),
 				ReservedRange: &filter.TimeRange{
-					To:   spvwallettest.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
-					From: spvwallettest.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
+					To:   testutils.Ptr(time.Date(2021, 2, 2, 0, 0, 0, 0, time.UTC)),
+					From: testutils.Ptr(time.Date(2021, 2, 1, 0, 0, 0, 0, time.UTC)),
 				},
 			},
 		},

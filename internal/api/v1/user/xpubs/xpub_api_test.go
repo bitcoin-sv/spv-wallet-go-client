@@ -6,12 +6,15 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/xpubs/xpubstest"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/spvwallettest"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
+
+const xpubsURL = "/api/v1/users/current"
 
 func TestXPubAPI_UpdateXPubMetadata(t *testing.T) {
 	tests := map[string]struct {
@@ -21,23 +24,27 @@ func TestXPubAPI_UpdateXPubMetadata(t *testing.T) {
 	}{
 		"HTTP PATCH /api/v1/users/current response: 200": {
 			expectedResponse: xpubstest.ExpectedUpdatedXPubMetadata(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("xpubstest/patch_xpub_metadata_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("xpubstest/patch_xpub_metadata_200.json"),
 		},
 		"HTTP PATCH /api/v1/users/current response: 400": {
-			expectedErr: xpubstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, xpubstest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
+		},
+		"HTTP PATCH /api/v1/users/current response: 500": {
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP PATCH /api/v1/users/current str response: 500": {
-			expectedErr: xpubstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, xpubstest.NewInternalServerSPVError()),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/users/current"
+	url := testutils.FullAPIURL(t, xpubsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPatch, url, tc.responder)
 
 			// when:
@@ -58,25 +65,29 @@ func TestXPubAPI_XPub(t *testing.T) {
 		expectedResponse *response.Xpub
 		expectedErr      error
 	}{
-		"HTTP GET /api/v1/users/current/ response: 200": {
+		"HTTP GET /api/v1/users/current response: 200": {
 			expectedResponse: xpubstest.ExpectedUserXPub(t),
-			responder:        httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File("xpubstest/get_xpub_200.json")),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("xpubstest/get_xpub_200.json"),
 		},
 		"HTTP GET /api/v1/users/current response: 400": {
-			expectedErr: xpubstest.NewBadRequestSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, xpubstest.NewBadRequestSPVError()),
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
+		},
+		"HTTP GET /api/v1/users/current response: 500": {
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
 		},
 		"HTTP GET /api/v1/users/current str response: 500": {
-			expectedErr: xpubstest.NewInternalServerSPVError(),
-			responder:   httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, xpubstest.NewInternalServerSPVError()),
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
 		},
 	}
 
-	url := spvwallettest.TestAPIAddr + "/api/v1/users/current"
+	url := testutils.FullAPIURL(t, xpubsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			wallet, transport := spvwallettest.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// when:
