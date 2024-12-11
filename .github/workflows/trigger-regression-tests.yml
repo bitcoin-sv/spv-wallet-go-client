@@ -25,7 +25,6 @@ jobs:
   test:
     uses: 4chain-ag/spv-wallet-regression/.github/workflows/run-regression-tests.yaml@test-regression-tests-on-client-v2
     with:
-      image_tag: ${{ needs.release.outputs.imageVersion }}
       run_id: '${{ github.run_id }}-${{ github.run_attempt }}'
       keep_instances: ${{ inputs.keep_instances }}
       go_client_ref: ${{ inputs.go_client_branch }}
