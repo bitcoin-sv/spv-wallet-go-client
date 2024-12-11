@@ -13,55 +13,45 @@ import (
 
 func TestPaymailFilterBuilder_Build(t *testing.T) {
 	tests := map[string]struct {
-		filter         filter.AdminPaymailFilter
+		filter         filter.PaymailFilter
 		expectedParams url.Values
 		expectedErr    error
 	}{
-		"admin paymail filter: zero values": {
+		"paymail filter: zero values": {
 			expectedParams: make(url.Values),
 		},
-		"admin paymail filter: filter with only 'id' field set": {
-			filter: filter.AdminPaymailFilter{
+		"paymail filter: filter with only 'id' field set": {
+			filter: filter.PaymailFilter{
 				ID: spvwallettest.Ptr("b950f5de-3d3a-40b6-bdf8-c9d60e9e0a0a"),
 			},
 			expectedParams: url.Values{
 				"id": []string{"b950f5de-3d3a-40b6-bdf8-c9d60e9e0a0a"},
 			},
 		},
-		"admin paymail filter: filter with only 'xPubId' field set": {
-			filter: filter.AdminPaymailFilter{
-				XpubID: spvwallettest.Ptr("7d373830-1d74-4c4b-a435-04ce09398027"),
-			},
-			expectedParams: url.Values{
-				"xpubId": []string{"7d373830-1d74-4c4b-a435-04ce09398027"},
-			},
-		},
-		"admin paymail filter: filter with only 'alias' field set": {
-			filter: filter.AdminPaymailFilter{
+		"paymail filter: filter with only 'alias' field set": {
+			filter: filter.PaymailFilter{
 				Alias: spvwallettest.Ptr("alias"),
 			},
 			expectedParams: url.Values{
 				"alias": []string{"alias"},
 			},
 		},
-		"admin paymail filter: filter with only 'public name' field set": {
-			filter: filter.AdminPaymailFilter{
+		"paymail filter: filter with only 'public name' field set": {
+			filter: filter.PaymailFilter{
 				PublicName: spvwallettest.Ptr("Alice"),
 			},
 			expectedParams: url.Values{
 				"publicName": []string{"Alice"},
 			},
 		},
-		"admin paymail filter: all fields set": {
-			filter: filter.AdminPaymailFilter{
+		"paymail filter: all fields set": {
+			filter: filter.PaymailFilter{
 				ID:         spvwallettest.Ptr("b950f5de-3d3a-40b6-bdf8-c9d60e9e0a0a"),
-				XpubID:     spvwallettest.Ptr("7d373830-1d74-4c4b-a435-04ce09398027"),
 				PublicName: spvwallettest.Ptr("Alice"),
 				Alias:      spvwallettest.Ptr("alias"),
 			},
 			expectedParams: url.Values{
 				"publicName": []string{"Alice"},
-				"xpubId":     []string{"7d373830-1d74-4c4b-a435-04ce09398027"},
 				"alias":      []string{"alias"},
 				"id":         []string{"b950f5de-3d3a-40b6-bdf8-c9d60e9e0a0a"},
 			},

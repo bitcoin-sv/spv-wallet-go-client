@@ -9,11 +9,11 @@ import (
 )
 
 type PaymailFilterBuilder struct {
-	PaymailFilter      filter.AdminPaymailFilter
+	PaymailFilter      filter.PaymailFilter
 	ModelFilterBuilder querybuilders.ModelFilterBuilder
 }
 
-func (p *PaymailFilterBuilder) Build() (url.Values, error) {
+func (p *PaymailFilterBuilder) BuildExtendedURLValues() (*querybuilders.ExtendedURLValues, error) {
 	modelFilterBuilder, err := p.ModelFilterBuilder.Build()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build model filter query params: %w", err)
@@ -25,9 +25,16 @@ func (p *PaymailFilterBuilder) Build() (url.Values, error) {
 	}
 
 	params.AddPair("id", p.PaymailFilter.ID)
-	params.AddPair("xpubId", p.PaymailFilter.XpubID)
 	params.AddPair("alias", p.PaymailFilter.Alias)
 	params.AddPair("domain", p.PaymailFilter.Domain)
 	params.AddPair("publicName", p.PaymailFilter.PublicName)
+	return params, nil
+}
+
+func (p *PaymailFilterBuilder) Build() (url.Values, error) {
+	params, err := p.BuildExtendedURLValues()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build extended URL values: %w", err)
+	}
 	return params.Values, nil
 }

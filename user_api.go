@@ -22,6 +22,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
 )
@@ -416,7 +417,7 @@ func (u *UserAPI) ValidateTotpForContact(contact *models.Contact, passcode, requ
 //
 // The API response is unmarshaled into a *queries.PaymailAddressPage struct.
 // Returns an error if the API request fails or the response cannot be decoded.
-func (u *UserAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption) (*queries.PaymailAddressPage, error) {
+func (u *UserAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption[filter.PaymailFilter]) (*queries.PaymailAddressPage, error) {
 	res, err := u.paymailsAPI.Paymails(ctx, opts...)
 	if err != nil {
 		return nil, paymails.HTTPErrorFormatter("retrieve paymail addresses page", err).FormatGetErr()

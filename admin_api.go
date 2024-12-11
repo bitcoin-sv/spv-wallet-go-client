@@ -21,6 +21,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
@@ -245,7 +246,7 @@ func (a *AdminAPI) UTXOs(ctx context.Context, opts ...queries.AdminUtxoQueryOpti
 //
 // The API response is unmarshaled into a *queries.PaymailAddressPage struct.
 // Returns an error if the API request fails or the response cannot be decoded.
-func (a *AdminAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption) (*queries.PaymailAddressPage, error) {
+func (a *AdminAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption[filter.AdminPaymailFilter]) (*queries.PaymailAddressPage, error) {
 	res, err := a.paymailsAPI.Paymails(ctx, opts...)
 	if err != nil {
 		return nil, paymails.HTTPErrorFormatter("retrieve paymail addresses page", err).FormatGetErr()

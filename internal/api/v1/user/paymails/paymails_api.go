@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -21,8 +22,8 @@ type API struct {
 	httpClient *resty.Client
 }
 
-func (a *API) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption) (*queries.PaymailAddressPage, error) {
-	var query queries.PaymailQuery
+func (a *API) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption[filter.PaymailFilter]) (*queries.PaymailAddressPage, error) {
+	var query queries.PaymailQuery[filter.PaymailFilter]
 	for _, o := range opts {
 		o(&query)
 	}

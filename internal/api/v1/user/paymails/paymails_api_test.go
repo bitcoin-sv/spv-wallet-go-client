@@ -46,7 +46,7 @@ func TestPaymailsAPI_Paymails(t *testing.T) {
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
-			got, err := wallet.Paymails(context.Background(), queries.PaymailQueryWithPageFilter(filter.Page{Size: 1}))
+			got, err := wallet.Paymails(context.Background(), queries.PaymailQueryWithPageFilter[filter.PaymailFilter](filter.Page{Size: 1}))
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
