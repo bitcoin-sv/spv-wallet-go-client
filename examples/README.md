@@ -1,7 +1,7 @@
-# Qucik Guide 
+# Qucik Guide
 
-In this directory you can find bunch of examples describing how to use 
-the wallet client package during interaction wit the SPV Wallet API. 
+In this directory you can find bunch of examples describing how to use
+the wallet client package during interaction wit the SPV Wallet API.
 
 1. [Before you run](#before-you-run)
 1. [Authorization](#authroization)
@@ -11,9 +11,9 @@ the wallet client package during interaction wit the SPV Wallet API.
 
 ### Pre-requisites
 
--   You have access to the `spv-wallet` non-custodial wallet (running locally or remotely).
--   [Taskfile](https://taskfile.dev/installation/) is installed on your environment.
--   SPV Wallet go client instance is properly created and configured.
+- You have access to the `spv-wallet` non-custodial wallet (running locally or remotely).
+- [Taskfile](https://taskfile.dev/installation/) is installed on your environment.
+- SPV Wallet go client instance is properly created and configured.
 
 > [!TIP]
 > To verify Taskfile installation run: `task` command in the terminal.
@@ -52,22 +52,23 @@ task: Available tasks for this project:
 * user-invitation-reject:                 Reject user contact invitation with a given paymail address.
 * user-transaction-metadata-update:       Update user transaction metadata with a given ID.
 * user-xpub-metadata:                     Update current authorized user's xpub metadata.
+* send-op-return:                         Sends an OP_RETURN transaction.
 ```
 
-## Authroization 
+## Authroization
 
 > [!CAUTION]
 > Don't use the keys which are already added to another wallet.
 
-
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > Additionally, to make it work properly, you should adjust the `ExamplePaymail` to align with your `domains` configuration in the `spv-wallet` instance.
 
 Before interacting with the SPV Wallet API, you must complete the authorization process.
 
-To begin, generate a pair of keys using the `task generate-keys` command, which is included in the dedicated Taskfile. 
+To begin, generate a pair of keys using the `task generate-keys` command, which is included in the dedicated Taskfile.
 
 **Example output:**
+
 ```
 ==================================================================
 XPriv:  xprv1d77e47e-452c-453f-bc4c-a42748f8145f
@@ -76,7 +77,7 @@ Mnemonic:  mnemonic
 ==================================================================
 ```
 
-## 
+##
 
 > [!TIP]
 > Previously generated keys can be used as function parameters.
@@ -89,39 +90,39 @@ To verify the connection and authorization, you can either run one of the availa
 package main
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"log"
-	"strings"
+ "context"
+ "encoding/json"
+ "fmt"
+ "log"
+ "strings"
 
-	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
+ wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 )
 
 func main() {
-	xPriv := "121d2f43-4261-42ab-813e-3d3fa4d87313"
-	cfg := wallet.NewDefaultConfig("http://localhost:3003")
-	userAPI, err := wallet.NewUserAPIWithXPriv(cfg, xPriv)
-	if err != nil {
-		log.Fatal(err)
-	}
+ xPriv := "121d2f43-4261-42ab-813e-3d3fa4d87313"
+ cfg := wallet.NewDefaultConfig("http://localhost:3003")
+ userAPI, err := wallet.NewUserAPIWithXPriv(cfg, xPriv)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	xPub, err := userAPI.XPub(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-	Print("XPub", xPub)
+ xPub, err := userAPI.XPub(context.Background())
+ if err != nil {
+  log.Fatal(err)
+ }
+ Print("XPub", xPub)
 }
 
 func Print(s string, a any) {
-	fmt.Println(strings.Repeat("~", 100))
-	fmt.Println(s)
-	fmt.Println(strings.Repeat("~", 100))
-	res, err := json.MarshalIndent(a, "", " ")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(string(res))
+ fmt.Println(strings.Repeat("~", 100))
+ fmt.Println(s)
+ fmt.Println(strings.Repeat("~", 100))
+ res, err := json.MarshalIndent(a, "", " ")
+ if err != nil {
+  log.Fatal(err)
+ }
+ fmt.Println(string(res))
 }
 ```
 

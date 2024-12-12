@@ -74,6 +74,18 @@ func (a *API) UpdateContact(ctx context.Context, cmd *commands.UpdateContact) (*
 	return &result, nil
 }
 
+func (a *API) ConfirmContacts(ctx context.Context, cmd *commands.ConfirmContacts) error {
+	_, err := a.httpClient.
+		R().
+		SetContext(ctx).
+		SetBody(cmd).
+		Post(a.url.JoinPath("confirmations").String())
+	if err != nil {
+		return fmt.Errorf("HTTP response failure :%w", err)
+	}
+	return nil
+}
+
 func (a *API) DeleteContact(ctx context.Context, ID string) error {
 	_, err := a.httpClient.
 		R().

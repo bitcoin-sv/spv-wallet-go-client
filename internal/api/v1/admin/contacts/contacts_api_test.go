@@ -61,6 +61,47 @@ func TestContactsAPI_Contacts(t *testing.T) {
 	}
 }
 
+func TestContactsAPI_ConfirmContacts(t *testing.T) {
+	tests := map[string]struct {
+		responder   httpmock.Responder
+		expectedErr error
+	}{
+		"HTTP POST /api/v1/admin/contacts/confirmations response: 200": {
+			responder: httpmock.NewJsonResponderOrPanic(http.StatusOK, http.StatusText(http.StatusOK)),
+		},
+		"HTTP POST /api/v1/admin/contacts/confirmations response: 400": {
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
+		},
+		"HTTP POST /api/v1/admin/contacts/confirmations response: 500": {
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
+		},
+		"HTTP POST /api/v1/admin/contacts/confirmations str response: 500": {
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
+		},
+	}
+
+	url := testutils.FullAPIURL(t, contactsURL+"/confirmations")
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			wallet, transport := testutils.GivenSPVAdminAPI(t)
+			transport.RegisterResponder(http.MethodPost, url, tc.responder)
+
+			// when:
+			err := wallet.ConfirmContacts(context.Background(), &commands.ConfirmContacts{
+				PaymailA: "alice@paymail.com",
+				PaymailB: "bob@paymail.com",
+			})
+
+			// then:
+			require.ErrorIs(t, err, tc.expectedErr)
+		})
+	}
+}
+
 func TestContactsAPI_ContactUpdate(t *testing.T) {
 
 	tests := map[string]struct {
