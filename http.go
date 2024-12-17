@@ -1086,6 +1086,22 @@ func (wc *WalletClient) AdminUpdateContact(ctx context.Context, id, fullName str
 	return &contact, WrapError(err)
 }
 
+// AdminCreateContact executes an HTTP POST request to create a new contact using the specified paymail, creator paymail, full name, and metadata.
+func (wc *WalletClient) AdminCreateContact(ctx context.Context, contactPaymail, creatorPaymail, fullName string, metadata map[string]any) (*models.Contact, error) {
+	jsonStr, err := json.Marshal(map[string]interface{}{
+		"creatorPaymail": creatorPaymail,
+		"fullName":       fullName,
+		FieldMetadata:    metadata,
+	})
+	if err != nil {
+		return nil, WrapError(err)
+	}
+
+	var contact models.Contact
+	err = wc.doHTTPRequest(ctx, http.MethodPost, fmt.Sprintf("/admin/contact/%s", contactPaymail), jsonStr, wc.adminXPriv, true, &contact)
+	return &contact, WrapError(err)
+}
+
 // AdminDeleteContact executes an HTTP DELETE request to remove a contact using their ID.
 func (wc *WalletClient) AdminDeleteContact(ctx context.Context, id string) error {
 	err := wc.doHTTPRequest(ctx, http.MethodDelete, fmt.Sprintf("/admin/contact/%s", id), nil, wc.adminXPriv, true, nil)
