@@ -105,7 +105,7 @@ func TestPaymailsAPI_CreatePaymail(t *testing.T) {
 func TestPaymailsAPI_Paymails(t *testing.T) {
 	tests := map[string]struct {
 		responder        httpmock.Responder
-		expectedResponse *queries.PaymailAddressPage
+		expectedResponse *queries.PaymailsPage
 		expectedErr      error
 	}{
 		"HTTP GET /api/v1/admin/paymails response: 200": {
@@ -134,7 +134,7 @@ func TestPaymailsAPI_Paymails(t *testing.T) {
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
-			got, err := wallet.Paymails(context.Background(), queries.PaymailQueryWithPageFilter[filter.AdminPaymailFilter](filter.Page{Size: 1}))
+			got, err := wallet.Paymails(context.Background(), queries.QueryWithPageFilter[filter.AdminPaymailFilter](filter.Page{Size: 1}))
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})

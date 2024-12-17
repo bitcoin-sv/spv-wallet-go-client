@@ -25,11 +25,11 @@ const (
 func TestContactsAPI_Contacts(t *testing.T) {
 	tests := map[string]struct {
 		responder        httpmock.Responder
-		expectedResponse *queries.UserContactsPage
+		expectedResponse *queries.ContactsPage
 		expectedErr      error
 	}{
 		"HTTP GET /api/v1/admin/contacts response: 200": {
-			expectedResponse: contactstest.ExpectedUserContactsPage(t),
+			expectedResponse: contactstest.ExpectedContactsPage(t),
 			responder:        testutils.NewJSONFileResponderWithStatusOK("contactstest/get_contacts_200.json"),
 		},
 		"HTTP GET /api/v1/admin/contacts response: 400": {
@@ -54,7 +54,7 @@ func TestContactsAPI_Contacts(t *testing.T) {
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
-			got, err := wallet.Contacts(context.Background(), queries.ContactQueryWithPageFilter(filter.Page{Size: 1}))
+			got, err := wallet.Contacts(context.Background(), queries.QueryWithPageFilter[filter.ContactFilter](filter.Page{Size: 1}))
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})

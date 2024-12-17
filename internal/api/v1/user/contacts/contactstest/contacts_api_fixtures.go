@@ -8,8 +8,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
-func ExpectedUserContactsPage(t *testing.T) *queries.UserContactsPage {
-	return &queries.UserContactsPage{
+func ExpectedContactsPage(t *testing.T) *queries.ContactsPage {
+	return &queries.ContactsPage{
 		Content: []*response.Contact{
 			{
 				Model: response.Model{

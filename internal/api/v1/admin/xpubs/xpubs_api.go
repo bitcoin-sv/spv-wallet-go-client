@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
 )
@@ -37,18 +38,14 @@ func (a *API) CreateXPub(ctx context.Context, cmd *commands.CreateUserXpub) (*re
 	return &result, nil
 }
 
-func (a *API) XPubs(ctx context.Context, opts ...queries.XPubQueryOption) (*queries.XPubPage, error) {
-	var query queries.XPubQuery
-	for _, o := range opts {
-		o(&query)
-	}
-
+func (a *API) XPubs(ctx context.Context, opts ...queries.QueryOption[filter.XpubFilter]) (*queries.XPubPage, error) {
+	query := queries.NewQuery(opts...)
 	queryBuilder := querybuilders.NewQueryBuilder(
 		querybuilders.WithMetadataFilter(query.Metadata),
 		querybuilders.WithPageFilter(query.PageFilter),
 		querybuilders.WithFilterQueryBuilder(&xpubFilterBuilder{
-			xpubFilter:         query.XpubFilter,
-			modelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.XpubFilter.ModelFilter},
+			xpubFilter:         query.Filter,
+			modelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.Filter.ModelFilter},
 		}),
 	)
 	params, err := queryBuilder.Build()

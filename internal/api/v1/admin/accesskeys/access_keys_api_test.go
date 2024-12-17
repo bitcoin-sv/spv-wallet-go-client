@@ -47,7 +47,7 @@ func TestAccessKeyAPI_AccessKeys(t *testing.T) {
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// when:
-			got, err := wallet.AccessKeys(context.Background(), queries.AdminAccessKeyQueryWithPageFilter(filter.Page{Size: 1}))
+			got, err := wallet.AccessKeys(context.Background(), queries.QueryWithPageFilter[filter.AdminAccessKeyFilter](filter.Page{Size: 1}))
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

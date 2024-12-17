@@ -26,11 +26,11 @@ const (
 func TestContactsAPI_Contacts(t *testing.T) {
 	tests := map[string]struct {
 		responder        httpmock.Responder
-		expectedResponse *queries.UserContactsPage
+		expectedResponse *queries.ContactsPage
 		expectedErr      error
 	}{
 		"HTTP GET /api/v1/contacts response: 200": {
-			expectedResponse: contactstest.ExpectedUserContactsPage(t),
+			expectedResponse: contactstest.ExpectedContactsPage(t),
 			responder:        testutils.NewJSONFileResponderWithStatusOK("contactstest/get_contacts_200.json"),
 		},
 		"HTTP GET /api/v1/contacts response: 400": {

@@ -17,9 +17,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	page, err := adminAPI.Paymails(context.Background(), queries.PaymailQueryWithPageFilter[filter.AdminPaymailFilter](filter.Page{
-		Size: 3,
-	}))
+	page, err := adminAPI.Paymails(context.Background(), queries.QueryWithPageFilter[filter.AdminPaymailFilter](filter.Page{Size: 1}))
 	if err != nil {
 		log.Fatal(err)
 	}

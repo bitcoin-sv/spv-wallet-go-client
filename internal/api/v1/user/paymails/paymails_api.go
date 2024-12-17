@@ -22,18 +22,14 @@ type API struct {
 	httpClient *resty.Client
 }
 
-func (a *API) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption[filter.PaymailFilter]) (*queries.PaymailAddressPage, error) {
-	var query queries.PaymailQuery[filter.PaymailFilter]
-	for _, o := range opts {
-		o(&query)
-	}
-
+func (a *API) Paymails(ctx context.Context, opts ...queries.QueryOption[filter.PaymailFilter]) (*queries.PaymailsPage, error) {
+	query := queries.NewQuery(opts...)
 	queryBuilder := querybuilders.NewQueryBuilder(
 		querybuilders.WithMetadataFilter(query.Metadata),
 		querybuilders.WithPageFilter(query.PageFilter),
 		querybuilders.WithFilterQueryBuilder(&PaymailFilterBuilder{
-			PaymailFilter:      query.PaymailFilter,
-			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.PaymailFilter.ModelFilter},
+			PaymailFilter:      query.Filter,
+			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.Filter.ModelFilter},
 		}),
 	)
 	params, err := queryBuilder.Build()
@@ -41,7 +37,7 @@ func (a *API) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption[f
 		return nil, fmt.Errorf("failed to build paymail address query params: %w", err)
 	}
 
-	var result queries.PaymailAddressPage
+	var result queries.PaymailsPage
 	_, err = a.httpClient.
 		R().
 		SetContext(ctx).

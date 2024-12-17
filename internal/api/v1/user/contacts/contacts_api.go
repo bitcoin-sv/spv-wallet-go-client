@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
 )
@@ -23,19 +24,15 @@ type API struct {
 	httpClient *resty.Client
 }
 
-func (a *API) Contacts(ctx context.Context, opts ...queries.ContactQueryOption) (*queries.UserContactsPage, error) {
-	var query queries.ContactQuery
-	for _, o := range opts {
-		o(&query)
-	}
-
+func (a *API) Contacts(ctx context.Context, opts ...queries.QueryOption[filter.ContactFilter]) (*queries.ContactsPage, error) {
+	query := queries.NewQuery(opts...)
 	queryBuilder := querybuilders.NewQueryBuilder(
 		querybuilders.WithMetadataFilter(query.Metadata),
 		querybuilders.WithPageFilter(query.PageFilter),
 		querybuilders.WithFilterQueryBuilder(&ContactFilterQueryBuilder{
-			ContactFilter: query.ContactFilter,
+			ContactFilter: query.Filter,
 			ModelFilterBuilder: querybuilders.ModelFilterBuilder{
-				ModelFilter: query.ContactFilter.ModelFilter,
+				ModelFilter: query.Filter.ModelFilter,
 			},
 		}),
 	)
@@ -44,7 +41,7 @@ func (a *API) Contacts(ctx context.Context, opts ...queries.ContactQueryOption) 
 		return nil, fmt.Errorf("failed to build user contacts query params: %w", err)
 	}
 
-	var result queries.UserContactsPage
+	var result queries.ContactsPage
 	_, err = a.httpClient.
 		R().
 		SetContext(ctx).

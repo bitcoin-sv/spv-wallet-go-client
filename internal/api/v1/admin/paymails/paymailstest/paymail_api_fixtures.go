@@ -38,8 +38,8 @@ func ExpectedPaymail(t *testing.T) *response.PaymailAddress {
 	}
 }
 
-func ExpectedPaymailsPage(t *testing.T) *queries.PaymailAddressPage {
-	return &queries.PaymailAddressPage{
+func ExpectedPaymailsPage(t *testing.T) *queries.PaymailsPage {
+	return &queries.PaymailsPage{
 		Content: []*response.PaymailAddress{
 			{
 				Model: response.Model{

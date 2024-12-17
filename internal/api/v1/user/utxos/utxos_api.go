@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -21,18 +22,14 @@ type API struct {
 	httpClient *resty.Client
 }
 
-func (a *API) UTXOs(ctx context.Context, opts ...queries.UtxoQueryOption) (*queries.UtxosPage, error) {
-	var query queries.UtxoQuery
-	for _, o := range opts {
-		o(&query)
-	}
-
+func (a *API) UTXOs(ctx context.Context, opts ...queries.QueryOption[filter.UtxoFilter]) (*queries.UtxosPage, error) {
+	query := queries.NewQuery(opts...)
 	queryBuilder := querybuilders.NewQueryBuilder(
 		querybuilders.WithMetadataFilter(query.Metadata),
 		querybuilders.WithPageFilter(query.PageFilter),
 		querybuilders.WithFilterQueryBuilder(&UtxoFilterQueryBuilder{
-			UtxoFilter:         query.UtxoFilter,
-			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.UtxoFilter.ModelFilter},
+			UtxoFilter:         query.Filter,
+			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.Filter.ModelFilter},
 		}),
 	)
 	params, err := queryBuilder.Build()

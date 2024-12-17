@@ -13,7 +13,7 @@ type TransactionFilterBuilder struct {
 	ModelFilterBuilder querybuilders.ModelFilterBuilder
 }
 
-func (t *TransactionFilterBuilder) Build() (url.Values, error) {
+func (t *TransactionFilterBuilder) BuildExtendedURLValues() (*querybuilders.ExtendedURLValues, error) {
 	modelFilterBuilder, err := t.ModelFilterBuilder.Build()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build model filter query params: %w", err)
@@ -34,5 +34,13 @@ func (t *TransactionFilterBuilder) Build() (url.Values, error) {
 	params.AddPair("draftId", t.TransactionFilter.DraftID)
 	params.AddPair("totalValue", t.TransactionFilter.TotalValue)
 	params.AddPair("status", t.TransactionFilter.Status)
+	return params, nil
+}
+
+func (t *TransactionFilterBuilder) Build() (url.Values, error) {
+	params, err := t.BuildExtendedURLValues()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build extended URL values: %w", err)
+	}
 	return params.Values, nil
 }

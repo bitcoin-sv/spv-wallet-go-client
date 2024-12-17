@@ -17,9 +17,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	page, err := adminAPI.XPubs(context.Background(), queries.XPubQueryWithPageFilter(filter.Page{
-		Size: 1,
-	}))
+	page, err := adminAPI.XPubs(context.Background(), queries.QueryWithPageFilter[filter.XpubFilter](filter.Page{Size: 1}))
 	if err != nil {
 		log.Fatal(err)
 	}

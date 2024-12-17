@@ -70,7 +70,7 @@ func (a *AdminAPI) CreateXPub(ctx context.Context, cmd *commands.CreateUserXpub)
 //
 // The API response is unmarshaled into a *queries.XPubPage struct.
 // Returns an error if the API request fails or the response cannot be decoded.
-func (a *AdminAPI) XPubs(ctx context.Context, opts ...queries.XPubQueryOption) (*queries.XPubPage, error) {
+func (a *AdminAPI) XPubs(ctx context.Context, opts ...queries.QueryOption[filter.XpubFilter]) (*queries.XPubPage, error) {
 	res, err := a.xpubsAPI.XPubs(ctx, opts...)
 	if err != nil {
 		return nil, xpubs.HTTPErrorFormatter("retrieve XPubs page", err).FormatGetErr()
@@ -83,9 +83,9 @@ func (a *AdminAPI) XPubs(ctx context.Context, opts ...queries.XPubQueryOption) (
 //
 // The response includes contact data along with pagination details, such as the
 // current page, sort order, and sortBy field. Optional query parameters can be
-// provided using query options. The result is unmarshaled into a *queries.UserContactsPage.
+// provided using query options. The result is unmarshaled into a *queries.ContactsPage.
 // Returns an error if the API request fails or the response cannot be decoded.
-func (a *AdminAPI) Contacts(ctx context.Context, opts ...queries.ContactQueryOption) (*queries.UserContactsPage, error) {
+func (a *AdminAPI) Contacts(ctx context.Context, opts ...queries.QueryOption[filter.ContactFilter]) (*queries.ContactsPage, error) {
 	res, err := a.contactsAPI.Contacts(ctx, opts...)
 	if err != nil {
 		return nil, contacts.HTTPErrorFormatter("retrieve user contacts page", err).FormatGetErr()
@@ -167,7 +167,7 @@ func (a *AdminAPI) RejectInvitation(ctx context.Context, ID string) error {
 // This method allows optional query parameters to be applied via the provided query options.
 // The response is expected to be to unmarshal into a *queries.TransactionPage struct.
 // Returns an error if the request fails or the response cannot be decoded.
-func (a *AdminAPI) Transactions(ctx context.Context, opts ...queries.TransactionsQueryOption) (*queries.TransactionPage, error) {
+func (a *AdminAPI) Transactions(ctx context.Context, opts ...queries.QueryOption[filter.AdminTransactionFilter]) (*queries.TransactionPage, error) {
 	res, err := a.transactionsAPI.Transactions(ctx, opts...)
 	if err != nil {
 		return nil, transactions.HTTPErrorFormatter("retrieve transactions page", err).FormatGetErr()
@@ -196,8 +196,8 @@ func (a *AdminAPI) Transaction(ctx context.Context, ID string) (*response.Transa
 // This method allows optional query parameters to be applied via the provided query options.
 // The response is expected to unmarshal into a *queries.AccessKeyPage struct.
 // Returns an error if the request fails or the response cannot be decoded.
-func (a *AdminAPI) AccessKeys(ctx context.Context, accessKeyOpts ...queries.AdminAccessKeyQueryOption) (*queries.AccessKeyPage, error) {
-	res, err := a.accessKeyAPI.AccessKeys(ctx, accessKeyOpts...)
+func (a *AdminAPI) AccessKeys(ctx context.Context, opts ...queries.QueryOption[filter.AdminAccessKeyFilter]) (*queries.AccessKeyPage, error) {
+	res, err := a.accessKeyAPI.AccessKeys(ctx, opts...)
 	if err != nil {
 		return nil, accesskeys.HTTPErrorFormatter("retrieve access keys page ", err).FormatGetErr()
 	}
@@ -241,7 +241,7 @@ func (a *AdminAPI) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelW
 // Optional query parameters can be applied using the provided query options.
 // The response is unmarshaled into a *queries.UtxosPage struct.
 // Returns an error if the request fails or the response cannot be decoded.
-func (a *AdminAPI) UTXOs(ctx context.Context, opts ...queries.AdminUtxoQueryOption) (*queries.UtxosPage, error) {
+func (a *AdminAPI) UTXOs(ctx context.Context, opts ...queries.QueryOption[filter.AdminUtxoFilter]) (*queries.UtxosPage, error) {
 	res, err := a.utxosAPI.UTXOs(ctx, opts...)
 	if err != nil {
 		return nil, utxos.HTTPErrorFormatter("retrieve utxos page ", err).FormatGetErr()
@@ -257,9 +257,9 @@ func (a *AdminAPI) UTXOs(ctx context.Context, opts ...queries.AdminUtxoQueryOpti
 // Query parameters can be configured using optional query options. These options allow
 // filtering based on metadata, pagination settings, or specific paymail attributes.
 //
-// The API response is unmarshaled into a *queries.PaymailAddressPage struct.
+// The API response is unmarshaled into a *queries.PaymailsPage struct.
 // Returns an error if the API request fails or the response cannot be decoded.
-func (a *AdminAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption[filter.AdminPaymailFilter]) (*queries.PaymailAddressPage, error) {
+func (a *AdminAPI) Paymails(ctx context.Context, opts ...queries.QueryOption[filter.AdminPaymailFilter]) (*queries.PaymailsPage, error) {
 	res, err := a.paymailsAPI.Paymails(ctx, opts...)
 	if err != nil {
 		return nil, paymails.HTTPErrorFormatter("retrieve paymail addresses page", err).FormatGetErr()

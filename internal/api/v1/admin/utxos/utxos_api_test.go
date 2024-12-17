@@ -48,7 +48,7 @@ func TestUtxosAPI_UTXOs(t *testing.T) {
 			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
 
 			// when:
-			got, err := wallet.UTXOs(context.Background(), queries.AdminUtxoQueryWithPageFilter(filter.Page{Size: 1}))
+			got, err := wallet.UTXOs(context.Background(), queries.QueryWithPageFilter[filter.AdminUtxoFilter](filter.Page{Size: 1}))
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

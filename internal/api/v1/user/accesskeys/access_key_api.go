@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/go-resty/resty/v2"
 )
@@ -52,18 +53,14 @@ func (a *API) AccessKey(ctx context.Context, ID string) (*response.AccessKey, er
 	return &result, nil
 }
 
-func (a *API) AccessKeys(ctx context.Context, opts ...queries.AccessKeyQueryOption) (*queries.AccessKeyPage, error) {
-	var query queries.AccessKeyQuery
-	for _, o := range opts {
-		o(&query)
-	}
-
+func (a *API) AccessKeys(ctx context.Context, opts ...queries.QueryOption[filter.AccessKeyFilter]) (*queries.AccessKeyPage, error) {
+	query := queries.NewQuery(opts...)
 	queryBuilder := querybuilders.NewQueryBuilder(
 		querybuilders.WithMetadataFilter(query.Metadata),
 		querybuilders.WithPageFilter(query.PageFilter),
 		querybuilders.WithFilterQueryBuilder(&AccessKeyFilterQueryBuilder{
-			AccessKeyFilter:    query.AccessKeyFilter,
-			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.AccessKeyFilter.ModelFilter},
+			AccessKeyFilter:    query.Filter,
+			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.Filter.ModelFilter},
 		}),
 	)
 	params, err := queryBuilder.Build()

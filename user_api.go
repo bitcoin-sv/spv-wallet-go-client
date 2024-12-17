@@ -54,9 +54,9 @@ type UserAPI struct {
 //
 // The response includes contact data along with pagination details, such as the
 // current page, sort order, and sortBy field. Optional query parameters can be
-// provided using query options. The result is unmarshaled into a *queries.UserContactsPage.
+// provided using query options. The result is unmarshaled into a *queries.ContactsPage.
 // Returns an error if the API request fails or the response cannot be decoded.
-func (u *UserAPI) Contacts(ctx context.Context, contactOpts ...queries.ContactQueryOption) (*queries.UserContactsPage, error) {
+func (u *UserAPI) Contacts(ctx context.Context, contactOpts ...queries.QueryOption[filter.ContactFilter]) (*queries.ContactsPage, error) {
 	res, err := u.contactsAPI.Contacts(ctx, contactOpts...)
 	if err != nil {
 		return nil, contacts.HTTPErrorFormatter("retrieve contacts page", err).FormatGetErr()
@@ -206,7 +206,7 @@ func (u *UserAPI) UpdateTransactionMetadata(ctx context.Context, cmd *commands.U
 // This method allows optional query parameters to be applied via the provided query options.
 // The response is expected to be to unmarshal into a *response.PageModel[response.Transaction] struct.
 // Returns an error if the request fails or the response cannot be decoded.
-func (u *UserAPI) Transactions(ctx context.Context, opts ...queries.TransactionsQueryOption) (*queries.TransactionPage, error) {
+func (u *UserAPI) Transactions(ctx context.Context, opts ...queries.QueryOption[filter.TransactionFilter]) (*queries.TransactionPage, error) {
 	res, err := u.transactionsAPI.Transactions(ctx, opts...)
 	if err != nil {
 		return nil, transactions.HTTPErrorFormatter("retrieve transactions page", err).FormatGetErr()
@@ -299,7 +299,7 @@ func (u *UserAPI) GenerateAccessKey(ctx context.Context, cmd *commands.GenerateA
 // This method allows optional query parameters to be applied via the provided query options.
 // The response is expected to unmarshal into a *queries.AccessKeyPage struct.
 // Returns an error if the request fails or the response cannot be decoded.
-func (u *UserAPI) AccessKeys(ctx context.Context, accessKeyOpts ...queries.AccessKeyQueryOption) (*queries.AccessKeyPage, error) {
+func (u *UserAPI) AccessKeys(ctx context.Context, accessKeyOpts ...queries.QueryOption[filter.AccessKeyFilter]) (*queries.AccessKeyPage, error) {
 	res, err := u.accessKeyAPI.AccessKeys(ctx, accessKeyOpts...)
 	if err != nil {
 		return nil, accesskeys.HTTPErrorFormatter("retrieve access keys page ", err).FormatGetErr()
@@ -341,7 +341,7 @@ func (u *UserAPI) RevokeAccessKey(ctx context.Context, ID string) error {
 // Optional query parameters can be applied using the provided query options.
 // The response is unmarshaled into a *queries.UtxosPage struct.
 // Returns an error if the request fails or the response cannot be decoded.
-func (u *UserAPI) UTXOs(ctx context.Context, opts ...queries.UtxoQueryOption) (*queries.UtxosPage, error) {
+func (u *UserAPI) UTXOs(ctx context.Context, opts ...queries.QueryOption[filter.UtxoFilter]) (*queries.UtxosPage, error) {
 	res, err := u.utxosAPI.UTXOs(ctx, opts...)
 	if err != nil {
 		return nil, utxos.HTTPErrorFormatter("retrieve UTXOs page", err).FormatGetErr()
@@ -417,7 +417,7 @@ func (u *UserAPI) ValidateTotpForContact(contact *models.Contact, passcode, requ
 //
 // The API response is unmarshaled into a *queries.PaymailAddressPage struct.
 // Returns an error if the API request fails or the response cannot be decoded.
-func (u *UserAPI) Paymails(ctx context.Context, opts ...queries.PaymailQueryOption[filter.PaymailFilter]) (*queries.PaymailAddressPage, error) {
+func (u *UserAPI) Paymails(ctx context.Context, opts ...queries.QueryOption[filter.PaymailFilter]) (*queries.PaymailsPage, error) {
 	res, err := u.paymailsAPI.Paymails(ctx, opts...)
 	if err != nil {
 		return nil, paymails.HTTPErrorFormatter("retrieve paymail addresses page", err).FormatGetErr()
