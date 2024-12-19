@@ -8,7 +8,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -25,16 +24,13 @@ type API struct {
 	url        *url.URL
 }
 
-func (a *API) Contacts(ctx context.Context, opts ...queries.QueryOption[filter.ContactFilter]) (*queries.ContactsPage, error) {
+func (a *API) Contacts(ctx context.Context, opts ...queries.QueryOption[filter.AdminContactFilter]) (*queries.ContactsPage, error) {
 	query := queries.NewQuery(opts...)
 	queryBuilder := querybuilders.NewQueryBuilder(
 		querybuilders.WithMetadataFilter(query.Metadata),
 		querybuilders.WithPageFilter(query.PageFilter),
-		querybuilders.WithFilterQueryBuilder(&contacts.ContactFilterQueryBuilder{
-			ContactFilter: query.Filter,
-			ModelFilterBuilder: querybuilders.ModelFilterBuilder{
-				ModelFilter: query.Filter.ModelFilter,
-			},
+		querybuilders.WithFilterQueryBuilder(&adminContactFilterBuilder{
+			contactFilter: query.Filter,
 		}),
 	)
 	params, err := queryBuilder.Build()

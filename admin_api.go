@@ -85,7 +85,7 @@ func (a *AdminAPI) XPubs(ctx context.Context, opts ...queries.QueryOption[filter
 // current page, sort order, and sortBy field. Optional query parameters can be
 // provided using query options. The result is unmarshaled into a *queries.ContactsPage.
 // Returns an error if the API request fails or the response cannot be decoded.
-func (a *AdminAPI) Contacts(ctx context.Context, opts ...queries.QueryOption[filter.ContactFilter]) (*queries.ContactsPage, error) {
+func (a *AdminAPI) Contacts(ctx context.Context, opts ...queries.QueryOption[filter.AdminContactFilter]) (*queries.ContactsPage, error) {
 	res, err := a.contactsAPI.Contacts(ctx, opts...)
 	if err != nil {
 		return nil, contacts.HTTPErrorFormatter("retrieve user contacts page", err).FormatGetErr()

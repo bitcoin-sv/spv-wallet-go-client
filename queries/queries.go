@@ -62,7 +62,7 @@ func QueryWithFilter[F QueryFilters](f F) QueryOption[F] {
 // AdminQueryFilters aggregates the supported query filter types used for constructing query parameters
 // for SPV Wallet API admin search endpoints.
 type AdminQueryFilters interface {
-	filter.AdminAccessKeyFilter | filter.AdminUtxoFilter | filter.AdminPaymailFilter | filter.XpubFilter | filter.AdminTransactionFilter
+	filter.AdminAccessKeyFilter | filter.AdminUtxoFilter | filter.AdminPaymailFilter | filter.XpubFilter | filter.AdminTransactionFilter | filter.AdminContactFilter
 }
 
 // NonAdminQueryFilters aggregates the supported query filter types used for constructing query parameters

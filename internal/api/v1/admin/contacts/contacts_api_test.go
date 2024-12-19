@@ -54,7 +54,7 @@ func TestContactsAPI_Contacts(t *testing.T) {
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// then:
-			got, err := wallet.Contacts(context.Background(), queries.QueryWithPageFilter[filter.ContactFilter](filter.Page{Size: 1}))
+			got, err := wallet.Contacts(context.Background(), queries.QueryWithPageFilter[filter.AdminContactFilter](filter.Page{Size: 1}))
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})

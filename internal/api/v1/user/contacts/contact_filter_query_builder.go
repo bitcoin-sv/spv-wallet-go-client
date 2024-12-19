@@ -13,7 +13,7 @@ type ContactFilterQueryBuilder struct {
 	ContactFilter      filter.ContactFilter
 }
 
-func (c *ContactFilterQueryBuilder) Build() (url.Values, error) {
+func (c *ContactFilterQueryBuilder) BuildExtendedURLValues() (*querybuilders.ExtendedURLValues, error) {
 	modelFilterBuilder, err := c.ModelFilterBuilder.Build()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build model filter query params: %w", err)
@@ -29,5 +29,13 @@ func (c *ContactFilterQueryBuilder) Build() (url.Values, error) {
 	params.AddPair("paymail", c.ContactFilter.Paymail)
 	params.AddPair("pubKey", c.ContactFilter.PubKey)
 	params.AddPair("status", c.ContactFilter.Status)
+	return params, nil
+}
+
+func (c *ContactFilterQueryBuilder) Build() (url.Values, error) {
+	params, err := c.BuildExtendedURLValues()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build extended URL values: %w", err)
+	}
 	return params.Values, nil
 }
