@@ -1060,8 +1060,8 @@ func (wc *WalletClient) AdminRecordTransaction(ctx context.Context, hex string) 
 }
 
 // AdminGetContacts executes an HTTP POST request to search for contacts based on specified conditions, metadata, and query parameters.
-func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions *filter.ContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, error) {
-	return Search[filter.ContactFilter, *models.SearchContactsResponse](
+func (wc *WalletClient) AdminGetContacts(ctx context.Context, conditions *filter.AdminContactFilter, metadata map[string]any, queryParams *filter.QueryParams) (*models.SearchContactsResponse, error) {
+	return Search[filter.AdminContactFilter, *models.SearchContactsResponse](
 		ctx, http.MethodPost,
 		"/admin/contact/search",
 		wc.adminXPriv,
