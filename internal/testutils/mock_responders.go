@@ -28,6 +28,16 @@ func NewBadRequestSPVErrorResponder() httpmock.Responder {
 	return httpmock.NewJsonResponderOrPanic(http.StatusBadRequest, NewBadRequestSPVError())
 }
 
+// NewResourceNotFoundSPVErrorResponder returns a new SPVError object with status code 404.
+func NewResourceNotFoundSPVErrorResponder() httpmock.Responder {
+	return httpmock.NewJsonResponderOrPanic(http.StatusNotFound, NewResourceNotFoundSPVError())
+}
+
+// NewConflictRequestSPVErrorResponder returns a new SPVError object with status code 409.
+func NewConflictRequestSPVErrorResponder() httpmock.Responder {
+	return httpmock.NewJsonResponderOrPanic(http.StatusConflict, NewConflictRequestSPVError())
+}
+
 // NewInternalServerSPVErrorResponder returns a new SPVError object with status code 500
 func NewInternalServerSPVErrorResponder() httpmock.Responder {
 	return httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, NewInternalServerSPVError())

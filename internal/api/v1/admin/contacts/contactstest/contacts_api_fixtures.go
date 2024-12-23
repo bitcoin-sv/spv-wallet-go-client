@@ -23,6 +23,20 @@ func ExpectedUpdatedUserContact(t *testing.T) *response.Contact {
 	}
 }
 
+func ExpectedCreatedContact(t *testing.T) *response.Contact {
+	return &response.Contact{
+		Model: response.Model{
+			CreatedAt: testutils.ParseTime(t, "2024-12-23T08:31:14.66249+01:00"),
+			UpdatedAt: testutils.ParseTime(t, "2024-12-23T07:31:14.661618Z"),
+		},
+		ID:       "649da615-4442-4bcb-8d0c-612d35c841a8",
+		FullName: "John Doe",
+		Paymail:  "john.doe@test.4chain.space",
+		PubKey:   "4ccd70d0-d809-4aa8-98e9-76aa6bdd6017",
+		Status:   "unconfirmed",
+	}
+}
+
 func ExpectedContactsPage(t *testing.T) *queries.ContactsPage {
 	return &queries.ContactsPage{
 		Content: []*response.Contact{

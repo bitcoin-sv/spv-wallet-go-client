@@ -22,6 +22,57 @@ const (
 	id          = "4d570959-dd85-4f53-bad1-18d0671761e9"
 )
 
+func TestContactsAPI_CreateContact(t *testing.T) {
+	paymail := "john.doe@test.4chain.space"
+	tests := map[string]struct {
+		responder        httpmock.Responder
+		expectedResponse *response.Contact
+		expectedErr      error
+	}{
+		fmt.Sprintf("HTTP POST /api/v1/admin/contacts/%s response: 200", paymail): {
+			expectedResponse: contactstest.ExpectedCreatedContact(t),
+			responder:        testutils.NewJSONFileResponderWithStatusOK("contactstest/post_contact_200.json"),
+		},
+		fmt.Sprintf("HTTP POST /api/v1/admin/contacts/%s response: 400", paymail): {
+			expectedErr: testutils.NewBadRequestSPVError(),
+			responder:   testutils.NewBadRequestSPVErrorResponder(),
+		},
+		fmt.Sprintf("HTTP POST /api/v1/admin/contacts/%s response: 404", paymail): {
+			expectedErr: testutils.NewResourceNotFoundSPVError(),
+			responder:   testutils.NewResourceNotFoundSPVErrorResponder(),
+		},
+		fmt.Sprintf("HTTP POST /api/v1/admin/contacts/%s response: 409", paymail): {
+			expectedErr: testutils.NewConflictRequestSPVError(),
+			responder:   testutils.NewConflictRequestSPVErrorResponder(),
+		},
+		fmt.Sprintf("HTTP POST /api/v1/admin/contacts/%s response: 500", paymail): {
+			expectedErr: testutils.NewInternalServerSPVError(),
+			responder:   testutils.NewInternalServerSPVErrorResponder(),
+		},
+		fmt.Sprintf("HTTP POST /api/v1/admin/contacts/%s response: 500", paymail): {
+			expectedErr: errors.ErrUnrecognizedAPIResponse,
+			responder:   testutils.NewInternalServerSPVErrorStringResponder("unexpected internal server failure"),
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// when:
+			wallet, transport := testutils.GivenSPVAdminAPI(t)
+			transport.RegisterResponder(http.MethodPost, contactsURL+"/"+paymail, tc.responder)
+
+			// then:
+			got, err := wallet.CreateContact(context.Background(), &commands.CreateContact{
+				CreatorPaymail: "admin@test.4chain.space",
+				Paymail:        paymail,
+				FullName:       "John Doe",
+			})
+			require.ErrorIs(t, err, tc.expectedErr)
+			require.EqualValues(t, tc.expectedResponse, got)
+		})
+	}
+}
+
 func TestContactsAPI_Contacts(t *testing.T) {
 	tests := map[string]struct {
 		responder        httpmock.Responder
@@ -103,7 +154,6 @@ func TestContactsAPI_ConfirmContacts(t *testing.T) {
 }
 
 func TestContactsAPI_ContactUpdate(t *testing.T) {
-
 	tests := map[string]struct {
 		responder        httpmock.Responder
 		expectedResponse *response.Contact
@@ -147,7 +197,6 @@ func TestContactsAPI_ContactUpdate(t *testing.T) {
 }
 
 func TestContactsAPI_DeleteContact(t *testing.T) {
-
 	tests := map[string]struct {
 		responder   httpmock.Responder
 		expectedErr error

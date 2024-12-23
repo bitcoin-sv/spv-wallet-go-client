@@ -16,6 +16,26 @@ func NewBadRequestSPVError() models.SPVError {
 	}
 }
 
+// NewConflictRequestSPVError returns an example SPV error returned by SPV Wallet API to indicate
+// a request conflict with the current state of the target resource.
+func NewConflictRequestSPVError() models.SPVError {
+	return models.SPVError{
+		Code:       models.UnknownErrorCode,
+		Message:    http.StatusText(http.StatusConflict),
+		StatusCode: http.StatusConflict,
+	}
+}
+
+// NewResourceNotFoundSPVError returns an example SPV error returned by SPV Wallet API to indicate
+// that the server cannot find the requested resource.
+func NewResourceNotFoundSPVError() models.SPVError {
+	return models.SPVError{
+		Code:       models.UnknownErrorCode,
+		Message:    http.StatusText(http.StatusNotFound),
+		StatusCode: http.StatusNotFound,
+	}
+}
+
 // NewUnauthorizedAccessSPVError creates a new SPVError for unauthorized access
 func NewUnauthorizedAccessSPVError() models.SPVError {
 	return models.SPVError{

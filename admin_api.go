@@ -79,6 +79,24 @@ func (a *AdminAPI) XPubs(ctx context.Context, opts ...queries.QueryOption[filter
 	return res, nil
 }
 
+// CreateContact creates a new contact record via the Admin Contacts API.
+// It accepts a command containing the necessary parameters to define the contact record,
+// such as the creator's paymail, contact's full name, paymail and any associated metadata.
+//
+// The method sends a request to the Contacts API to create the contact, and the API
+// response is unmarshaled into a *response.Contact struct, representing the newly created contact.
+//
+// If the API request fails or the response cannot be decoded, an error is returned. The error is
+// wrapped with additional context to assist in troubleshooting.
+func (a *AdminAPI) CreateContact(ctx context.Context, cmd *commands.CreateContact) (*response.Contact, error) {
+	res, err := a.contactsAPI.CreateContact(ctx, cmd)
+	if err != nil {
+		return nil, contacts.HTTPErrorFormatter("create user contacts page", err).FormatPostErr()
+	}
+
+	return res, nil
+}
+
 // Contacts retrieves a paginated list of user contacts from the admin contacts API.
 //
 // The response includes contact data along with pagination details, such as the
