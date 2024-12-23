@@ -16,7 +16,7 @@ import (
 
 const (
 	route = "api/v1/admin/users"
-	api   = "Admin Users XPub API"
+	api   = "Admin XPub API"
 )
 
 type API struct {

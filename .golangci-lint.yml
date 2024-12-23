@@ -118,6 +118,11 @@ issues:
         - wrapcheck
         - bodyclose
 
+    # Exclude unsued issues after adding build integration tag.
+    - path: regression_tests
+      linters:
+        - unused
+
     # Exclude known linters from partially "hard-vendored" code,
     # which is impossible to exclude via "nolint" comments.
     - path: internal/hmac/
