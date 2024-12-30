@@ -1,5 +1,5 @@
-github.com/bitcoin-sv/go-sdk v1.1.16 h1:n2X0RiENFGD/1fQ/1y6osbostRB7I/xq9I7tcIKcCPY=
-github.com/bitcoin-sv/go-sdk v1.1.16/go.mod h1:3CsNdEDBwB+SIv6UBcJPC9bTvPqxQvg3GULt7wsuL58=
+github.com/bitcoin-sv/go-sdk v1.1.17 h1:AMMAR4RP5ucq2AdVZcmHFQKwRBB7jrTJocxQDfDDeqE=
+github.com/bitcoin-sv/go-sdk v1.1.17/go.mod h1:3CsNdEDBwB+SIv6UBcJPC9bTvPqxQvg3GULt7wsuL58=
 github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.39 h1:qo74o72mcdj7AYJoCq7RG3enHJiqtbkFEY9uXvEEG2M=
 github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.39/go.mod h1:UdY5AGsO9IomUEYSPilcSY+3BTQRJswdfZNveLt6LZQ=
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
