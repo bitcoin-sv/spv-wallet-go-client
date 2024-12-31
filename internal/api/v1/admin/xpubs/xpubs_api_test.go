@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/xpubs/xpubstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -89,11 +90,25 @@ func TestXPubsAPI_XPubs(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
+			opts := []queries.QueryOption[filter.XpubFilter]{
+				queries.QueryWithPageFilter[filter.XpubFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.XpubFilter{
+					ModelFilter: filter.ModelFilter{
+						IncludeDeleted: testutils.Ptr(true),
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
 
 			// when:
-			got, err := wallet.XPubs(context.Background())
+			got, err := wallet.XPubs(context.Background(), opts...)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

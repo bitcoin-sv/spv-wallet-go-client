@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 	paymail, err := adminAPI.CreatePaymail(ctx, &commands.CreatePaymail{
 		Key:      examples.XPub,
 		Address:  exampleutil.RandomPaymail(),
-		Metadata: querybuilders.Metadata{"key": "value"},
+		Metadata: queryparams.Metadata{"key": "value"},
 	})
 	if err != nil {
 		log.Fatal(err)

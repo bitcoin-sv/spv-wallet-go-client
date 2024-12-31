@@ -7,7 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -55,15 +55,12 @@ func (a *API) AccessKey(ctx context.Context, ID string) (*response.AccessKey, er
 
 func (a *API) AccessKeys(ctx context.Context, opts ...queries.QueryOption[filter.AccessKeyFilter]) (*queries.AccessKeyPage, error) {
 	query := queries.NewQuery(opts...)
-	queryBuilder := querybuilders.NewQueryBuilder(
-		querybuilders.WithMetadataFilter(query.Metadata),
-		querybuilders.WithPageFilter(query.PageFilter),
-		querybuilders.WithFilterQueryBuilder(&AccessKeyFilterQueryBuilder{
-			AccessKeyFilter:    query.Filter,
-			ModelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.Filter.ModelFilter},
-		}),
-	)
-	params, err := queryBuilder.Build()
+	parser, err := queryparams.NewQueryParser(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize query parser: %w", err)
+	}
+
+	params, err := parser.Parse()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build access keys query params: %w", err)
 	}

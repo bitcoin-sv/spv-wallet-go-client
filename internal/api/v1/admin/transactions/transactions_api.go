@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -38,11 +38,12 @@ func (a *API) Transaction(ctx context.Context, ID string) (*response.Transaction
 
 func (a *API) Transactions(ctx context.Context, opts ...queries.QueryOption[filter.AdminTransactionFilter]) (*queries.TransactionPage, error) {
 	query := queries.NewQuery(opts...)
-	queryBuilder := querybuilders.NewQueryBuilder(querybuilders.WithMetadataFilter(query.Metadata),
-		querybuilders.WithPageFilter(query.PageFilter),
-		querybuilders.WithFilterQueryBuilder(&adminTransactionFilterQueryBuilder{transactionFilter: query.Filter}),
-	)
-	params, err := queryBuilder.Build()
+	parser, err := queryparams.NewQueryParser(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize query parser: %w", err)
+	}
+
+	params, err := parser.Parse()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create transactions query params: %w", err)
 	}

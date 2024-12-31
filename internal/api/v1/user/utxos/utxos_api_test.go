@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/utxos/utxostest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
@@ -43,11 +44,25 @@ func TestUTXOAPI_UTXOs(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
+			opts := []queries.QueryOption[filter.UtxoFilter]{
+				queries.QueryWithPageFilter[filter.UtxoFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.UtxoFilter{
+					ModelFilter: filter.ModelFilter{
+						IncludeDeleted: testutils.Ptr(true),
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
 			wallet, transport := testutils.GivenSPVUserAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
 
 			// when:
-			got, err := wallet.UTXOs(context.Background())
+			got, err := wallet.UTXOs(context.Background(), opts...)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

@@ -1,17 +1,17 @@
-package querybuilders_test
+package queryparams_test
 
 import (
 	"net/url"
 	"testing"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/stretchr/testify/require"
 )
 
-func TestExtendedURLValues_AddPair(t *testing.T) {
+func TestURLValues_AddPair(t *testing.T) {
 	// given:
 	to := testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z")
 	from := testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z")
@@ -27,7 +27,7 @@ func TestExtendedURLValues_AddPair(t *testing.T) {
 	}
 
 	// when:
-	params := querybuilders.NewExtendedURLValues()
+	params := queryparams.NewURLValues()
 	params.AddPair("key1", "str")
 	params.AddPair("key2", 1)
 	params.AddPair("key3", testutils.Ptr("str_ptr"))
@@ -43,7 +43,7 @@ func TestExtendedURLValues_AddPair(t *testing.T) {
 	require.EqualValues(t, expectedValues, params.Values)
 }
 
-func TestExtendedURLValues_ParseToMap(t *testing.T) {
+func TestURLValues_ParseToMap(t *testing.T) {
 	// given:
 	to := testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z")
 	from := testutils.ParseTime(t, "2024-10-07T14:03:26.736816Z")
@@ -58,7 +58,7 @@ func TestExtendedURLValues_ParseToMap(t *testing.T) {
 		"key7[to]":   to.Format(time.RFC3339),
 	}
 
-	params := querybuilders.NewExtendedURLValues()
+	params := queryparams.NewURLValues()
 	params.AddPair("key1", "str")
 	params.AddPair("key2", 1)
 	params.AddPair("key3", testutils.Ptr("str_ptr"))

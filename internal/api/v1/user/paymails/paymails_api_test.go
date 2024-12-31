@@ -43,12 +43,28 @@ func TestPaymailsAPI_Paymails(t *testing.T) {
 	url := testutils.FullAPIURL(t, paymailsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
+			opts := []queries.QueryOption[filter.PaymailFilter]{
+				queries.QueryWithPageFilter[filter.PaymailFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.PaymailFilter{
+					ModelFilter: filter.ModelFilter{
+						IncludeDeleted: testutils.Ptr(true),
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
 			wallet, transport := testutils.GivenSPVUserAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
+
+			// when:
+			got, err := wallet.Paymails(context.Background(), opts...)
 
 			// then:
-			got, err := wallet.Paymails(context.Background(), queries.QueryWithPageFilter[filter.PaymailFilter](filter.Page{Size: 1}))
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})

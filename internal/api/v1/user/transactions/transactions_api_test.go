@@ -8,9 +8,11 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/transactions/transactionstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
+	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -28,13 +30,13 @@ func TestTransactionsAPI_SendToRecipients(t *testing.T) {
 
 	t.Run("SendToRecipients success", func(t *testing.T) {
 		// given:
-		spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+		wallet, transport := testutils.GivenSPVUserAPI(t)
 		transport.RegisterResponder(http.MethodPost, drafTransactionURL, testutils.NewJSONFileResponderWithStatusOK("transactionstest/transaction_draft_with_hex_200.json"))
 		transport.RegisterResponder(http.MethodPost, recordTransactionURL, testutils.NewJSONFileResponderWithStatusOK("transactionstest/transaction_send_to_recipients_200.json"))
 		ctx := context.Background()
 
 		// when:
-		result, err := spvWalletClient.SendToRecipients(ctx, &commands.SendToRecipients{
+		result, err := wallet.SendToRecipients(ctx, &commands.SendToRecipients{
 			Recipients: []*commands.Recipients{
 				{
 					OpReturn: opReturn,
@@ -49,12 +51,12 @@ func TestTransactionsAPI_SendToRecipients(t *testing.T) {
 
 	t.Run("SendToRecipients - DraftToRecipients error", func(t *testing.T) {
 		// given:
-		spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+		wallet, transport := testutils.GivenSPVUserAPI(t)
 		transport.RegisterResponder(http.MethodPost, drafTransactionURL, testutils.NewBadRequestSPVErrorResponder())
 		ctx := context.Background()
 
 		// when:
-		result, err := spvWalletClient.SendToRecipients(ctx, &commands.SendToRecipients{
+		result, err := wallet.SendToRecipients(ctx, &commands.SendToRecipients{
 			Recipients: []*commands.Recipients{
 				{
 					OpReturn: opReturn,
@@ -69,12 +71,12 @@ func TestTransactionsAPI_SendToRecipients(t *testing.T) {
 
 	t.Run("SendToRecipients - FinalizeTransaction error", func(t *testing.T) {
 		// given:
-		spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+		wallet, transport := testutils.GivenSPVUserAPI(t)
 		transport.RegisterResponder(http.MethodPost, drafTransactionURL, testutils.NewJSONBodyResponderWithStatusOK(transactionstest.ExpectedDraftTransactionWithWrongHex(t)))
 		ctx := context.Background()
 
 		// when:
-		result, err := spvWalletClient.SendToRecipients(ctx, &commands.SendToRecipients{
+		result, err := wallet.SendToRecipients(ctx, &commands.SendToRecipients{
 			Recipients: []*commands.Recipients{
 				{
 					OpReturn: opReturn,
@@ -89,13 +91,13 @@ func TestTransactionsAPI_SendToRecipients(t *testing.T) {
 
 	t.Run("SendToRecipients - RecordTransaction error", func(t *testing.T) {
 		// given:
-		spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+		wallet, transport := testutils.GivenSPVUserAPI(t)
 		transport.RegisterResponder(http.MethodPost, drafTransactionURL, testutils.NewJSONFileResponderWithStatusOK("transactionstest/transaction_draft_with_hex_200.json"))
 		transport.RegisterResponder(http.MethodPost, recordTransactionURL, testutils.NewBadRequestSPVErrorResponder())
 		ctx := context.Background()
 
 		// when:
-		result, err := spvWalletClient.SendToRecipients(ctx, &commands.SendToRecipients{
+		result, err := wallet.SendToRecipients(ctx, &commands.SendToRecipients{
 			Recipients: []*commands.Recipients{
 				{
 					OpReturn: opReturn,
@@ -106,7 +108,6 @@ func TestTransactionsAPI_SendToRecipients(t *testing.T) {
 		// then:
 		require.ErrorIs(t, err, testutils.NewBadRequestSPVError())
 		require.Nil(t, result)
-
 	})
 }
 
@@ -137,17 +138,16 @@ func TestTransactionsAPI_FinalizeTransaction(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			//given:
-			spvWalletClient, _ := testutils.GivenSPVUserAPI(t)
+			wallet, _ := testutils.GivenSPVUserAPI(t)
 
 			//when:
-			hex, err := spvWalletClient.FinalizeTransaction(tc.draft)
+			hex, err := wallet.FinalizeTransaction(tc.draft)
 
 			//then:
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.Equal(t, tc.expectedHex, hex)
 		})
 	}
-
 }
 
 func TestTransactionsAPI_UpdateTransactionMetadata(t *testing.T) {
@@ -179,13 +179,13 @@ func TestTransactionsAPI_UpdateTransactionMetadata(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPatch, url, tc.responder)
 
 			// when:
-			got, err := spvWalletClient.UpdateTransactionMetadata(context.Background(), &commands.UpdateTransactionMetadata{
+			got, err := wallet.UpdateTransactionMetadata(context.Background(), &commands.UpdateTransactionMetadata{
 				ID: id,
-				Metadata: querybuilders.Metadata{
+				Metadata: queryparams.Metadata{
 					"example_key1": "example_key10_val",
 					"example_key2": "example_key20_val",
 				},
@@ -226,11 +226,11 @@ func TestTransactionsAPI_RecordTransaction(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			// when:
-			got, err := spvWalletClient.RecordTransaction(context.Background(), &commands.RecordTransaction{})
+			got, err := wallet.RecordTransaction(context.Background(), &commands.RecordTransaction{})
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
@@ -267,11 +267,11 @@ func TestTransactionsAPI_DraftTransaction(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 
 			// when:
-			got, err := spvWalletClient.DraftTransaction(context.Background(), &commands.DraftTransaction{
+			got, err := wallet.DraftTransaction(context.Background(), &commands.DraftTransaction{
 				Config:   response.TransactionConfig{},
 				Metadata: map[string]any{},
 			})
@@ -312,11 +312,11 @@ func TestTransactionsAPI_Transaction(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// when:
-			got, err := spvWalletClient.Transaction(context.Background(), id)
+			got, err := wallet.Transaction(context.Background(), id)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
@@ -353,11 +353,25 @@ func TestTransactionsAPI_Transactions(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			opts := []queries.QueryOption[filter.TransactionFilter]{
+				queries.QueryWithPageFilter[filter.TransactionFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.TransactionFilter{
+					ModelFilter: filter.ModelFilter{
+						IncludeDeleted: testutils.Ptr(true),
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
+			wallet, transport := testutils.GivenSPVUserAPI(t)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
 
 			// when:
-			got, err := spvWalletClient.Transactions(context.Background())
+			got, err := wallet.Transactions(context.Background(), opts...)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

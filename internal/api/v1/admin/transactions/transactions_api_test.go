@@ -9,6 +9,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/transactions/transactionstest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
+	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -20,7 +22,6 @@ const (
 )
 
 func TestTransactionsAPI_Transaction(t *testing.T) {
-
 	tests := map[string]struct {
 		responder        httpmock.Responder
 		expectedResponse *response.Transaction
@@ -48,11 +49,11 @@ func TestTransactionsAPI_Transaction(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := testutils.GivenSPVAdminAPI(t)
+			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
 			// when:
-			got, err := spvWalletClient.Transaction(context.Background(), id)
+			got, err := wallet.Transaction(context.Background(), id)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
@@ -89,11 +90,27 @@ func TestTransactionsAPI_Transactions(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := testutils.GivenSPVAdminAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			opts := []queries.QueryOption[filter.AdminTransactionFilter]{
+				queries.QueryWithPageFilter[filter.AdminTransactionFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.AdminTransactionFilter{
+					TransactionFilter: filter.TransactionFilter{
+						ModelFilter: filter.ModelFilter{
+							IncludeDeleted: testutils.Ptr(true),
+						},
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
+			wallet, transport := testutils.GivenSPVAdminAPI(t)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
 
 			// when:
-			got, err := spvWalletClient.Transactions(context.Background())
+			got, err := wallet.Transactions(context.Background(), opts...)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

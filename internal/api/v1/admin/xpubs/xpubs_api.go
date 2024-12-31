@@ -7,7 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -40,15 +40,12 @@ func (a *API) CreateXPub(ctx context.Context, cmd *commands.CreateUserXpub) (*re
 
 func (a *API) XPubs(ctx context.Context, opts ...queries.QueryOption[filter.XpubFilter]) (*queries.XPubPage, error) {
 	query := queries.NewQuery(opts...)
-	queryBuilder := querybuilders.NewQueryBuilder(
-		querybuilders.WithMetadataFilter(query.Metadata),
-		querybuilders.WithPageFilter(query.PageFilter),
-		querybuilders.WithFilterQueryBuilder(&xpubFilterBuilder{
-			xpubFilter:         query.Filter,
-			modelFilterBuilder: querybuilders.ModelFilterBuilder{ModelFilter: query.Filter.ModelFilter},
-		}),
-	)
-	params, err := queryBuilder.Build()
+	parser, err := queryparams.NewQueryParser(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize query parser: %w", err)
+	}
+
+	params, err := parser.Parse()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build user xpubs query params: %w", err)
 	}

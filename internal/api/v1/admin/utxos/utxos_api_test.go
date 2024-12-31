@@ -40,15 +40,31 @@ func TestUtxosAPI_UTXOs(t *testing.T) {
 		},
 	}
 
-	URL := testutils.FullAPIURL(t, utxosURL)
+	url := testutils.FullAPIURL(t, utxosURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
+			opts := []queries.QueryOption[filter.AdminUtxoFilter]{
+				queries.QueryWithPageFilter[filter.AdminUtxoFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.AdminUtxoFilter{
+					UtxoFilter: filter.UtxoFilter{
+						ModelFilter: filter.ModelFilter{
+							IncludeDeleted: testutils.Ptr(true),
+						},
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
-			transport.RegisterResponder(http.MethodGet, URL, tc.responder)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
 
 			// when:
-			got, err := wallet.UTXOs(context.Background(), queries.QueryWithPageFilter[filter.AdminUtxoFilter](filter.Page{Size: 1}))
+			got, err := wallet.UTXOs(context.Background(), opts...)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

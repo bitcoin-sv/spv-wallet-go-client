@@ -57,16 +57,18 @@ func TestContactsAPI_CreateContact(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodPost, contactsURL+"/"+paymail, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.CreateContact(context.Background(), &commands.CreateContact{
 				CreatorPaymail: "admin@test.4chain.space",
 				Paymail:        paymail,
 				FullName:       "John Doe",
 			})
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
@@ -100,12 +102,30 @@ func TestContactsAPI_Contacts(t *testing.T) {
 	url := testutils.FullAPIURL(t, contactsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
+			opts := []queries.QueryOption[filter.AdminContactFilter]{
+				queries.QueryWithPageFilter[filter.AdminContactFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.AdminContactFilter{
+					ContactFilter: filter.ContactFilter{
+						ModelFilter: filter.ModelFilter{
+							IncludeDeleted: testutils.Ptr(true),
+						},
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
+
+			// when:
+			got, err := wallet.Contacts(context.Background(), opts...)
 
 			// then:
-			got, err := wallet.Contacts(context.Background(), queries.QueryWithPageFilter[filter.AdminContactFilter](filter.Page{Size: 1}))
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
@@ -180,16 +200,18 @@ func TestContactsAPI_ContactUpdate(t *testing.T) {
 	url := testutils.FullAPIURL(t, contactsURL, id)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodPut, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.ContactUpdate(context.Background(), &commands.UpdateContact{
 				ID:       id,
 				FullName: "John Doe Williams",
 				Metadata: map[string]any{"phoneNumber": "123456789"},
 			})
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
@@ -221,12 +243,14 @@ func TestContactsAPI_DeleteContact(t *testing.T) {
 	url := testutils.FullAPIURL(t, contactsURL, id)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
-			// then:
+			// when:
 			err := wallet.DeleteContact(context.Background(), id)
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
 		})
 	}

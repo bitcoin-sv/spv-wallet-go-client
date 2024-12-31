@@ -7,7 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -41,14 +41,12 @@ func (a *API) CreateContact(ctx context.Context, cmd *commands.CreateContact) (*
 
 func (a *API) Contacts(ctx context.Context, opts ...queries.QueryOption[filter.AdminContactFilter]) (*queries.ContactsPage, error) {
 	query := queries.NewQuery(opts...)
-	queryBuilder := querybuilders.NewQueryBuilder(
-		querybuilders.WithMetadataFilter(query.Metadata),
-		querybuilders.WithPageFilter(query.PageFilter),
-		querybuilders.WithFilterQueryBuilder(&adminContactFilterBuilder{
-			contactFilter: query.Filter,
-		}),
-	)
-	params, err := queryBuilder.Build()
+	parser, err := queryparams.NewQueryParser(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize query parser: %w", err)
+	}
+
+	params, err := parser.Parse()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build admin contacts query params: %w", err)
 	}

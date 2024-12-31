@@ -43,11 +43,27 @@ func TestAccessKeyAPI_AccessKeys(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
+			opts := []queries.QueryOption[filter.AdminAccessKeyFilter]{
+				queries.QueryWithPageFilter[filter.AdminAccessKeyFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.AdminAccessKeyFilter{
+					AccessKeyFilter: filter.AccessKeyFilter{
+						ModelFilter: filter.ModelFilter{
+							IncludeDeleted: testutils.Ptr(true),
+						},
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
 
 			// when:
-			got, err := wallet.AccessKeys(context.Background(), queries.QueryWithPageFilter[filter.AdminAccessKeyFilter](filter.Page{Size: 1}))
+			got, err := wallet.AccessKeys(context.Background(), opts...)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

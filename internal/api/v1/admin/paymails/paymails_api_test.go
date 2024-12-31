@@ -50,12 +50,14 @@ func TestPaymailsAPI_DeletePaymail(t *testing.T) {
 	url := testutils.FullAPIURL(t, paymailsURL, xpubID)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
-			// then:
+			// when:
 			err := wallet.DeletePaymail(context.Background(), xpubID)
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
 		})
 	}
@@ -88,14 +90,16 @@ func TestPaymailsAPI_CreatePaymail(t *testing.T) {
 	url := testutils.FullAPIURL(t, paymailsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodPost, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.CreatePaymail(context.Background(), &commands.CreatePaymail{
 				Key: xpubID,
 			})
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
@@ -129,12 +133,30 @@ func TestPaymailsAPI_Paymails(t *testing.T) {
 	url := testutils.FullAPIURL(t, paymailsURL)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
+			opts := []queries.QueryOption[filter.AdminPaymailFilter]{
+				queries.QueryWithPageFilter[filter.AdminPaymailFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.AdminPaymailFilter{
+					PaymailFilter: filter.PaymailFilter{
+						ModelFilter: filter.ModelFilter{
+							IncludeDeleted: testutils.Ptr(true),
+						},
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
+
+			// when:
+			got, err := wallet.Paymails(context.Background(), opts...)
 
 			// then:
-			got, err := wallet.Paymails(context.Background(), queries.QueryWithPageFilter[filter.AdminPaymailFilter](filter.Page{Size: 1}))
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})
@@ -142,7 +164,6 @@ func TestPaymailsAPI_Paymails(t *testing.T) {
 }
 
 func TestPaymailsAPI_Paymail(t *testing.T) {
-
 	tests := map[string]struct {
 		responder        httpmock.Responder
 		expectedResponse *response.PaymailAddress
@@ -169,12 +190,14 @@ func TestPaymailsAPI_Paymail(t *testing.T) {
 	url := testutils.FullAPIURL(t, paymailsURL, id)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			// when:
+			// given:
 			wallet, transport := testutils.GivenSPVAdminAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 
-			// then:
+			// when:
 			got, err := wallet.Paymail(context.Background(), id)
+
+			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
 			require.EqualValues(t, tc.expectedResponse, got)
 		})

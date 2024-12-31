@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 
 	xPub, err := adminAPI.CreateXPub(context.Background(), &commands.CreateUserXpub{
 		XPub:     "1c318ad8-5ee4-42d3-9cf5-5b0babec9156",
-		Metadata: querybuilders.Metadata{"key": "value"},
+		Metadata: queryparams.Metadata{"key": "value"},
 	})
 	if err != nil {
 		log.Fatal(err)

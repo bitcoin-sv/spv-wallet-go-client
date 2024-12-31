@@ -367,13 +367,13 @@ func NewAdminAPIWithXPriv(cfg config.Config, xPriv string) (*AdminAPI, error) {
 	return initAdminAPI(cfg, authenticator)
 }
 
-// NewAdminWithXPub initializes a new AdminAPI instance using an extended public key (xPub).
+// NewAdminAPIWithXPub initializes a new AdminAPI instance using an extended public key (xPub).
 // This function configures the API client with the provided configuration and uses the xPub key for authentication.
 // If any configuration or initialization step fails, an appropriate error is returned.
 //
 // Note: Requests made with this instance will not be signed.
 // For enhanced security, it is strongly recommended to use `NewAdminAPIWithXPriv` instead.
-func NewAdminWithXPub(cfg config.Config, xPub string) (*AdminAPI, error) {
+func NewAdminAPIWithXPub(cfg config.Config, xPub string) (*AdminAPI, error) {
 	authenticator, err := auth.NewXpubOnlyAuthenticator(xPub)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize xPub authenticator: %w", err)

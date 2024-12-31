@@ -8,7 +8,7 @@ import (
 
 	goclienterr "github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/querybuilders"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
@@ -39,14 +39,12 @@ func (a *API) MerkleRoots(ctx context.Context, merkleRootOpts ...queries.MerkleR
 		o(&query)
 	}
 
-	queryBuilder := querybuilders.NewQueryBuilder(querybuilders.WithFilterQueryBuilder(&merkleRootsFilterQueryBuilder{query: query}))
-	params, err := queryBuilder.Build()
-	if err != nil {
-		return nil, fmt.Errorf("failed to build merkle roots query params: %w", err)
-	}
+	params := queryparams.NewURLValues()
+	params.AddPair("batchSize", query.BatchSize)
+	params.AddPair("lastEvaluatedKey", query.LastEvaluatedKey)
 
 	var result queries.MerkleRootPage
-	_, err = a.httpClient.R().
+	_, err := a.httpClient.R().
 		SetContext(ctx).
 		SetResult(&result).
 		SetQueryParams(params.ParseToMap()).

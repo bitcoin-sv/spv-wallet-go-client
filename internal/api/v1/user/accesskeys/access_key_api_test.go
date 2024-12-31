@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/accesskeys/accesskeystest"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -65,7 +66,6 @@ func TestAccessKeyAPI_GenerateAccessKey(t *testing.T) {
 }
 
 func TestAccessKeyAPI_AccessKey(t *testing.T) {
-
 	tests := map[string]struct {
 		responder        httpmock.Responder
 		expectedResponse *response.AccessKey
@@ -134,11 +134,25 @@ func TestAccessKeyAPI_AccessKeys(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
+			opts := []queries.QueryOption[filter.AccessKeyFilter]{
+				queries.QueryWithPageFilter[filter.AccessKeyFilter](filter.Page{
+					Number: 1,
+					Size:   1,
+					Sort:   "asc",
+					SortBy: "key",
+				}),
+				queries.QueryWithFilter(filter.AccessKeyFilter{
+					ModelFilter: filter.ModelFilter{
+						IncludeDeleted: testutils.Ptr(true),
+					},
+				}),
+			}
+			params := "page=1&size=1&sort=asc&sortBy=key&includeDeleted=true"
 			wallet, transport := testutils.GivenSPVUserAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
 
 			// when:
-			got, err := wallet.AccessKeys(context.Background())
+			got, err := wallet.AccessKeys(context.Background(), opts...)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

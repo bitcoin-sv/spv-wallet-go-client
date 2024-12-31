@@ -44,11 +44,16 @@ func TestMerkleRootsAPI_MerkleRoots(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
-			transport.RegisterResponder(http.MethodGet, url, tc.responder)
+			opts := []queries.MerkleRootsQueryOption{
+				queries.MerkleRootsQueryWithBatchSize(1),
+				queries.MerkleRootsQueryWithLastEvaluatedKey("key"),
+			}
+			params := "batchSize=1&lastEvaluatedKey=key"
+			wallet, transport := testutils.GivenSPVUserAPI(t)
+			transport.RegisterResponderWithQuery(http.MethodGet, url, params, tc.responder)
 
 			// when:
-			got, err := spvWalletClient.MerkleRoots(context.Background())
+			got, err := wallet.MerkleRoots(context.Background(), opts...)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
@@ -57,7 +62,6 @@ func TestMerkleRootsAPI_MerkleRoots(t *testing.T) {
 	}
 }
 
-// TestSyncMerkleRoots tests the SyncMerkleRoots functionality
 func TestMerkleRootsAPI_SyncMerkleRoots(t *testing.T) {
 	tests := map[string]struct {
 		responder   httpmock.Responder
@@ -95,13 +99,14 @@ func TestMerkleRootsAPI_SyncMerkleRoots(t *testing.T) {
 			// given:
 			mockRepo := new(testutils.MockMerkleRootsRepository)
 			httpmock.Activate()
+
 			defer httpmock.DeactivateAndReset()
-			spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+			wallet, transport := testutils.GivenSPVUserAPI(t)
 			transport.RegisterResponder(http.MethodGet, url, tc.responder)
 			tc.setupMock(mockRepo)
 
 			// when:
-			err := spvWalletClient.SyncMerkleRoots(context.Background(), mockRepo)
+			err := wallet.SyncMerkleRoots(context.Background(), mockRepo)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)
@@ -113,7 +118,7 @@ func TestMerkleRootsAPI_SyncMerkleRoots_PartialResponsesStoredSuccessfully(t *te
 	// given:
 	db := merklerootstest.CreateRepository([]models.MerkleRoot{})
 	url := testutils.FullAPIURL(t, merkleRootsURL)
-	spvWalletClient, transport := testutils.GivenSPVUserAPI(t)
+	wallet, transport := testutils.GivenSPVUserAPI(t)
 
 	var expected []models.MerkleRoot
 	expected = append(expected, merklerootstest.FirstMerkleRootsPage().Content...)
@@ -123,7 +128,7 @@ func TestMerkleRootsAPI_SyncMerkleRoots_PartialResponsesStoredSuccessfully(t *te
 	transport.RegisterResponder(http.MethodGet, url, merklerootstest.ResponderWithThreeMerkleRootPagesSuccess(t))
 
 	// when:
-	err := spvWalletClient.SyncMerkleRoots(context.Background(), db)
+	err := wallet.SyncMerkleRoots(context.Background(), db)
 
 	// then:
 	require.NoError(t, err)
