@@ -8,8 +8,8 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/configs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/accesskeys"
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/configs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/contacts"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/invitations"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/user/merkleroots"
@@ -149,7 +149,7 @@ func (u *UserAPI) RejectInvitation(ctx context.Context, paymail string) error {
 	return nil
 }
 
-// SharedConfig retrieves the shared configuration via the user configurations API.
+// SharedConfig retrieves the shared configuration via the configurations API.
 // The response is unmarshaled into a response.SharedConfig.
 // Returns an error if the request fails or the response cannot be decoded.
 func (u *UserAPI) SharedConfig(ctx context.Context) (*response.SharedConfig, error) {

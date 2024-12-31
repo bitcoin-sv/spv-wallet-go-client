@@ -12,7 +12,7 @@ import (
 
 const (
 	route = "api/v1/configs"
-	api   = "User Shared Config API"
+	api   = "Shared Config API"
 )
 
 type API struct {

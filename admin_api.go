@@ -17,6 +17,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/utxos"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/webhooks"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/xpubs"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/configs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
@@ -35,6 +36,7 @@ import (
 // Methods may return wrapped errors, including models.SPVError or
 // ErrUnrecognizedAPIResponse, depending on the behavior of the SPV Wallet API.
 type AdminAPI struct {
+	configsAPI      *configs.API
 	xpubsAPI        *xpubs.API
 	paymailsAPI     *paymails.API
 	accessKeyAPI    *accesskeys.API
@@ -45,6 +47,18 @@ type AdminAPI struct {
 	webhooksAPI     *webhooks.API
 	statusAPI       *status.API
 	statsAPI        *stats.API
+}
+
+// SharedConfig retrieves the shared configuration via the configurations API.
+// The response is unmarshaled into a response.SharedConfig.
+// Returns an error if the request fails or the response cannot be decoded.
+func (a *AdminAPI) SharedConfig(ctx context.Context) (*response.SharedConfig, error) {
+	res, err := a.configsAPI.SharedConfig(ctx)
+	if err != nil {
+		return nil, configs.HTTPErrorFormatter("retrieve shared configuration", err).FormatGetErr()
+	}
+
+	return res, nil
 }
 
 // CreateXPub creates a new XPub record via the Admin XPubs API.
@@ -394,6 +408,7 @@ func initAdminAPI(cfg config.Config, auth authenticator) (*AdminAPI, error) {
 	}
 
 	return &AdminAPI{
+		configsAPI:      configs.NewAPI(url, httpClient),
 		paymailsAPI:     paymails.NewAPI(url, httpClient),
 		transactionsAPI: transactions.NewAPI(url, httpClient),
 		xpubsAPI:        xpubs.NewAPI(url, httpClient),
