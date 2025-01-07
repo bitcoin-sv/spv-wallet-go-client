@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -50,12 +49,4 @@ func (a *API) UTXOs(ctx context.Context, opts ...queries.QueryOption[filter.Admi
 
 func NewAPI(url *url.URL, httpClient *resty.Client) *API {
 	return &API{url: url.JoinPath(route), httpClient: httpClient}
-}
-
-func HTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {
-	return &errutil.HTTPErrorFormatter{
-		Action: action,
-		API:    api,
-		Err:    err,
-	}
 }

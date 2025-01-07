@@ -18,7 +18,9 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/webhooks"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/admin/xpubs"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/configs"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/constants"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -55,7 +57,7 @@ type AdminAPI struct {
 func (a *AdminAPI) SharedConfig(ctx context.Context) (*response.SharedConfig, error) {
 	res, err := a.configsAPI.SharedConfig(ctx)
 	if err != nil {
-		return nil, configs.HTTPErrorFormatter("retrieve shared configuration", err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminSharedConfigAPI, "retrieve shared configuration", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -69,7 +71,7 @@ func (a *AdminAPI) SharedConfig(ctx context.Context) (*response.SharedConfig, er
 func (a *AdminAPI) CreateXPub(ctx context.Context, cmd *commands.CreateUserXpub) (*response.Xpub, error) {
 	res, err := a.xpubsAPI.CreateXPub(ctx, cmd)
 	if err != nil {
-		return nil, xpubs.HTTPErrorFormatter("create XPub", err).FormatPostErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminXPubsAPI, "create XPub", err).FormatPostErr()
 	}
 
 	return res, nil
@@ -87,7 +89,7 @@ func (a *AdminAPI) CreateXPub(ctx context.Context, cmd *commands.CreateUserXpub)
 func (a *AdminAPI) XPubs(ctx context.Context, opts ...queries.QueryOption[filter.XpubFilter]) (*queries.XPubPage, error) {
 	res, err := a.xpubsAPI.XPubs(ctx, opts...)
 	if err != nil {
-		return nil, xpubs.HTTPErrorFormatter("retrieve XPubs page", err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminXPubsAPI, "retrieve XPubs page", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -105,7 +107,7 @@ func (a *AdminAPI) XPubs(ctx context.Context, opts ...queries.QueryOption[filter
 func (a *AdminAPI) CreateContact(ctx context.Context, cmd *commands.CreateContact) (*response.Contact, error) {
 	res, err := a.contactsAPI.CreateContact(ctx, cmd)
 	if err != nil {
-		return nil, contacts.HTTPErrorFormatter("create user contacts page", err).FormatPostErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminContactsAPI, "create user contacts page", err).FormatPostErr()
 	}
 
 	return res, nil
@@ -120,7 +122,7 @@ func (a *AdminAPI) CreateContact(ctx context.Context, cmd *commands.CreateContac
 func (a *AdminAPI) Contacts(ctx context.Context, opts ...queries.QueryOption[filter.AdminContactFilter]) (*queries.ContactsPage, error) {
 	res, err := a.contactsAPI.Contacts(ctx, opts...)
 	if err != nil {
-		return nil, contacts.HTTPErrorFormatter("retrieve user contacts page", err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminContactsAPI, "retrieve user contacts page", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -136,7 +138,7 @@ func (a *AdminAPI) ContactUpdate(ctx context.Context, cmd *commands.UpdateContac
 	res, err := a.contactsAPI.UpdateContact(ctx, cmd)
 	if err != nil {
 		msg := fmt.Sprintf("update contact with ID: %s", cmd.ID)
-		return nil, contacts.HTTPErrorFormatter(msg, err).FormatPutErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminContactsAPI, msg, err).FormatPutErr()
 	}
 
 	return res, nil
@@ -149,7 +151,7 @@ func (a *AdminAPI) DeleteContact(ctx context.Context, ID string) error {
 	err := a.contactsAPI.DeleteContact(ctx, ID)
 	if err != nil {
 		msg := fmt.Sprintf("delete contact with ID: %s", ID)
-		return contacts.HTTPErrorFormatter(msg, err).FormatDeleteErr()
+		return errutil.NewHTTPErrorFormatter(constants.AdminContactsAPI, msg, err).FormatDeleteErr()
 	}
 
 	return nil
@@ -162,7 +164,7 @@ func (a *AdminAPI) ConfirmContacts(ctx context.Context, cmd *commands.ConfirmCon
 	err := a.contactsAPI.ConfirmContacts(ctx, cmd)
 	if err != nil {
 		msg := fmt.Sprintf("confirm contacts: %s & %s", cmd.PaymailA, cmd.PaymailB)
-		return contacts.HTTPErrorFormatter(msg, err).FormatPostErr()
+		return errutil.NewHTTPErrorFormatter(constants.AdminContactsAPI, msg, err).FormatPostErr()
 	}
 
 	return nil
@@ -174,7 +176,7 @@ func (a *AdminAPI) AcceptInvitation(ctx context.Context, ID string) error {
 	err := a.invitationsAPI.AcceptInvitation(ctx, ID)
 	if err != nil {
 		msg := fmt.Sprintf("accept invitation with ID: %s", ID)
-		return invitations.HTTPErrorFormatter(msg, err).FormatDeleteErr()
+		return errutil.NewHTTPErrorFormatter(constants.AdminInvitationsAPI, msg, err).FormatDeleteErr()
 	}
 
 	return nil
@@ -186,7 +188,7 @@ func (a *AdminAPI) RejectInvitation(ctx context.Context, ID string) error {
 	err := a.invitationsAPI.RejectInvitation(ctx, ID)
 	if err != nil {
 		msg := fmt.Sprintf("delete invitation with ID: %s", ID)
-		return invitations.HTTPErrorFormatter(msg, err).FormatDeleteErr()
+		return errutil.NewHTTPErrorFormatter(constants.AdminInvitationsAPI, msg, err).FormatDeleteErr()
 	}
 
 	return nil
@@ -202,7 +204,7 @@ func (a *AdminAPI) RejectInvitation(ctx context.Context, ID string) error {
 func (a *AdminAPI) Transactions(ctx context.Context, opts ...queries.QueryOption[filter.AdminTransactionFilter]) (*queries.TransactionPage, error) {
 	res, err := a.transactionsAPI.Transactions(ctx, opts...)
 	if err != nil {
-		return nil, transactions.HTTPErrorFormatter("retrieve transactions page", err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminTransactionsAPI, "retrieve transactions page", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -215,7 +217,7 @@ func (a *AdminAPI) Transaction(ctx context.Context, ID string) (*response.Transa
 	res, err := a.transactionsAPI.Transaction(ctx, ID)
 	if err != nil {
 		msg := fmt.Sprintf("retrieve a transaction with ID: %s", ID)
-		return nil, transactions.HTTPErrorFormatter(msg, err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminTransactionsAPI, msg, err).FormatGetErr()
 	}
 
 	return res, nil
@@ -231,7 +233,7 @@ func (a *AdminAPI) Transaction(ctx context.Context, ID string) (*response.Transa
 func (a *AdminAPI) AccessKeys(ctx context.Context, opts ...queries.QueryOption[filter.AdminAccessKeyFilter]) (*queries.AccessKeyPage, error) {
 	res, err := a.accessKeyAPI.AccessKeys(ctx, opts...)
 	if err != nil {
-		return nil, accesskeys.HTTPErrorFormatter("retrieve access keys page ", err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminAccessKeyAPI, "retrieve access keys page ", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -246,7 +248,7 @@ func (a *AdminAPI) SubscribeWebhook(ctx context.Context, cmd *commands.CreateWeb
 	err := a.webhooksAPI.SubscribeWebhook(ctx, cmd)
 	if err != nil {
 		msg := fmt.Sprintf("subscribe webhook URL address: %s", cmd.URL)
-		return webhooks.HTTPErrorFormatter(msg, err).FormatPostErr()
+		return errutil.NewHTTPErrorFormatter(constants.AdminWebhooksAPI, msg, err).FormatPostErr()
 	}
 
 	return nil
@@ -260,7 +262,7 @@ func (a *AdminAPI) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelW
 	err := a.webhooksAPI.UnsubscribeWebhook(ctx, cmd)
 	if err != nil {
 		msg := fmt.Sprintf("unsubscribe webhook URL address: %s", cmd.URL)
-		return webhooks.HTTPErrorFormatter(msg, err).FormatDeleteErr()
+		return errutil.NewHTTPErrorFormatter(constants.AdminWebhooksAPI, msg, err).FormatDeleteErr()
 	}
 
 	return nil
@@ -276,7 +278,7 @@ func (a *AdminAPI) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelW
 func (a *AdminAPI) UTXOs(ctx context.Context, opts ...queries.QueryOption[filter.AdminUtxoFilter]) (*queries.UtxosPage, error) {
 	res, err := a.utxosAPI.UTXOs(ctx, opts...)
 	if err != nil {
-		return nil, utxos.HTTPErrorFormatter("retrieve utxos page ", err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminUtxosAPI, "retrieve utxos page ", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -294,7 +296,7 @@ func (a *AdminAPI) UTXOs(ctx context.Context, opts ...queries.QueryOption[filter
 func (a *AdminAPI) Paymails(ctx context.Context, opts ...queries.QueryOption[filter.AdminPaymailFilter]) (*queries.PaymailsPage, error) {
 	res, err := a.paymailsAPI.Paymails(ctx, opts...)
 	if err != nil {
-		return nil, paymails.HTTPErrorFormatter("retrieve paymail addresses page", err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminPaymailAPI, "retrieve paymail addresses page", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -307,7 +309,7 @@ func (a *AdminAPI) Paymail(ctx context.Context, ID string) (*response.PaymailAdd
 	res, err := a.paymailsAPI.Paymail(ctx, ID)
 	if err != nil {
 		msg := fmt.Sprintf("retrieve paymail address with ID: %s", ID)
-		return nil, paymails.HTTPErrorFormatter(msg, err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminPaymailAPI, msg, err).FormatGetErr()
 	}
 
 	return res, nil
@@ -321,7 +323,7 @@ func (a *AdminAPI) Paymail(ctx context.Context, ID string) (*response.PaymailAdd
 func (a *AdminAPI) CreatePaymail(ctx context.Context, cmd *commands.CreatePaymail) (*response.PaymailAddress, error) {
 	res, err := a.paymailsAPI.CreatePaymail(ctx, cmd)
 	if err != nil {
-		return nil, paymails.HTTPErrorFormatter("create paymail address", err).FormatPostErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminPaymailAPI, "create paymail address", err).FormatPostErr()
 	}
 
 	return res, nil
@@ -334,7 +336,7 @@ func (a *AdminAPI) DeletePaymail(ctx context.Context, address string) error {
 	err := a.paymailsAPI.DeletePaymail(ctx, address)
 	if err != nil {
 		msg := fmt.Sprintf("remove paymail address: %s", address)
-		return paymails.HTTPErrorFormatter(msg, err).FormatGetErr()
+		return errutil.NewHTTPErrorFormatter(constants.AdminPaymailAPI, msg, err).FormatGetErr()
 	}
 
 	return nil
@@ -348,7 +350,7 @@ func (a *AdminAPI) DeletePaymail(ctx context.Context, address string) error {
 func (a *AdminAPI) Stats(ctx context.Context) (*models.AdminStats, error) {
 	res, err := a.statsAPI.Stats(ctx)
 	if err != nil {
-		return nil, stats.HTTPErrorFormatter("retrieve stats", err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminStatsAPI, "retrieve stats", err).FormatGetErr()
 	}
 
 	return res, nil
@@ -361,7 +363,7 @@ func (a *AdminAPI) Stats(ctx context.Context) (*models.AdminStats, error) {
 func (a *AdminAPI) Status(ctx context.Context) (bool, error) {
 	ok, err := a.statusAPI.Status(ctx)
 	if err != nil {
-		return false, status.HTTPErrorFormatter("retrieve information about the used key type: %w", err).FormatGetErr()
+		return false, errutil.NewHTTPErrorFormatter(constants.AdminStatusAPI, "retrieve information about the used key type: %w", err).FormatGetErr()
 	}
 
 	return ok, nil

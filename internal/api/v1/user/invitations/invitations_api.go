@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/errutil"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -47,13 +46,5 @@ func NewAPI(url *url.URL, httpClient *resty.Client) *API {
 	return &API{
 		url:        url.JoinPath(route),
 		httpClient: httpClient,
-	}
-}
-
-func HTTPErrorFormatter(action string, err error) *errutil.HTTPErrorFormatter {
-	return &errutil.HTTPErrorFormatter{
-		Action: action,
-		API:    api,
-		Err:    err,
 	}
 }
