@@ -1,11 +1,11 @@
-# Qucik Guide
+# Quick Guide
 
 In this directory you can find bunch of examples describing how to use
 the wallet client package during interaction wit the SPV Wallet API.
 
 1. [Before you run](#before-you-run)
-1. [Authorization](#authroization)
-1. [How to run example](#how-to-run-an-example)
+1. [Authorization](#authorization)
+1. [Getting Started with the Project](#getting-started-with-the-project)
 
 ## Before you run
 
@@ -21,51 +21,38 @@ the wallet client package during interaction wit the SPV Wallet API.
 ```
 task: [default] task --list
 task: Available tasks for this project:
-* create-paymail-as-admin:                Create a paymail address.
-* default:                                Display all available tasks.
-* delete-paymail-as-admin:                Delete paymail address.
-* fetch-paymail-as-admin:                 Fetch paymail with a given address.
-* fetch-paymails-as-admin:                Fetch paymails page.
-* accept-invitation-as-admin:             Accept invitation with a given ID as Admin.
-* create-xpub-as-admin:                   Create xPub as Admin.
-* default:                                Display all available tasks.
-* delete-contact-as-admin:                Delete contact with a given ID as Admin.
-* fetch-contacts-as-admin:                Fetch contacts page as Admin.
-* fetch-user-contact-by-paymail:          Fetch user contact by given paymail.
-* fetch-user-contacts:                    Fetch user contacts page.
-* fetch-user-merkleroots:                 Fetch user Merkle roots page.
-* fetch-user-shared-config:               Fetch user shared configuration.
-* fetch-user-transaction:                 Fetch user transaction with a given ID.
-* fetch-user-transactions:                Fetch user transactions page.
-* fetch-user-utxos:                       Fetch user UTXOs page.
-* fetch-user-xpub:                        Fetch current authorized user's xpub info.
-* fetch-xpubs-as-admin:                   Fetch xPubs page as Admin.
-* generate-keys:                          Generate keys for SPV Wallet API access.
-* reject-invitation-as-admin:             Reject invitation with a given ID as Admin.
-* update-contact-as-admin:                Update contact with a given ID as Admin.
-* user-contact-confirmation:              Confirm user contact with a given paymail address.
-* user-contact-remove:                    Remove user contact with a given paymail address.
-* user-contact-unconfirm:                 Unconfirm user contact with a given paymail address.
-* user-contact-upsert:                    Upsert user contact with a given paymail address.
-* user-draft-transaction:                 Create a user draft transaction.
-* user-invitation-accept:                 Accept user contact invitation with a given paymail address.
-* user-invitation-reject:                 Reject user contact invitation with a given paymail address.
-* user-transaction-metadata-update:       Update user transaction metadata with a given ID.
-* user-xpub-metadata:                     Update current authorized user's xpub metadata.
-* send-op-return:                         Sends an OP_RETURN transaction.
+* access_key:                      Fetch Access key as User.
+* admin_add_user:                  Add user as Admin.
+* admin_remove_paymail:            Remove paymail as Admin.
+* create_transaction:              Create transaction as User.
+* default:                         Display all available tasks.
+* generate_keys:                   Generate keys for SPV Wallet API access.
+* generate_totp:                   Generate totp.
+* get_balance:                     Get balance as User.
+* get_shared_config:               Get shared config as User.
+* list_access_keys:                Fetch first page of access keys as User.
+* list_transactions:               Fetch first page of transactions as User.
+* send_op_return:                  Create draft transaction, finalize transaction and record transaction as User.
+* sync_merkleroots:                Sync Merkle roots as User.
+* update_user_xpub_metadata:       Update xPub metadata as User.
+* xpriv_from_mnemonic:             Extract xPriv from mnemonic.
+* xpub_from_xpriv:                 Extract xPub from xPriv.
 ```
 
-## Authroization
+## Authorization
 
 > [!CAUTION]
 > Don't use the keys which are already added to another wallet.
 
 > [!IMPORTANT]
-> Additionally, to make it work properly, you should adjust the `ExamplePaymail` to align with your `domains` configuration in the `spv-wallet` instance.
+> Additionally, to make it work properly, you should adjust the `Paymail` to align with your `domains` configuration in the `spv-wallet` instance.
+
+> [!IMPORTANT]
+> `Paymail` is defined in example_keys.go file. 
 
 Before interacting with the SPV Wallet API, you must complete the authorization process.
 
-To begin, generate a pair of keys using the `task generate-keys` command, which is included in the dedicated Taskfile.
+To begin, generate a pair of keys using the `task generate_keys` command, which is included in the dedicated Taskfile.
 
 **Example output:**
 
@@ -100,7 +87,7 @@ import (
 )
 
 func main() {
- xPriv := "121d2f43-4261-42ab-813e-3d3fa4d87313"
+ xPriv := "xprv1d77e47e-452c-453f-bc4c-a42748f8145f"
  cfg := wallet.NewDefaultConfig("http://localhost:3003")
  userAPI, err := wallet.NewUserAPIWithXPriv(cfg, xPriv)
  if err != nil {
@@ -151,7 +138,51 @@ XPub
 }
 ```
 
-## How to run an example
+## Getting Started with the Project
+
+To help you fully utilize this project, we've outlined a series of steps and important tips to guide you through the process.
+
+## Preliminary Setup
+
+> [!TIP]
+> For the best experience, we recommend transferring some funds to your Paymail. This allows the examples to demonstrate key functionality, such as creating transactions with an actual balance. 
+
+You can transfer funds to your Paymail using any Bitcoin SV wallet application that supports Paymail, such as **HandCash** or similar applications.
+
+> [!IMPORTANT]
+> The following terms are defined in the `example_keys.go` file:
+> - **Paymail**
+> - **UserXPub**
+
+Ensure that this file is configured appropriately before running the examples.
+
+## Recommended Order of Examples
+
+1. **`generate_keys`**  
+   Generates new keys. If you want to use these keys in subsequent examples, you can copy them to the `example_keys.go` file.
+
+2. **`admin_add_user`**  
+   Adds a new user to the wallet. Specifically, it registers the **UserXPub** and associates a **Paymail**.
+
+3. **`get_balance`**  
+   Retrieves the current balance for the user. If you've transferred funds to your Paymail, the balance will be displayed here.
+
+4. **`create_transaction`**  
+   Creates a transaction. You can customize the outputs to suit your specific requirements.
+
+5. **`list_transactions`**  
+   Lists all transactions. This includes examples of filtering options.
+
+6. **`send_op_return`**  
+   Sends an OP_RETURN transaction, allowing you to attach data to the blockchain.
+
+7. **`admin_remove_paymail`**  
+   Removes the user by deleting their Paymail from the wallet.
+
+
+## Next Steps
+
+Follow the steps in the suggested order to gain a comprehensive understanding of the project's functionality. If you encounter any issues or have questions, refer to the documentation or reach out for support.
 
 The examples are written in Go and can be run by:
 

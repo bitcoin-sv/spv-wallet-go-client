@@ -37,7 +37,7 @@ type KeysWithMnemonic struct {
 func (k *KeysWithMnemonic) Mnemonic() string { return k.mnemonic }
 
 // XPrivFromString generates an extended private key (xPriv) from a string.
-// It returns the extended private key and an error if the conversion fails.
+// It returns the nil extended private key and an error if the conversion fails.
 func XPrivFromString(s string) (*bip32.ExtendedKey, error) {
 	xPriv, err := bip32.NewKeyFromString(s)
 	if err != nil {
@@ -45,6 +45,22 @@ func XPrivFromString(s string) (*bip32.ExtendedKey, error) {
 	}
 
 	return xPriv, nil
+}
+
+// XPubFromXPriv derives an extended public key (xPub) from the provided xPriv string.
+// Returns an empty string and an error if the conversion fails.
+func XPubFromXPriv(s string) (string, error) {
+	xPriv, err := XPrivFromString(s)
+	if err != nil {
+		return "", fmt.Errorf("failed to get xPriv from string: %w", err)
+	}
+
+	key, err := xPriv.Neuter()
+	if err != nil {
+		return "", fmt.Errorf("failed to return the extedned public key: %w", err)
+	}
+
+	return key.String(), nil
 }
 
 // XPrivFromMnemonic generates an extended private key (xPriv) from a mnemonic phrase.

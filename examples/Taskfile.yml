@@ -6,7 +6,39 @@ tasks:
       - task --list
     desc: "Display all available tasks."
 
-  generate-keys:
+  access_key:
+    desc: "Fetch Access key as User."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./access_key/access_key.go
+      - echo "=================================================================="
+
+  admin_add_user:
+    desc: "Add user as Admin."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./admin_add_user/admin_add_user.go
+      - echo "=================================================================="
+
+  admin_remove_paymail:
+    desc: "Remove paymail as Admin."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./admin_remove_paymail/admin_remove_paymail.go
+      - echo "=================================================================="
+
+  create_transaction:
+    desc: "Create transaction as User."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./create_transaction/create_transaction.go
+      - echo "=================================================================="
+
+  generate_keys:
     desc: "Generate keys for SPV Wallet API access."
     silent: true
     cmds:
@@ -14,175 +46,82 @@ tasks:
       - go run ../walletkeys/cmd/main.go
       - echo "=================================================================="
 
-  fetch-paymails-as-admin:
-    desc: "Fetch paymails page."
+  generate_totp:
+    desc: "Generate totp."
     silent: true
     cmds:
-      - go run ./fetch_paymails_as_admin/fetch_paymails_as_admin.go
+      - echo "=================================================================="
+      - go run ./generate_totp/generate_totp.go
+      - echo "=================================================================="
 
-  fetch-paymail-as-admin:
-    desc: "Fetch paymail with a given address."
+  get_balance:
+    desc: "Get balance as User."
     silent: true
     cmds:
-      - go run ./fetch_paymail_as_admin/fetch_paymail_as_admin.go
+      - echo "=================================================================="
+      - go run ./get_balance/get_balance.go
+      - echo "=================================================================="
 
-  create-paymail-as-admin:
-    desc: "Create a paymail address."
+  get_shared_config:
+    desc: "Get shared config as User."
     silent: true
     cmds:
-      - go run ./create_paymail_as_admin/create_paymail_as_admin.go
+      - echo "=================================================================="
+      - go run ./get_shared_config/get_shared_config.go
+      - echo "=================================================================="
 
-  delete-paymail-as-admin:
-    desc: "Delete paymail address."
+  list_access_keys:
+    desc: "Fetch first page of access keys as User."
     silent: true
     cmds:
-      - go run ./delete_paymail_as_admin/delete_paymail_as_admin.go
-  accept-invitation-as-admin:
-    desc: "Accept invitation with a given ID as Admin."
-    silent: true
-    cmds:
-      - go run ./accept_invitation_as_admin/accept_invitation_as_admin.go
+      - echo "=================================================================="
+      - go run ./list_access_keys/list_access_keys.go
+      - echo "=================================================================="
 
-  reject-invitation-as-admin:
-    desc: "Reject invitation with a given ID as Admin."
+  list_transactions:
+    desc: "Fetch first page of transactions as User."
     silent: true
     cmds:
-      - go run ./reject_invitation_as_admin/reject_invitation_as_admin.go
+      - echo "=================================================================="
+      - go run ./list_transactions/list_transactions.go
+      - echo "=================================================================="
 
-  fetch-contacts-as-admin:
-    desc: "Fetch contacts page as Admin."
+  send_op_return:
+    desc: "Create draft transaction, finalize transaction and record transaction as User."
     silent: true
     cmds:
-      - go run ./fetch_contacts_as_admin/fetch_contacts_as_admin.go
-
-  update-contact-as-admin:
-    desc: "Update contact with a given ID as Admin."
-    silent: true
-    cmds:
-      - go run ./update_contact_as_admin/update_contact_as_admin.go
-
-  delete-contact-as-admin:
-    desc: "Delete contact with a given ID as Admin."
-    silent: true
-    cmds:
-      - go run ./delete_contact_as_admin/delete_contact_as_admin.go
-
-  fetch-xpubs-as-admin:
-    desc: "Fetch xPubs page as Admin."
-    silent: true
-    cmds:
-      - go run ./fetch_xpubs_as_admin/fetch_xpubs_as_admin.go
-
-  create-xpub-as-admin:
-    desc: "Create xPub as Admin."
-    silent: true
-    cmds:
-      - go run ./create_xpub_as_admin/create_xpub_as_admin.go
-
-  fetch-user-shared-config:
-    desc: "Fetch user shared configuration."
-    silent: true
-    cmds:
-      - go run ./fetch_shared_config/fetch_shared_config.go
-
-  fetch-user-merkleroots:
-    desc: "Fetch user Merkle roots page."
-    silent: true
-    cmds:
-      - go run ./fetch_merkleroots/fetch_merkleroots.go
-
-  fetch-user-contacts:
-    desc: "Fetch user contacts page."
-    silent: true
-    cmds:
-      - go run ./fetch_contacts/fetch_contacts.go
-
-  fetch-user-contact-by-paymail:
-    desc: "Fetch user contact by given paymail."
-    silent: true
-    cmds:
-      - go run ./fetch_contact_by_paymail/fetch_contact_by_paymail.go
-
-  user-contact-confirmation:
-    desc: "Confirm user contact with a given paymail address."
-    silent: true
-    cmds:
-      - go run ./contact_confirmation/contact_confirmation.go
-
-  user-contact-unconfirm:
-    desc: "Unconfirm user contact with a given paymail address."
-    silent: true
-    cmds:
-      - go run ./unconfirm_contact/unconfirm_contact.go
-
-  user-contact-remove:
-    desc: "Remove user contact with a given paymail address."
-    silent: true
-    cmds:
-      - go run ./contact_remove/contact_remove.go
-
-  user-contact-upsert:
-    desc: "Upsert user contact with a given paymail address."
-    silent: true
-    cmds:
-      - go run ./contact_upsert/contact_upsert.go
-
-  user-invitation-accept:
-    desc: "Accept user contact invitation with a given paymail address."
-    silent: true
-    cmds:
-      - go run ./accept_invitation/accept_invitation.go
-
-  user-invitation-reject:
-    desc: "Reject user contact invitation with a given paymail address."
-    silent: true
-    cmds:
-      - go run ./reject_invitation/reject_invitation.go
-
-  fetch-user-transactions:
-    desc: "Fetch user transactions page."
-    silent: true
-    cmds:
-      - go run ./fetch_transactions/fetch_transactions.go
-
-  fetch-user-transaction:
-    desc: "Fetch user transaction with a given ID."
-    silent: true
-    cmds:
-      - go run ./fetch_transaction/fetch_transaction.go
-
-  user-draft-transaction:
-    desc: "Create a user draft transaction."
-    silent: true
-    cmds:
-      - go run ./draft_transaction/draft_transaction.go
-
-  user-transaction-metadata-update:
-    desc: "Update user transaction metadata with a given ID."
-    silent: true
-    cmds:
-      - go run ./update_transaction_metadata/update_transaction_metadata.go
-
-  send-op-return:
-    desc: "Send OP return."
-    silent: true
-    cmds:
+      - echo "=================================================================="
       - go run ./send_op_return/send_op_return.go
+      - echo "=================================================================="
 
-  fetch-user-utxos:
-    desc: "Fetch user UTXOs page."
+  sync_merkleroots:
+    desc: "Sync Merkle roots as User."
     silent: true
     cmds:
-      - go run ./fetch_utxos/fetch_utxos.go
+      - echo "=================================================================="
+      - go run ./sync_merkleroots/sync_merkleroots.go
+      - echo "=================================================================="
 
-  fetch-user-xpub:
-    desc: "Fetch current authorized user's xpub info."
+  update_user_xpub_metadata:
+    desc: "Update xPub metadata as User."
     silent: true
     cmds:
-      - go run ./fetch_xpub/fetch_xpub.go
+      - echo "=================================================================="
+      - go run ./update_user_xpub_metadata/update_user_xpub_metadata.go
+      - echo "=================================================================="
 
-  user-xpub-metadata:
-    desc: "Update current authorized user's xpub metadata."
+  xpriv_from_mnemonic:
+    desc: "Extract xPriv from mnemonic."
     silent: true
     cmds:
-      - go run ./update_xpub_metadata/update_xpub_metadata.go
+      - echo "=================================================================="
+      - go run ./xpriv_from_mnemonic/xpriv_from_mnemonic.go
+      - echo "=================================================================="
+
+  xpub_from_xpriv:
+    desc: "Extract xPub from xPriv."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./xpub_from_xpriv/xpub_from_xpriv.go
+      - echo "=================================================================="
