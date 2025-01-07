@@ -14,3 +14,48 @@ jobs:
     secrets:
       DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
       SLACK_WEBHOOK_URL: ${{ secrets.ON_PUSH_SLACK_WEBHOOK_URL }}
+  yamllint:
+    name: Run yaml linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run yaml linter
+        uses: ibiqlik/action-yamllint@v3.1
+  asknancy:
+    name: Ask Nancy (check dependencies)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Write go list
+        run: go list -json -m all > go.list
+      - name: Ask Nancy
+        uses: sonatype-nexus-community/nancy-github-action@v1.0.3
+        continue-on-error: true
+  test:
+    needs: [yamllint, asknancy]
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Go from go.mod
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Cache code
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod              # Module download cache
+            ~/.cache/go-build         # Build cache (Linux)
+            ~/Library/Caches/go-build # Build cache (Mac)
+            '%LocalAppData%\go-build' # Build cache (Windows)
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Run linter and tests
+        run: make test-coverage-custom
