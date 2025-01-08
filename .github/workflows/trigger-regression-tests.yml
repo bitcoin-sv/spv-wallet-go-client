@@ -22,7 +22,7 @@ jobs:
     with:
       run_id: '${{ github.run_id }}-${{ github.run_attempt }}'
       keep_instances: ${{ inputs.keep_instances }}
-      go_client_repository: ${{ github.event.head.repo.full_name || github.repository }}
+      go_client_repository: ${{ github.event.pull_request.head.repo.full_name || github.repository}}
       go_client_ref: ${{ github.head_ref || github.ref }}
       run_js_client_tests: false
     secrets:
