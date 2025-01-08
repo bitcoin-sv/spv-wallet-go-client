@@ -1,0 +1,127 @@
+{
+    "createdAt": "2024-11-05T07:30:14.219077Z",
+    "updatedAt": "2024-11-05T07:30:14.219077Z",
+    "deletedAt": null,
+    "metadata": {
+        "receiver": "john.doe.test4@john.doe.test.4chain.space",
+        "sender": "john.doe.test4@john.doe.test.4chain.space"
+    },
+    "id": "36be741b-31c7-4aed-8840-5e5b2eafeb41",
+    "hex": "c959fdb6-f438-4ef9-aef9-92a1852885ef",
+    "xpubId": "3f0a90d3-4f8b-45f6-81e4-9858fa47ecc0",
+    "expiresAt": "2024-11-05T07:30:27.372912Z",
+    "configuration": {
+        "changeDestinations": [
+            {
+                "createdAt": "2024-11-05T07:30:14.219077Z",
+                "updatedAt": "2024-11-05T07:30:14.219077Z",
+                "deletedAt": null,
+                "metadata": null,
+                "id": "c86dd8f4-316f-4d71-be00-7bd1a38079e4",
+                "xpubId": "d6884260-1624-415b-8625-652a59345ead",
+                "lockingScript": "189593db-0048-4fb7-80da-b69bce8fbf78",
+                "type": "pubkeyhash",
+                "chain": 1,
+                "num": 5,
+                "paymailExternalDerivationNum": null,
+                "address": "3f96ea59-ac83-476e-a0ea-f0d668086081",
+                "draftId": "fc60742e-92b5-4a98-90a7-422d89879494"
+            }
+        ],
+        "changeDestinationsStrategy": "",
+        "changeMinimumSatoshis": 0,
+        "changeNumberOfDestinations": 0,
+        "changeSatoshis": 98,
+        "expiresIn": 0,
+        "fee": 0,
+        "feeUnit": {
+            "satoshis": 1,
+            "bytes": 1000
+        },
+        "fromUtxos": null,
+        "includeUtxos": null,
+        "inputs": [
+            {
+                "createdAt": "2024-11-05T07:30:14.219077Z",
+                "updatedAt": "2024-11-05T07:30:14.219077Z",
+                "deletedAt": null,
+                "metadata": null,
+                "transactionId": "3e0c5f6d-0dfc-462d-8a63-31b7a20d0c6b",
+                "outputIndex": 0,
+                "id": "203277ff-006a-4e48-bbe9-2f1b6fb9ddfd",
+                "xpubId": "4676a7d6-45f8-46b3-850b-68a9bb7642bc",
+                "satoshis": 100,
+                "scriptPubKey": "9d7eede4-00cd-47fd-ab3d-b0ae6d2ca6a6",
+                "type": "pubkeyhash",
+                "draftId": "f1ebe294-d921-4fb7-8b22-ed33e090e7ea",
+                "reservedAt": "2024-11-05T07:30:14.207287Z",
+                "spendingTxId": "",
+                "transaction": null,
+                "destination": {
+                    "createdAt": "2024-11-05T07:30:14.219077Z",
+                    "updatedAt": "2024-11-05T07:30:14.219077Z",
+                    "deletedAt": null,
+                    "metadata": {
+                        "domain": "john.doe.test.4chain.space",
+                        "ip_address": "127.0.0.1",
+                        "paymail_request": "CreateP2PDestinationResponse",
+                        "reference_id": "1a461311db24115cd5e0525f8c9b5613",
+                        "satoshis": 100,
+                        "user_agent": "node-fetch"
+                    },
+                    "id": "bc22a0b9-d91c-4d0b-a7e4-8ea2d37e42db",
+                    "xpubId": "325b1440-3af4-4a65-bf90-d88ed978948b",
+                    "lockingScript": "e459d941-d820-4663-a5d8-6a12457825e9",
+                    "type": "pubkeyhash",
+                    "chain": 0,
+                    "num": 0,
+                    "paymailExternalDerivationNum": 3,
+                    "address": "6e4f50b1-356b-4453-a83e-2f412f328c25",
+                    "draftId": ""
+                }
+            }
+        ],
+        "outputs": [
+            {
+                "paymailP4": {
+                    "alias": "john.doe.test4",
+                    "domain": "john.doe.test.4chain.space",
+                    "fromPaymail": "from@domain.com",
+                    "receiveEndpoint": "https://john.doe.test.4chain.space:443/v1/bsvalias/beef/{alias}@{domain.tld}",
+                    "referenceId": "bdac6a12ec7f31feb5ae426e28c9ddfa",
+                    "resolutionType": "p2p"
+                },
+                "satoshis": 1,
+                "script": "",
+                "scripts": [
+                    {
+                        "address": "18p1xtQQeaVVpsxrSiRUhUKMyR5jPEvAhY",
+                        "satoshis": 1,
+                        "script": "45a858f8-c645-48c3-bff0-f776d8d8452d",
+                        "scriptType": "pubkeyhash"
+                    }
+                ],
+                "to": "john.doe.test4@john.doe.test.4chain.space",
+                "useForChange": false
+            },
+            {
+                "satoshis": 98,
+                "script": "",
+                "scripts": [
+                    {
+                        "address": "19a5857d-3eb9-43f8-b240-c29c05909fdc",
+                        "satoshis": 98,
+                        "script": "cca457ab-2277-457b-bf53-17face515f5c",
+                        "scriptType": "pubkeyhash"
+                    }
+                ],
+                "to": "b1e97d9c-e1e5-4120-b0f1-0363693b1959",
+                "useForChange": false
+            }
+        ],
+        "sendAllTo": null,
+        "sync": null
+    },
+    "status": "",
+    "finalTxId": ""
+}

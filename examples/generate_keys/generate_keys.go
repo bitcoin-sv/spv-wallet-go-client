@@ -1,25 +1,18 @@
-/*
-Package main - generate_keys example
-*/
 package main
 
 import (
 	"fmt"
-	"os"
+	"log"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
+	"github.com/bitcoin-sv/spv-wallet-go-client/walletkeys"
 )
 
 func main() {
-	keys, err := xpriv.Generate()
+	keys, err := walletkeys.RandomKeys()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatalf("Failed to generate random keys: %v", err)
 	}
 
-	exampleXPriv := keys.XPriv()
-	exampleXPub := keys.XPub().String()
-
-	fmt.Println("exampleXPriv: ", exampleXPriv)
-	fmt.Println("exampleXPub: ", exampleXPub)
+	fmt.Printf("Generated xPub for user: %s\n", keys.XPub())
+	fmt.Printf("Generated xPriv for user: %s\n", keys.XPriv())
 }

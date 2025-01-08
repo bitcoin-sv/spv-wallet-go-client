@@ -19,228 +19,241 @@
 </div>
 
 ## Table of Contents
-- [SPV Wallet: Go Client](#spv-wallet-go-client)
-  - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Documentation](#documentation)
-      - [Built-in Features](#built-in-features)
-    - [Automatic Releases on Tag Creation (recommended)](#automatic-releases-on-tag-creation-recommended)
-    - [Manual Releases (optional)](#manual-releases-optional)
-  - [Usage](#usage)
-    - [Examples \& Tests](#examples--tests)
-    - [Benchmarks](#benchmarks)
-  - [Code Standards](#code-standards)
-  - [Usage](#usage-1)
-  - [Contributing](#contributing)
-  - [License](#license)
+1. [Requirements and Compatibility](#requirements-and-compatibility)
+1. [Quick start](#quick-start)
+1. [Documentation](#documentation)
+1. [Testing and Development Standards](#testing-and-development-standards)
+1. [Examples](/examples/README.md)
+1. [License](#license)
 
-<br/>
+## Requirements and Compatibility
 
-## Installation
-
-**spv-wallet-go-client** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
+Instalation: 
 ```shell script
 go get -u github.com/bitcoin-sv/spv-wallet-go-client
 ```
 
-<br/>
+## Requirements
+
+- **Go Version**: The `spv-wallet-go-client` requires **Go version 1.22.5** or a later supported release of Go. Ensure your Go environment meets this requirement before using the client.
+
+
+## Compatibility and Support
+
+### Deprecation Notice
+The client **does not support** the following:
+- **Admin and non-admin old endpoints** of the SPV Wallet API based on the `/v1/` prefix.
+- Deprecated methods for building query parameters for HTTP requests.
+
+### Current Compatibility
+The client is designed for full compatibility with the newer `/api/v1/` endpoints exposed by the SPV Wallet API. It focuses on aligning with the latest standards and structure provided by the API.
+ 
+### API Admin Endpoints Compatibility
+
+#### Access Keys API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                          |   Pagination     |
+|-------------|-------------------------------|----------------------|----------------|--------------------------------------------------|----------------- | 
+| GET         | /api/v1/admin/users/keys     | Search access keys   | ✅             | [API](/internal/api/v1/admin/accesskeys/access_keys_api.go#L25) | ✅ |
+
+#### Contacts API
+| HTTP Method | Endpoint                              | Action               | Support Status | API Code                                       |  Pagination   |
+|-------------|---------------------------------------|----------------------|----------------|------------------------------------------------|-------------- |
+| GET         | /api/v1/admin/contacts               | Search contacts      | ✅             | [API](/internal/api/v1/admin/contacts/contacts_api.go#L42) | ✅ |
+| POST        | /api/v1/admin/contacts/confirmations | Confirm contact      | ✅             | [API](/internal/api/v1/admin/contacts/contacts_api.go#L83) | ❌ |
+| PUT         | /api/v1/admin/contacts/{id}          | Update contact       | ✅             | [API](/internal/api/v1/admin/contacts/contacts_api.go#L68) | ❌ |
+| DELETE      | /api/v1/admin/contacts/{id}          | Delete contact       | ✅             | [API](/internal/api/v1/admin/contacts/contacts_api.go#L95) | ❌ |
+| POST        | /api/v1/admin/contacts/{paymail}     | Create contact       | ✅             | [API](/internal/api/v1/admin/contacts/contacts_api.go#L27) | ❌ |
+
+#### Invitations API
+| HTTP Method | Endpoint                              | Action               | Support Status | API Code                                         |   Pagination      |
+|-------------|---------------------------------------|----------------------|----------------|--------------------------------------------------|-------------------|
+| POST        | /api/v1/admin/invitations/{id}       | Accept invitation    | ✅             | [API](/internal/api/v1/admin/invitations/invitations_api.go#L22) | ❌ |
+| DELETE      | /api/v1/admin/invitations/{id}       | Reject invitation    | ✅             | [API](/internal/api/v1/admin/invitations/invitations_api.go#L35) | ❌ |
+
+
+#### Paymails API
+| HTTP Method | Endpoint                              | Action               | Support Status | API Code                                         |  Pagination      |
+|-------------|---------------------------------------|----------------------|----------------|--------------------------------------------------|------------------|
+| GET         | /api/v1/admin/paymails               | Search paymails      | ✅             | [API](/internal/api/v1/admin/paymails/paymails_api.go#L73) | ✅      |
+| POST        | /api/v1/admin/paymails               | Create paymail       | ✅             | [API](/internal/api/v1/admin/paymails/paymails_api.go#L44) | ❌      |
+| GET         | /api/v1/admin/paymails/{id}          | Retrieve paymail     | ✅             | [API](/internal/api/v1/admin/paymails/paymails_api.go#L59) | ❌      |
+| DELETE      | /api/v1/admin/paymails/{id}          | Delete paymail       | ✅             | [API](/internal/api/v1/admin/paymails/paymails_api.go#L27) | ❌      |
+
+#### Stats API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                             |  Pagination   |
+|-------------|-------------------------------|----------------------|----------------|-----------------------------------------------------|---------------|
+| GET         | /api/v1/admin/stats          | Retrieve stats       | ✅             | [API](/internal/api/v1/admin/stats/stats_api.go#L23) |     ✅        |
+
+#### Status API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                               | Pagination      |
+|-------------|-------------------------------|----------------------|----------------|-------------------------------------------------------|-----------------|
+| GET         | /api/v1/admin/status         | Retrieve status      | ✅             | [API](/internal/api/v1/admin/status/status_api.go#L23) |      ❌         |
+
+#### Transactions API
+| HTTP Method | Endpoint                              | Action               | Support Status | API Code                                         |       Pagination      |
+|-------------|---------------------------------------|----------------------|----------------|--------------------------------------------------|-----------------------|
+| GET         | /api/v1/admin/transactions           | Search transactions | ✅             | [API](/internal/api/v1/admin/transactions/transactions_api.go#L39) | ✅    |
+| GET         | /api/v1/admin/transactions/{id}      | Retrieve transaction | ✅             | [API](/internal/api/v1/admin/transactions/transactions_api.go#L26)| ❌    |
+
+#### UTXOs API
+| HTTP Method | Endpoint                              | Action               | Support Status | API Code                                            |    Pagination    |
+|-------------|---------------------------------------|----------------------|----------------|-----------------------------------------------------| -----------------|
+| GET         | /api/v1/admin/utxos                  | Search UTXOs         | ✅             | [API](/internal/api/v1/admin/utxos/utxos_api.go#L25) | ✅               |
+
+#### Webhooks API
+| HTTP Method | Endpoint                              | Action               | Support Status | API Code                                          |   Pagination  |
+|-------------|---------------------------------------|----------------------|----------------|---------------------------------------------------|---------------|
+| GET         | /api/v1/admin/webhooks/subscriptions | Subscribe to webhook | ✅             | [API](/internal/api/v1/admin/webhooks/webhooks_api.go#L23) |  ❌   |
+| DELETE      | /api/v1/admin/webhooks/subscriptions | Unsubscribe webhook  | ✅             | [API](/internal/api/v1/admin/webhooks/webhooks_api.go#L36) |  ❌   |
+
+#### XPubs API
+| HTTP Method | Endpoint                              | Action               | Support Status | API Code                                            |  Pagination |
+|-------------|---------------------------------------|----------------------|----------------|-----------------------------------------------------|-------------|
+| GET         | /api/v1/admin/users                  | Search XPubs         | ✅             | [API](/internal/api/v1/admin/xpubs/xpubs_api.go#L41) |  ✅         |
+| POST        | /api/v1/admin/users                  | Create XPub          | ✅             | [API](/internal/api/v1/admin/xpubs/xpubs_api.go#L27) |  ❌         |
+
+### API Non-Admin Endpoints Compatibility
+
+#### Access Keys API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                          |  Pagination      |
+|-------------|-------------------------------|----------------------|----------------|--------------------------------------------------|------------------|
+| GET         | /api/v1/users/current/keys   | Search access keys   | ✅             | [API](/internal/api/v1/user/accesskeys/access_key_api.go#L56)   | ✅ |
+| POST        | /api/v1/users/current/keys   | Create access key    | ✅             | [API](/internal/api/v1/user/accesskeys/access_key_api.go#L27)   | ❌ |
+| GET         | /api/v1/users/current/keys/{id} | Retrieve access key | ✅             | [API](/internal/api/v1/user/accesskeys/access_key_api.go#L42) | ❌ |
+| DELETE      | /api/v1/users/current/keys/{id} | Revoke access key   | ✅             | [API](/internal/api/v1/user/accesskeys/access_key_api.go#L82) | ❌ |
+
+#### Contacts API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                          |  Pagination  |
+|-------------|-------------------------------|----------------------|----------------|--------------------------------------------------|--------------|
+| GET         | /api/v1/contacts             | Search contacts      | ✅             | [API](/internal/api/v1/user/contacts/contacts_api.go#L27) | ✅   |
+| GET         | /api/v1/contacts/{paymail}   | Retrieve contact     | ✅             | [API](/internal/api/v1/user/contacts/contacts_api.go#L53) | ❌   |
+| PUT         | /api/v1/contacts/{paymail}   | Upsert contact       | ✅             | [API](/internal/api/v1/user/contacts/contacts_api.go#L67) | ❌   |
+| DELETE      | /api/v1/contacts/{paymail}   | Remove contact       | ✅             | [API](/internal/api/v1/user/contacts/contacts_api.go#L89) | ❌   |
+| POST        | /api/v1/contacts/{paymail}   | Confirm contact      | ✅             | [API](/internal/api/v1/user/contacts/contacts_api.go#L101)| ❌   |
+| DELETE      | /api/v1/contacts/{paymail}   | Unconfirm contact    | ✅             | [API](/internal/api/v1/user/contacts/contacts_api.go#L113)| ❌   |
+
+#### Invitations API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                          |  Pagination               |
+|-------------|-------------------------------|----------------------|----------------|--------------------------------------------------|---------------------------|
+| POST        | /api/v1/invitations/{paymail}/contacts | Accept invitation   | ✅             | [API](/internal/api/v1/user/invitations/invitations_api.go#L22) | ❌ |
+| DELETE      | /api/v1/invitations/{paymail}          | Reject invitation   | ✅             | [API](/internal/api/v1/user/invitations/invitations_api.go#L34) | ❌ |
+
+#### Merkle Roots API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                          |  Pagination       |
+|-------------|-------------------------------|----------------------|----------------|--------------------------------------------------|-------------------|
+| GET         | /api/v1/merkleroots          | Search Merkle roots  | ✅             | [API](/internal/api/v1/user/merkleroots/merkleroots_api.go#L36)| ❌   |
+
+#### Paymails API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                          | Pagination       |
+|-------------|-------------------------------|----------------------|----------------|--------------------------------------------------|------------------|
+| GET         | /api/v1/paymails             | Search paymails      | ✅             | [API](/internal/api/v1/user/paymails/paymails_api.go#L25) | ✅       |
+
+#### Transactions API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                          |     Pagination       |
+|-------------|-------------------------------|----------------------|----------------|--------------------------------------------------|----------------------|
+| GET         | /api/v1/transactions         | Search transactions  | ✅             | [API](/internal/api/v1/user/transactions/transactions_api.go#L137) |✅   |
+| POST        | /api/v1/transactions         | Record transaction   | ✅             | [API](/internal/api/v1/user/transactions/transactions_api.go#L93) |❌    |
+| POST        | /api/v1/transactions/drafts  | Draft transaction    | ✅             | [API](/internal/api/v1/user/transactions/transactions_api.go#L78) |❌    |
+| GET         | /api/v1/transactions/{id}    | Retrieve transaction | ✅             | [API](/internal/api/v1/user/transactions/transactions_api.go#L123) |❌   |
+| PATCH       | /api/v1/transactions/{id}    | Update transaction   | ✅             | [API](/internal/api/v1/user/transactions/transactions_api.go#L108) |❌   |
+
+#### UTXOs API
+| HTTP Method | Endpoint                     | Action               | Support Status | API Code                                            | Pagination  |
+|-------------|-------------------------------|----------------------|----------------|----------------------------------------------------|---------------|
+| GET         | /api/v1/utxos                | Search UTXOs         | ✅             | [API](/internal/api/v1/user/utxos/utxos_api.go#L25) |          ❌   |
+
+#### XPubs API
+| HTTP Method | Endpoint                     | Action                       | Support Status | API Code                                           |Pagination |
+|-------------|-------------------------------|------------------------------|----------------|---------------------------------------------------|-----------|
+| GET         | /api/v1/users/current        | Retrieve current user info   | ✅             | [API](/internal/api/v1/user/xpubs/xpub_api.go#L24) |  ❌       |
+| PATCH       | /api/v1/users/current        | Update current user info     | ✅             | [API](/internal/api/v1/user/xpubs/xpub_api.go#L24) |  ❌       |
+
+
+
+## Feature Updates
+
+While the client strives to support the latest API features, there may be a delay in fully integrating new functionalities. If you encounter any issues or have questions:
+- Refer to the official documentation.
+- Reach out for support to ensure a smooth development experience.
+
+
+ 
+## Quick start
+
+The implementation enforces separation of concerns by isolating admin and non-admin APIs, requiring separate initialization for their respective clients. This ensures clarity and modularity when utilizing the exposed functionality. 
+ 
+### `UserAPI` Initialization Methods:
+
+### 1. [`NewUserAPIWithAccessKey`](/user_api.go#L468)
+- **Description:** Initializes a `UserAPI` instance using an access key for authentication.
+- **Note:** Requests made with this instance will be securely signed, ensuring integrity and authenticity.
+
+### 2. [`NewUserAPIWithXPriv`](/user_api.go#L449)
+- **Description:** Initializes a `UserAPI` instance using an extended private key (xPriv) for authentication.
+- **Note:** Requests made with this instance will also be securely signed.
+- **Recommendation:** This option offers a high level of security, making it a preferred choice alongside the access key option.
+
+### 3. [`NewUserAPIWithXPub`](/user_api.go#L435)
+- **Description:** Initializes a `UserAPI` instance using an extended public key (xPub).
+- **Note:** Requests made with this instance will not be signed.
+- **Security Advisory:** For enhanced security, it is strongly recommended to use either `NewUserAPIWithAccessKey` or `NewUserAPIWithXPriv` instead, as unsigned requests may be less secure.
+
+
+### `AdminAPI` Initialization Methods:
+
+### 1. [`NewAdminAPIWithXPriv`](/admin_api.go#L375)
+- **Description:** Initializes a `AdminAPI` instance using an extended private key (xPriv) for authentication.
+- **Note:** Requests made with this instance will be securely signed, ensuring integrity and authenticity.
+
+### 2. [`NewAdminAPIWithXPub`](/admin_api.go#L390)
+- **Description:** Initializes a `AdminAPI` instance using an extended public key (xPub).
+- **Note:** Requests made with this instance will not be signed.
+- **Security Advisory:** For enhanced security, it is strongly recommended to use either `NewAdminAPIWithXPriv`instead, as unsigned requests may be less secure.
+
+**Code snippets:**
+- [AdminAPI example](/examples/admin_add_user/admin_add_user.go)
+- [UserAPI example](/examples/list_transactions/list_transactions.go)
+
 
 ## Documentation
+ 
 View the generated [documentation](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet-go-client)
 
 For in-depth information and guidance, please refer to the [SPV Wallet Documentation](https://docs.bsvblockchain.org/network-topology/applications/spv-wallet).
 
 [![GoDoc](https://godoc.org/github.com/bitcoin-sv/spv-wallet-go-client?status.svg&style=flat&v=2)](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet-go-client)
 
-<br/>
+# Testing and Development Standards
 
-<details>
-<summary><strong><code>Repository Features</code></strong></summary>
-<br/>
+The current implementation includes comprehensive support for:
+- **Unit Tests:** To validate individual components and ensure they work as expected in isolation.
+- **Regression Tests:** To verify compatibility with the latest released version of the SPV Wallet API and to prevent unintended functionality breaks.
 
-This repository was created using [MrZ's `go-template`](https://github.com/mrz1836/go-template#about)
+These tests ensure a stable and reliable integration with the SPV Wallet API, maintaining high-quality code and robust functionality.
 
-#### Built-in Features
-- Continuous integration via [GitHub Actions](https://github.com/features/actions)
-- Build automation via [Make](https://www.gnu.org/software/make)
-- Dependency management using [Go Modules](https://github.com/golang/go/wiki/Modules)
-- Code formatting using [gofumpt](https://github.com/mvdan/gofumpt) and linting with [golangci-lint](https://github.com/golangci/golangci-lint) and [yamllint](https://yamllint.readthedocs.io/en/stable/index.html)
-- Unit testing with [testify](https://github.com/stretchr/testify), [race detector](https://blog.golang.org/race-detector), code coverage [HTML report](https://blog.golang.org/cover) and [Codecov report](https://codecov.io/)
-- Releasing using [GoReleaser](https://github.com/goreleaser/goreleaser) on [new Tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging)
-- Dependency scanning and updating thanks to [Dependabot](https://dependabot.com) and [Nancy](https://github.com/sonatype-nexus-community/nancy)
-- Security code analysis using [CodeQL Action](https://docs.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/about-code-scanning)
-- Automatic syndication to [pkg.go.dev](https://pkg.go.dev/) on every release
-- Generic templates for [Issues and Pull Requests](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository) in GitHub
-- All standard GitHub files such as `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`
-- Code [ownership configuration](.github/CODEOWNERS) for GitHub
-- All your ignore files for [vs-code](.editorconfig), [docker](.dockerignore) and [git](.gitignore)
-- Automatic sync for [labels](.github/labels.yml) into GitHub using a pre-defined [configuration](.github/labels.yml)
-- Built-in powerful merging rules using [Mergify](https://mergify.io/)
-- Welcome [new contributors](.github/mergify.yml) on their first Pull-Request
-- Follows the [standard-readme](https://github.com/RichardLitt/standard-readme/blob/master/spec.md) specification
-- [Visual Studio Code](https://code.visualstudio.com) configuration with [Go](https://code.visualstudio.com/docs/languages/go)
-- (Optional) [Slack](https://slack.com), [Discord](https://discord.com) or [Twitter](https://twitter.com) announcements on new GitHub Releases
-- (Optional) Easily add [contributors](https://allcontributors.org/docs/en/bot/installation) in any Issue or Pull-Request
-
-</details>
-
-<details>
-<summary><strong><code>Package Dependencies</code></strong></summary>
-<br/>
-
-- [stretchr/testify](https://github.com/stretchr/testify)
-</details>
-
-<details>
-<summary><strong><code>Library Deployment</code></strong></summary>
-<br/>
-
-Releases are automatically created when you create a new [git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging)!
-
-If you want to manually make releases, please install GoReleaser:
-
-[goreleaser](https://github.com/goreleaser/goreleaser) for easy binary or library deployment to GitHub and can be installed:
-- **using make:** `make install-releaser`
-- **using brew:** `brew install goreleaser`
-
-The [.goreleaser.yml](.goreleaser.yml) file is used to configure [goreleaser](https://github.com/goreleaser/goreleaser).
-
-<br/>
-
-### Automatic Releases on Tag Creation (recommended)
-Automatic releases via [GitHub Actions](.github/workflows/release.yml) from creating a new tag:
-```shell
-make tag version=1.2.3
-```
-
-<br/>
-
-### Manual Releases (optional)
-Use `make release-snap` to create a snapshot version of the release, and finally `make release` to ship to production (manually).
-
-<br/>
-
-</details>
-
-<details>
-<summary><strong><code>Makefile Commands</code></strong></summary>
-<br/>
-
-View all `makefile` commands
-```shell script
-make help
-```
-
-List of all current commands:
-```text
-all                           Runs multiple commands
-clean                         Remove previous builds and any cached data
-clean-mods                    Remove all the Go mod cache
-coverage                      Shows the test coverage
-diff                          Show the git diff
-generate                      Runs the go generate command in the base of the repo
-godocs                        Sync the latest tag with GoDocs
-help                          Show this help message
-install                       Install the application
-install-all-contributors      Installs all contributors locally
-install-go                    Install the application (Using Native Go)
-install-releaser              Install the GoReleaser application
-lint                          Run the golangci-lint application (install if not found)
-release                       Full production release (creates release in GitHub)
-release                       Runs common.release then runs godocs
-release-snap                  Test the full release (build binaries)
-release-test                  Full production test release (everything except deploy)
-replace-version               Replaces the version in HTML/JS (pre-deploy)
-tag                           Generate a new tag and push (tag version=0.0.0)
-tag-remove                    Remove a tag if found (tag-remove version=0.0.0)
-tag-update                    Update an existing tag to current commit (tag-update version=0.0.0)
-test                          Runs lint and ALL tests
-test-ci                       Runs all tests via CI (exports coverage)
-test-ci-no-race               Runs all tests via CI (no race) (exports coverage)
-test-ci-short                 Runs unit tests via CI (exports coverage)
-test-no-lint                  Runs just tests
-test-short                    Runs vet, lint and tests (excludes integration tests)
-test-unit                     Runs tests and outputs coverage
-uninstall                     Uninstall the application (and remove files)
-update-contributors           Regenerates the contributors html/list
-update-linter                 Update the golangci-lint package (macOS only)
-vet                           Run the Go vet application
-```
-</details>
-
-<br/>
-
-## Usage
-Checkout all the [examples](examples)!
-
-<br/>
-
-### Examples & Tests
-All unit tests and [examples](examples) run via [GitHub Actions](https://github.com/bitcoin-sv/spv-wallet-go-client/actions) and
-uses [Go version 1.19.x](https://golang.org/doc/go1.19). View the [configuration file](.github/workflows/run-tests.yml).
-
-<br/>
+## Commands
 
 Run all tests (including integration tests)
 ```shell script
 make test
 ```
 
-<br/>
 
 Run tests (excluding integration tests)
 ```shell script
 make test-short
 ```
 
-<br/>
+## Development Guidelines
 
-### Benchmarks
-Run the Go benchmarks:
-```shell script
-make bench
-```
+Each new proposed functionality must adhere to the following principles:
+1. **Code of Conduct:** Contributions should align with the repository's code of conduct, fostering a positive and collaborative environment.
+1. **Repository Standards:** Proposals and implementations should strictly follow the coding standards, conventions, and best practices outlined in the repository documentation.
 
-<br/>
+By adhering to these guidelines, contributors can ensure that their changes are consistent, maintainable, and compatible with the SPV Wallet API.
 
-## Code Standards
-Read more about this Go project's [code standards](.github/CODE_STANDARDS.md).
-
-<br/>
-
-## Usage
-
-
-```
-// http example
-func main() {
-
-	// Generate keys
-	keys, _ := xpriv.Generate()
-
-	// Create a client
-	client, _ := walletclient.New(
-        walletclient.WithXPriv(keys.XPriv()),
-        walletclient.WithHTTP("localhost:3001"),
-        walletclient.WithSignRequest(true))
-    
-    fmt.Println(client.IsSignRequest())
-}
-
-```
-
-Checkout all the [examples](examples)!
-
-<br/>
-
-## Contributing
-All kinds of contributions are welcome!
-<br/>
-To get started, take a look at [code standards](.github/CODE_STANDARDS.md).
-<br/>
+All kinds of contributions are welcome 🎉! To get started, take a look at [code standards](.github/CODE_STANDARDS.md).
 View the [contributing guidelines](.github/CODE_STANDARDS.md#3-contributing) and follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
-
-<br/>
 
 ## License
 

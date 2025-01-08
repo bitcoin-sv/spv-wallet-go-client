@@ -1,78 +1,127 @@
----
 version: "3"
 
 tasks:
-  admin_add_user:
-    desc: "running admin_add_user..."
+  default:
     cmds:
-      - echo "running admin_add_user..."
-      - go run ./admin_add_user/admin_add_user.go
+      - task --list
+    desc: "Display all available tasks."
 
-  admin_remove_user:
-    desc: "running admin_remove_user..."
+  access_key:
+    desc: "Fetch Access key as User."
+    silent: true
     cmds:
-      - echo "running admin_remove_user..."
-      - go run ./admin_remove_user/admin_remove_user.go
+      - echo "=================================================================="
+      - go run ./access_key/access_key.go
+      - echo "=================================================================="
+
+  admin_add_user:
+    desc: "Add user as Admin."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./admin_add_user/admin_add_user.go
+      - echo "=================================================================="
+
+  admin_remove_paymail:
+    desc: "Remove paymail as Admin."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./admin_remove_paymail/admin_remove_paymail.go
+      - echo "=================================================================="
 
   create_transaction:
-    desc: "running create_transaction..."
+    desc: "Create transaction as User."
+    silent: true
     cmds:
-      - echo "running create_transaction..."
+      - echo "=================================================================="
       - go run ./create_transaction/create_transaction.go
+      - echo "=================================================================="
 
   generate_keys:
-    desc: "running generate_keys..."
+    desc: "Generate keys for SPV Wallet API access."
+    silent: true
     cmds:
-      - echo "running generate_keys..."
-      - go run ./generate_keys/generate_keys.go
+      - echo "=================================================================="
+      - go run ../walletkeys/cmd/main.go
+      - echo "=================================================================="
+
+  generate_totp:
+    desc: "Generate totp."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./generate_totp/generate_totp.go
+      - echo "=================================================================="
 
   get_balance:
-    desc: "running get_balance..."
+    desc: "Get balance as User."
+    silent: true
     cmds:
-      - echo "running get_balance..."
+      - echo "=================================================================="
       - go run ./get_balance/get_balance.go
+      - echo "=================================================================="
 
-  handle_exceptions:
-    desc: "running handle_exceptions..."
+  get_shared_config:
+    desc: "Get shared config as User."
+    silent: true
     cmds:
-      - echo "running handle_exceptions..."
-      - go run ./handle_exceptions/handle_exceptions.go
+      - echo "=================================================================="
+      - go run ./get_shared_config/get_shared_config.go
+      - echo "=================================================================="
+
+  list_access_keys:
+    desc: "Fetch first page of access keys as User."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./list_access_keys/list_access_keys.go
+      - echo "=================================================================="
 
   list_transactions:
-    desc: "running list_transactions..."
+    desc: "Fetch first page of transactions as User."
+    silent: true
     cmds:
-      - echo "running list_transactions..."
+      - echo "=================================================================="
       - go run ./list_transactions/list_transactions.go
+      - echo "=================================================================="
 
   send_op_return:
-    desc: "running send_op_return..."
+    desc: "Create draft transaction, finalize transaction and record transaction as User."
+    silent: true
     cmds:
-      - echo "running send_op_return..."
+      - echo "=================================================================="
       - go run ./send_op_return/send_op_return.go
+      - echo "=================================================================="
+
+  sync_merkleroots:
+    desc: "Sync Merkle roots as User."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./sync_merkleroots/sync_merkleroots.go
+      - echo "=================================================================="
+
+  update_user_xpub_metadata:
+    desc: "Update xPub metadata as User."
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./update_user_xpub_metadata/update_user_xpub_metadata.go
+      - echo "=================================================================="
 
   xpriv_from_mnemonic:
-    desc: "running xpriv_from_mnemonic..."
+    desc: "Extract xPriv from mnemonic."
+    silent: true
     cmds:
-      - echo "running xpriv_from_mnemonic..."
+      - echo "=================================================================="
       - go run ./xpriv_from_mnemonic/xpriv_from_mnemonic.go
+      - echo "=================================================================="
 
   xpub_from_xpriv:
-    desc: "running xpub_from_xpriv..."
+    desc: "Extract xPub from xPriv."
+    silent: true
     cmds:
-      - echo "running xpub_from_xpriv..."
+      - echo "=================================================================="
       - go run ./xpub_from_xpriv/xpub_from_xpriv.go
-  generate_totp:
-    desc: "running generate_totp..."
-    cmds:
-      - echo "running generate_totp..."
-      - go run ./generate_totp/generate_totp.go
-  webhooks:
-    desc: "running webhooks..."
-    cmds:
-      - echo "running webhooks..."
-      - go run ./webhooks/webhooks.go || true
-  sync_merkleroots:
-    desc: "running sync_merkleroots.."
-    cmds:
-      - echo "running sync_merkleroots..."
-      - go run ./sync_merkleroots/sync_merkleroots.go
+      - echo "=================================================================="

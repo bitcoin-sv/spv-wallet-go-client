@@ -1,0 +1,9 @@
+{
+    "paymailDomains": [
+        "john.test.4chain.space"
+    ],
+    "experimentalFeatures": {
+        "pikeContactsEnabled": true,
+        "pikePaymentEnabled": true
+    }
+}

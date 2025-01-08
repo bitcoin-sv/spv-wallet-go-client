@@ -1,35 +1,26 @@
-/*
-Package main - get_balance example
-*/
 package main
 
 import (
 	"context"
 	"fmt"
-	"os"
+	"log"
 
-	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
+	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
+	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
 )
 
 func main() {
-	defer examples.HandlePanic()
-
-	examples.CheckIfXPrivExists()
-
-	const server = "http://localhost:3003/v1"
-
-	client, err := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
+	usersAPI, err := wallet.NewUserAPIWithXPriv(exampleutil.NewDefaultConfig(), examples.UserXPriv)
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to initialize user API with XPriv: %v", err)
 	}
+
 	ctx := context.Background()
-
-	xpubInfo, err := client.GetXPub(ctx)
+	xPub, err := usersAPI.XPub(ctx)
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to fetch xPub: %v", err)
 	}
-	fmt.Println("Current balance: ", xpubInfo.CurrentBalance)
+
+	fmt.Printf("Current balance: %v\n", xPub.CurrentBalance)
 }

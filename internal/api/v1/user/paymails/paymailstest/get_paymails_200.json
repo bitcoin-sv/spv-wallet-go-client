@@ -1,0 +1,34 @@
+{
+    "content": [
+        {
+            "createdAt": "2024-11-18T06:50:07.144902Z",
+            "updatedAt": "2024-11-18T06:50:07.144932Z",
+            "deletedAt": null,
+            "metadata": null,
+            "id": "31b80181-4d8b-4766-9bc7-76a1d9c6b44d",
+            "xpubId": "69245a3a-f9ed-4046-9acb-9d66c0b3750c",
+            "alias": "john.doe.test",
+            "domain": "john.doe.4chain.space",
+            "publicName": "John Doe",
+            "avatar": ""
+        },
+        {
+            "createdAt": "2024-11-08T15:10:44.688653Z",
+            "updatedAt": "2024-11-18T07:19:51.561691Z",
+            "deletedAt": null,
+            "metadata": null,
+            "id": "ec91273e-9fb7-4f10-9ecb-d1848d238814",
+            "xpubId": "68026cb6-a549-45e8-97b1-11426bb16769",
+            "alias": "jane.doe.test",
+            "domain": "jane.doe.4chain.space",
+            "publicName": "Jane Doe",
+            "avatar": "http://localhost:3003/static/paymail/avatar.jpg"
+        }
+    ],
+    "page": {
+        "size": 10,
+        "number": 1,
+        "totalElements": 2,
+        "totalPages": 1
+    }
+}

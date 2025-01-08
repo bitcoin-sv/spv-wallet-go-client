@@ -1,0 +1,26 @@
+{
+    "content": [
+        {
+            "createdAt": "2024-11-28T14:56:59.841638Z",
+            "updatedAt": "2024-11-28T14:56:59.841832Z",
+            "deletedAt": null,
+            "metadata": null,
+            "id": "3a77c921-b881-4907-8dc6-3903700272cb",
+            "xpubId": "cd6709cd-4f0e-464b-8d7d-0197e853f375"
+        },
+        {
+            "createdAt": "2024-11-28T13:28:22.943632Z",
+            "updatedAt": "2024-11-28T13:28:22.943664Z",
+            "deletedAt": null,
+            "metadata": null,
+            "id": "35aacdfd-5839-4125-9180-d33e798b1cde",
+            "xpubId": "7c6c4462-626c-47f6-84bc-04044798a4bf"
+        }
+    ],
+    "page": {
+        "size": 2,
+        "number": 1,
+        "totalElements": 2,
+        "totalPages": 1
+    }
+}

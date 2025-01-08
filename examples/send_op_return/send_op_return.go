@@ -1,53 +1,59 @@
-/*
-Package main - send_op_return example
-*/
 package main
 
 import (
 	"context"
 	"fmt"
-	"os"
+	"log"
 
-	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
+	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
-	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 func main() {
-	defer examples.HandlePanic()
-
-	examples.CheckIfXPrivExists()
-
-	const server = "http://localhost:3003/v1"
-
-	client, err := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
+	usersAPI, err := wallet.NewUserAPIWithXPriv(exampleutil.NewDefaultConfig(), examples.UserXPriv)
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to initialize user API with XPriv: %v", err)
 	}
+
 	ctx := context.Background()
-
-	metadata := map[string]any{}
-
-	opReturn := models.OpReturn{StringParts: []string{"hello", "world"}}
-	transactionConfig := models.TransactionConfig{Outputs: []*models.TransactionOutput{{OpReturn: &opReturn}}}
-
-	draftTransaction, err := client.DraftTransaction(ctx, &transactionConfig, metadata)
+	draftTransaction, err := usersAPI.DraftTransaction(ctx, &commands.DraftTransaction{
+		Config: response.TransactionConfig{
+			Outputs: []*response.TransactionOutput{
+				{
+					OpReturn: &response.OpReturn{StringParts: []string{"hello", "world"}},
+				},
+			},
+		},
+		Metadata: queryparams.Metadata{},
+	})
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to create draft transaction: %v", err)
 	}
-	fmt.Println("DraftTransaction response: ", draftTransaction)
+	exampleutil.PrettyPrint("Created DraftTransaction", draftTransaction)
 
-	finalized, err := client.FinalizeTransaction(draftTransaction)
+	finalized, err := usersAPI.FinalizeTransaction(draftTransaction)
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to finalize draft transaction: %v", err)
 	}
-	transaction, err := client.RecordTransaction(ctx, finalized, draftTransaction.ID, metadata)
+	fmt.Printf("Finalized draft transaction hex: %s\n", finalized)
+
+	transaction, err := usersAPI.RecordTransaction(ctx, &commands.RecordTransaction{
+		Hex:         finalized,
+		Metadata:    queryparams.Metadata{},
+		ReferenceID: draftTransaction.ID,
+	})
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to record finalized transaction: %v", err)
 	}
-	fmt.Println("Transaction with OP_RETURN: ", transaction)
+	exampleutil.PrettyPrint("Recorded transaction with OP_RETURN", transaction)
+
+	transactionG, err := usersAPI.Transaction(context.Background(), transaction.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	exampleutil.PrettyPrint("Fetched transaction", transactionG)
 }

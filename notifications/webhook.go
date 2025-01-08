@@ -3,12 +3,72 @@ package notifications
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"reflect"
+	"runtime"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
+
+// WebhookOptions - options for the webhook
+type WebhookOptions struct {
+	TokenHeader string
+	TokenValue  string
+	BufferSize  int
+	RootContext context.Context
+	Processors  int
+}
+
+// NewWebhookOptions - creates a new webhook options
+func NewWebhookOptions() *WebhookOptions {
+	return &WebhookOptions{
+		TokenHeader: "",
+		TokenValue:  "",
+		BufferSize:  100,
+		Processors:  runtime.NumCPU(),
+		RootContext: context.Background(),
+	}
+}
+
+// WebhookOpts - functional options for the webhook
+type WebhookOpts = func(*WebhookOptions)
+
+// WithToken - sets the token header and value
+func WithToken(tokenHeader, tokenValue string) WebhookOpts {
+	return func(w *WebhookOptions) {
+		w.TokenHeader = tokenHeader
+		w.TokenValue = tokenValue
+	}
+}
+
+// WithBufferSize - sets the buffer size
+func WithBufferSize(size int) WebhookOpts {
+	return func(w *WebhookOptions) {
+		w.BufferSize = size
+	}
+}
+
+// WithRootContext - sets the root context
+func WithRootContext(ctx context.Context) WebhookOpts {
+	return func(w *WebhookOptions) {
+		w.RootContext = ctx
+	}
+}
+
+// WithProcessors - sets the number of concurrent loops which will process the events
+func WithProcessors(count int) WebhookOpts {
+	return func(w *WebhookOptions) {
+		w.Processors = count
+	}
+}
+
+// WebhookSubscriber - interface for subscribing and unsubscribing to webhooks
+type WebhookSubscriber interface {
+	AdminSubscribeWebhook(ctx context.Context, webhookURL, tokenHeader, tokenValue string) error
+	AdminUnsubscribeWebhook(ctx context.Context, webhookURL string) error
+}
 
 // Webhook - the webhook event receiver
 type Webhook struct {
@@ -41,12 +101,20 @@ func NewWebhook(subscriber WebhookSubscriber, url string, opts ...WebhookOpts) *
 
 // Subscribe - sends a subscription request to the spv-wallet
 func (w *Webhook) Subscribe(ctx context.Context) error {
-	return w.subscriber.AdminSubscribeWebhook(ctx, w.URL, w.options.TokenHeader, w.options.TokenValue)
+	err := w.subscriber.AdminSubscribeWebhook(ctx, w.URL, w.options.TokenHeader, w.options.TokenValue)
+	if err != nil {
+		return fmt.Errorf("failed to subscribe webhook: %w", err)
+	}
+	return nil
 }
 
 // Unsubscribe - sends an unsubscription request to the spv-wallet
 func (w *Webhook) Unsubscribe(ctx context.Context) error {
-	return w.subscriber.AdminUnsubscribeWebhook(ctx, w.URL)
+	err := w.subscriber.AdminUnsubscribeWebhook(ctx, w.URL)
+	if err != nil {
+		return fmt.Errorf("failed to unsubscribe webhook: %w", err)
+	}
+	return nil
 }
 
 // HTTPHandler - returns an http handler for the webhook; it should be registered with the http server

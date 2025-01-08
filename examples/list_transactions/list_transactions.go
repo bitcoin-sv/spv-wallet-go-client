@@ -1,52 +1,28 @@
-/*
-Package main - list_transactions example
-*/
 package main
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"log"
 
-	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
+	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
+	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
+	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
 func main() {
-	defer examples.HandlePanic()
-
-	examples.CheckIfXPrivExists()
-
-	const server = "http://localhost:3003/v1"
-
-	client, err := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
+	usersAPI, err := wallet.NewUserAPIWithXPriv(exampleutil.NewDefaultConfig(), examples.UserXPriv)
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to initialize user API with XPriv: %v", err)
 	}
-	ctx := context.Background()
 
-	metadata := map[string]any{}
-
-	conditions := filter.TransactionFilter{}
-	queryParams := filter.QueryParams{}
-
-	txs, err := client.GetTransactions(ctx, &conditions, metadata, &queryParams)
+	page, err := usersAPI.Transactions(context.Background(), queries.QueryWithPageFilter[filter.TransactionFilter](filter.Page{
+		Size: 1,
+		Sort: "asc",
+	}))
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to fetch transactions: %v", err)
 	}
-	fmt.Println("GetTransactions response: ", txs)
-
-	targetBlockHeight := uint64(839228)
-	conditions = filter.TransactionFilter{BlockHeight: &targetBlockHeight}
-	queryParams = filter.QueryParams{PageSize: 100, Page: 1}
-
-	txsFiltered, err := client.GetTransactions(ctx, &conditions, metadata, &queryParams)
-	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
-	}
-	fmt.Println("Filtered GetTransactions response: ", txsFiltered)
+	exampleutil.PrettyPrint("Fetched transactions", page.Content)
 }

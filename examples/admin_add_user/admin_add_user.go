@@ -1,43 +1,39 @@
-/*
-Package main - admin_add_user example
-*/
 package main
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"log"
 
-	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
+	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
+	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 )
 
 func main() {
-	defer examples.HandlePanic()
-
-	examples.CheckIfAdminKeyExists()
-
-	server := "http://localhost:3003/v1"
-
-	adminClient, err := walletclient.NewWithAdminKey(server, examples.ExampleAdminKey)
+	adminAPI, err := wallet.NewAdminAPIWithXPub(exampleutil.NewDefaultConfig(), examples.AdminXPriv)
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to initialize admin API with XPriv: %v", err)
 	}
+
 	ctx := context.Background()
-
-	metadata := map[string]any{"some_metadata": "example"}
-
-	err = adminClient.AdminNewXpub(ctx, examples.ExampleXPub, metadata)
+	xPub, err := adminAPI.CreateXPub(ctx, &commands.CreateUserXpub{
+		XPub:     examples.UserXPub,
+		Metadata: queryparams.Metadata{"key": "value"},
+	})
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to create xPub: %v", err)
 	}
+	exampleutil.PrettyPrint("Created XPub", xPub)
 
-	createPaymailRes, err := adminClient.AdminCreatePaymail(ctx, examples.ExampleXPub, examples.ExamplePaymail, "Some public name", "")
+	paymail, err := adminAPI.CreatePaymail(ctx, &commands.CreatePaymail{
+		Metadata: queryparams.Metadata{"key": "value"},
+		Key:      examples.UserXPub,
+		Address:  examples.Paymail,
+	})
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to create paymail: %v", err)
 	}
-	fmt.Println("AdminCreatePaymail response: ", createPaymailRes)
+	exampleutil.PrettyPrint("Created paymail", paymail)
 }

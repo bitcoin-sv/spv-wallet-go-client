@@ -1,0 +1,95 @@
+{
+    "content": [
+        {
+            "createdAt": "2024-11-12T11:31:07.728974Z",
+            "updatedAt": "2024-11-12T11:31:07.732139Z",
+            "deletedAt": null,
+            "metadata": null,
+            "transactionId": "f365f697-3db9-44fd-bd0d-ba8e94ca63f2",
+            "outputIndex": 0,
+            "id": "db9bdd87-432d-44e6-b08f-9c0abd0d90ef",
+            "xpubId": "0f8ff805-a282-48d6-be70-8b607deba5f1",
+            "satoshis": 100,
+            "scriptPubKey": "88ca49f2-816e-4a0b-b5c5-e5c574e2d292",
+            "type": "pubkeyhash", 
+            "reservedAt": "0001-01-01T00:00:00Z",
+            "spendingTxId": "",
+            "transaction": {
+                "createdAt": "2024-11-12T11:31:07.72894Z",
+                "updatedAt": "2024-11-12T12:33:35.266758Z",
+                "deletedAt": null,
+                "metadata": {
+                    "domain": "john.doe.test.space",
+                    "ip_address": "127.0.0.1",
+                    "p2p_tx_metadata": {
+                        "pubkey": "d90c6998-010a-466f-83d7-25c39188a1c5",
+                        "sender": "john.doe@test.com"
+                    },
+                    "paymail_request": "HandleReceivedP2pTransaction",
+                    "reference_id": "81fbfb26-e648-463e-99ce-ade498774c8f",
+                    "user_agent": "node-fetch"
+                },
+                "id": "ec943c46-bfa8-4764-820a-a604c8b6c890",
+                "hex": "d825088b-1f04-406a-b046-059bc0736b11",
+                "xpubInIds": null,
+                "xpubOutIds": [
+                    "6e980e21-a8f8-4699-9d11-98aef96bdf98"
+                ],
+                "blockHash": "a7755931-eceb-473e-ab5b-6a6459948166",
+                "blockHeight": 1024,
+                "fee": 0,
+                "numberOfInputs": 2,
+                "numberOfOutputs": 3,
+                "draftId": "",
+                "totalValue": 1305,
+                "status": "MINED",
+                "direction": "outgoing"
+            }
+        },
+        {
+            "createdAt": "2024-11-08T13:40:55.592Z",
+            "updatedAt": "2024-11-08T13:40:55.593441Z",
+            "deletedAt": null,
+            "metadata": null,
+            "transactionId": "54ed5bcb-a964-47af-892b-1054065c28a8",
+            "outputIndex": 1,
+            "id": "7ed4a935-6b62-4e83-9d97-7e9a7f9eab30",
+            "xpubId": "68019cf3-616c-4d14-b9bf-cd9486b63f4f",
+            "satoshis": 18,
+            "scriptPubKey": "5e63148d-f506-43fb-88c3-2d98491625da",
+            "type": "pubkeyhash",
+            "draftId": "",
+            "reservedAt": "0001-01-01T00:00:00Z",
+            "spendingTxId": "",
+            "transaction": {
+                "createdAt": "2024-11-08T13:40:55.591986Z",
+                "updatedAt": "2024-11-08T14:43:56.256571Z",
+                "deletedAt": null,
+                "metadata": null,
+                "id": "29b89717-f139-45ae-9848-f2d7415ea596",
+                "hex": "6a1c1ddb-f3c1-4491-98b4-9ce3eb016e60",
+                "xpubInIds": [
+                    "32dfa8c9-82e3-4f49-8d33-ff7130e1cfae"
+                ],
+                "xpubOutIds": [
+                    "b0559e5f-b4b5-416f-b1f8-116f19a89f30"
+                ],
+                "blockHash": "f90fb747-4cec-4e00-912a-582d46090d61",
+                "blockHeight": 2048,
+                "fee": 1,
+                "numberOfInputs": 2,
+                "numberOfOutputs": 2,
+                "draftId": "057a743c-4c97-444b-b6ac-8b4a757aee8c",
+                "totalValue": 0,
+                "status": "MINED",
+                "direction": "outgoing"
+            }
+        }
+    ],
+    "page": {
+        "size": 2,
+        "number": 1,
+        "totalElements": 9,
+        "totalPages": 5
+    }
+}

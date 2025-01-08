@@ -1,0 +1,11 @@
+{
+    "createdAt": "2024-12-23T08:31:14.66249+01:00",
+    "updatedAt": "2024-12-23T07:31:14.661618Z",
+    "deletedAt": null,
+    "metadata": null,
+    "id": "649da615-4442-4bcb-8d0c-612d35c841a8",
+    "fullName": "John Doe",
+    "paymail": "john.doe@test.4chain.space",
+    "pubKey": "4ccd70d0-d809-4aa8-98e9-76aa6bdd6017",
+    "status": "unconfirmed"
+}

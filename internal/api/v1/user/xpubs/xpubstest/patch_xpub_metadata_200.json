@@ -1,0 +1,14 @@
+{
+    "createdAt": "2024-10-07T13:39:07.886862Z",
+    "updatedAt": "2024-11-13T11:41:56.115402Z",
+    "deletedAt": null,
+    "metadata": {
+     "metadata": {
+      "key": "value"
+     }
+    },
+    "id": "1356cc11-8164-4364-afa4-59f096a79eb5",
+    "currentBalance": 315,
+    "nextInternalNum": 13,
+    "nextExternalNum": 2
+   }

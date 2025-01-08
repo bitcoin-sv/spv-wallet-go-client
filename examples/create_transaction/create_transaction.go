@@ -1,46 +1,41 @@
-/*
-Package main - create_transaction example
-*/
 package main
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"log"
 
-	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
+	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
+	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
+	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 )
 
 func main() {
-	defer examples.HandlePanic()
-
-	examples.CheckIfXPrivExists()
-
-	const server = "http://localhost:3003/v1"
-
-	client, err := walletclient.NewWithXPriv(server, examples.ExampleXPriv)
+	usersAPI, err := wallet.NewUserAPIWithXPriv(exampleutil.NewDefaultConfig(), examples.UserXPriv)
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to initialize user API with XPriv: %v", err)
 	}
+
 	ctx := context.Background()
-
-	recipient := walletclient.Recipients{To: "alice@example.com", Satoshis: 1}
-	recipients := []*walletclient.Recipients{&recipient}
-	metadata := map[string]any{"some_metadata": "example"}
-
-	newTransaction, err := client.SendToRecipients(ctx, recipients, metadata)
+	created, err := usersAPI.SendToRecipients(ctx, &commands.SendToRecipients{
+		Recipients: []*commands.Recipients{
+			{
+				Satoshis: 1,
+				To:       "alice@example.com",
+			},
+		},
+		Metadata: queryparams.Metadata{"key": "value"},
+	})
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to create transaction: %v", err)
 	}
-	fmt.Println("SendToRecipients response: ", newTransaction)
+	exampleutil.PrettyPrint("Created transaction", created)
 
-	tx, err := client.GetTransaction(ctx, newTransaction.ID)
+	fetch, err := usersAPI.Transaction(ctx, created.ID)
 	if err != nil {
-		examples.GetFullErrorMessage(err)
-		os.Exit(1)
+		log.Fatalf("Failed to fetch transaction: %v", err)
 	}
-	fmt.Println("GetTransaction response: ", tx)
+
+	exampleutil.PrettyPrint("Fetched transaction", fetch)
 }

@@ -9,7 +9,7 @@ tasks:
     desc: "running go regression tests"
     cmds:
       - echo "running go regression tests..."
-      - go test -tags=regression ./...
+      - go test -tags=regression ./... -v
     dir: .
     env:
       CLIENT_ONE_URL: "{{.CLIENT_ONE_URL}}"

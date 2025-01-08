@@ -1,0 +1,13 @@
+{
+    "createdAt": "2024-11-28T13:34:52.11722Z",
+    "updatedAt": "2024-11-29T08:23:19.66093Z",
+    "deletedAt": null,
+    "metadata": {
+        "phoneNumber": "123456789"
+    },
+    "id": "4d570959-dd85-4f53-bad1-18d0671761e9",
+    "fullName": "John Doe Williams",
+    "paymail": "john.doe.test@john.doe.test.4chain.space",
+    "pubKey": "96843af4-fc9c-4778-945d-2131ac5b1a8a",
+    "status": "awaiting"
+}

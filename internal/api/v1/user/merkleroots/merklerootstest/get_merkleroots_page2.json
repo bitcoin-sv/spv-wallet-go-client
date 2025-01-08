@@ -1,0 +1,12 @@
+{
+  "content": [
+    { "blockHeight": 3, "merkleRoot": "d229c224-6c21-4c68-ba25-261119e9b8dc" }
+  ],
+  "page": {
+    "lastEvaluatedKey": "",
+    "orderByField": "blockHeight",
+    "size": 20,
+    "sortDirection": "asc",
+    "totalElements": 10
+  }
+}

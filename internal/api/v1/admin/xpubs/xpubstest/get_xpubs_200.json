@@ -1,0 +1,34 @@
+{
+    "content": [
+        {
+            "createdAt": "2024-11-21T11:41:49.830635Z",
+            "updatedAt": "2024-11-21T11:41:49.830649Z",
+            "deletedAt": null,
+            "metadata": {
+                "key": "val"
+            },
+            "id": "3c7a9d02-32e3-4d83-a391-af64f1933acb",
+            "currentBalance": 10,
+            "nextInternalNum": 20,
+            "nextExternalNum": 30
+        },
+        {
+            "createdAt": "2024-11-21T11:26:43.091808Z",
+            "updatedAt": "2024-11-21T11:26:43.091857Z",
+            "deletedAt": null,
+            "metadata": {
+                "key": "val"
+            },
+            "id": "301f38e2-f1dc-43cb-9db2-f2835a648b8b",
+            "currentBalance": 40,
+            "nextInternalNum": 50,
+            "nextExternalNum": 60
+        }
+    ],
+    "page": {
+        "size": 50,
+        "number": 1,
+        "totalElements": 40,
+        "totalPages": 1
+    }
+}
