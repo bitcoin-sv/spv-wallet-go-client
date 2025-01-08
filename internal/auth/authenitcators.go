@@ -71,7 +71,7 @@ func (a *AccessKeyAuthenticator) privKeyHex() string {
 }
 
 func (a *AccessKeyAuthenticator) pubKeyHex() string {
-	return hex.EncodeToString(a.pub.SerializeCompressed())
+	return hex.EncodeToString(a.pub.Compressed())
 }
 
 func bodyString(r *resty.Request) string {
