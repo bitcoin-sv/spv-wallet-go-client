@@ -95,7 +95,7 @@ func createSignatureAccessKey(privateKeyHex, bodyString string) (payload *models
 
 	// Get the AccessKey
 	payload = new(models.AuthPayload)
-	payload.AccessKey = hex.EncodeToString(publicKey.SerializeCompressed())
+	payload.AccessKey = hex.EncodeToString(publicKey.Compressed())
 
 	// auth_nonce is a random unique string to seed the signing message
 	// this can be checked server side to make sure the request is not being replayed

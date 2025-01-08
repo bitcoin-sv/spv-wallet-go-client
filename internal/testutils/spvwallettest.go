@@ -78,7 +78,7 @@ func MockPKI(t *testing.T, xpub string) string {
 		t.Fatalf("test helper - ec public key from xpub: %s", err)
 	}
 
-	return hex.EncodeToString(pubKey.SerializeCompressed())
+	return hex.EncodeToString(pubKey.Compressed())
 }
 
 func ParseTime(t *testing.T, s string) time.Time {
