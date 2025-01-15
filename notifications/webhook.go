@@ -9,9 +9,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/models"
-
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // WebhookOptions - options for the webhook
