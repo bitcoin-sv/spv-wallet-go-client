@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 )
 
 // WebhookOptions - options for the webhook
@@ -66,8 +68,8 @@ func WithProcessors(count int) WebhookOpts {
 
 // WebhookSubscriber - interface for subscribing and unsubscribing to webhooks
 type WebhookSubscriber interface {
-	AdminSubscribeWebhook(ctx context.Context, webhookURL, tokenHeader, tokenValue string) error
-	AdminUnsubscribeWebhook(ctx context.Context, webhookURL string) error
+	AdminSubscribeWebhook(ctx context.Context, cmd *commands.CreateWebhookSubscription) error
+	AdminUnsubscribeWebhook(ctx context.Context, cmd *commands.CancelWebhookSubscription) error
 }
 
 // Webhook - the webhook event receiver
@@ -101,7 +103,12 @@ func NewWebhook(subscriber WebhookSubscriber, url string, opts ...WebhookOpts) *
 
 // Subscribe - sends a subscription request to the spv-wallet
 func (w *Webhook) Subscribe(ctx context.Context) error {
-	err := w.subscriber.AdminSubscribeWebhook(ctx, w.URL, w.options.TokenHeader, w.options.TokenValue)
+	cmd := &commands.CreateWebhookSubscription{
+		URL:         w.URL,
+		TokenHeader: w.options.TokenHeader,
+		TokenValue:  w.options.TokenValue,
+	}
+	err := w.subscriber.AdminSubscribeWebhook(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("failed to subscribe webhook: %w", err)
 	}
@@ -110,7 +117,10 @@ func (w *Webhook) Subscribe(ctx context.Context) error {
 
 // Unsubscribe - sends an unsubscription request to the spv-wallet
 func (w *Webhook) Unsubscribe(ctx context.Context) error {
-	err := w.subscriber.AdminUnsubscribeWebhook(ctx, w.URL)
+	cmd := &commands.CancelWebhookSubscription{
+		URL: w.URL,
+	}
+	err := w.subscriber.AdminUnsubscribeWebhook(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("failed to unsubscribe webhook: %w", err)
 	}
