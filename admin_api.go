@@ -332,10 +332,10 @@ func (a *AdminAPI) CreatePaymail(ctx context.Context, cmd *commands.CreatePaymai
 // DeletePaymail deletes a paymail address with via the Admin Paymails API.
 // It returns an error if the API request fails. A nil error indicates that the paymail
 // was successfully deleted.
-func (a *AdminAPI) DeletePaymail(ctx context.Context, address string) error {
-	err := a.paymailsAPI.DeletePaymail(ctx, address)
+func (a *AdminAPI) DeletePaymail(ctx context.Context, id string) error {
+	err := a.paymailsAPI.DeletePaymail(ctx, id)
 	if err != nil {
-		msg := fmt.Sprintf("remove paymail address: %s", address)
+		msg := fmt.Sprintf("remove paymail address with id: %s", id)
 		return errutil.NewHTTPErrorFormatter(constants.AdminPaymailAPI, msg, err).FormatGetErr()
 	}
 

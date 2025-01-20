@@ -127,6 +127,7 @@ func TestRegressionWorkflow(t *testing.T) {
 				// then:
 				assert.NoError(err, "Paymail record %s wasn't created successfully for %s by %s. Expect to get nil error", user.paymail, user.alias, admin.paymail)
 				assert.NotNil(paymail, "Expected to get non-nil paymail addresss response after sending creation request by %s.", admin.paymail)
+				user.paymailID = paymail.ID
 
 				logSuccessOp(t, err, "Paymail record %s was created successfully for %s by %s.", user.paymail, user.alias, admin.paymail)
 			})
@@ -257,12 +258,13 @@ func TestRegressionWorkflow(t *testing.T) {
 				// given:
 				admin := tc.server.admin
 				paymail := tc.server.user.paymail
+				paymailID := tc.server.user.paymailID
 
 				// when:
-				err := admin.client.DeletePaymail(ctx, paymail)
+				err := admin.client.DeletePaymail(ctx, paymailID)
 
 				// then:
-				assert.NoError(err, "Delete paymail %s wasn't successful by %s. Expect to get nil error, got error: %v", paymail, admin.paymail)
+				assert.NoError(err, "Delete paymail %s wasn't successful by %s. Expect to get nil error, got error: %v", paymail, admin.paymail, err)
 				logSuccessOp(t, err, "Delete paymail %s was successful by %s", paymail, admin.paymail)
 			})
 		}

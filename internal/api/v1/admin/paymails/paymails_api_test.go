@@ -20,6 +20,7 @@ import (
 const (
 	paymailsURL = "/api/v1/admin/paymails"
 	xpubID      = "xpub22e6cba6-ef6e-432a-8612-63ac4b290ce9"
+	paymailID   = "d43ed481ba08aae1db02d880ebefe962f9796168387bb293a95024cb02b953ef"
 	id          = "98dbafe0-4e2b-4307-8fbf-c55209214bae"
 )
 
@@ -47,7 +48,7 @@ func TestPaymailsAPI_DeletePaymail(t *testing.T) {
 		},
 	}
 
-	url := testutils.FullAPIURL(t, paymailsURL, xpubID)
+	url := testutils.FullAPIURL(t, paymailsURL, paymailID)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
@@ -55,7 +56,7 @@ func TestPaymailsAPI_DeletePaymail(t *testing.T) {
 			transport.RegisterResponder(http.MethodDelete, url, tc.responder)
 
 			// when:
-			err := wallet.DeletePaymail(context.Background(), xpubID)
+			err := wallet.DeletePaymail(context.Background(), paymailID)
 
 			// then:
 			require.ErrorIs(t, err, tc.expectedErr)

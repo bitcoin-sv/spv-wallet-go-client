@@ -24,16 +24,11 @@ type API struct {
 	url        *url.URL
 }
 
-func (a *API) DeletePaymail(ctx context.Context, address string) error {
-	type body struct {
-		Address string `json:"address"`
-	}
-
+func (a *API) DeletePaymail(ctx context.Context, id string) error {
 	_, err := a.httpClient.
 		R().
 		SetContext(ctx).
-		SetBody(body{Address: address}).
-		Delete(a.url.JoinPath(address).String())
+		Delete(a.url.JoinPath(id).String())
 	if err != nil {
 		return fmt.Errorf("HTTP response failure: %w", err)
 	}
