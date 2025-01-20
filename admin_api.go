@@ -336,7 +336,7 @@ func (a *AdminAPI) DeletePaymail(ctx context.Context, id string) error {
 	err := a.paymailsAPI.DeletePaymail(ctx, id)
 	if err != nil {
 		msg := fmt.Sprintf("remove paymail address with id: %s", id)
-		return errutil.NewHTTPErrorFormatter(constants.AdminPaymailAPI, msg, err).FormatGetErr()
+		return errutil.NewHTTPErrorFormatter(constants.AdminPaymailAPI, msg, err).FormatDeleteErr()
 	}
 
 	return nil
