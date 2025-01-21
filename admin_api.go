@@ -330,6 +330,8 @@ func (a *AdminAPI) CreatePaymail(ctx context.Context, cmd *commands.CreatePaymai
 }
 
 // DeletePaymail deletes a paymail address with via the Admin Paymails API.
+// This function accepts an id, which corresponds to the database record id of the paymail to be deleted.
+//
 // It returns an error if the API request fails. A nil error indicates that the paymail
 // was successfully deleted.
 func (a *AdminAPI) DeletePaymail(ctx context.Context, id string) error {

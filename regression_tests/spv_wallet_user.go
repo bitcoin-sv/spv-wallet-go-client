@@ -35,7 +35,7 @@ type user struct {
 	xPriv     string          // The extended private key for the user.
 	xPub      string          // The extended public key for the user.
 	paymail   string          // The paymail address associated with the user.
-	paymailID string          //The paymail id associated with the users paymail.
+	paymailID string          // The paymail id associated with the users paymail.
 	client    *wallet.UserAPI // The API client for interacting with the SPV Wallet.
 }
 
