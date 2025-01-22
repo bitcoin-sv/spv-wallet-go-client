@@ -31,11 +31,12 @@ func (tt transactionsSlice) Has(id string) bool {
 // The user struct also utilizes the wallet's UserAPI client to interact with the SPV Wallet API
 // for transaction-related operations.
 type user struct {
-	alias   string          // The unique alias for the user.
-	xPriv   string          // The extended private key for the user.
-	xPub    string          // The extended public key for the user.
-	paymail string          // The paymail address associated with the user.
-	client  *wallet.UserAPI // The API client for interacting with the SPV Wallet.
+	alias     string          // The unique alias for the user.
+	xPriv     string          // The extended private key for the user.
+	xPub      string          // The extended public key for the user.
+	paymail   string          // The paymail address associated with the user.
+	paymailID string          // The paymail id associated with the users paymail.
+	client    *wallet.UserAPI // The API client for interacting with the SPV Wallet.
 }
 
 // setPaymail sets the user's Paymail address with the given domain.

@@ -17,7 +17,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	err = adminAPI.DeletePaymail(ctx, examples.Paymail)
+	err = adminAPI.DeletePaymail(ctx, "d43ed481ba08aae1db02d880ebefe962f9796168387bb293a95024cb02b953ef")
 	if err != nil {
 		log.Fatalf("Failed to delete paymail: %v", err)
 	}
