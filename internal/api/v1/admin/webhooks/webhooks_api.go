@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/go-resty/resty/v2"
-
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/notifications"
+	"github.com/go-resty/resty/v2"
 )
 
 const (

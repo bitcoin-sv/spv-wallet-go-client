@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/require"
-
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/require"
 )
 
 const (
