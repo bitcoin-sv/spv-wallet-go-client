@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/testutils"
+	"github.com/bitcoin-sv/spv-wallet-go-client/notifications"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
@@ -97,8 +98,9 @@ func TestWebhooksAPI_UnsubscribeWebhook(t *testing.T) {
 
 func TestWebhooksAPI_GetAllWebhooks(t *testing.T) {
 	tests := map[string]struct {
-		responder   httpmock.Responder
-		expectedErr error
+		responder        httpmock.Responder
+		expectedErr      error
+		expectedResponse []*notifications.Webhook
 	}{
 		"HTTP GET /api/v1/admin/webhooks/subscriptions response: 200": {
 			responder: httpmock.NewJsonResponderOrPanic(http.StatusOK, []map[string]interface{}{
@@ -113,6 +115,18 @@ func TestWebhooksAPI_GetAllWebhooks(t *testing.T) {
 					"tokenValue":  "xyz5678",
 				},
 			}),
+			expectedResponse: []*notifications.Webhook{
+				{
+					URL:         url,
+					TokenHeader: "Authorization",
+					TokenValue:  "abcd1234",
+				},
+				{
+					URL:         "http://webhook2.com",
+					TokenHeader: "Auth",
+					TokenValue:  "xyz5678",
+				},
+			},
 		},
 		"HTTP GET /api/v1/admin/webhooks/subscriptions response: 400": {
 			expectedErr: testutils.NewBadRequestSPVError(),
@@ -137,23 +151,8 @@ func TestWebhooksAPI_GetAllWebhooks(t *testing.T) {
 
 			// then:
 			webhooks, err := wallet.GetAllWebhooks(context.Background())
-
 			require.ErrorIs(t, err, tc.expectedErr)
-
-			if tc.expectedErr == nil {
-				require.NotNil(t, webhooks)
-				require.Len(t, webhooks, 2)
-
-				require.Equal(t, "http://webhook1.com", webhooks[0].URL)
-				require.Equal(t, "Authorization", webhooks[0].TokenHeader)
-				require.Equal(t, "abcd1234", webhooks[0].TokenValue)
-
-				require.Equal(t, "http://webhook2.com", webhooks[1].URL)
-				require.Equal(t, "Auth", webhooks[1].TokenHeader)
-				require.Equal(t, "xyz5678", webhooks[1].TokenValue)
-			} else {
-				require.Nil(t, webhooks)
-			}
+			require.ElementsMatch(t, tc.expectedResponse, webhooks)
 		})
 	}
 }
