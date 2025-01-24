@@ -69,15 +69,18 @@ func WithProcessors(count int) WebhookOpts {
 type WebhookSubscriber interface {
 	AdminSubscribeWebhook(ctx context.Context, cmd *commands.CreateWebhookSubscription) error
 	AdminUnsubscribeWebhook(ctx context.Context, cmd *commands.CancelWebhookSubscription) error
+	AdminGetAllWebhooks(ctx context.Context) ([]*Webhook, error)
 }
 
 // Webhook - the webhook event receiver
 type Webhook struct {
-	URL        string
-	options    *WebhookOptions
-	buffer     chan *models.RawEvent
-	subscriber WebhookSubscriber
-	handlers   *eventsMap
+	URL         string `json:"url"`
+	TokenHeader string `json:"tokenHeader"`
+	TokenValue  string `json:"tokenValue"`
+	options     *WebhookOptions
+	buffer      chan *models.RawEvent
+	subscriber  WebhookSubscriber
+	handlers    *eventsMap
 }
 
 // NewWebhook - creates a new webhook
@@ -124,6 +127,15 @@ func (w *Webhook) Unsubscribe(ctx context.Context) error {
 		return fmt.Errorf("failed to unsubscribe webhook: %w", err)
 	}
 	return nil
+}
+
+// GetAllWebhooks - retrieves all subscribed webhooks from the spv-wallet
+func (w *Webhook) GetAllWebhooks(ctx context.Context) ([]*Webhook, error) {
+	webhooks, err := w.subscriber.AdminGetAllWebhooks(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all webhooks: %w", err)
+	}
+	return webhooks, nil
 }
 
 // HTTPHandler - returns an http handler for the webhook; it should be registered with the http server

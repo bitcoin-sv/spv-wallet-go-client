@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet-go-client/notifications"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -43,6 +44,22 @@ func (a *API) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelWebhoo
 	}
 
 	return nil
+}
+
+func (a *API) AdminGetAllWebhooks(ctx context.Context) ([]*notifications.Webhook, error) {
+	var webhooks []*notifications.Webhook
+
+	_, err := a.httpClient.
+		R().
+		SetContext(ctx).
+		SetResult(&webhooks).
+		Get(a.url.String())
+
+	if err != nil {
+		return nil, fmt.Errorf("HTTP request failure: %w", err)
+	}
+
+	return webhooks, nil
 }
 
 func NewAPI(url *url.URL, httpClient *resty.Client) *API {

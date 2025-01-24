@@ -22,6 +22,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/auth"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/constants"
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/restyutil"
+	"github.com/bitcoin-sv/spv-wallet-go-client/notifications"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -266,6 +267,18 @@ func (a *AdminAPI) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelW
 	}
 
 	return nil
+}
+
+// GetAllWebhooks retrieves all webhook subscriptions using the Admin Webhooks API.
+// Accepts the context for controlling cancellation and timeout for the API request.
+// Returns a list of Webhook objects or an error if the API request fails.
+func (a *AdminAPI) GetAllWebhooks(ctx context.Context) ([]*notifications.Webhook, error) {
+	webhooks, err := a.webhooksAPI.AdminGetAllWebhooks(ctx)
+	if err != nil {
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminWebhooksAPI, "get all webhooks", err).FormatGetErr()
+	}
+
+	return webhooks, nil
 }
 
 // UTXOs fetches a paginated list of UTXOs via the Admin XPubs API.
