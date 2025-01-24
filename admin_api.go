@@ -275,8 +275,7 @@ func (a *AdminAPI) UnsubscribeWebhook(ctx context.Context, cmd *commands.CancelW
 func (a *AdminAPI) GetAllWebhooks(ctx context.Context) ([]*notifications.Webhook, error) {
 	webhooks, err := a.webhooksAPI.AdminGetAllWebhooks(ctx)
 	if err != nil {
-		msg := "get all webhooks"
-		return nil, errutil.NewHTTPErrorFormatter(constants.AdminWebhooksAPI, msg, err).FormatGetErr()
+		return nil, errutil.NewHTTPErrorFormatter(constants.AdminWebhooksAPI, "get all webhooks", err).FormatGetErr()
 	}
 
 	return webhooks, nil
