@@ -52,14 +52,14 @@ func (b *API) GenerateTotpForContact(contact *models.Contact, period, digits uin
 }
 
 // ValidateTotpForContact validates a TOTP for a contact.
-func (b *API) ValidateTotpForContact(contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
-	sharedSecret, err := b.makeSharedSecret(contact)
+func (b *API) ValidateTotpForContact(generatorContact *models.Contact, passcode, validatorContact string, period, digits uint) error {
+	sharedSecret, err := b.makeSharedSecret(generatorContact)
 	if err != nil {
 		return fmt.Errorf("ValidateTotpForContact: error when making shared secret: %w", err)
 	}
 
 	opts := getTotpOpts(period, digits)
-	valid, err := totp.ValidateCustom(passcode, directedSecret(sharedSecret, requesterPaymail), time.Now(), *opts)
+	valid, err := totp.ValidateCustom(passcode, directedSecret(sharedSecret, validatorContact), time.Now(), *opts)
 	if err != nil {
 		return fmt.Errorf("ValidateTotpForContact: error when validating TOTP: %w", err)
 	}
