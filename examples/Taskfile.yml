@@ -46,14 +46,6 @@ tasks:
       - go run ../walletkeys/cmd/main.go
       - echo "=================================================================="
 
-  generate_totp:
-    desc: "Generate totp."
-    silent: true
-    cmds:
-      - echo "=================================================================="
-      - go run ./generate_totp/generate_totp.go
-      - echo "=================================================================="
-
   get_balance:
     desc: "Get balance as User."
     silent: true
