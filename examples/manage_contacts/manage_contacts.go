@@ -251,7 +251,7 @@ func main() {
 
 	ctx := context.Background()
 
-	fmt.Println("We assume that the users: Alice and Bob are already registered.\n")
+	fmt.Println("We assume that the users: Alice and Bob are already registered.")
 	fmt.Println("If they're not, please uncomment the setupUsers() call below.")
 
 	// Uncomment to setup users
