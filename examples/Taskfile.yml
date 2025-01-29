@@ -78,6 +78,14 @@ tasks:
       - go run ./list_transactions/list_transactions.go
       - echo "=================================================================="
 
+  manage_contacts:
+    desc: "Show possible contact scenario with TOTP generation&validation"
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./manage_contacts/manage_contacts.go
+      - echo "=================================================================="
+
   send_op_return:
     desc: "Create draft transaction, finalize transaction and record transaction as User."
     silent: true
