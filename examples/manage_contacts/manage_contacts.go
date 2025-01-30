@@ -58,7 +58,7 @@ var clients = struct {
 var ctx = context.Background()
 
 func verificationFlow() (*verificationResults, error) {
-	fmt.Println("1. Creating initial contacts")
+	fmt.Println("\n1. Creating initial contacts")
 
 	alicePaymail := config.alice.paymail
 	bobPaymail := config.bob.paymail
@@ -100,7 +100,7 @@ func verificationFlow() (*verificationResults, error) {
 	}
 	logSecureMessage("Alice", "Bob", aliceTotpForBob)
 
-	fmt.Println("3. Bob validates Alice's TOTP")
+	fmt.Println("\n3. Bob validates Alice's TOTP")
 	bobValidationErr := clients.bob.ValidateTotpForContact(aliceContact, aliceTotpForBob, respBob.Paymail, config.totpPeriods, config.totpDigits)
 	bobValidatedAlicesTotp := bobValidationErr == nil
 	fmt.Printf("Validation status: %v\n", bobValidatedAlicesTotp)
@@ -112,7 +112,7 @@ func verificationFlow() (*verificationResults, error) {
 	}
 	logSecureMessage("Bob", "Alice", bobTotpForAlice)
 
-	fmt.Println("5. Alice validates Bob's TOTP")
+	fmt.Println("\n5. Alice validates Bob's TOTP")
 	aliceValidationErr := clients.alice.ValidateTotpForContact(bobContact, bobTotpForAlice, respAlice.Paymail, config.totpPeriods, config.totpDigits)
 	aliceValidatedBobsTotp := aliceValidationErr == nil
 	fmt.Printf("Validation status: %v\n", aliceValidatedBobsTotp)

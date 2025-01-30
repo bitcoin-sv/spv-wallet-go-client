@@ -51,7 +51,7 @@ func mapToContactModel(resp *response.Contact) *models.Contact {
 }
 
 func setupUsers() {
-	fmt.Println("0. Setting up users (optional - uncomment if users are not registered)")
+	fmt.Println("0. Setting up users (optional)")
 
 	// Create account for Alice
 	assertNoError(clients.admin.CreateXPub(ctx, &commands.CreateUserXpub{
