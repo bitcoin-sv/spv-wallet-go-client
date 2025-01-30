@@ -398,12 +398,12 @@ func (u *UserAPI) GenerateTotpForContact(contact *models.Contact, period, digits
 }
 
 // ValidateTotpForContact validates a TOTP code for the specified contact.
-func (u *UserAPI) ValidateTotpForContact(contact *models.Contact, passcode, requesterPaymail string, period, digits uint) error {
+func (u *UserAPI) ValidateTotpForContact(generatorContact *models.Contact, passcode, validatorPaymail string, period, digits uint) error {
 	if u.totpAPI == nil {
 		return errors.New("totp client not initialized - xPriv authentication required")
 	}
 
-	if err := u.totpAPI.ValidateTotpForContact(contact, passcode, requesterPaymail, period, digits); err != nil {
+	if err := u.totpAPI.ValidateTotpForContact(generatorContact, passcode, validatorPaymail, period, digits); err != nil {
 		return fmt.Errorf("failed to validate TOTP for contact: %w", err)
 	}
 
