@@ -171,6 +171,19 @@ func (a *AdminAPI) ConfirmContacts(ctx context.Context, cmd *commands.ConfirmCon
 	return nil
 }
 
+// UnconfirmContact changes the status of a contact to unconfirmed using the admin contacts API.
+// Returns an error if the API request fails.
+// A nil error indicates the unconfirming contact was successful.
+func (a *AdminAPI) UnconfirmContact(ctx context.Context, id string) error {
+	err := a.contactsAPI.UnconfirmContact(ctx, id)
+	if err != nil {
+		msg := fmt.Sprintf("unconfirm contact: %s", id)
+		return errutil.NewHTTPErrorFormatter(constants.AdminContactsAPI, msg, err).FormatPostErr()
+	}
+
+	return nil
+}
+
 // AcceptInvitation processes and accepts a user contact invitation using the given ID via the admin invitations API.
 // Returns an error if the API request fails. A nil error indicates the invitation was successfully accepted.
 func (a *AdminAPI) AcceptInvitation(ctx context.Context, ID string) error {

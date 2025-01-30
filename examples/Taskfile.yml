@@ -46,14 +46,6 @@ tasks:
       - go run ../walletkeys/cmd/main.go
       - echo "=================================================================="
 
-  generate_totp:
-    desc: "Generate totp."
-    silent: true
-    cmds:
-      - echo "=================================================================="
-      - go run ./generate_totp/generate_totp.go
-      - echo "=================================================================="
-
   get_balance:
     desc: "Get balance as User."
     silent: true
@@ -84,6 +76,14 @@ tasks:
     cmds:
       - echo "=================================================================="
       - go run ./list_transactions/list_transactions.go
+      - echo "=================================================================="
+
+  manage_contacts:
+    desc: "Show possible contact scenario with TOTP generation&validation"
+    silent: true
+    cmds:
+      - echo "=================================================================="
+      - go run ./manage_contacts/manage_contacts.go
       - echo "=================================================================="
 
   send_op_return:

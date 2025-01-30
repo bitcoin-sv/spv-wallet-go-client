@@ -1,5 +1,5 @@
-//go:build regression
-// +build regression
+////go:build regression
+//// +build regression
 
 package regressiontests
 
@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 )
 
 func TestRegressionWorkflow(t *testing.T) {
@@ -239,7 +241,110 @@ func TestRegressionWorkflow(t *testing.T) {
 		}
 	})
 
-	t.Run("Step 7: The admin clients attempt to remove created actor paymails using the appropriate SPV Wallet API instance.", func(t *testing.T) {
+	bob, alice, tom, jerry := prepareUsersForContactsFlowVerification(t, spvWalletPG, spvWalletSL)
+	t.Run("Step 7: Bob adds Alice as contact", func(t *testing.T) {
+
+		contact, err := bob.addContact(ctx, alice.paymail, alice.alias)
+		require.NoError(t, err, "Bob failed to add Alice as contact")
+		require.NotNil(t, contact, "Bob failed to add Alice as contact")
+
+		logSuccessOp(t, nil, "Contact successfully created between %s and %s", bob.alias, alice.alias)
+	})
+
+	t.Run("Step 8: Alice adds Bob as contact", func(t *testing.T) {
+
+		contact, err := alice.addContact(ctx, bob.paymail, bob.alias)
+		require.NoError(t, err, "Alice failed to add Bob as contact")
+		require.NotNil(t, contact, "Alice failed to add Bob as contact")
+
+		logSuccessOp(t, nil, "Contact successfully created between %s and %s", alice.alias, bob.alias)
+	})
+
+	t.Run("Step 9: Bob should confirm contact with Alice", func(t *testing.T) {
+		totp, err := alice.generateTotp(ctx, bob.paymail)
+		require.NoError(t, err, "Failed to generate TOTP for Bob")
+		require.NotEmpty(t, totp, "TOTP should not be empty")
+
+		err = bob.confirmContact(ctx, alice.paymail, totp)
+		require.NoError(t, err, "Bob failed to confirm Alice")
+
+		contact, err := bob.getContact(ctx, alice.paymail)
+		require.NoError(t, err, "Failed to fetch contact")
+		require.Equal(t, response.ContactConfirmed, contact.Status, "Alice's contact status should be confirmed")
+
+		logSuccessOp(t, nil, "Contact successfully confirmed between %s and %s", bob.alias, alice.alias)
+	})
+
+	t.Run("Step 10: Bob should unconfirm contact with Alice", func(t *testing.T) {
+		err := bob.unconfirmContact(ctx, alice.paymail)
+		require.NoError(t, err, "Bob failed to unconfirm Alice")
+
+		contact, err := bob.getContact(ctx, alice.paymail)
+		require.NoError(t, err, "Failed to fetch contact")
+		require.Equal(t, response.ContactNotConfirmed, contact.Status, "Alice's contact status should be unconfirmed")
+
+		logSuccessOp(t, nil, "Contact successfully unconfirmed between %s and %s", bob.alias, alice.alias)
+	})
+
+	t.Run("Step 11: Bob should remove Alice from contacts", func(t *testing.T) {
+		err := bob.removeContact(ctx, alice.paymail)
+		require.NoError(t, err, "Bob failed to remove Alice")
+
+		logSuccessOp(t, nil, "Contacts successfully removed between %s and %s", bob.alias, alice.alias)
+	})
+
+	t.Run("Step 12: Tom adds Jerry as contact", func(t *testing.T) {
+
+		contact, err := tom.addContact(ctx, jerry.paymail, jerry.alias)
+		require.NoError(t, err, "Tom failed to add Jerry as contact")
+		require.NotNil(t, contact, "Tom failed to add Jerry as contact")
+
+		logSuccessOp(t, nil, "Contacts successfully created between %s and %s", tom.alias, jerry.alias)
+	})
+
+	t.Run("Step 13: Jerry adds Tom as contact", func(t *testing.T) {
+
+		contact, err := jerry.addContact(ctx, tom.paymail, tom.alias)
+		require.NoError(t, err, "Jerry failed to add Tom as contact")
+		require.NotNil(t, contact, "Jerry failed to add Tom as contact")
+
+		logSuccessOp(t, nil, "Contacts successfully created between %s and %s", jerry.alias, tom.alias)
+	})
+
+	t.Run("Step 14: Tom should confirm contact with Jerry", func(t *testing.T) {
+		totp, err := jerry.generateTotp(ctx, tom.paymail)
+		require.NoError(t, err, "Failed to generate TOTP for Jerry")
+		require.NotEmpty(t, totp, "TOTP should not be empty")
+
+		err = tom.confirmContact(ctx, jerry.paymail, totp)
+		require.NoError(t, err, "Tom failed to confirm Jerry")
+
+		contact, err := tom.getContact(ctx, jerry.paymail)
+		require.NoError(t, err, "Failed to fetch contact")
+		require.Equal(t, response.ContactConfirmed, contact.Status, "Jerry's contact status should be confirmed")
+
+		logSuccessOp(t, nil, "Contact successfully confirmed between %s and %s", tom.alias, jerry.alias)
+	})
+
+	t.Run("Step 15: Tom should unconfirm contact with Jerry", func(t *testing.T) {
+		err := tom.unconfirmContact(ctx, jerry.paymail)
+		require.NoError(t, err, "Tom failed to unconfirm Jerry")
+
+		contact, err := tom.getContact(ctx, jerry.paymail)
+		require.NoError(t, err, "Failed to fetch contact")
+		require.Equal(t, response.ContactNotConfirmed, contact.Status, "Jerry's contact status should be unconfirmed")
+
+		logSuccessOp(t, nil, "Contact successfully unconfirmed between %s and %s", tom.alias, jerry.alias)
+	})
+
+	t.Run("Step 16: Tom should remove Jerry from contacts", func(t *testing.T) {
+		err := tom.removeContact(ctx, jerry.paymail)
+		require.NoError(t, err, "Tom failed to remove Jerry")
+
+		logSuccessOp(t, nil, "Contact successfully removed between %s and %s", tom.alias, jerry.alias)
+	})
+
+	t.Run("Step 17: The admin clients attempt to remove created actor paymails using the appropriate SPV Wallet API instance.", func(t *testing.T) {
 		tests := []struct {
 			name   string
 			server *spvWalletServer
