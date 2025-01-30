@@ -14,7 +14,8 @@ import (
 // !!! Adjust the paymail domain to the domain supported by the spv-wallet server
 const yourPaymailDomain = "example.com"
 
-// example configuration - adjust as needed hold values needed to present the example
+// Example configuration – adjust as needed.
+// It holds the values required to present the example.
 var config = struct {
 	setupUsers    bool
 	totpDigits    uint
