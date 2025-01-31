@@ -1,7 +1,7 @@
 package examples
 
 const (
-	// A string representing the alias part of the Paymail address.
+	// Alias is string representing the alias part of the Paymail address.
 	Alias = "test"
 	// Domain specifies the domain portion of the Paymail address.
 	Domain = "example.com"
