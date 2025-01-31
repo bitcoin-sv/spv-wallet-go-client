@@ -1,8 +1,12 @@
 package examples
 
 const (
-	Alias   = "test"
-	Domain  = "example.com"
+	// A string representing the alias part of the Paymail address.
+	Alias = "test"
+	// Domain specifies the domain portion of the Paymail address.
+	Domain = "example.com"
+	// Paymail constructs the complete Paymail address by concatenating
+	// Alias and Domain with an "@" separator.
 	Paymail = Alias + "@" + Domain
 )
 
