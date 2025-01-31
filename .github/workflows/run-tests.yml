@@ -1,3 +1,6 @@
+env:
+  LINT_VERSION: "latest"
+
 on:
   push:
     branches-ignore:
@@ -14,3 +17,32 @@ jobs:
     secrets:
       DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
       SLACK_WEBHOOK_URL: ${{ secrets.ON_PUSH_SLACK_WEBHOOK_URL }}
+
+  examples-error-lint:
+    name: "[examples] Lint for errors"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "../go.mod"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: ${{ env.LINT_VERSION }}
+          working-directory: "./examples"
+          args: --config=../.golangci-lint.yml
+  examples-style-lint:
+    name: "[examples] Lint for style lint errors"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "../go.mod"
+      - name: golangci-style-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: ${{ env.LINT_VERSION }}
+          working-directory: "./examples"
+          args: --config=../.golangci-style.yml
