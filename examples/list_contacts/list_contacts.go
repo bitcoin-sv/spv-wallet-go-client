@@ -1,4 +1,4 @@
-package listcontacts
+package main
 
 import (
 	"context"
