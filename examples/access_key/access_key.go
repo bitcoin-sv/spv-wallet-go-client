@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
+
 	"github.com/bitcoin-sv/spv-wallet-go-client/internal/api/v1/queryparams"
 )
 
