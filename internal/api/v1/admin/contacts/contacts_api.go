@@ -91,6 +91,17 @@ func (a *API) ConfirmContacts(ctx context.Context, cmd *commands.ConfirmContacts
 	return nil
 }
 
+func (a *API) UnconfirmContact(ctx context.Context, id string) error {
+	_, err := a.httpClient.
+		R().
+		SetContext(ctx).
+		Patch(a.url.JoinPath("unconfirm", id).String())
+	if err != nil {
+		return fmt.Errorf("HTTP response failure :%w", err)
+	}
+	return nil
+}
+
 func (a *API) DeleteContact(ctx context.Context, ID string) error {
 	_, err := a.httpClient.
 		R().
