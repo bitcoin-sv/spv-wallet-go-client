@@ -80,7 +80,7 @@ linters-settings:
   revive:
     rules:
       - name: exported
-        exclude: 
+        exclude:
           - "**/testabilities/**"
           - "**/internal/**"
 
