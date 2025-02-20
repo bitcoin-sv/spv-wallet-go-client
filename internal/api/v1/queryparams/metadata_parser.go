@@ -38,7 +38,7 @@ func (m *MetadataParser) generateQueryParams(depth int, path metadataPath, val a
 		return nil
 	}
 
-	switch reflect.TypeOf(val).Kind() {
+	switch reflect.TypeOf(val).Kind() { //nolint: exhaustive
 	case reflect.Map:
 		return m.processMapQueryParams(depth+1, val, path, params)
 	case reflect.Slice:
