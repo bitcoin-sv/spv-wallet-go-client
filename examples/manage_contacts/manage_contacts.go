@@ -139,7 +139,7 @@ func finalizeAndCleanup(results *verificationResults) error {
 		}
 	}
 
-	fmt.Println("\n7. Cleaning up contacts")
+	fmt.Println("\n7. Deleting contact and unconfirm other side")
 
 	aliceXpubID := exampleutil.CreateXpubID(config.alice.xPub)
 	aliceToBobContactResponse, err := clients.admin.Contacts(
