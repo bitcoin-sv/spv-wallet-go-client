@@ -9,6 +9,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
+	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
 // !!! Adjust the paymail domain to the domain supported by the spv-wallet server
@@ -138,10 +140,50 @@ func finalizeAndCleanup(results *verificationResults) error {
 	}
 
 	fmt.Println("\n7. Cleaning up contacts")
-	if err := clients.alice.RemoveContact(ctx, config.bob.paymail); err != nil {
-		return fmt.Errorf("failed to remove Bob's contact: %w", err)
+
+	aliceXpubID := exampleutil.CreateXpubID(config.alice.xPub)
+	aliceToBobContactResponse, err := clients.admin.Contacts(
+		context.Background(),
+		queries.QueryOption[filter.AdminContactFilter](
+			queries.QueryWithFilter(filter.AdminContactFilter{
+				ContactFilter: filter.ContactFilter{
+					Paymail: &config.bob.paymail,
+				},
+				XPubID: &aliceXpubID,
+			}),
+		),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to get Alice's contact with Bob: %w", err)
 	}
 
+	err = clients.admin.DeleteContact(context.Background(), aliceToBobContactResponse.Content[0].ID)
+	if err != nil {
+		return fmt.Errorf("failed to delete Alice's contact with Bob: %w", err)
+	}
+
+	bobXpubID := exampleutil.CreateXpubID(config.bob.xPub)
+	bobToAliceContactResponse, err := clients.admin.Contacts(
+		context.Background(),
+		queries.QueryOption[filter.AdminContactFilter](
+			queries.QueryWithFilter(filter.AdminContactFilter{
+				ContactFilter: filter.ContactFilter{
+					Paymail: &config.alice.paymail,
+				},
+				XPubID: &bobXpubID,
+			}),
+		),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to get Bob's contact with Alice: %w", err)
+	}
+
+	err = clients.admin.UnconfirmContact(context.Background(), bobToAliceContactResponse.Content[0].ID)
+	if err != nil {
+		return fmt.Errorf("failed to unconfirm Bob's contact with Alice: %w", err)
+	}
+
+	fmt.Println("\n8. Cleaning up contacts")
 	if err := clients.bob.RemoveContact(ctx, config.alice.paymail); err != nil {
 		return fmt.Errorf("failed to remove Alice's contact: %w", err)
 	}
