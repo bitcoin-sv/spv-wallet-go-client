@@ -11,15 +11,19 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 // !!! Adjust the paymail domain to the domain supported by the spv-wallet server
 const yourPaymailDomain = "example.com"
 
+// We assume that the users: Alice and Bob are already registered.
+// If they're not, please set this to true to make the example create them.
+const setupUsers = false
+
 // Example configuration – adjust as needed.
 // It holds the values required to present the example.
 var config = struct {
-	setupUsers    bool
 	totpDigits    uint
 	totpPeriods   uint
 	server        string
@@ -27,10 +31,6 @@ var config = struct {
 	alice         user
 	bob           user
 }{
-	// We assume that the users: Alice and Bob are already registered.
-	// If they're not, please set this to true to make the example create them.
-	setupUsers: false,
-
 	totpDigits:    2,
 	totpPeriods:   1200,
 	server:        "http://localhost:3003",
@@ -59,152 +59,211 @@ var clients = struct {
 
 var ctx = context.Background()
 
-func verificationFlow() (*verificationResults, error) {
-	fmt.Println("\n1. Creating initial contacts")
-
-	alicePaymail := config.alice.paymail
-	bobPaymail := config.bob.paymail
-
+func createInitialContacts() error {
+	// Initial Contacts Creation: Step 1  Create Alice's contact with Bob
+	fmt.Println("\n Creating Alice's contact with Bob")
 	_, err := clients.alice.UpsertContact(ctx, commands.UpsertContact{
-		ContactPaymail:   bobPaymail,
+		ContactPaymail:   config.bob.paymail,
 		FullName:         "Bob Smith",
-		RequesterPaymail: alicePaymail,
+		RequesterPaymail: config.alice.paymail,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Bob's contact for Alice: %w", err)
+		return fmt.Errorf("failed to create Alice's contact with Bob: %w", err)
 	}
 
+	// Initial Contacts Creation: Step 2  Create Bob's contact with Alice
+	fmt.Println("\n Creating Bob's contact with Alice")
 	_, err = clients.bob.UpsertContact(ctx, commands.UpsertContact{
-		ContactPaymail:   alicePaymail,
+		ContactPaymail:   config.alice.paymail,
 		FullName:         "Alice Smith",
-		RequesterPaymail: bobPaymail,
+		RequesterPaymail: config.bob.paymail,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Alice's contact for Bob: %w", err)
+		return fmt.Errorf("failed to create Bob's contact with Alice: %w", err)
 	}
 
-	respBob, err := clients.alice.ContactWithPaymail(ctx, bobPaymail)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get Bob's contact: %w", err)
-	}
-	bobContact := mapToContactModel(respBob)
-
-	respAlice, err := clients.bob.ContactWithPaymail(ctx, alicePaymail)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get Alice's contact: %w", err)
-	}
-	aliceContact := mapToContactModel(respAlice)
-
-	fmt.Println("\n2. Alice initiates verification")
-	aliceTotpForBob, err := clients.alice.GenerateTotpForContact(bobContact, config.totpPeriods, config.totpDigits)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate Alice's TOTP for Bob: %w", err)
-	}
-	logSecureMessage("Alice", "Bob", aliceTotpForBob)
-
-	fmt.Println("\n3. Bob validates Alice's TOTP")
-	bobValidationErr := clients.bob.ValidateTotpForContact(aliceContact, aliceTotpForBob, respBob.Paymail, config.totpPeriods, config.totpDigits)
-	bobValidatedAlicesTotp := bobValidationErr == nil
-	fmt.Printf("Validation status: %v\n", bobValidatedAlicesTotp)
-
-	fmt.Println("\n4. Bob initiates verification")
-	bobTotpForAlice, err := clients.bob.GenerateTotpForContact(aliceContact, config.totpPeriods, config.totpDigits)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate Bob's TOTP for Alice: %w", err)
-	}
-	logSecureMessage("Bob", "Alice", bobTotpForAlice)
-
-	fmt.Println("\n5. Alice validates Bob's TOTP")
-	aliceValidationErr := clients.alice.ValidateTotpForContact(bobContact, bobTotpForAlice, respAlice.Paymail, config.totpPeriods, config.totpDigits)
-	aliceValidatedBobsTotp := aliceValidationErr == nil
-	fmt.Printf("Validation status: %v\n", aliceValidatedBobsTotp)
-
-	return &verificationResults{
-		bobValidatedAlicesTotp: bobValidatedAlicesTotp,
-		aliceValidatedBobsTotp: aliceValidatedBobsTotp,
-	}, nil
+	return nil
 }
 
-func finalizeAndCleanup(results *verificationResults) error {
-	isFullyVerified := results.bobValidatedAlicesTotp && results.aliceValidatedBobsTotp
-	fmt.Printf("\nBidirectional verification complete: %v\n", isFullyVerified)
-
-	if isFullyVerified {
-		fmt.Println("\n6. Admin confirms verified contacts")
-		if err := clients.admin.ConfirmContacts(ctx, &commands.ConfirmContacts{
-			PaymailA: config.alice.paymail,
-			PaymailB: config.bob.paymail,
-		}); err != nil {
-			_ = fmt.Errorf("failed to confirm contacts: %w", err)
-		}
+func initiateContactVerification() error {
+	// Verification: Step 1  Alice generate TOTP
+	fmt.Println("\n Alice generate TOTP for Bob")
+	aliceTotpForBob, err := generateTOTP(clients.alice, config.bob)
+	if err != nil {
+		return fmt.Errorf("generating TOTP by Alice failed: %w", err)
 	}
 
-	fmt.Println("\n7. Deleting contact and unconfirm other side")
+	logSecureMessage("Alice", "Bob", aliceTotpForBob)
 
-	aliceXpubID := exampleutil.CreateXpubID(config.alice.xPub)
-	aliceToBobContactResponse, err := clients.admin.Contacts(
-		context.Background(),
-		queries.QueryOption[filter.AdminContactFilter](
-			queries.QueryWithFilter(filter.AdminContactFilter{
-				ContactFilter: filter.ContactFilter{
-					Paymail: &config.bob.paymail,
-				},
-				XPubID: &aliceXpubID,
-			}),
-		),
-	)
+	// Verification: Step 2  Bob validates Alice's TOTP
+	fmt.Println("\n Bob validates Alice's TOTP")
+	err = validateTOTP(clients.bob, config.bob.paymail, config.alice.paymail, aliceTotpForBob)
+	if err != nil {
+		return fmt.Errorf("validating TOTP by Bob failed: %w", err)
+	}
+
+	// As err here is nil, Alice's contact is validated
+	aliceValidated := true
+
+	// Verification: Step 3  Bob generate TOTP
+	fmt.Println("\n Bob generate TOTP for Alice")
+	bobTotpForAlice, err := generateTOTP(clients.bob, config.alice)
+	if err != nil {
+		return fmt.Errorf("generating TOTP by Bob failed: %w", err)
+	}
+
+	logSecureMessage("Bob", "Alice", bobTotpForAlice)
+
+	// Verification: Step 4  Alice validates Bob's TOTP
+	fmt.Println("\n Alice validates Bob's TOTP")
+	err = validateTOTP(clients.alice, config.alice.paymail, config.bob.paymail, bobTotpForAlice)
+	if err != nil {
+		return fmt.Errorf("validating TOTP by Alice failed: %w", err)
+	}
+
+	// As err here is nil, Bob's contact is validated
+	bobValidated := true
+
+	if bobValidated && aliceValidated {
+		fmt.Println("Both TOTP verifications succeeded.")
+	}
+	return nil
+}
+
+func cleanup() error {
+	// Cleanup: Step 1  Admin deletes Alice's contact with Bob
+	fmt.Println("\n Deleting contact and unconfirm other side")
+	aliceToBobContact, err := adminGetContact(config.alice.xPub, config.bob.paymail)
 	if err != nil {
 		return fmt.Errorf("failed to get Alice's contact with Bob: %w", err)
 	}
 
-	err = clients.admin.DeleteContact(context.Background(), aliceToBobContactResponse.Content[0].ID)
+	fmt.Println("\n Admin deletes Alice's contact with Bob")
+	err = clients.admin.DeleteContact(context.Background(), aliceToBobContact.ID)
 	if err != nil {
 		return fmt.Errorf("failed to delete Alice's contact with Bob: %w", err)
 	}
 
-	bobXpubID := exampleutil.CreateXpubID(config.bob.xPub)
-	bobToAliceContactResponse, err := clients.admin.Contacts(
-		context.Background(),
-		queries.QueryOption[filter.AdminContactFilter](
-			queries.QueryWithFilter(filter.AdminContactFilter{
-				ContactFilter: filter.ContactFilter{
-					Paymail: &config.alice.paymail,
-				},
-				XPubID: &bobXpubID,
-			}),
-		),
-	)
+	// Cleanup: Step 2  Admin unconfirms Bob's contact with Alice
+	bobToAliceContact, err := adminGetContact(config.bob.xPub, config.alice.paymail)
 	if err != nil {
 		return fmt.Errorf("failed to get Bob's contact with Alice: %w", err)
 	}
 
-	err = clients.admin.UnconfirmContact(context.Background(), bobToAliceContactResponse.Content[0].ID)
+	fmt.Println("\n Admin unconfirms Bob's contact with Alice")
+	err = clients.admin.UnconfirmContact(context.Background(), bobToAliceContact.ID)
 	if err != nil {
 		return fmt.Errorf("failed to unconfirm Bob's contact with Alice: %w", err)
 	}
 
-	fmt.Println("\n8. Cleaning up contacts")
+	// Cleanup: Step 3  Bob removes contact with Alice
+	fmt.Println("\n Bob removes contact with Alice")
 	if err := clients.bob.RemoveContact(ctx, config.alice.paymail); err != nil {
-		return fmt.Errorf("failed to remove Alice's contact: %w", err)
+		return fmt.Errorf("failed to remove contact with Alice: %w", err)
+	}
+
+	return nil
+}
+
+func adminGetContact(creatorOfContactXPub, counterpartyPaymail string) (*response.Contact, error) {
+	creatorOfContactXPubID := exampleutil.CreateXpubID(creatorOfContactXPub)
+	response, err := clients.admin.Contacts(
+		context.Background(),
+		queries.QueryOption[filter.AdminContactFilter](
+			queries.QueryWithFilter(filter.AdminContactFilter{
+				ContactFilter: filter.ContactFilter{
+					Paymail: &counterpartyPaymail,
+				},
+				XPubID: &creatorOfContactXPubID,
+			}),
+		),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get contact %w", err)
+	}
+	contact := response.Content[0]
+
+	return contact, nil
+}
+
+func generateTOTP(initiatorClient *wallet.UserAPI, counterparty user) (totp string, err error) {
+	// Contact initiator gets the contact info
+	response, err := initiatorClient.ContactWithPaymail(ctx, counterparty.paymail)
+	if err != nil {
+		return "", fmt.Errorf("failed to get contact from initiator's perspective: %w", err)
+	}
+	contact := mapToContactModel(response)
+
+	// Contact initiator generates TOTP
+	totp, err = initiatorClient.GenerateTotpForContact(contact, config.totpPeriods, config.totpDigits)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate TOTP: %w", err)
+	}
+
+	return totp, nil
+}
+
+func validateTOTP(validatorClient *wallet.UserAPI, validatorPaymail string, generatingUserPaymail string, totp string) error {
+	// Contact counterparty gets the contact info
+	respCounterparty, err := validatorClient.ContactWithPaymail(ctx, generatingUserPaymail)
+	if err != nil {
+		return fmt.Errorf("failed to get contact from counterparty's perspective: %w", err)
+	}
+
+	contact := mapToContactModel(respCounterparty)
+
+	// Contact counterparty validates TOTP
+	validationErr := validatorClient.ValidateTotpForContact(
+		contact,
+		totp,
+		validatorPaymail,
+		config.totpPeriods,
+		config.totpDigits,
+	)
+	if validationErr != nil {
+		fmt.Printf("[WARN] TOTP validation failed: %v\n", validationErr)
+		return validationErr
 	}
 
 	return nil
 }
 
 func main() {
-	if config.setupUsers {
-		setupUsers()
+	if setupUsers {
+		// Initiate users
+		fmt.Println("\n======== Initiating users ========")
+		initiateUsers()
 	} else {
 		fmt.Println("We assume that the users: Alice and Bob are already registered.")
-		fmt.Println("If they're not, please set config.setupUsers to true to make the example create them.")
+		fmt.Println("If they're not, please set config.SetupUsers to true.")
 	}
 
-	results, err := verificationFlow()
+	// Create initial contacts
+	fmt.Println("\n======== Creating initial contacts ========")
+	err := createInitialContacts()
 	if err != nil {
+		log.Fatalf("Error during initial contacts creation: %v", err)
+	}
+
+	// Initiate contact verification
+	fmt.Println("\n======== Initiating contact verification ========")
+	if err := initiateContactVerification(); err != nil {
 		log.Fatalf("Error during verification flow: %v", err)
 	}
 
-	if err := finalizeAndCleanup(results); err != nil {
+	// Confirm contacts using the admin API
+	fmt.Println("\n======== Confirming contacts ========")
+	err = clients.admin.ConfirmContacts(ctx, &commands.ConfirmContacts{
+		PaymailA: config.alice.paymail,
+		PaymailB: config.bob.paymail,
+	})
+	if err != nil {
+		log.Fatalf("Error during confirmation of contacts: %v", err)
+	}
+
+	// Clean up
+	fmt.Println("\n======== Cleaning up ========")
+	if err := cleanup(); err != nil {
 		log.Fatalf("Error during cleanup: %v", err)
 	}
 }
