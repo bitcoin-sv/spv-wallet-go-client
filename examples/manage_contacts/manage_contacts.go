@@ -7,12 +7,16 @@ import (
 
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	connectionConfig "github.com/bitcoin-sv/spv-wallet-go-client/config"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples"
 	"github.com/bitcoin-sv/spv-wallet-go-client/examples/exampleutil"
 	"github.com/bitcoin-sv/spv-wallet-go-client/queries"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
+
+// !!! Adjust the server url
+const server = "http://localhost:3003"
 
 // !!! Adjust the paymail domain to the domain supported by the spv-wallet server
 const yourPaymailDomain = "example.com"
@@ -26,14 +30,12 @@ const setupUsers = false
 var config = struct {
 	totpDigits    uint
 	totpPeriods   uint
-	server        string
 	paymailDomain string
 	alice         user
 	bob           user
 }{
 	totpDigits:    2,
 	totpPeriods:   1200,
-	server:        "http://localhost:3003",
 	paymailDomain: examplePaymailCorrectlyEdited(yourPaymailDomain),
 	alice: user{
 		xPriv:   "xprv9s21ZrQH143K2jMwweKF33hFDDvwxEooDtXbZ7mGTJQfmSs8aD77ThuYDsfNrgBAbHr9Yx8FrPaukMLHpxFUyyvBuzAJBMpd4a2xFxr6qts",
@@ -47,14 +49,16 @@ var config = struct {
 	},
 }
 
+var conConfig = connectionConfig.New(connectionConfig.WithAddr(server))
+
 var clients = struct {
 	alice *wallet.UserAPI
 	bob   *wallet.UserAPI
 	admin *wallet.AdminAPI
 }{
-	alice: assertNoError(wallet.NewUserAPIWithXPriv(exampleutil.NewDefaultConfig(), config.alice.xPriv)),
-	bob:   assertNoError(wallet.NewUserAPIWithXPriv(exampleutil.NewDefaultConfig(), config.bob.xPriv)),
-	admin: assertNoError(wallet.NewAdminAPIWithXPriv(exampleutil.NewDefaultConfig(), examples.AdminXPriv)),
+	alice: assertNoError(wallet.NewUserAPIWithXPriv(conConfig, config.alice.xPriv)),
+	bob:   assertNoError(wallet.NewUserAPIWithXPriv(conConfig, config.bob.xPriv)),
+	admin: assertNoError(wallet.NewAdminAPIWithXPriv(conConfig, examples.AdminXPriv)),
 }
 
 var ctx = context.Background()
