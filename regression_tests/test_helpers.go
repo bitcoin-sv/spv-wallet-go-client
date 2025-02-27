@@ -3,6 +3,7 @@ package regressiontests
 import (
 	"context"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -47,4 +48,53 @@ func logSuccessOp(t *testing.T, err error, format string, args ...any) {
 		return
 	}
 	t.Logf(format, args...)
+}
+
+// prepareUsersForContactsFlowVerification prepares users for the contacts flow verification.
+// It initializes the users and returns them as user objects.
+// This function is intended for use in tests. It calls t.Helper()
+// to ensure that errors are reported at the caller's location.
+func prepareUsersForContactsFlowVerification(t *testing.T, spvWalletPG, spvWalletSL *spvWalletServer) (bob *user, alice *user, tom *user, jerry *user) {
+	t.Helper()
+
+	// PG = Postgres
+	bob = spvWalletPG.leader
+	alice = spvWalletPG.user
+	// SL = SQLite
+	tom = spvWalletSL.leader
+	jerry = spvWalletSL.user
+
+	alice = &user{
+		alias:     "Alice",
+		paymail:   strings.ToLower(alice.paymail),
+		xPub:      alice.xPub,
+		xPriv:     alice.xPriv,
+		paymailID: alice.paymailID,
+		client:    alice.client,
+	}
+	bob = &user{
+		alias:     "Bob",
+		paymail:   strings.ToLower(bob.paymail),
+		xPub:      bob.xPub,
+		xPriv:     bob.xPriv,
+		paymailID: bob.paymailID,
+		client:    bob.client,
+	}
+	tom = &user{
+		alias:     "Tom",
+		paymail:   strings.ToLower(tom.paymail),
+		xPub:      tom.xPub,
+		xPriv:     tom.xPriv,
+		paymailID: tom.paymailID,
+		client:    tom.client,
+	}
+	jerry = &user{
+		alias:     "Jerry",
+		paymail:   strings.ToLower(jerry.paymail),
+		xPub:      jerry.xPub,
+		xPriv:     jerry.xPriv,
+		paymailID: jerry.paymailID,
+		client:    jerry.client,
+	}
+	return
 }

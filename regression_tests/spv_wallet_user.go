@@ -8,7 +8,15 @@ import (
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
 	"github.com/bitcoin-sv/spv-wallet-go-client/walletkeys"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
+)
+
+const (
+	// TOTP_DIGITS represents the number of digits in the TOTP.
+	TOTP_DIGITS uint = 2
+	// TOTP_PERIOD represents the period for the TOTP.
+	TOTP_PERIOD uint = 1200
 )
 
 // transactionsSlice represents a slice of response.Transaction objects.
@@ -80,6 +88,110 @@ func (u *user) balance(ctx context.Context) (uint64, error) {
 	return xPub.CurrentBalance, nil
 }
 
+// addContact adds a new contact to the user's contact list.
+// It accepts the contact's paymail, contact full name, and the requester's paymail as input parameters.
+// The function uses the SPV Wallet API to add the contact to the user's contact list.
+// On success, it returns the newly added contact and a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) addContact(ctx context.Context, contactPaymail, contactFullName string) (*response.Contact, error) {
+	resp, err := u.client.UpsertContact(ctx, commands.UpsertContact{
+		ContactPaymail:   contactPaymail,
+		FullName:         contactFullName,
+		RequesterPaymail: u.paymail,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("could not add contact %s: %w", contactPaymail, err)
+	}
+
+	return resp, nil
+}
+
+// getContact retrieves the contact details for a given paymail address.
+// It accepts the contact's paymail as input parameter.
+// The function uses the SPV Wallet API to fetch the contact details for the given paymail.
+// On success, it returns the contact details and a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) getContact(ctx context.Context, contactPaymail string) (*response.Contact, error) {
+	resp, err := u.client.ContactWithPaymail(ctx, contactPaymail)
+	if err != nil {
+		return nil, fmt.Errorf("could not get contact %s: %w", contactPaymail, err)
+	}
+
+	return resp, nil
+}
+
+// confirmContact confirms a contact using a received TOTP.
+// It accepts the contact's paymail, received TOTP, and requester's paymail as input parameters.
+// The function uses the SPV Wallet API to confirm the contact using the received TOTP.
+// On success, it returns a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) confirmContact(ctx context.Context, contactPaymail, receivedTotp string) error {
+	contactResp, err := u.client.ContactWithPaymail(ctx, contactPaymail)
+	if err != nil {
+		return fmt.Errorf("failed to fetch contact %s: %w", contactPaymail, err)
+	}
+	if contactResp == nil {
+		return fmt.Errorf("contact %s not found", contactPaymail)
+	}
+
+	contact := mapToContactModel(contactResp)
+	err = u.client.ConfirmContact(ctx, contact, receivedTotp, u.paymail, TOTP_PERIOD, TOTP_DIGITS)
+	if err != nil {
+		return fmt.Errorf("failed to confirm contact %s: %w", contactPaymail, err)
+	}
+
+	return nil
+}
+
+// unconfirmContact unconfirms a contact by their Paymail.
+// It accepts the contact's paymail as input parameter.
+// The function uses the SPV Wallet API to unconfirm the contact from the user's contact list.
+// On success, it returns a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) unconfirmContact(ctx context.Context, contactPaymail string) error {
+	err := u.client.UnconfirmContact(ctx, contactPaymail)
+	if err != nil {
+		return fmt.Errorf("failed to unconfirm contact %s: %w", contactPaymail, err)
+	}
+	return nil
+}
+
+// removeContact removes a contact by their Paymail.
+// It accepts the contact's paymail as input parameter.
+// The function uses the SPV Wallet API to remove the contact from the user's contact list.
+// On success, it returns a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) removeContact(ctx context.Context, contactPaymail string) error {
+	err := u.client.RemoveContact(ctx, contactPaymail)
+	if err != nil {
+		return fmt.Errorf("failed to remove contact %s: %w", contactPaymail, err)
+	}
+	return nil
+}
+
+// generateTotp generates a TOTP for a contact.
+// It accepts the contact's paymail as input parameter.
+// The function uses the SPV Wallet API to generate a TOTP for the given contact.
+// On success, it returns the generated TOTP and a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) generateTotp(ctx context.Context, contactPaymail string) (string, error) {
+	contactResp, err := u.client.ContactWithPaymail(ctx, contactPaymail)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch contact %s: %w", contactPaymail, err)
+	}
+	if contactResp == nil {
+		return "", fmt.Errorf("contact %s not found", contactPaymail)
+	}
+
+	contact := mapToContactModel(contactResp)
+	totp, err := u.client.GenerateTotpForContact(contact, TOTP_PERIOD, TOTP_DIGITS)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate TOTP for contact %s: %w", contactPaymail, err)
+	}
+
+	return totp, nil
+}
+
 // initUser initializes a new user within the SPV Wallet ecosystem.
 // It accepts the alias and SPV Wallet API URL as input parameters.
 // The function generates a random pair of wallet keys (xPub, xPriv) and uses the xPriv key
@@ -116,9 +228,32 @@ func initUserWithXPriv(alias, url, xPriv string) (*user, error) {
 		return nil, fmt.Errorf("could not initialize user API for alias %q: %w", alias, err)
 	}
 
+	xPub, err := walletkeys.XPubFromXPriv(xPriv)
+	if err != nil {
+		return nil, fmt.Errorf("could not get xPub from xPriv: %w", err)
+	}
+
 	return &user{
 		alias:  alias,
 		xPriv:  xPriv,
+		xPub:   xPub,
 		client: client,
 	}, nil
+}
+
+// mapToContactModel maps a response.Contact object to a models.Contact object.
+// It accepts a response.Contact object as input parameter.
+// On success, it returns the mapped models.Contact object.
+// If the input parameter is nil, it returns nil.
+func mapToContactModel(resp *response.Contact) *models.Contact {
+	if resp == nil {
+		return nil
+	}
+	return &models.Contact{
+		ID:       resp.ID,
+		FullName: resp.FullName,
+		Paymail:  resp.Paymail,
+		PubKey:   resp.PubKey,
+		Status:   resp.Status,
+	}
 }
