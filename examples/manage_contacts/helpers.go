@@ -50,7 +50,7 @@ func mapToContactModel(resp *response.Contact) *models.Contact {
 	}
 }
 
-func setupUsers() {
+func initiateUsers() {
 	fmt.Println("0. Setting up users (optional)")
 
 	// Create account for Alice
