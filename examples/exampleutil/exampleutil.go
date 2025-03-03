@@ -1,6 +1,8 @@
 package exampleutil
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -30,4 +32,15 @@ func PrettyPrint(title string, JSON any) {
 
 	fmt.Println(string(res))
 	fmt.Println()
+}
+
+// CreateXpubID creates a hash from xpub which is equal to xpubID.
+func CreateXpubID(xpub string) string {
+	return Hash(xpub)
+}
+
+// Hash returns the sha256 hash of the data string
+func Hash(data string) string {
+	hash := sha256.Sum256([]byte(data))
+	return hex.EncodeToString(hash[:])
 }
