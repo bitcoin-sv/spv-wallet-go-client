@@ -1,5 +1,5 @@
-////go:build regression
-//// +build regression
+//go:build regression
+// +build regression
 
 package regressiontests
 
@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 )
 
 func TestRegressionWorkflow(t *testing.T) {
