@@ -1,5 +1,5 @@
-//go:build regression
-// +build regression
+////go:build regression
+//// +build regression
 
 package regressiontests
 
@@ -465,13 +465,13 @@ func TestRegressionWorkflow(t *testing.T) {
 			fullName string
 		}{
 			{
-				name:     fmt.Sprintf("%s should add Bob as contact", spvWalletPG.admin.paymail),
+				name:     fmt.Sprintf("%s should add Bob as contact", spvWalletSL.admin.paymail),
 				server:   spvWalletSL,
 				paymail:  bob.paymail,
 				fullName: "Bob",
 			},
 			{
-				name:     fmt.Sprintf("%s should add Tom as contact", spvWalletSL.admin.paymail),
+				name:     fmt.Sprintf("%s should add Tom as contact", spvWalletPG.admin.paymail),
 				server:   spvWalletPG,
 				paymail:  tom.paymail,
 				fullName: "Tom",
@@ -513,18 +513,24 @@ func TestRegressionWorkflow(t *testing.T) {
 			server   *spvWalletServer
 			paymailA string
 			paymailB string
+			nameA    string
+			nameB    string
 		}{
 			{
 				name:     "Admin should confirm contact between Alice and Bob",
 				server:   spvWalletSL,
 				paymailA: alice.paymail,
 				paymailB: bob.paymail,
+				nameA:    bob.alias,
+				nameB:    alice.alias,
 			},
 			{
 				name:     "Admin should confirm contact between Tom and Jerry",
 				server:   spvWalletPG,
 				paymailA: tom.paymail,
 				paymailB: jerry.paymail,
+				nameA:    tom.alias,
+				nameB:    jerry.alias,
 			},
 		}
 
@@ -534,15 +540,15 @@ func TestRegressionWorkflow(t *testing.T) {
 				userA := tc.server.leader
 				userB := tc.server.user
 
-				_, errA := userA.addContact(ctx, tc.paymailA, "Bob")
-				_, errB := userB.addContact(ctx, tc.paymailB, "Alice")
+				contactA, errA := userA.addContact(ctx, tc.paymailA, tc.nameA)
+				contactB, errB := userB.addContact(ctx, tc.paymailB, tc.nameB)
 				require.NoError(t, errA, "Failed to create contact A")
 				require.NoError(t, errB, "Failed to create contact B")
 
-				err := admin.confirmContact(ctx, tc.paymailA, tc.paymailB)
-				require.NoError(t, err, "Admin failed to confirm contact between %s and %s", tc.paymailA, tc.paymailB)
+				err := admin.confirmContact(ctx, contactA.Paymail, contactB.Paymail)
+				require.NoError(t, err, "Admin failed to confirm contact between %s and %s", contactA.Paymail, contactB.Paymail)
 
-				logSuccessOp(t, err, "Contact between %s and %s confirmed successfully", tc.paymailA, tc.paymailB)
+				logSuccessOp(t, err, "Contact between %s and %s confirmed successfully", contactA.Paymail, contactB.Paymail)
 			})
 		}
 	})
