@@ -3,11 +3,13 @@ package regressiontests
 import (
 	"context"
 	"fmt"
+	"strings"
+
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 // admin represents an administrator within the SPV Wallet ecosystem.
@@ -103,7 +105,7 @@ func (a *admin) createContact(ctx context.Context, paymail, fullName string) (*r
 	cmd := &commands.CreateContact{
 		Paymail:        paymail,
 		FullName:       fullName,
-		CreatorPaymail: a.paymail,
+		CreatorPaymail: strings.ToLower(a.paymail),
 	}
 
 	contact, err := a.client.CreateContact(ctx, cmd)
