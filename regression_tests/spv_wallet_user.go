@@ -192,6 +192,56 @@ func (u *user) generateTotp(ctx context.Context, contactPaymail string) (string,
 	return totp, nil
 }
 
+// getAccessKeys fetches all access keys for the user.
+// It accepts a context parameter to manage cancellation and timeouts.
+// On success, it returns a slice of access keys and a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) getAccessKeys(ctx context.Context) ([]*response.AccessKey, error) {
+	keys, err := u.client.AccessKeys(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch user access keys: %w", err)
+	}
+	return keys.Content, nil
+}
+
+// generateAccessKey generates a new access key for the user.
+// It accepts a context parameter to manage cancellation and timeouts.
+// On success, it returns the generated access key and a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) generateAccessKey(ctx context.Context) (*response.AccessKey, error) {
+	key, err := u.client.GenerateAccessKey(ctx, &commands.GenerateAccessKey{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate access key: %w", err)
+	}
+	return key, nil
+}
+
+// getAccessKeyByID retrieves a specific access key by ID.
+// It accepts the access key ID as input parameter.
+// The function uses the SPV Wallet API to fetch the access key with the given ID.
+// On success, it returns the access key and a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) getAccessKeyByID(ctx context.Context, accessKeyID string) (*response.AccessKey, error) {
+	key, err := u.client.AccessKey(ctx, accessKeyID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get access key with ID %s: %w", accessKeyID, err)
+	}
+	return key, nil
+}
+
+// revokeAccessKey revokes an access key.
+// It accepts the access key ID as input parameter.
+// The function uses the SPV Wallet API to revoke the access key with the given ID.
+// On success, it returns a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) revokeAccessKey(ctx context.Context, accessKeyID string) error {
+	err := u.client.RevokeAccessKey(ctx, accessKeyID)
+	if err != nil {
+		return fmt.Errorf("failed to revoke access key with ID %s: %w", accessKeyID, err)
+	}
+	return nil
+}
+
 // initUser initializes a new user within the SPV Wallet ecosystem.
 // It accepts the alias and SPV Wallet API URL as input parameters.
 // The function generates a random pair of wallet keys (xPub, xPriv) and uses the xPriv key
