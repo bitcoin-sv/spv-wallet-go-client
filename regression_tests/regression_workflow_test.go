@@ -1,5 +1,5 @@
-////go:build regression
-//// +build regression
+//go:build regression
+// +build regression
 
 package regressiontests
 
