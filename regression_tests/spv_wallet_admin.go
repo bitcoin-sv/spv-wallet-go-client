@@ -1,7 +1,10 @@
 package regressiontests
 
 import (
+	"context"
 	"fmt"
+
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
@@ -19,6 +22,17 @@ type admin struct {
 
 // setPaymail sets the admin's Paymail address to the given value.
 func (a *admin) setPaymail(s string) { a.paymail = a.alias + "@" + s }
+
+// getAccessKeysAdmin fetches all access keys for the admin.
+// It accepts a context and returns a slice of access keys and an error.
+// If the operation fails, the error is non-nil and contains details of the failure.
+func (a *admin) getAccessKeysAdmin(ctx context.Context) ([]*response.AccessKey, error) {
+	keys, err := a.client.AccessKeys(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch admin access keys: %w", err)
+	}
+	return keys.Content, nil
+}
 
 // initAdmin initializes a new admin within the SPV Wallet ecosystem.
 // It accepts the SPV Wallet API URL and the administrator's extended private key (xPriv) as input parameters.

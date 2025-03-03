@@ -344,7 +344,78 @@ func TestRegressionWorkflow(t *testing.T) {
 		logSuccessOp(t, nil, "Contact successfully removed between %s and %s", tom.alias, jerry.alias)
 	})
 
-	t.Run("Step 17: The admin clients attempt to remove created actor paymails using the appropriate SPV Wallet API instance.", func(t *testing.T) {
+	t.Run("Step 17: The SPV Wallet users manage their access keys.", func(t *testing.T) {
+		tests := []struct {
+			name   string
+			server *spvWalletServer
+		}{
+			{
+				name:   fmt.Sprintf("%s should generate and retrieve an access key", spvWalletPG.user.paymail),
+				server: spvWalletPG,
+			},
+			{
+				name:   fmt.Sprintf("%s should generate and retrieve an access key", spvWalletSL.user.paymail),
+				server: spvWalletSL,
+			},
+		}
+
+		for _, tc := range tests {
+			t.Run(tc.name, func(t *testing.T) {
+				// given:
+				user := tc.server.user
+
+				// when: Generate a new access key
+				accessKey, err := user.client.GenerateAccessKey(ctx)
+				require.NoError(t, err, "Failed to generate access key for %s", user.paymail)
+				require.NotNil(t, accessKey, "Expected non-nil access key response")
+				logSuccessOp(t, err, "User %s successfully generated an access key", user.paymail)
+
+				// when: Fetch access key by ID
+				retrievedKey, err := user.client.AccessKey(ctx, accessKey.ID)
+				require.NoError(t, err, "Failed to retrieve access key %s for user %s", accessKey.ID, user.paymail)
+				require.Equal(t, accessKey.ID, retrievedKey.ID, "Fetched access key ID should match generated key ID")
+				logSuccessOp(t, err, "User %s successfully retrieved access key %s", user.paymail, accessKey.ID)
+
+				// when: Revoke access key
+				err = user.client.RevokeAccessKey(ctx, accessKey.ID)
+				require.NoError(t, err, "Failed to revoke access key %s for user %s", accessKey.ID, user.paymail)
+				logSuccessOp(t, err, "User %s successfully revoked access key %s", user.paymail, accessKey.ID)
+			})
+		}
+	})
+
+	t.Run("Step 18: The SPV Wallet admin clients fetch all access keys.", func(t *testing.T) {
+		tests := []struct {
+			name   string
+			server *spvWalletServer
+		}{
+			{
+				name:   fmt.Sprintf("%s should fetch all access keys", spvWalletPG.admin.paymail),
+				server: spvWalletPG,
+			},
+			{
+				name:   fmt.Sprintf("%s should fetch all access keys", spvWalletSL.admin.paymail),
+				server: spvWalletSL,
+			},
+		}
+
+		for _, tc := range tests {
+			t.Run(tc.name, func(t *testing.T) {
+				// given:
+				admin := tc.server.admin
+
+				// when:
+				keys, err := admin.client.AccessKeys(ctx, commands.AccessKeyFilter{}, commands.QueryPageParams{})
+
+				// then:
+				assert.NoError(err, "Fetching access keys failed for %s", admin.paymail)
+				assert.NotNil(keys, "Expected non-nil access keys response")
+				logSuccessOp(t, err, "Admin %s successfully retrieved access keys", admin.paymail)
+			})
+		}
+	})
+
+	t.Run("Step 19: The admin clients attempt to remove created actor paymails using the appropriate SPV Wallet API instance.", func(t *testing.T) {
 		tests := []struct {
 			name   string
 			server *spvWalletServer
