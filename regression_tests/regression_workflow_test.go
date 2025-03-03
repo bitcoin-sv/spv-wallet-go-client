@@ -479,15 +479,13 @@ func TestRegressionWorkflow(t *testing.T) {
 		for _, tc := range tests {
 			t.Run(tc.title, func(t *testing.T) {
 				admin := tc.admin
-				user := tc.user
-
 				// Create Contact
 				contact, err := admin.createContact(ctx, tc.user.paymail, tc.user.alias)
 				require.NoError(t, err, "Admin %s failed to create contact for %s", admin.paymail, tc.user.paymail)
 				require.NotNil(t, contact, "Expected non-nil contact response")
 				contactID := contact.ID
 
-				logSuccessOp(t, err, "Contact %s successfully created by %s", tc.paymail, admin.paymail)
+				logSuccessOp(t, err, "Contact %s successfully created by %s", contact.Paymail, admin.paymail)
 
 				// Update Contact
 				updatedName := fmt.Sprintf("%s Updated", tc.user.alias)
