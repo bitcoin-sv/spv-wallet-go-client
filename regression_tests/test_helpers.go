@@ -103,7 +103,7 @@ func prepareUsersForContactsFlowVerification(t *testing.T, spvWalletPG, spvWalle
 // It initializes the admin and returns it as an admin object.
 // This function is intended for use in tests. It calls t.Helper()
 // to ensure that errors are reported at the caller's location.
-func prepareAdminForContactsFlowVerification(t *testing.T, spvWalletPG, spvWalletSL *spvWalletServer) (adminSL *admin, adminPG *admin) {
+func prepareAdminForContactsFlowVerification(t *testing.T, spvWalletSL, spvWalletPG *spvWalletServer) (adminSL *admin, adminPG *admin) {
 	t.Helper()
 
 	// PG = Postgres
@@ -123,5 +123,5 @@ func prepareAdminForContactsFlowVerification(t *testing.T, spvWalletPG, spvWalle
 		xPriv:   adminSL.xPriv,
 		client:  adminSL.client,
 	}
-	return
+	return adminSL, adminPG
 }
