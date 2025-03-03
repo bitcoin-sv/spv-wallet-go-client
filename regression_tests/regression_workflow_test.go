@@ -241,10 +241,17 @@ func TestRegressionWorkflow(t *testing.T) {
 		}
 	})
 
-	bob, alice, tom, jerry := prepareUsersForContactsFlowVerification(t, spvWalletPG, spvWalletSL)
-	t.Run("Step 7: Bob adds Alice as contact", func(t *testing.T) {
+	// The flow is designed to test the contacts management feature in the SPV Wallet API.
+	// The verification flow is a series of steps that involve creating contacts, initiating verification, and confirming contacts.
 
+	// given: Bob, Alice, Tom, Jerry are initialized as users for the contacts flow verification.
+	bob, alice, tom, jerry := prepareUsersForContactsFlowVerification(t, spvWalletPG, spvWalletSL)
+
+	t.Run("Step 7: Bob adds Alice as contact", func(t *testing.T) {
+		// when: Bob attempts to add Alice as a contact
 		contact, err := bob.addContact(ctx, alice.paymail, alice.alias)
+
+		// then: The operation should succeed, and the contact should not be nil
 		require.NoError(t, err, "Bob failed to add Alice as contact")
 		require.NotNil(t, contact, "Bob failed to add Alice as contact")
 
@@ -252,8 +259,10 @@ func TestRegressionWorkflow(t *testing.T) {
 	})
 
 	t.Run("Step 8: Alice adds Bob as contact", func(t *testing.T) {
-
+		// when: Alice attempts to add Bob as a contact
 		contact, err := alice.addContact(ctx, bob.paymail, bob.alias)
+
+		// then: The operation should succeed, and the contact should not be nil
 		require.NoError(t, err, "Alice failed to add Bob as contact")
 		require.NotNil(t, contact, "Alice failed to add Bob as contact")
 
@@ -261,11 +270,15 @@ func TestRegressionWorkflow(t *testing.T) {
 	})
 
 	t.Run("Step 9: Bob should confirm contact with Alice", func(t *testing.T) {
+		// when: Alice generates a TOTP for Bob
 		totp, err := alice.generateTotp(ctx, bob.paymail)
 		require.NoError(t, err, "Failed to generate TOTP for Bob")
 		require.NotEmpty(t, totp, "TOTP should not be empty")
 
+		// when: Bob confirms Alice as a contact using the generated TOTP
 		err = bob.confirmContact(ctx, alice.paymail, totp)
+
+		// then: The contact status should be confirmed
 		require.NoError(t, err, "Bob failed to confirm Alice")
 
 		contact, err := bob.getContact(ctx, alice.paymail)
@@ -276,9 +289,11 @@ func TestRegressionWorkflow(t *testing.T) {
 	})
 
 	t.Run("Step 10: Bob should unconfirm contact with Alice", func(t *testing.T) {
+		// when: Bob unconfirms Alice as a contact
 		err := bob.unconfirmContact(ctx, alice.paymail)
 		require.NoError(t, err, "Bob failed to unconfirm Alice")
 
+		// then: The contact status should be unconfirmed
 		contact, err := bob.getContact(ctx, alice.paymail)
 		require.NoError(t, err, "Failed to fetch contact")
 		require.Equal(t, response.ContactNotConfirmed, contact.Status, "Alice's contact status should be unconfirmed")
@@ -287,15 +302,20 @@ func TestRegressionWorkflow(t *testing.T) {
 	})
 
 	t.Run("Step 11: Bob should remove Alice from contacts", func(t *testing.T) {
+		// when: Bob removes Alice from his contacts
 		err := bob.removeContact(ctx, alice.paymail)
+
+		// then: The operation should succeed
 		require.NoError(t, err, "Bob failed to remove Alice")
 
 		logSuccessOp(t, nil, "Contacts successfully removed between %s and %s", bob.alias, alice.alias)
 	})
 
 	t.Run("Step 12: Tom adds Jerry as contact", func(t *testing.T) {
-
+		// when: Tom attempts to add Jerry as a contact
 		contact, err := tom.addContact(ctx, jerry.paymail, jerry.alias)
+
+		// then: The operation should succeed, and the contact should not be nil
 		require.NoError(t, err, "Tom failed to add Jerry as contact")
 		require.NotNil(t, contact, "Tom failed to add Jerry as contact")
 
@@ -303,8 +323,10 @@ func TestRegressionWorkflow(t *testing.T) {
 	})
 
 	t.Run("Step 13: Jerry adds Tom as contact", func(t *testing.T) {
-
+		// when: Jerry attempts to add Tom as a contact
 		contact, err := jerry.addContact(ctx, tom.paymail, tom.alias)
+
+		// then: The operation should succeed, and the contact should not be nil
 		require.NoError(t, err, "Jerry failed to add Tom as contact")
 		require.NotNil(t, contact, "Jerry failed to add Tom as contact")
 
@@ -312,11 +334,15 @@ func TestRegressionWorkflow(t *testing.T) {
 	})
 
 	t.Run("Step 14: Tom should confirm contact with Jerry", func(t *testing.T) {
+		// when: Jerry generates a TOTP for Tom
 		totp, err := jerry.generateTotp(ctx, tom.paymail)
 		require.NoError(t, err, "Failed to generate TOTP for Jerry")
 		require.NotEmpty(t, totp, "TOTP should not be empty")
 
+		// when: Tom confirms Jerry as a contact using the generated TOTP
 		err = tom.confirmContact(ctx, jerry.paymail, totp)
+
+		// then: The contact status should be confirmed
 		require.NoError(t, err, "Tom failed to confirm Jerry")
 
 		contact, err := tom.getContact(ctx, jerry.paymail)
@@ -327,9 +353,11 @@ func TestRegressionWorkflow(t *testing.T) {
 	})
 
 	t.Run("Step 15: Tom should unconfirm contact with Jerry", func(t *testing.T) {
+		// when: Tom unconfirms Jerry as a contact
 		err := tom.unconfirmContact(ctx, jerry.paymail)
 		require.NoError(t, err, "Tom failed to unconfirm Jerry")
 
+		// then: The contact status should be unconfirmed
 		contact, err := tom.getContact(ctx, jerry.paymail)
 		require.NoError(t, err, "Failed to fetch contact")
 		require.Equal(t, response.ContactNotConfirmed, contact.Status, "Jerry's contact status should be unconfirmed")
@@ -338,7 +366,10 @@ func TestRegressionWorkflow(t *testing.T) {
 	})
 
 	t.Run("Step 16: Tom should remove Jerry from contacts", func(t *testing.T) {
+		// when: Tom removes Jerry from his contacts
 		err := tom.removeContact(ctx, jerry.paymail)
+
+		// then: The operation should succeed
 		require.NoError(t, err, "Tom failed to remove Jerry")
 
 		logSuccessOp(t, nil, "Contact successfully removed between %s and %s", tom.alias, jerry.alias)
