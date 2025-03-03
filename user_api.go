@@ -97,7 +97,7 @@ func (u *UserAPI) UpsertContact(ctx context.Context, cmd commands.UpsertContact)
 func (u *UserAPI) RemoveContact(ctx context.Context, paymail string) error {
 	err := u.contactsAPI.RemoveContact(ctx, paymail)
 	if err != nil {
-		return errutil.NewHTTPErrorFormatter(constants.AdminContactsAPI, "remove contact", err).FormatDeleteErr()
+		return errutil.NewHTTPErrorFormatter(constants.UserContactsAPI, "remove contact", err).FormatDeleteErr()
 	}
 
 	return nil
@@ -111,7 +111,7 @@ func (u *UserAPI) ConfirmContact(ctx context.Context, contact *models.Contact, p
 
 	err := u.contactsAPI.ConfirmContact(ctx, contact.Paymail)
 	if err != nil {
-		return errutil.NewHTTPErrorFormatter(constants.AdminContactsAPI, "confirm contact", err).FormatPostErr()
+		return errutil.NewHTTPErrorFormatter(constants.UserContactsAPI, "confirm contact", err).FormatPostErr()
 	}
 
 	return nil
@@ -122,7 +122,7 @@ func (u *UserAPI) ConfirmContact(ctx context.Context, contact *models.Contact, p
 func (u *UserAPI) UnconfirmContact(ctx context.Context, paymail string) error {
 	err := u.contactsAPI.UnconfirmContact(ctx, paymail)
 	if err != nil {
-		return errutil.NewHTTPErrorFormatter(constants.AdminContactsAPI, "unconfirm contact", err).FormatDeleteErr()
+		return errutil.NewHTTPErrorFormatter(constants.UserContactsAPI, "unconfirm contact", err).FormatDeleteErr()
 	}
 
 	return nil
