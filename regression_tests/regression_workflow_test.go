@@ -1,5 +1,5 @@
-//go:build regression
-// +build regression
+////go:build regression
+//// +build regression
 
 package regressiontests
 
@@ -457,43 +457,42 @@ func TestRegressionWorkflow(t *testing.T) {
 		}
 	})
 
+	adminSL, adminPG := prepareAdminForContactsFlowVerification(t, spvWalletPG, spvWalletSL)
 	t.Run("Step 19: The SPV Wallet admin clients attempt to add user contacts.", func(t *testing.T) {
 		tests := []struct {
-			name     string
-			server   *spvWalletServer
-			paymail  string
-			fullName string
+			title string
+			admin *admin
+			user  *user
 		}{
 			{
-				name:     fmt.Sprintf("%s should add Bob as contact", spvWalletSL.admin.paymail),
-				server:   spvWalletSL,
-				paymail:  bob.paymail,
-				fullName: "Bob",
+				title: fmt.Sprintf("%s should add Bob as contact", spvWalletSL.admin.paymail),
+				admin: adminSL,
+				user:  bob,
 			},
 			{
-				name:     fmt.Sprintf("%s should add Tom as contact", spvWalletPG.admin.paymail),
-				server:   spvWalletPG,
-				paymail:  tom.paymail,
-				fullName: "Tom",
+				title: fmt.Sprintf("%s should add Tom as contact", spvWalletPG.admin.paymail),
+				admin: adminPG,
+				user:  tom,
 			},
 		}
 
 		for _, tc := range tests {
-			t.Run(tc.name, func(t *testing.T) {
-				admin := tc.server.admin
+			t.Run(tc.title, func(t *testing.T) {
+				admin := tc.admin
+				user := tc.user
 
 				// Create Contact
-				contact, err := admin.createContact(ctx, tc.paymail, tc.fullName)
-				require.NoError(t, err, "Admin %s failed to create contact for %s", admin.paymail, tc.paymail)
+				contact, err := admin.createContact(ctx, tc.user.paymail, tc.user.alias)
+				require.NoError(t, err, "Admin %s failed to create contact for %s", admin.paymail, tc.user.paymail)
 				require.NotNil(t, contact, "Expected non-nil contact response")
 				contactID := contact.ID
 
 				logSuccessOp(t, err, "Contact %s successfully created by %s", tc.paymail, admin.paymail)
 
 				// Update Contact
-				updatedName := fmt.Sprintf("%s Updated", tc.fullName)
+				updatedName := fmt.Sprintf("%s Updated", tc.user.alias)
 				updatedContact, err := admin.updateContact(ctx, contactID, updatedName)
-				require.NoError(t, err, "Failed to update contact for %s", tc.paymail)
+				require.NoError(t, err, "Failed to update contact for %s", tc.user.paymail)
 				require.Equal(t, updatedContact.FullName, updatedName, "Updated contact name should match")
 
 				logSuccessOp(t, err, "Contact %s successfully updated by %s", contactID, admin.paymail)
@@ -509,39 +508,33 @@ func TestRegressionWorkflow(t *testing.T) {
 
 	t.Run("Step 20: The SPV Wallet admin clients attempt to confirm contacts.", func(t *testing.T) {
 		tests := []struct {
-			name     string
-			server   *spvWalletServer
-			paymailA string
-			paymailB string
-			nameA    string
-			nameB    string
+			title string
+			admin *admin
+			userA *user
+			userB *user
 		}{
 			{
-				name:     "Admin should confirm contact between Alice and Bob",
-				server:   spvWalletSL,
-				paymailA: alice.paymail,
-				paymailB: bob.paymail,
-				nameA:    bob.alias,
-				nameB:    alice.alias,
+				title: "Admin should confirm contact between Alice and Bob",
+				admin: adminSL,
+				userA: bob,
+				userB: alice,
 			},
 			{
-				name:     "Admin should confirm contact between Tom and Jerry",
-				server:   spvWalletPG,
-				paymailA: tom.paymail,
-				paymailB: jerry.paymail,
-				nameA:    tom.alias,
-				nameB:    jerry.alias,
+				title: "Admin should confirm contact between Tom and Jerry",
+				admin: adminPG,
+				userA: tom,
+				userB: jerry,
 			},
 		}
 
 		for _, tc := range tests {
-			t.Run(tc.name, func(t *testing.T) {
-				admin := tc.server.admin
-				userA := tc.server.leader
-				userB := tc.server.user
+			t.Run(tc.title, func(t *testing.T) {
+				userA := tc.userA
+				userB := tc.userB
+				admin := tc.admin
 
-				contactA, errA := userA.addContact(ctx, tc.paymailA, tc.nameA)
-				contactB, errB := userB.addContact(ctx, tc.paymailB, tc.nameB)
+				contactA, errA := userA.addContact(ctx, tc.userB.paymail, tc.userB.alias)
+				contactB, errB := userB.addContact(ctx, tc.userA.paymail, tc.userA.alias)
 				require.NoError(t, errA, "Failed to create contact A")
 				require.NoError(t, errB, "Failed to create contact B")
 
