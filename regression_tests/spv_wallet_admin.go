@@ -3,7 +3,6 @@ package regressiontests
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 
@@ -105,7 +104,7 @@ func (a *admin) createContact(ctx context.Context, paymail, fullName string) (*r
 	cmd := &commands.CreateContact{
 		Paymail:        paymail,
 		FullName:       fullName,
-		CreatorPaymail: strings.ToLower(a.paymail),
+		CreatorPaymail: paymail,
 	}
 
 	contact, err := a.client.CreateContact(ctx, cmd)

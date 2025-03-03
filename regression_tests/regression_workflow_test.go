@@ -500,9 +500,11 @@ func TestRegressionWorkflow(t *testing.T) {
 		for _, tc := range tests {
 			t.Run(tc.name, func(t *testing.T) {
 				admin := tc.server.admin
+				userA := tc.server.user
+				userB := tc.server.leader
 
-				_, errA := admin.createContact(ctx, tc.paymailA, "Alice")
-				_, errB := admin.createContact(ctx, tc.paymailB, "Bob")
+				_, errA := userB.addContact(ctx, tc.paymailB, "Bob")
+				_, errB := userA.addContact(ctx, tc.paymailA, "Alice")
 				require.NoError(t, errA, "Failed to create contact A")
 				require.NoError(t, errB, "Failed to create contact B")
 
