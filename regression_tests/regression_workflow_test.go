@@ -1,5 +1,5 @@
-////go:build regression
-//// +build regression
+//go:build regression
+// +build regression
 
 package regressiontests
 
@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 )
 
 func TestRegressionWorkflow(t *testing.T) {
@@ -485,14 +486,14 @@ func TestRegressionWorkflow(t *testing.T) {
 			{
 				name:     "Admin should confirm contact between Alice and Bob",
 				server:   spvWalletPG,
-				paymailA: "alice@example.com",
-				paymailB: "bob@example.com",
+				paymailA: alice.paymail,
+				paymailB: bob.paymail,
 			},
 			{
 				name:     "Admin should confirm contact between Tom and Jerry",
 				server:   spvWalletSL,
-				paymailA: "tom@example.com",
-				paymailB: "jerry@example.com",
+				paymailA: tom.paymail,
+				paymailB: jerry.paymail,
 			},
 		}
 
@@ -506,7 +507,7 @@ func TestRegressionWorkflow(t *testing.T) {
 				require.NoError(t, errB, "Failed to create contact B")
 
 				err := admin.confirmContact(ctx, tc.paymailA, tc.paymailB)
-				require.NoError(t, err, "Admin %s failed to confirm contact between %s and %s", admin.paymail, tc.paymailA, tc.paymailB)
+				require.NoError(t, err, "Admin failed to confirm contact between %s and %s", tc.paymailA, tc.paymailB)
 
 				logSuccessOp(t, err, "Contact between %s and %s confirmed successfully", tc.paymailA, tc.paymailB)
 			})
