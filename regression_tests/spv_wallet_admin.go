@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
 )
 
@@ -32,6 +33,100 @@ func (a *admin) getAccessKeysAdmin(ctx context.Context) ([]*response.AccessKey, 
 		return nil, fmt.Errorf("failed to fetch admin access keys: %w", err)
 	}
 	return keys.Content, nil
+}
+
+// getContacts retrieves all contacts for the admin.
+// It accepts a context and returns a slice of contacts and an error.
+// If the operation fails, the error is non-nil and contains details of the failure.
+func (a *admin) getContacts(ctx context.Context) ([]*response.Contact, error) {
+	contactsPage, err := a.client.Contacts(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch admin contacts: %w", err)
+	}
+	return contactsPage.Content, nil
+}
+
+// updateContact updates an existing contact in the admin panel.
+// It accepts a context, contact ID, and full name as input parameters.
+// On success, it returns the updated contact and a nil error.
+// If the operation fails, it returns a non-nil error with details of the failure.
+func (a *admin) updateContact(ctx context.Context, contactID, fullName string) (*response.Contact, error) {
+	cmd := &commands.UpdateContact{
+		ID:       contactID,
+		FullName: fullName,
+	}
+
+	updatedContact, err := a.client.ContactUpdate(ctx, cmd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update contact with ID %s: %w", contactID, err)
+	}
+	return updatedContact, nil
+}
+
+// deleteContact removes a contact from the admin panel.
+// It accepts a context and contact ID as input parameters.
+// On success, it returns a nil error.
+// If the operation fails, it returns a non-nil error with details of the failure.
+func (a *admin) deleteContact(ctx context.Context, contactID string) error {
+	if err := a.client.DeleteContact(ctx, contactID); err != nil {
+		return fmt.Errorf("failed to delete contact with ID %s: %w", contactID, err)
+	}
+	return nil
+}
+
+// acceptContactInvitation accepts an invitation to add a contact.
+// It accepts a context and invitation ID as input parameters.
+// On success, it returns a nil error.
+// If the operation fails, it returns a non-nil error with details of the failure.
+func (a *admin) acceptContactInvitation(ctx context.Context, invitationID string) error {
+	if err := a.client.AcceptInvitation(ctx, invitationID); err != nil {
+		return fmt.Errorf("failed to accept contact invitation with ID %s: %w", invitationID, err)
+	}
+	return nil
+}
+
+// rejectContactInvitation rejects an invitation to add a contact.
+// It accepts a context and invitation ID as input parameters.
+// On success, it returns a nil error.
+// If the operation fails, it returns a non-nil error with details of the failure.
+func (a *admin) rejectContactInvitation(ctx context.Context, invitationID string) error {
+	if err := a.client.RejectInvitation(ctx, invitationID); err != nil {
+		return fmt.Errorf("failed to reject contact invitation with ID %s: %w", invitationID, err)
+	}
+	return nil
+}
+
+// createContact adds a new contact in the admin panel.
+// It accepts a context, paymail, and full name as input parameters.
+// On success, it returns the created contact and a nil error.
+// If the operation fails, it returns a non-nil error with details of the failure.
+func (a *admin) createContact(ctx context.Context, paymail string, fullName string) (*response.Contact, error) {
+	cmd := &commands.CreateContact{
+		Paymail:  paymail,
+		FullName: fullName,
+	}
+
+	contact, err := a.client.CreateContact(ctx, cmd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create contact for paymail %s: %w", paymail, err)
+	}
+	return contact, nil
+}
+
+// confirmContact confirms a contact connection between two paymails.
+// It accepts a context, paymails A and B as input parameters.
+// On success, it returns a nil error.
+// If the operation fails, it returns a non-nil error with details of the failure.
+func (a *admin) confirmContact(ctx context.Context, paymailA, paymailB string) error {
+	cmd := &commands.ConfirmContacts{
+		PaymailA: paymailA,
+		PaymailB: paymailB,
+	}
+
+	if err := a.client.ConfirmContacts(ctx, cmd); err != nil {
+		return fmt.Errorf("failed to confirm contact between %s and %s: %w", paymailA, paymailB, err)
+	}
+	return nil
 }
 
 // initAdmin initializes a new admin within the SPV Wallet ecosystem.

@@ -1,5 +1,5 @@
-//go:build regression
-// +build regression
+////go:build regression
+//// +build regression
 
 package regressiontests
 
@@ -415,7 +415,95 @@ func TestRegressionWorkflow(t *testing.T) {
 		}
 	})
 
-	t.Run("Step 19: The admin clients attempt to remove created actor paymails using the appropriate SPV Wallet API instance.", func(t *testing.T) {
+	t.Run("Step 19: The SPV Wallet admin clients attempt to add user contacts.", func(t *testing.T) {
+		tests := []struct {
+			name       string
+			server     *spvWalletServer
+			contactPay string
+			fullName   string
+		}{
+			{
+				name:       fmt.Sprintf("%s should add Bob as contact", spvWalletPG.admin.paymail),
+				server:     spvWalletPG,
+				contactPay: bob.paymail,
+				fullName:   "Bob",
+			},
+			{
+				name:       fmt.Sprintf("%s should add Tom as contact", spvWalletSL.admin.paymail),
+				server:     spvWalletSL,
+				contactPay: tom.paymail,
+				fullName:   "Tom",
+			},
+		}
+
+		for _, tc := range tests {
+			t.Run(tc.name, func(t *testing.T) {
+				admin := tc.server.admin
+
+				// Create Contact
+				contact, err := admin.createContact(ctx, tc.contactPay, tc.fullName)
+				require.NoError(t, err, "Admin %s failed to create contact for %s", admin.paymail, tc.contactPay)
+				require.NotNil(t, contact, "Expected non-nil contact response")
+				contactID := contact.ID
+
+				logSuccessOp(t, err, "Contact %s successfully created by %s", tc.contactPay, admin.paymail)
+
+				// Update Contact
+				updatedName := fmt.Sprintf("%s Updated", tc.fullName)
+				updatedContact, err := admin.updateContact(ctx, contactID, updatedName)
+				require.NoError(t, err, "Failed to update contact for %s", tc.contactPay)
+				require.Equal(t, updatedContact.FullName, updatedName, "Updated contact name should match")
+
+				logSuccessOp(t, err, "Contact %s successfully updated by %s", contactID, admin.paymail)
+
+				// Remove Contact
+				err = admin.deleteContact(ctx, contactID)
+				require.NoError(t, err, "Admin %s failed to remove contact %s", admin.paymail, contactID)
+
+				logSuccessOp(t, err, "Contact %s successfully removed by %s", contactID, admin.paymail)
+			})
+		}
+	})
+
+	t.Run("Step 20: The SPV Wallet admin clients attempt to confirm contacts.", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			server   *spvWalletServer
+			paymailA string
+			paymailB string
+		}{
+			{
+				name:     "Admin should confirm contact between Alice and Bob",
+				server:   spvWalletPG,
+				paymailA: "alice@example.com",
+				paymailB: "bob@example.com",
+			},
+			{
+				name:     "Admin should confirm contact between Tom and Jerry",
+				server:   spvWalletSL,
+				paymailA: "tom@example.com",
+				paymailB: "jerry@example.com",
+			},
+		}
+
+		for _, tc := range tests {
+			t.Run(tc.name, func(t *testing.T) {
+				admin := tc.server.admin
+
+				_, errA := admin.createContact(ctx, tc.paymailA, "Alice")
+				_, errB := admin.createContact(ctx, tc.paymailB, "Bob")
+				require.NoError(t, errA, "Failed to create contact A")
+				require.NoError(t, errB, "Failed to create contact B")
+
+				err := admin.confirmContact(ctx, tc.paymailA, tc.paymailB)
+				require.NoError(t, err, "Admin %s failed to confirm contact between %s and %s", admin.paymail, tc.paymailA, tc.paymailB)
+
+				logSuccessOp(t, err, "Contact between %s and %s confirmed successfully", tc.paymailA, tc.paymailB)
+			})
+		}
+	})
+
+	t.Run("Step 21: The admin clients attempt to remove created actor paymails using the appropriate SPV Wallet API instance.", func(t *testing.T) {
 		tests := []struct {
 			name   string
 			server *spvWalletServer
