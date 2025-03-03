@@ -198,7 +198,7 @@ func (u *user) generateTotp(ctx context.Context, contactPaymail string) (string,
 // On success, it returns a slice of access keys and a nil error.
 // If the API call fails, it returns a non-nil error with details of the failure.
 func (u *user) getAccessKeys(ctx context.Context) ([]*response.AccessKey, error) {
-	keys, err := u.client.AccessKeys(ctx, commands.AccessKeyFilter{}, commands.QueryPageParams{})
+	keys, err := u.client.AccessKeys(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch user access keys: %w", err)
 	}
