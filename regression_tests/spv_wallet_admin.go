@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/models/response"
+
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 // admin represents an administrator within the SPV Wallet ecosystem.
@@ -99,10 +100,11 @@ func (a *admin) rejectContactInvitation(ctx context.Context, invitationID string
 // It accepts a context, paymail, and full name as input parameters.
 // On success, it returns the created contact and a nil error.
 // If the operation fails, it returns a non-nil error with details of the failure.
-func (a *admin) createContact(ctx context.Context, paymail string, fullName string) (*response.Contact, error) {
+func (a *admin) createContact(ctx context.Context, paymail, fullName string) (*response.Contact, error) {
 	cmd := &commands.CreateContact{
-		Paymail:  paymail,
-		FullName: fullName,
+		Paymail:        paymail,
+		FullName:       fullName,
+		CreatorPaymail: a.paymail,
 	}
 
 	contact, err := a.client.CreateContact(ctx, cmd)
