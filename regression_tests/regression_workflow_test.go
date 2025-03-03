@@ -1,5 +1,5 @@
-//go:build regression
-// +build regression
+////go:build regression
+//// +build regression
 
 package regressiontests
 
@@ -428,22 +428,22 @@ func TestRegressionWorkflow(t *testing.T) {
 
 	t.Run("Step 19: The SPV Wallet admin clients attempt to add user contacts.", func(t *testing.T) {
 		tests := []struct {
-			name       string
-			server     *spvWalletServer
-			contactPay string
-			fullName   string
+			name     string
+			server   *spvWalletServer
+			paymail  string
+			fullName string
 		}{
 			{
-				name:       fmt.Sprintf("%s should add Bob as contact", spvWalletPG.admin.paymail),
-				server:     spvWalletPG,
-				contactPay: bob.paymail,
-				fullName:   "Bob",
+				name:     fmt.Sprintf("%s should add Bob as contact", spvWalletPG.admin.paymail),
+				server:   spvWalletSL,
+				paymail:  bob.paymail,
+				fullName: "Bob",
 			},
 			{
-				name:       fmt.Sprintf("%s should add Tom as contact", spvWalletSL.admin.paymail),
-				server:     spvWalletSL,
-				contactPay: tom.paymail,
-				fullName:   "Tom",
+				name:     fmt.Sprintf("%s should add Tom as contact", spvWalletSL.admin.paymail),
+				server:   spvWalletPG,
+				paymail:  tom.paymail,
+				fullName: "Tom",
 			},
 		}
 
@@ -452,17 +452,17 @@ func TestRegressionWorkflow(t *testing.T) {
 				admin := tc.server.admin
 
 				// Create Contact
-				contact, err := admin.createContact(ctx, tc.contactPay, tc.fullName)
-				require.NoError(t, err, "Admin %s failed to create contact for %s", admin.paymail, tc.contactPay)
+				contact, err := admin.createContact(ctx, tc.paymail, tc.fullName)
+				require.NoError(t, err, "Admin %s failed to create contact for %s", admin.paymail, tc.paymail)
 				require.NotNil(t, contact, "Expected non-nil contact response")
 				contactID := contact.ID
 
-				logSuccessOp(t, err, "Contact %s successfully created by %s", tc.contactPay, admin.paymail)
+				logSuccessOp(t, err, "Contact %s successfully created by %s", tc.paymail, admin.paymail)
 
 				// Update Contact
 				updatedName := fmt.Sprintf("%s Updated", tc.fullName)
 				updatedContact, err := admin.updateContact(ctx, contactID, updatedName)
-				require.NoError(t, err, "Failed to update contact for %s", tc.contactPay)
+				require.NoError(t, err, "Failed to update contact for %s", tc.paymail)
 				require.Equal(t, updatedContact.FullName, updatedName, "Updated contact name should match")
 
 				logSuccessOp(t, err, "Contact %s successfully updated by %s", contactID, admin.paymail)
@@ -485,13 +485,13 @@ func TestRegressionWorkflow(t *testing.T) {
 		}{
 			{
 				name:     "Admin should confirm contact between Alice and Bob",
-				server:   spvWalletPG,
+				server:   spvWalletSL,
 				paymailA: alice.paymail,
 				paymailB: bob.paymail,
 			},
 			{
 				name:     "Admin should confirm contact between Tom and Jerry",
-				server:   spvWalletSL,
+				server:   spvWalletPG,
 				paymailA: tom.paymail,
 				paymailB: jerry.paymail,
 			},
