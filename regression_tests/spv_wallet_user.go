@@ -209,7 +209,7 @@ func (u *user) getAccessKeys(ctx context.Context) ([]*response.AccessKey, error)
 // On success, it returns the generated access key and a nil error.
 // If the API call fails, it returns a non-nil error with details of the failure.
 func (u *user) generateAccessKey(ctx context.Context) (*response.AccessKey, error) {
-	key, err := u.client.GenerateAccessKey(ctx, commands.Metadata{})
+	key, err := u.client.GenerateAccessKey(ctx, &commands.GenerateAccessKey{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate access key: %w", err)
 	}

@@ -364,16 +364,22 @@ func TestRegressionWorkflow(t *testing.T) {
 				user := tc.server.user
 
 				// when: Generate a new access key
-				accessKey, err := user.client.GenerateAccessKey(ctx)
+				accessKey, err := user.generateAccessKey(ctx)
 				require.NoError(t, err, "Failed to generate access key for %s", user.paymail)
 				require.NotNil(t, accessKey, "Expected non-nil access key response")
 				logSuccessOp(t, err, "User %s successfully generated an access key", user.paymail)
 
 				// when: Fetch access key by ID
-				retrievedKey, err := user.client.AccessKey(ctx, accessKey.ID)
+				retrievedKey, err := user.getAccessKeyByID(ctx, accessKey.ID)
 				require.NoError(t, err, "Failed to retrieve access key %s for user %s", accessKey.ID, user.paymail)
 				require.Equal(t, accessKey.ID, retrievedKey.ID, "Fetched access key ID should match generated key ID")
 				logSuccessOp(t, err, "User %s successfully retrieved access key %s", user.paymail, accessKey.ID)
+
+				keys, err := user.getAccessKeys(ctx)
+				require.NoError(t, err, "Failed to retrieve access keys for user %s", user.paymail)
+				require.NotNil(t, keys, "Expected non-nil access keys response")
+				assert.True(len(keys) > 0, "Expected at least one access key to be present")
+				logSuccessOp(t, err, "User %s successfully retrieved access keys", user.paymail)
 
 				// when: Revoke access key
 				err = user.client.RevokeAccessKey(ctx, accessKey.ID)
@@ -402,13 +408,18 @@ func TestRegressionWorkflow(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				// given:
 				admin := tc.server.admin
+				user := tc.server.user
+				accessKey, err := user.generateAccessKey(ctx)
+				require.NoError(t, err, "Failed to generate access key for %s", user.paymail)
+				require.NotNil(t, accessKey, "Expected non-nil access key response")
 
 				// when:
-				keys, err := admin.client.AccessKeys(ctx, commands.AccessKeyFilter{}, commands.QueryPageParams{})
+				keys, err := admin.getAccessKeysAdmin(ctx)
 
 				// then:
 				assert.NoError(err, "Fetching access keys failed for %s", admin.paymail)
 				assert.NotNil(keys, "Expected non-nil access keys response")
+				assert.True(len(keys) > 0, "Expected at least one access key to be present")
 				logSuccessOp(t, err, "Admin %s successfully retrieved access keys", admin.paymail)
 			})
 		}
