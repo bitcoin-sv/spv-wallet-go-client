@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bitcoin-sv/spv-wallet/models/response"
-
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 // admin represents an administrator within the SPV Wallet ecosystem.
