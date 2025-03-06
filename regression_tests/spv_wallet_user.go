@@ -5,12 +5,13 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
+
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
 	"github.com/bitcoin-sv/spv-wallet-go-client/walletkeys"
-	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 const (
@@ -88,7 +89,7 @@ func (u *user) transactions(ctx context.Context) (transactionsSlice, error) {
 
 	page, err := u.client.Transactions(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not retrieve transactions: %w", err)
 	}
 
 	if page == nil || page.Content == nil {
