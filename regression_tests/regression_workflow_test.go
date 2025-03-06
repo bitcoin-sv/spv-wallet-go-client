@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 )
 
 const adminXPriv = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
@@ -388,16 +389,19 @@ func TestRegressionWorkflow(t *testing.T) {
 
 	t.Run("Step 17: The SPV Wallet users manage their access keys.", func(t *testing.T) {
 		tests := []struct {
-			name   string
-			server *spvWalletServer
+			name      string
+			server    *spvWalletServer
+			clientURL string
 		}{
 			{
-				name:   fmt.Sprintf("%s should generate and retrieve an access key", spvWalletPG.user.paymail),
-				server: spvWalletPG,
+				name:      fmt.Sprintf("%s should generate and retrieve an access key", spvWalletPG.user.paymail),
+				server:    spvWalletPG,
+				clientURL: lookupEnvOrDefault(t, clientTwoURL, ""),
 			},
 			{
-				name:   fmt.Sprintf("%s should generate and retrieve an access key", spvWalletSL.user.paymail),
-				server: spvWalletSL,
+				name:      fmt.Sprintf("%s should generate and retrieve an access key", spvWalletSL.user.paymail),
+				server:    spvWalletSL,
+				clientURL: lookupEnvOrDefault(t, clientOneURL, ""),
 			},
 		}
 
@@ -425,7 +429,7 @@ func TestRegressionWorkflow(t *testing.T) {
 				logSuccessOp(t, err, "User %s successfully retrieved access keys", user.paymail)
 
 				// given: User with access key
-				userViaAccessKey, err := initUserWithAccessKey(user.alias, lookupEnvOrDefault(t, clientOneURL, ""), accessKey.Key)
+				userViaAccessKey, err := initUserWithAccessKey(user.alias, tc.clientURL, accessKey.Key)
 				require.NoError(t, err, "Failed to initialize user with access key")
 				require.NotNil(t, userViaAccessKey, "Expected non-nil user with access key")
 
