@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/models/response"
+
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
 	"github.com/bitcoin-sv/spv-wallet-go-client/config"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 // admin represents an administrator within the SPV Wallet ecosystem.
@@ -113,11 +114,11 @@ func (a *admin) createContact(ctx context.Context, paymail, fullName string) (*r
 	return contact, nil
 }
 
-// confirmContact confirms a contact connection between two paymails.
+// confirmContacts confirms a contact connection between two paymails.
 // It accepts a context, paymails A and B as input parameters.
 // On success, it returns a nil error.
 // If the operation fails, it returns a non-nil error with details of the failure.
-func (a *admin) confirmContact(ctx context.Context, paymailA, paymailB string) error {
+func (a *admin) confirmContacts(ctx context.Context, paymailA, paymailB string) error {
 	cmd := &commands.ConfirmContacts{
 		PaymailA: paymailA,
 		PaymailB: paymailB,
@@ -125,6 +126,17 @@ func (a *admin) confirmContact(ctx context.Context, paymailA, paymailB string) e
 
 	if err := a.client.ConfirmContacts(ctx, cmd); err != nil {
 		return fmt.Errorf("failed to confirm contact between %s and %s: %w", paymailA, paymailB, err)
+	}
+	return nil
+}
+
+// unconfirmContacts unconfirms a contact connection between two paymails.
+// It accepts a context, paymails A and B as input parameters.
+// On success, it returns a nil error.
+// If the operation fails, it returns a non-nil error with details of the failure.
+func (a *admin) unconfirmContact(ctx context.Context, contactID string) error {
+	if err := a.client.UnconfirmContact(ctx, contactID); err != nil {
+		return fmt.Errorf("failed to unconfirm contact for contact id [%s]: %w", contactID, err)
 	}
 	return nil
 }

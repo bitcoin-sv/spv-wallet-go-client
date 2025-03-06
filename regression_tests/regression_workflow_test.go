@@ -1,5 +1,5 @@
-//go:build regression
-// +build regression
+////go:build regression
+//// +build regression
 
 package regressiontests
 
@@ -567,7 +567,7 @@ func TestRegressionWorkflow(t *testing.T) {
 				require.NoError(t, errB, "Failed to create contact B")
 
 				// when: Admin confirms the contact between the users
-				err := tc.admin.confirmContact(ctx, contactA.Paymail, contactB.Paymail)
+				err := tc.admin.confirmContacts(ctx, contactA.Paymail, contactB.Paymail)
 
 				// then: The operation should succeed
 				require.NoError(t, err, "Admin failed to confirm contact between %s and %s", contactA.Paymail, contactB.Paymail)
@@ -577,7 +577,45 @@ func TestRegressionWorkflow(t *testing.T) {
 		}
 	})
 
-	t.Run("Step 21: The admin clients attempt to remove created actor paymails using the appropriate SPV Wallet API instance.", func(t *testing.T) {
+	t.Run("Step 21: The SPV Wallet admin clients attempt to unconfirm contact.", func(t *testing.T) {
+		tests := []struct {
+			title string
+			admin *admin
+			userA *user
+			userB *user
+		}{
+			{
+				title: "Admin should confirm contact between Alice and Bob",
+				admin: adminPG,
+				userA: bob,
+				userB: alice,
+			},
+			{
+				title: "Admin should confirm contact between Tom and Jerry",
+				admin: adminSL,
+				userA: tom,
+				userB: jerry,
+			},
+		}
+
+		for _, tc := range tests {
+			t.Run(tc.title, func(t *testing.T) {
+				// given: Create contacts
+				contact, err := tc.userA.getContact(ctx, tc.userB.paymail)
+				require.NoError(t, err, "Failed to fetch contact")
+				require.NotNil(t, contact, "Expected non-nil contact")
+
+				// when: Admin confirms the contact between the users
+				err = tc.admin.unconfirmContact(ctx, contact.ID)
+
+				// then: The operation should succeed
+				require.NoError(t, err, "Admin failed to unconfirm contact between %s and %s", tc.userA.paymail, tc.userB.paymail)
+				logSuccessOp(t, err, "Contact between %s and %s unconfirmed successfully", tc.userA.alias, tc.userB.alias)
+			})
+		}
+	})
+
+	t.Run("Step 22: The admin clients attempt to remove created actor paymails using the appropriate SPV Wallet API instance.", func(t *testing.T) {
 		tests := []struct {
 			name   string
 			server *spvWalletServer
