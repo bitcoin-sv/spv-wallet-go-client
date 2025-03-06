@@ -1,5 +1,5 @@
-//go:build regression
-// +build regression
+////go:build regression
+//// +build regression
 
 package regressiontests
 
@@ -13,6 +13,18 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+)
+
+const adminXPriv = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
+const (
+	clientOneURL         = "CLIENT_ONE_URL"
+	clientOneLeaderXPriv = "CLIENT_ONE_LEADER_XPRIV"
+	clientTwoURL         = "CLIENT_TWO_URL"
+	clientTwoLeaderXPriv = "CLIENT_TWO_LEADER_XPRIV"
+)
+const (
+	alias1 = "UserSLRegressionTest"
+	alias2 = "UserPGRegressionTest"
 )
 
 func TestRegressionWorkflow(t *testing.T) {
@@ -410,8 +422,19 @@ func TestRegressionWorkflow(t *testing.T) {
 				keys, err := user.getAccessKeys(ctx)
 				require.NoError(t, err, "Failed to retrieve access keys for user %s", user.paymail)
 				require.NotNil(t, keys, "Expected non-nil access keys response")
-				assert.True(len(keys) > 0, "Expected at least one access key to be present")
+				require.True(t, len(keys) > 0, "Expected at least one access key to be present")
 				logSuccessOp(t, err, "User %s successfully retrieved access keys", user.paymail)
+
+				// given: User with access key
+				userViaAccessKey, err := initUserWithAccessKey(user.alias, lookupEnvOrDefault(t, clientOneURL, ""), accessKey.Key)
+				require.NoError(t, err, "Failed to initialize user with access key")
+				require.NotNil(t, userViaAccessKey, "Expected non-nil user with access key")
+
+				// when: Retrieve transactions via access key
+				txs, err := userViaAccessKey.transactions(ctx)
+				require.NoError(t, err, "Failed to retrieve transactions for user %s via access key", userViaAccessKey.paymail)
+				require.NotNil(t, txs, "Expected non-nil transactions response")
+				logSuccessOp(t, err, "User %s successfully retrieved transactions via access key", userViaAccessKey.paymail)
 
 				// when: Revoke access key
 				err = user.client.RevokeAccessKey(ctx, accessKey.ID)
@@ -584,17 +607,6 @@ func TestRegressionWorkflow(t *testing.T) {
 }
 
 func initServers(t *testing.T) (*spvWalletServer, *spvWalletServer) {
-	const adminXPriv = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
-	const (
-		clientOneURL         = "CLIENT_ONE_URL"
-		clientOneLeaderXPriv = "CLIENT_ONE_LEADER_XPRIV"
-		clientTwoURL         = "CLIENT_TWO_URL"
-		clientTwoLeaderXPriv = "CLIENT_TWO_LEADER_XPRIV"
-	)
-	const (
-		alias1 = "UserSLRegressionTest"
-		alias2 = "UserPGRegressionTest"
-	)
 
 	spvWalletSL, err := initSPVWalletServer(alias1, &spvWalletServerConfig{
 		envURL:     lookupEnvOrDefault(t, clientOneURL, ""),
