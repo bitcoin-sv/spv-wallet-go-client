@@ -2,6 +2,7 @@ package regressiontests
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	wallet "github.com/bitcoin-sv/spv-wallet-go-client"
@@ -73,6 +74,28 @@ func (u *user) transferFunds(ctx context.Context, paymail string, funds uint64) 
 	}
 
 	return transaction, nil
+}
+
+// transactions retrieves the transactions for the user.
+// It accepts a context parameter to manage cancellation and timeouts.
+// The function uses the SPV Wallet API to fetch the transactions for the user.
+// On success, it returns a slice of transactions and a nil error.
+// If the API call fails, it returns a non-nil error with details of the failure.
+func (u *user) transactions(ctx context.Context) (transactionsSlice, error) {
+	if u.client == nil {
+		return nil, errors.New("user client is not initialized")
+	}
+
+	page, err := u.client.Transactions(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not retrieve transactions: %w", err)
+	}
+
+	if page == nil || page.Content == nil {
+		return nil, errors.New("transactions response is empty")
+	}
+
+	return transactionsSlice(page.Content), nil
 }
 
 // balance retrieves the current satoshi balance for given actor.
@@ -263,6 +286,23 @@ func initUser(alias, url string) (*user, error) {
 		alias:  alias,
 		xPriv:  keys.XPriv(),
 		xPub:   keys.XPub(),
+		client: client,
+	}, nil
+}
+
+// initUserWithAccessKey initializes a new user within the SPV Wallet ecosystem.
+// It accepts the alias, SPV Wallet API URL, and access key as input parameters.
+// The function initializes the wallet's client using the provided access key,
+// enabling transaction-related operations.
+// On success, it returns the initialized user and a nil error.
+func initUserWithAccessKey(alias, url, accessKey string) (*user, error) {
+	client, err := wallet.NewUserAPIWithAccessKey(config.New(config.WithAddr(url)), accessKey)
+	if err != nil {
+		return nil, fmt.Errorf("could not initialize user API for alias %q: %w", alias, err)
+	}
+
+	return &user{
+		alias:  alias,
 		client: client,
 	}, nil
 }
