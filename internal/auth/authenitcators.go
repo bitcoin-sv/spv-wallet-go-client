@@ -1,16 +1,18 @@
 package auth
 
 import (
+	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	goclienterr "github.com/bitcoin-sv/spv-wallet-go-client/errors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
+	"io"
+	"net/http"
 )
 
 type XpubAuthenticator struct {
@@ -75,11 +77,30 @@ func (a *AccessKeyAuthenticator) pubKeyHex() string {
 }
 
 func bodyString(r *resty.Request) string {
-	switch r.Method {
-	case http.MethodGet:
+	if r.Method == http.MethodGet || r.Method == http.MethodHead {
 		return ""
 	}
-	return ""
+
+	switch body := r.Body.(type) {
+	case string:
+		return body
+	case []byte:
+		return string(body)
+	case io.Reader:
+		buf := new(bytes.Buffer)
+		_, err := buf.ReadFrom(body)
+		if err != nil {
+			return ""
+		}
+		return buf.String()
+	default:
+		b, err := json.Marshal(body)
+		if err != nil {
+			return ""
+		}
+
+		return string(b)
+	}
 }
 
 func NewXprivAuthenticator(xpriv string) (*XprivAuthenticator, error) {
