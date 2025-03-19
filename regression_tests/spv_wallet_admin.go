@@ -129,7 +129,7 @@ func (a *admin) confirmContacts(ctx context.Context, paymailA, paymailB string) 
 	return nil
 }
 
-// unconfirmContacts unconfirms a contact connection between two paymails.
+// unconfirmContact unconfirms a contact connection between two paymails.
 // It accepts a context, paymails A and B as input parameters.
 // On success, it returns a nil error.
 // If the operation fails, it returns a non-nil error with details of the failure.
