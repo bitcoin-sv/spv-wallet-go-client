@@ -8,12 +8,12 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
-// NewBadRequestSPVError returns a new SPVError object with status code 400
+// NewJSONFileResponderWithStatusOK returns a new SPVError object with status code 400
 func NewJSONFileResponderWithStatusOK(filePath string) httpmock.Responder {
 	return httpmock.NewJsonResponderOrPanic(http.StatusOK, httpmock.File(filePath))
 }
 
-// NewBadRequestSPVError returns a new SPVError object with status code 400
+// NewJSONBodyResponderWithStatusOK returns a new SPVError object with status code 400
 func NewJSONBodyResponderWithStatusOK(body any) httpmock.Responder {
 	return httpmock.NewJsonResponderOrPanic(http.StatusOK, body)
 }
